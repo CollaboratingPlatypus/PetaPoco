@@ -153,6 +153,23 @@ You can also tell it to ignore certain fields:
 
 Well I could use them but there are so few that PetaPoco supports that I didn't want to cause confusion over what it could do.
 
+### Automatic Select clauses
+
+When using PetaPoco, most queries start with "SELECT * FROM table".  Given that we can now grab the table 
+name from the POCO object using the TableName attribute, there's no reason we can't automatically
+generate this part of the select statement.
+
+If you run a query that doesn't start with "SELECT", PetaPoco will automatically put it in. So this:
+
+	// Get a record
+	var a=db.SingleOrDefault<article>("SELECT * FROM articles WHERE article_id=@0", 123);
+	
+can be shortened to this:
+
+	// Get a record
+	var a=db.SingleOrDefault<article>("WHERE article_id=@0", 123);
+
+
 ### Transactions
 
 Transactions are pretty simple:
@@ -263,4 +280,4 @@ There are also methods for building common SQL stuff:
 This was knocked together over about a 24-hour period and I'm yet to use it in a real project, but I'm about to. 
 I expect it will be updated reasonably regularly over the coming weeks so check back often.
 
-Let me know what you think - comments, suggestions and criticisms and welcome [here](http://toptensoftware.com/contact).
+Let me know what you think - comments, suggestions and criticisms are welcome [here](http://toptensoftware.com/contact).
