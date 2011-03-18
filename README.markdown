@@ -170,6 +170,24 @@ can be shortened to this:
 	var a=db.SingleOrDefault<article>("WHERE article_id=@0", 123);
 
 
+### IsNew and Save Methods
+
+Sometimes you have a POCO and you want to know if it's already in the database, or whether it's a new record.  Since we have the primary key all we need to do is check if that property has been set to something other than the default value and we can tell.
+
+So to test if a record is new:
+
+	// Is this a new record	
+	if (db.IsNew(a))
+	{
+		// Yes it is...
+	}
+
+And related, there's a Save method that will work out whether to Insert or Update
+
+	// Save a new or existing record
+	db.Save(a);
+
+
 ### Transactions
 
 Transactions are pretty simple:
