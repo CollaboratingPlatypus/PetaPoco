@@ -487,7 +487,7 @@ namespace PetaPoco
 							continue;
 
 						names.Add(i.name);
-						values.Add(string.Format("{0}{0}", _paramPrefix, index++));
+						values.Add(string.Format("{0}{1}", _paramPrefix, index++));
 						cmd.AddParam(i.value, _paramPrefix);
 					}
 
@@ -719,17 +719,17 @@ namespace PetaPoco
 
 		public Sql OrderBy(params object[] args)
 		{
-			return Append(new Sql("", "ORDER BY " + String.Join(", ", args)));
+			return Append(new Sql("", "ORDER BY " + String.Join(", ", (from x in args select x.ToString()).ToArray())));
 		}
 
 		public Sql Select(params object[] args)
 		{
-			return Append(new Sql("", "SELECT " + String.Join(", ", args)));
+			return Append(new Sql("", "SELECT " + String.Join(", ", (from x in args select x.ToString()).ToArray())));
 		}
 
 		public Sql From(params object[] args)
 		{
-			return Append(new Sql("", "FROM " + String.Join(", ", args)));
+			return Append(new Sql("", "FROM " + String.Join(", ", (from x in args select x.ToString()).ToArray())));
 		}
 
 		public void Build(StringBuilder sb, List<object> args, string ParamPrefix)
