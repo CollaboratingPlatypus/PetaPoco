@@ -366,12 +366,23 @@ namespace PetaPoco
 			return ExecuteScalar<T>(sql.SQL, sql.Arguments);
 		}
 
+		string AddSelectClause<T>(string sql)
+		{
+			// Already present?
+			if (sql.StartsWith("SELECT", StringComparison.InvariantCultureIgnoreCase))
+				return sql;
+
+			// Get the poco data for this type
+			var pd = new PocoData(typeof(T));
+			return string.Format("SELECT * FROM {0} {1}", pd.TableName, sql);
+		}
+
 		// Return a typed list of pocos
         public List<T> Fetch<T>(string sql, params object[] args) where T:new()
 		{
 			using (var conn = OpenSharedConnection())
 			{
-				using (var cmd = CreateCommand(conn, sql, args))
+				using (var cmd = CreateCommand(conn, AddSelectClause<T>(sql), args))
 				{
 					var r = cmd.ExecuteReader();
 					var l = new List<T>();
@@ -389,7 +400,7 @@ namespace PetaPoco
 		{
 			using (var conn = OpenSharedConnection())
 			{
-				using (var cmd = CreateCommand(conn, sql, args))
+				using (var cmd = CreateCommand(conn, AddSelectClause<T>(sql), args))
 				{
 					var r = cmd.ExecuteReader();
 					while (r.Read())
@@ -592,6 +603,69 @@ namespace PetaPoco
 		{
 			var pd = new PocoData(poco.GetType());
 			Delete(pd.TableName, pd.PrimaryKey, poco);
+		}
+
+		// Check if a poco represents a new record
+		public bool IsNew(string primaryKeyName, object poco)
+		{
+			// Get the property info for the primary key column
+			var pi = poco.GetType().GetProperty(primaryKeyName);
+			if (pi == null)
+				throw new ArgumentException("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName);
+
+			// Get it's value
+			var pk = pi.GetValue(poco, null);
+			if (pk==null)
+				return true;
+
+			var type=pk.GetType();
+
+			if (type.IsValueType)
+			{
+				// Common primary key types
+				if (type == typeof(long))
+					return (long)pk == 0;
+				else if (type == typeof(ulong))
+					return (ulong)pk == 0;
+				else if (type == typeof(int))
+					return (int)pk == 0;
+				else if (type == typeof(uint))
+					return (int)pk == 0;
+
+				// Create a default instance and compare
+				return pk == Activator.CreateInstance(pk.GetType());
+			}
+			else
+			{
+				return pk==null;
+			}
+		}
+
+		// Same as above but for decorated pocos
+		public bool IsNew(object poco)
+		{
+			var pd = new PocoData(poco.GetType());
+			return IsNew(pd.PrimaryKey, poco);
+		}
+
+		// Insert new record or Update existing record
+		public void Save(string tableName, string primaryKeyName, object poco)
+		{
+			if (IsNew(primaryKeyName, poco))
+			{
+				Insert(tableName, primaryKeyName, poco);
+			}
+			else
+			{
+				Update(tableName, primaryKeyName, poco);
+			}
+		}
+
+		// Same as above for decorated pocos
+		public void Save(object poco)
+		{
+			var pd = new PocoData(poco.GetType());
+			Save(pd.TableName, pd.PrimaryKey, poco);
 		}
 
 		// Member variables
