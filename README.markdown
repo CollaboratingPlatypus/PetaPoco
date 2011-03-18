@@ -23,7 +23,6 @@ typos.  If so, please [let me know](http://www.toptensoftware.com/contact).
 
 First define your POCOs:
 
-	{{C#}}
 	// Represents a record in the "articles" table
 	public class article
 	{
@@ -36,7 +35,6 @@ First define your POCOs:
 
 Next, create a `PetaPoco.Database` and run the query:
 
-	{{C#}}
 	// Create a PetaPoco database object
 	var db=new PetaPoco.Database("connectionStringName");
 
@@ -48,12 +46,10 @@ Next, create a `PetaPoco.Database` and run the query:
 	
 To query a scalar:
 
-	{{C#}}
 	long count=db.ExecuteScalar<long>("SELECT Count(*) FROM articles");
 	
 Or, to get a single record:
 
-	{{C#}}
 	var a = db.SingleOrDefault<article>("SELECT * FROM articles WHERE article_id=@0", 123));
 	
 ### Query vs Fetch ###
@@ -66,7 +62,6 @@ over the results without loading the whole set into memory.
 
 To execute non-query commands, use the Execute method
 
-	{{C#}}
 	db.Execute("DELETE FROM articles WHERE draft<>0");
 	
 ### Inserts, Updates and Deletes ###
@@ -75,7 +70,6 @@ PetaPoco has helpers for insert, update and delete operations.
 
 To insert a record, you need to specify the table and its primary key:
 
-	{{C#}}
 	// Create the article
 	var a=new article();
 	a.title="My new article";
@@ -89,7 +83,6 @@ To insert a record, you need to specify the table and its primary key:
 	
 Updates are similar:
 
-	{{C#}}
 	// Get a record
 	var a=db.SingleOrDefault<article>("SELECT * FROM articles WHERE article_id=@0", 123);
 	
@@ -101,12 +94,10 @@ Updates are similar:
 	
 Or you can pass an anonymous type update a subset of fields.  In this case only article's title field will be updated.
 
-	{{C#}}
 	db.Update("articles", "article_id", new { title="New title" }, 123);
 	
 To delete:
 
-	{{C#}}
 	// Delete an article extracting the primary key from a record
 	db.Delete("articles", "article_id", a);
 	
@@ -119,7 +110,6 @@ To delete:
 In the above examples, it's a pain to have to specify the table name and primary key all over the place,
 so you can attach this info to your POCO:
 
-	{{C#}}
 	// Represents a record in the "articles" table
 	[PetaPoco.TableName("articles")]
 	[PetaPoco.PrimaryKey("article_id")]
@@ -134,7 +124,6 @@ so you can attach this info to your POCO:
 
 Now inserts, updates and deletes get simplified to this:
 
-	{{C#}}
 	// Insert a record
 	var a=new article();
 	a.title="My new article";
@@ -151,7 +140,6 @@ Now inserts, updates and deletes get simplified to this:
 	
 You can also tell it to ignore certain fields:
 
-	{{C#}}
 	public class article
 	{
 		[PetaPoco.Ignore]
@@ -169,7 +157,6 @@ Well I could use them but there are so few that PetaPoco supports that I didn't 
 
 Transactions are pretty simple:
 
-	{{C#}}
 	using (var scope=db.Transaction)
 	{
 		// Do transacted updates here
@@ -215,7 +202,6 @@ trying to hold anyone's hand with intellisense.
 
 Here's its most basic form:
 
-	{{C#}}
 	var id=123;
 	var a=db.Query<article>(new PetaPoco.Sql()
 		.Append("SELECT * FROM articles")
@@ -224,7 +210,6 @@ Here's its most basic form:
 
 Big deal right?  Well what's cool about this is that the parameter indicies are specific to each `.Append` call:
 
-	{{C#}}
 	var id=123;
 	var a=db.Query<article>(new PetaPoco.Sql()
 		.Append("SELECT * FROM articles")
@@ -234,7 +219,6 @@ Big deal right?  Well what's cool about this is that the parameter indicies are 
 
 You can also conditionally build SQL.  
 
-	{{C#}}
 	var id=123;
 	var sql=new PetaPoco.Sql()
 		.Append("SELECT * FROM articles")
@@ -254,7 +238,6 @@ updates the parameter indices internally for you.
 You can also use named parameters and it will look for an appropriately named property on
 any of the passed arguments
 
-	{{C#}}
 	sql.Append("AND date_created>=@start AND date_created<=@end", 
 					new 
 					{ 
