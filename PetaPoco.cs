@@ -319,10 +319,9 @@ namespace PetaPoco
 		}
 
 		// Create a poco object for the current record in a data reader
-		public T CreatePoco<T>(IDataReader r) where T : new()
+		public T CreatePoco<T>(IDataReader r, PocoData pd) where T : new()
 		{
 			var record = new T();
-			var pd = PocoData.ForType(typeof(T));
 
 			for (var i = 0; i < r.FieldCount; i++)
 			{
@@ -439,9 +438,10 @@ namespace PetaPoco
 					{
 						var r = cmd.ExecuteReader();
 						var l = new List<T>();
+						var pd = PocoData.ForType(typeof(T));
 						while (r.Read())
 						{
-							l.Add(CreatePoco<T>(r));
+							l.Add(CreatePoco<T>(r, pd));
 						}
 						return l;
 					}
@@ -462,6 +462,7 @@ namespace PetaPoco
 				using (var cmd = CreateCommand(conn, AddSelectClause<T>(sql), args))
 				{
 					IDataReader r;
+					var pd = PocoData.ForType(typeof(T));
 					try
 					{
 						r = cmd.ExecuteReader();
@@ -473,7 +474,7 @@ namespace PetaPoco
 					}
 					while (r.Read())
 					{
-						yield return CreatePoco<T>(r);
+						yield return CreatePoco<T>(r, pd);
 					}
 				}
 			}
