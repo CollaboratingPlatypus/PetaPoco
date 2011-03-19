@@ -429,7 +429,7 @@ namespace PetaPoco
 		}
 
 
-		public IEnumerable<T> Fetch<T>(Sql sql) where T : new()
+		public List<T> Fetch<T>(Sql sql) where T : new()
 		{
 			sql.ParameterPrefix = _paramPrefix;
 			return Fetch<T>(sql.SQL, sql.Arguments);
@@ -532,9 +532,15 @@ namespace PetaPoco
 			var pd=new PocoData(poco.GetType());
 			return Insert(pd.TableName, pd.PrimaryKey, poco);
 		}
+		
+		public void Update(string tableName, string primaryKeyName, object poco)
+		{
+			Update(tableName, primaryKeyName, poco, null);
+		}
+
 
 		// Update a record with values from a poco.  primary key value can be either supplied or read from the poco
-		public void Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue=null)
+		public void Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			using (var conn = OpenSharedConnection())
 			{
@@ -576,15 +582,25 @@ namespace PetaPoco
 			}
 		}
 
+		public void Update(object poco)
+		{
+			Update(poco, null);
+		}
+
 		// Update an annotated poco object
-		public void Update(object poco, object primaryKeyValue=null)
+		public void Update(object poco, object primaryKeyValue)
 		{
 			var pd = new PocoData(poco.GetType());
 			Update(pd.TableName, pd.PrimaryKey, poco, primaryKeyValue);
 		}
 
+		public void Delete(string tableName, string primaryKeyName, object poco)
+		{
+			Delete(tableName, primaryKeyName, poco, null);
+		}
+
 		// Delete a record, using the primary key value from a poco, or supplied
-		public void Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue = null)
+		public void Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			// If primary key value not specified, pick it up from the object
 			if (primaryKeyValue == null)
