@@ -312,7 +312,7 @@ There are also methods for building common SQL stuff:
 				.Where("date_created < @0", DateTime.UtcNow)
 				.OrderBy("date_created DESC");
 
-## SQL Command Tracking
+### SQL Command Tracking
 
 Sometime it's useful to be able to see what SQL was just executed.  PetaPoco exposes these three properties:
 
@@ -322,7 +322,7 @@ Sometime it's useful to be able to see what SQL was just executed.  PetaPoco exp
 
 Watching the LastCommand property in the debugger makes it easy to see what just happened!
 
-## OnException Handler Routine
+### OnException Handler Routine
 
 PetaPoco wraps all SQL command invocations in try/catch statements. Any exceptions are passed
 to the virtual OnException method.  By logging these exceptions (or setting a breakpoint on this method)
