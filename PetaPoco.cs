@@ -358,7 +358,7 @@ namespace PetaPoco
 			return record;
 		}
 
-		void OnException(Exception x)
+		public virtual void OnException(Exception x)
 		{
 			System.Diagnostics.Debug.WriteLine(x.ToString());
 			System.Diagnostics.Debug.WriteLine(LastCommand);

@@ -149,6 +149,26 @@ You can also tell it to ignore certain fields:
 		}
 	}
 
+Or, perhaps you'd like to be a little more explicit. Rather than automatically mapping all columns you can
+use the ExplicitColumns attribute on the class and the Column to indicate just those columns that should be
+mapped.
+
+	// Represents a record in the "articles" table
+	[PetaPoco.TableName("articles")]
+	[PetaPoco.PrimaryKey("article_id")]
+	[PetaPoco.ExplicitColumns]
+	public class article
+	{
+		[PetaPoco.Column] public long article_id { get; set; }
+		[PetaPoco.Column] public string title { get; set; }
+		[PetaPoco.Column] public DateTime date_created { get; set; }
+		[PetaPoco.Column] public bool draft { get; set; }
+		[PetaPoco.Column] public string content { get; set; }
+	}
+
+(this works great with partial classes, put all your table binding stuff in one .cs file and calculated and 
+other useful properties can be added with out thinking about the ORM layer).
+
 ### Hey! Wait a minute. Aren't there already standard attributes for decorating a POCO's database info?
 
 Well I could use them but there are so few that PetaPoco supports that I didn't want to cause confusion over what it could do.
@@ -291,6 +311,22 @@ There are also methods for building common SQL stuff:
 				.From("articles")
 				.Where("date_created < @0", DateTime.UtcNow)
 				.OrderBy("date_created DESC");
+
+## SQL Command Tracking
+
+Sometime it's useful to be able to see what SQL was just executed.  PetaPoco exposes these three properties:
+
+* LastSQL - pretty obvious
+* LastArgs - an object[] array of all arguments passed
+* LastCommand - a string that shows the SQL and the arguments
+
+Watching the LastCommand property in the debugger makes it easy to see what just happened!
+
+## OnException Handler Routine
+
+PetaPoco wraps all SQL command invocations in try/catch statements. Any exceptions are passed
+to the virtual OnException method.  By logging these exceptions (or setting a breakpoint on this method)
+you can easily track where an when there are problems with your SQL.
 
 
 ## That's it.
