@@ -16,8 +16,8 @@ PetaPoco is a tiny (&lt; 1,000 lines) .NET data access layer inspired by Massive
 		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
 	</metadata>
 	<files>
-		<file src="PetaPoco.cs" target="Models" />
-		<file src="Models\Generated\PetaPoco*" target="Models\Generated" />
-		<file src="Models\Generated\*.tt" target="Models\Generated" />
+		<file src="PetaPoco.cs" target="Content\Models" />
+		<file src="Models\Generated\PetaPoco*" target="Content\Models\Generated" />
+		<file src="Models\Generated\*.tt" target="Content\Models\Generated" />
 	</files>
 </package>
