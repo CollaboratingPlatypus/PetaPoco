@@ -6,3 +6,5 @@ Program.cs
 Massive.cs
 *.csproj
 Tingo*
+Models/Generated/*.cs
+

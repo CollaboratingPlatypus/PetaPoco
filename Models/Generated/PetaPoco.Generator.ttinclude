@@ -1,0 +1,107 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using PetaPoco;
+
+namespace <#=Namespace #>
+{
+	public partial class <#=RepoName#> : Database
+	{
+		public <#=RepoName#>() 
+			: base("<#=ConnectionStringName#>")
+		{
+			CommonConstruct();
+		}
+
+		public <#=RepoName#>(string connectionStringName) 
+			: base(connectionStringName)
+		{
+			CommonConstruct();
+		}
+		
+		partial void CommonConstruct();
+		
+		public interface IFactory
+		{
+			<#=RepoName#> GetInstance();
+		}
+		
+		public static IFactory Factory { get; set; }
+        public static <#=RepoName#> GetInstance()
+        {
+			if (_instance!=null)
+				return _instance;
+				
+			if (Factory!=null)
+				return Factory.GetInstance();
+			else
+				return new <#=RepoName#>();
+        }
+
+		[ThreadStatic] static <#=RepoName#> _instance;
+		
+		public override void OnBeginTransaction()
+		{
+			if (_instance==null)
+				_instance=this;
+		}
+		
+		public override void OnEndTransaction()
+		{
+			if (_instance==this)
+				_instance=null;
+		}
+        
+<# if (GenerateOperations) { #>
+		public class Record<T> where T:new()
+		{
+			public bool IsNew() { return <#=RepoName#>.GetInstance().IsNew(this); }
+			public void Save() { <#=RepoName#>.GetInstance().Save(this); }
+			public object Insert() { return <#=RepoName#>.GetInstance().Insert(this); }
+			public void Update() { <#=RepoName#>.GetInstance().Update(this); }
+			public void Delete() { <#=RepoName#>.GetInstance().Delete(this); }
+			public static T SingleOrDefault(string sql, params object[] args) { return <#=RepoName#>.GetInstance().SingleOrDefault<T>(sql, args); }
+			public static T SingleOrDefault(Sql sql) { return <#=RepoName#>.GetInstance().SingleOrDefault<T>(sql); }
+			public static T FirstOrDefault(string sql, params object[] args) { return <#=RepoName#>.GetInstance().FirstOrDefault<T>(sql, args); }
+			public static T FirstOrDefault(Sql sql) { return <#=RepoName#>.GetInstance().FirstOrDefault<T>(sql); }
+			public static T Single(string sql, params object[] args) { return <#=RepoName#>.GetInstance().Single<T>(sql, args); }
+			public static T Single(Sql sql) { return <#=RepoName#>.GetInstance().Single<T>(sql); }
+			public static T First(string sql, params object[] args) { return <#=RepoName#>.GetInstance().First<T>(sql, args); }
+			public static T First(Sql sql) { return <#=RepoName#>.GetInstance().First<T>(sql); }
+			public static List<T> Fetch(string sql, params object[] args) { return <#=RepoName#>.GetInstance().Fetch<T>(sql, args); }
+			public static List<T> Fetch(Sql sql) { return <#=RepoName#>.GetInstance().Fetch<T>(sql); }
+			public static IEnumerable<T> Query(string sql, params object[] args) { return <#=RepoName#>.GetInstance().Query<T>(sql, args); }
+			public static IEnumerable<T> Query(Sql sql) { return <#=RepoName#>.GetInstance().Query<T>(sql); }
+		}
+<# } #>
+	}
+	
+
+<#
+foreach(Table tbl in tables)
+{
+#>
+    
+	[TableName("<#=tbl.Name#>")]
+<# if (tbl.PK!=null) { #>
+	[PrimaryKey("<#=tbl.PK.Name#>")]
+<# } #>
+	[ExplicitColumns]
+    public partial class <#=tbl.ClassName#> <# if (GenerateOperations) { #>: <#=RepoName#>.Record<<#=tbl.ClassName#>> <# } #> 
+    {
+<#
+foreach(Column col in tbl.Columns)
+{
+		// Column bindings
+#>
+        [Column] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+<#
+}
+#>
+	}
+
+<#
+}
+#>
+}

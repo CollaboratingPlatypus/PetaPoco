@@ -1,0 +1,15 @@
+<#@ include file="PetaPoco.Core.ttinclude" #>
+<#
+	// Settings
+    Namespace = "jab";
+    ConnectionStringName = "jab";
+    DatabaseName = "jab";
+    string RepoName = DatabaseName + "DB";
+    bool GenerateOperations = true;
+    
+    // Load tables
+	var tables = LoadTables();
+	
+#>
+<#@ include file="PetaPoco.Generator.ttinclude" #>
+
