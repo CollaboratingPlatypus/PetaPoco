@@ -1,0 +1,23 @@
+﻿<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+		<id>PetaPoco</id>
+		<title>PetaPoco- A tiny ORMish thing for your POCOs</title>
+		<version>1.0</version>
+		<authors>Topten Software</authors>
+		<owners>Topten Software</owners>
+		<licenseUrl>http://www.toptensoftware.com/petapoco/license</licenseUrl>
+		<projectUrl>http://www.toptensoftware.com/petapoco/</projectUrl>
+		<iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<description>
+PetaPoco is a tiny (&lt; 1,000 lines) .NET data access layer inspired by Massive, but for use with non-dynamic POCO objects.  
+		</description>
+		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
+	</metadata>
+	<files>
+		<file src="PetaPoco.cs" target="Models" />
+		<file src="Models\Generated\PetaPoco*" target="Models\Generated" />
+		<file src="Models\Generated\*.tt" target="Models\Generated" />
+	</files>
+</package>

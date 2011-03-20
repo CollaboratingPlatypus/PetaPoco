@@ -1,9 +1,9 @@
 <#@ include file="PetaPoco.Core.ttinclude" #>
 <#
 	// Settings
-    Namespace = "jab";
     ConnectionStringName = "jab";
-    DatabaseName = "jab";
+    Namespace = ConnectionStringName;
+    DatabaseName = ConnectionStringName;
     string RepoName = DatabaseName + "DB";
     bool GenerateOperations = true;
     

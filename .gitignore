@@ -5,6 +5,7 @@ App.config
 Program.cs
 Massive.cs
 *.csproj
+*.nupkg
 Tingo*
 Models/Generated/*.cs
 
