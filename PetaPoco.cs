@@ -146,7 +146,7 @@ namespace PetaPoco
 		{
 			get
 			{
-				return _connection;	
+				return _connection;
 			}
 		}
 
@@ -169,24 +169,24 @@ namespace PetaPoco
 		public Database(string connectionStringName)
 		{
 			// Get connection string name
-            if (connectionStringName == "")
-                connectionStringName = ConfigurationManager.ConnectionStrings[0].Name;
+			if (connectionStringName == "")
+				connectionStringName = ConfigurationManager.ConnectionStrings[0].Name;
 
 			// Work out connection string and provider name
-            var _providerName = "System.Data.SqlClient";
-            if (ConfigurationManager.ConnectionStrings[connectionStringName] != null) 
+			var _providerName = "System.Data.SqlClient";
+			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
-                if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
-                    _providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
-            } 
-			else 
+				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
+					_providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
+			}
+			else
 			{
-                throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
-            }
+				throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+			}
 
 			// Store factory and connection string
-            _factory = DbProviderFactories.GetFactory(_providerName);
-            _connectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
+			_factory = DbProviderFactories.GetFactory(_providerName);
+			_connectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
 			_transactionDepth = 0;
 
 			if (_connectionString.IndexOf("Allow User Variables=true") >= 0 &&
@@ -208,7 +208,7 @@ namespace PetaPoco
 		// Get a shared connection to be used when in a transaction
 		public ShareableConnection OpenSharedConnection()
 		{
-			if (_sharedConnection!=null)
+			if (_sharedConnection != null)
 				return new ShareableConnection(_sharedConnection, true);
 			else
 				return new ShareableConnection(OpenConnection(), false);
@@ -277,7 +277,7 @@ namespace PetaPoco
 		{
 			_transactionDepth--;
 
-			if (_transactionDepth==0 && _transaction != null)
+			if (_transactionDepth == 0 && _transaction != null)
 			{
 				// Commit transaction
 				_transaction.Commit();
@@ -326,7 +326,7 @@ namespace PetaPoco
 		}
 
 		// Create a poco object for the current record in a data reader
-		public T CreatePoco<T>(IDataReader r) where T:new()
+		public T CreatePoco<T>(IDataReader r) where T : new()
 		{
 			var record = new T();
 			var pd = PocoData.ForType(typeof(T));
@@ -334,20 +334,20 @@ namespace PetaPoco
 			for (var i = 0; i < r.FieldCount; i++)
 			{
 				// Get property info
-				var name=r.GetName(i);
+				var name = r.GetName(i);
 				PropertyInfo pi;
 				if (!pd.Columns.TryGetValue(name, out pi))
 					continue;
 
-				object val=r[i];
+				object val = r[i];
 
 				if (pi != null)
 				{
-					if ((!pi.PropertyType.IsValueType || Nullable.GetUnderlyingType(pi.PropertyType) != null) 
-							&& val != null 
+					if ((!pi.PropertyType.IsValueType || Nullable.GetUnderlyingType(pi.PropertyType) != null)
+							&& val != null
 							&& val.GetType() == typeof(DBNull))
 					{
-						val=null;
+						val = null;
 					}
 
 					try
@@ -362,7 +362,7 @@ namespace PetaPoco
 				}
 			}
 
-			return record;			
+			return record;
 		}
 
 		public virtual void OnException(Exception x)
@@ -372,7 +372,7 @@ namespace PetaPoco
 		}
 
 		// Execute a non-query command
-		public void Execute(string sql, params object[] args)
+		public int Execute(string sql, params object[] args)
 		{
 			try
 			{
@@ -380,7 +380,7 @@ namespace PetaPoco
 				{
 					using (var cmd = CreateCommand(conn, sql, args))
 					{
-						cmd.ExecuteNonQuery();
+						return cmd.ExecuteNonQuery();
 					}
 				}
 			}
@@ -393,9 +393,9 @@ namespace PetaPoco
 
 		string _paramPrefix = "@";
 
-		public void Execute(Sql sql)
+		public int Execute(Sql sql)
 		{
-			Execute(sql.SQL, sql.Arguments);
+			return Execute(sql.SQL, sql.Arguments);
 		}
 
 		// Execute and cast a scalar property
@@ -436,7 +436,7 @@ namespace PetaPoco
 		}
 
 		// Return a typed list of pocos
-        public List<T> Fetch<T>(string sql, params object[] args) where T:new()
+		public List<T> Fetch<T>(string sql, params object[] args) where T : new()
 		{
 			try
 			{
@@ -462,7 +462,7 @@ namespace PetaPoco
 		}
 
 		// Return an enumerable collection of pocos
-		public IEnumerable<T> Query<T>(string sql, params object[] args) where T:new()
+		public IEnumerable<T> Query<T>(string sql, params object[] args) where T : new()
 		{
 			using (var conn = OpenSharedConnection())
 			{
@@ -485,7 +485,7 @@ namespace PetaPoco
 				}
 			}
 		}
-  
+
 		public T Single<T>(string sql, params object[] args) where T : new()
 		{
 			return Query<T>(sql, args).Single();
@@ -531,10 +531,10 @@ namespace PetaPoco
 			return Query<T>(sql).First();
 		}
 
-	
+
 		// Insert a poco into a table.  If the poco has a property with the same name 
 		// as the primary key the id of the new record is assigned to it.  Either way,
- 		// the new id is returned.
+		// the new id is returned.
 		public object Insert(string tableName, string primaryKey, object poco)
 		{
 			try
@@ -594,18 +594,18 @@ namespace PetaPoco
 		// Insert an annotated poco object
 		public object Insert(object poco)
 		{
-			var pd=new PocoData(poco.GetType());
+			var pd = new PocoData(poco.GetType());
 			return Insert(pd.TableName, pd.PrimaryKey, poco);
 		}
-		
-		public void Update(string tableName, string primaryKeyName, object poco)
+
+		public int Update(string tableName, string primaryKeyName, object poco)
 		{
-			Update(tableName, primaryKeyName, poco, null);
+			return Update(tableName, primaryKeyName, poco, null);
 		}
 
 
 		// Update a record with values from a poco.  primary key value can be either supplied or read from the poco
-		public void Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			try
 			{
@@ -621,8 +621,8 @@ namespace PetaPoco
 							// Don't update the primary key, but grab the value if we don't have it
 							if (i.Key == primaryKeyName)
 							{
-								if (primaryKeyValue==null)
-									primaryKeyValue=i.Value.GetValue(poco, null);
+								if (primaryKeyValue == null)
+									primaryKeyValue = i.Value.GetValue(poco, null);
 								continue;
 							}
 
@@ -648,7 +648,7 @@ namespace PetaPoco
 						_lastArgs = new object[] { primaryKeyValue };
 
 						// Do it
-						cmd.ExecuteNonQuery();
+						return cmd.ExecuteNonQuery();
 					}
 				}
 			}
@@ -659,25 +659,25 @@ namespace PetaPoco
 			}
 		}
 
-		public void Update(object poco)
+		public int Update(object poco)
 		{
-			Update(poco, null);
+			return Update(poco, null);
 		}
 
 		// Update an annotated poco object
-		public void Update(object poco, object primaryKeyValue)
+		public int Update(object poco, object primaryKeyValue)
 		{
 			var pd = new PocoData(poco.GetType());
-			Update(pd.TableName, pd.PrimaryKey, poco, primaryKeyValue);
+			return Update(pd.TableName, pd.PrimaryKey, poco, primaryKeyValue);
 		}
 
-		public void Delete(string tableName, string primaryKeyName, object poco)
+		public int Delete(string tableName, string primaryKeyName, object poco)
 		{
-			Delete(tableName, primaryKeyName, poco, null);
+			return Delete(tableName, primaryKeyName, poco, null);
 		}
 
 		// Delete a record, using the primary key value from a poco, or supplied
-		public void Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+		public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			// If primary key value not specified, pick it up from the object
 			if (primaryKeyValue == null)
@@ -687,22 +687,22 @@ namespace PetaPoco
 			}
 
 			// Do it
-			var sql=string.Format("DELETE FROM {0} WHERE {1}=@0", tableName, primaryKeyName);
-			Execute(sql, primaryKeyValue);
+			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", tableName, primaryKeyName);
+			return Execute(sql, primaryKeyValue);
 		}
 
 		// Delete an annotated poco
-		public void Delete(object poco)
+		public int Delete(object poco)
 		{
 			var pd = new PocoData(poco.GetType());
-			Delete(pd.TableName, pd.PrimaryKey, poco);
+			return Delete(pd.TableName, pd.PrimaryKey, poco);
 		}
 
 		// Delete given a where clause
-		public void Delete<T>(string Where, params object[] args)
+		public int Delete<T>(string Where, params object[] args)
 		{
 			var pd = new PocoData(typeof(T));
-			Execute(string.Format("DELETE FROM {0} {1}", pd.TableName, Where), args);
+			return Execute(string.Format("DELETE FROM {0} {1}", pd.TableName, Where), args);
 		}
 
 		// Check if a poco represents a new record
@@ -715,10 +715,10 @@ namespace PetaPoco
 
 			// Get it's value
 			var pk = pi.GetValue(poco, null);
-			if (pk==null)
+			if (pk == null)
 				return true;
 
-			var type=pk.GetType();
+			var type = pk.GetType();
 
 			if (type.IsValueType)
 			{
@@ -737,7 +737,7 @@ namespace PetaPoco
 			}
 			else
 			{
-				return pk==null;
+				return pk == null;
 			}
 		}
 
@@ -768,7 +768,7 @@ namespace PetaPoco
 			Save(pd.TableName, pd.PrimaryKey, poco);
 		}
 
-		public string LastSQL {	get	{ return _lastSql; } }
+		public string LastSQL { get { return _lastSql; } }
 		public object[] LastArgs { get { return _lastArgs; } }
 
 		public string LastCommand
@@ -857,15 +857,15 @@ namespace PetaPoco
 		void Build()
 		{
 			// already built?
-			if (_sqlFinal!=null)
+			if (_sqlFinal != null)
 				return;
 
 			// Build it
 			var sb = new StringBuilder();
 			var args = new List<object>();
 			Build(sb, args);
-			_sqlFinal=sb.ToString();
-			_argsFinal=args.ToArray();
+			_sqlFinal = sb.ToString();
+			_argsFinal = args.ToArray();
 		}
 
 		public string SQL
@@ -969,7 +969,7 @@ namespace PetaPoco
 							throw new ArgumentException(string.Format("Parameter '@{0}' specified but none of the passed arguments have a property with this name (in '{1}')", param, _sql));
 						}
 					}
-					return "@" + (args.Count-1).ToString();
+					return "@" + (args.Count - 1).ToString();
 				}
 				);
 
