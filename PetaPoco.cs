@@ -698,6 +698,13 @@ namespace PetaPoco
 			Delete(pd.TableName, pd.PrimaryKey, poco);
 		}
 
+		// Delete given a where clause
+		public void Delete<T>(string Where, params object[] args)
+		{
+			var pd = new PocoData(typeof(T));
+			Execute(string.Format("DELETE FROM {0} {1}", pd.TableName, Where), args);
+		}
+
 		// Check if a poco represents a new record
 		public bool IsNew(string primaryKeyName, object poco)
 		{

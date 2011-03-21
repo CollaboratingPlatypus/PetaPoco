@@ -61,6 +61,7 @@ namespace <#=Namespace #>
 			public object Insert() { return <#=RepoName#>.GetInstance().Insert(this); }
 			public void Update() { <#=RepoName#>.GetInstance().Update(this); }
 			public void Delete() { <#=RepoName#>.GetInstance().Delete(this); }
+			public static void DeleteWhere(string Where, params object[] args) { return <#=RepoName#>.GetInstance().Delete<T>(Where, args); }
 			public static T SingleOrDefault(string sql, params object[] args) { return <#=RepoName#>.GetInstance().SingleOrDefault<T>(sql, args); }
 			public static T SingleOrDefault(Sql sql) { return <#=RepoName#>.GetInstance().SingleOrDefault<T>(sql); }
 			public static T FirstOrDefault(string sql, params object[] args) { return <#=RepoName#>.GetInstance().FirstOrDefault<T>(sql, args); }
