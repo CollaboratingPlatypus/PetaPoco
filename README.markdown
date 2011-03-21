@@ -10,6 +10,11 @@ claim of Massive being only 400 lines of code intruiged me and I wondered if som
 So, what's with the name?  Well if Massive is massive, this is peta-massive (it's about twice the size 
 after all) and it works with POCOs ... so PetaPoco!!
 
+WORK IN PROGRESS:  This project is under active development.  Currently MySQL support is reasonably solid, but 
+SQL Server support is completely untested.  I'm updating this project nearly every day (sometimes more) so if you
+find something wrong, please [let me know](/contact).
+
+
 ## Download ##
 
 PetaPoco is available from:
