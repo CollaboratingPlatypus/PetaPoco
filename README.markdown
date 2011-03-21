@@ -10,6 +10,13 @@ claim of Massive being only 400 lines of code intruiged me and I wondered if som
 So, what's with the name?  Well if Massive is massive, this is peta-massive (it's about twice the size 
 after all) and it works with POCOs ... so PetaPoco!!
 
+## Download ##
+
+PetaPoco is available from:
+
+* NuGet - <http://nuget.org/List/Packages/PetaPoco>
+* GitHub - <https://github.com/toptensoftware/petapoco>
+
 ## Show Me the Code! ##
 
 These examples start out more verbose than they need to be but become less so as more features are 
@@ -136,7 +143,17 @@ Now inserts, updates and deletes get simplified to this:
 	db.Update(a);
 	
 	// Delete it
-	db.Delete(a)
+	db.Delete(a);
+	
+There are also other overloads for Update and Delete:
+
+
+	// Delete an article
+	db.Delete<article>("WHERE article_id=@0", 123);
+	
+	// Update an article
+	db.Update<article>("SET title=@0 WHERE article_id=@0", "New Title", 123);
+	
 	
 You can also tell it to ignore certain fields:
 
@@ -169,9 +186,57 @@ mapped.
 (this works great with partial classes, put all your table binding stuff in one .cs file and calculated and 
 other useful properties can be added with out thinking about the ORM layer).
 
-### Hey! Wait a minute. Aren't there already standard attributes for decorating a POCO's database info?
+### Hey! Aren't there already standard attributes for decorating a POCO's database info?
 
 Well I could use them but there are so few that PetaPoco supports that I didn't want to cause confusion over what it could do.
+
+### Hey! Wait a minute... they're not POCO objects?
+
+Your right, the attributes really do break the strict concept of [POCO](http://en.wikipedia.org/wiki/Plain_Old_CLR_Object), 
+but if you can live with that they really do making working with PetaPoco easy.
+
+### T4 Template
+
+Writing all those POCO objects can soon get tedious and error prone... so PetaPoco includes a [T4 template](http://www.hanselman.com/blog/T4TextTemplateTransformationToolkitCodeGenerationBestKeptVisualStudioSecret.aspx) 
+that can automatically write classes for all the tables in your your MySQL or SQL Server database.
+
+Using the T4 template is pretty simple.  The git repository includes three files (The NuGet package adds 
+these to your project automatically in the folder `\Models\Generated`).
+
+* PetaPoco.Core.ttinclude - includes all the helper routines for reading the DB schema
+* PetaPoco.Generator.ttinclude - the actual template that defines what's generated
+* Records.tt - the template itself that includes various settings and includes the two other ttinclude files.
+
+A typical Records.tt file looks like this:
+
+	<#@ include file="PetaPoco.Core.ttinclude" #>
+	<#
+		// Settings
+		ConnectionStringName = "jab";
+		Namespace = ConnectionStringName;
+		DatabaseName = ConnectionStringName;
+		string RepoName = DatabaseName + "DB";
+		bool GenerateOperations = true;
+	    
+		// Load tables
+		var tables = LoadTables();
+		
+	#>
+	<#@ include file="PetaPoco.Generator.ttinclude" #>
+
+To use the template:
+
+1. Add the three files to you C# project
+2. Make sure you have a connection string and provider name set in your app.config or web.config file
+3. Edit ConnectionStringName property in Records.tt (ie: change it from "jab" to the name of your connection string)
+4. Save Records.tt.  
+
+All going well Records.cs should be generated with POCO objects representing all the tables in your database. To get 
+the project to build you'll also need to add PetaPoco.cs to your project and ensure it is set to compile (NuGet does 
+this for you) .
+
+The template is based on the [SubSonic](http://subsonicproject.com) template.  If you're familiar with this
+ActiveRecord templates you'll find PetaPoco's template very similar. 
 
 ### Automatic Select clauses
 
@@ -188,6 +253,9 @@ can be shortened to this:
 
 	// Get a record
 	var a=db.SingleOrDefault<article>("WHERE article_id=@0", 123);
+	
+PetaPoco doesn't actually generate "SELECT *"... rather it picks the column names of the POCO
+and just queries for those columns.
 
 
 ### IsNew and Save Methods

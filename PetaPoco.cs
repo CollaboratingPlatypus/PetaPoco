@@ -877,7 +877,7 @@ namespace PetaPoco
 					Columns.Add(pi.Name, pi);
 				}
 
-				ColumnList = string.Join(", ", Columns.Keys);
+				ColumnList = string.Join(", ", (from x in Columns select x.Key).ToArray());
 			}
 
 			public string TableName { get; private set; }
