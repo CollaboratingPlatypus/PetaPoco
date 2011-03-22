@@ -259,7 +259,7 @@ namespace PetaPoco
 		}
 
 		// Create a poco object for the current record in a data reader
-		T CreatePoco<T>(IDataReader r, PocoData pd, ref PropertyInfo[] ColumnMap) where T : new()
+		static T CreatePoco<T>(IDataReader r, PocoData pd, ref PropertyInfo[] ColumnMap) where T : new()
 		{
 			var record = new T();
 
@@ -384,15 +384,17 @@ namespace PetaPoco
 				{
 					using (var cmd = CreateCommand(conn, AddSelectClause<T>(sql), args))
 					{
-						var r = cmd.ExecuteReader();
-						var l = new List<T>();
-						var pd = PocoData.ForType(typeof(T));
-						PropertyInfo[] ColumnMap=null; 
-						while (r.Read())
+						using (var r = cmd.ExecuteReader())
 						{
-							l.Add(CreatePoco<T>(r, pd, ref ColumnMap));
+							var l = new List<T>();
+							var pd = PocoData.ForType(typeof(T));
+							PropertyInfo[] ColumnMap = null;
+							while (r.Read())
+							{
+								l.Add(CreatePoco<T>(r, pd, ref ColumnMap));
+							}
+							return l;
 						}
-						return l;
 					}
 				}
 			}
@@ -503,9 +505,25 @@ namespace PetaPoco
 						OnException(x);
 						throw;
 					}
-					while (r.Read())
+					using (r)
 					{
-						yield return CreatePoco<T>(r, pd, ref ColumnMap);
+						while (true)
+						{
+							T poco;
+							try
+							{
+								if (!r.Read())
+									yield break;
+								poco=CreatePoco<T>(r, pd, ref ColumnMap);
+							}
+							catch (Exception x)
+							{
+								OnException(x);
+								throw;
+							}
+
+							yield return poco;
+						}
 					}
 				}
 			}
