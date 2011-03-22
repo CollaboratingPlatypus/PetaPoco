@@ -425,11 +425,7 @@ namespace PetaPoco
 			sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
 			sqlSelectRemoved = sql.Substring(g.Index);
 
-			if (g.ToString().IndexOf("@") >= 0)
-				throw new Exception("Unable to use SQL statement for paged query due to use of parameters in column list");
-
 			// Look for an "ORDER BY <whatever>" clause
-
 			m = rxOrderBy.Match(sqlCount);
 			if (!m.Success)
 				return false;
@@ -481,10 +477,12 @@ namespace PetaPoco
 
 			// Done
 			return result;
-		}								   
+		}
 
-
-
+		public PagedFetch<T> FetchPage<T>(long page, long itemsPerPage, Sql sql) where T : new()
+		{
+			return FetchPage<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
+		}
 
 		// Return an enumerable collection of pocos
 		public IEnumerable<T> Query<T>(string sql, params object[] args) where T : new()

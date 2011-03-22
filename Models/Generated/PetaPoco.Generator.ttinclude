@@ -75,6 +75,8 @@ namespace <#=Namespace #>
 			public static T First(Sql sql) { return <#=RepoName#>.GetInstance().First<T>(sql); }
 			public static List<T> Fetch(string sql, params object[] args) { return <#=RepoName#>.GetInstance().Fetch<T>(sql, args); }
 			public static List<T> Fetch(Sql sql) { return <#=RepoName#>.GetInstance().Fetch<T>(sql); }
+			public static List<T> FetchPage(long page, long itemsPerPage, string sql, params object[] args) { return <#=RepoName#>.GetInstance().FetchPage<T>(page, itemsPerPage, sql, args); }
+			public static List<T> FetchPage(long page, long itemsPerPage, Sql sql) { return <#=RepoName#>.GetInstance().FetchPage<T>(page, itemsPerPage, sql); }
 			public static IEnumerable<T> Query(string sql, params object[] args) { return <#=RepoName#>.GetInstance().Query<T>(sql, args); }
 			public static IEnumerable<T> Query(Sql sql) { return <#=RepoName#>.GetInstance().Query<T>(sql); }
 		}
