@@ -1,4 +1,4 @@
-<#@ template hostspecific="True" #>
+<#@ template language="C#v3.5" hostspecific="True" #>
 <#@ assembly name="EnvDTE" #>
 <#@ assembly name="System.Core.dll" #>
 <#@ assembly name="System.Data" #>
