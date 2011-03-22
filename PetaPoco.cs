@@ -525,7 +525,7 @@ namespace PetaPoco
 		}
 		public T FirstOrDefault<T>(string sql, params object[] args) where T : new()
 		{
-			return Query<T>(sql, args).First();
+			return Query<T>(sql, args).FirstOrDefault();
 		}
 
 
@@ -553,7 +553,7 @@ namespace PetaPoco
 		}
 		public T FirstOrDefault<T>(Sql sql) where T : new()
 		{
-			return Query<T>(sql).First();
+			return Query<T>(sql).FirstOrDefault();
 		}
 
 
