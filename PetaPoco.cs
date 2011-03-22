@@ -25,6 +25,17 @@ namespace PetaPoco
 	[AttributeUsage(AttributeTargets.Property)]
 	public class Column : Attribute
 	{
+		public Column() { }
+		public Column(string name) { Name = name; }
+		public string Name { get; set; }
+	}
+
+	// For explicit pocos, marks property as a column
+	[AttributeUsage(AttributeTargets.Property)]
+	public class ResultColumn : Column
+	{
+		public ResultColumn() { }
+		public ResultColumn(string name) : base(name) {  }
 	}
 
 	// Specify the table name of a poco
@@ -259,21 +270,22 @@ namespace PetaPoco
 		}
 
 		// Create a poco object for the current record in a data reader
-		static T CreatePoco<T>(IDataReader r, PocoData pd, ref PropertyInfo[] ColumnMap) where T : new()
+		static T CreatePoco<T>(IDataReader r, PocoData pd, ref PocoColumn[] ColumnMap) where T : new()
 		{
 			var record = new T();
 
 			// Create column map first time through
 			if (ColumnMap == null)
 			{
-				var map = new List<PropertyInfo>();
+				var map = new List<PocoColumn>();
 				for (var i = 0; i < r.FieldCount; i++)
 				{
 					var name = r.GetName(i);
-					PropertyInfo pi;
-					if (!pd.Columns.TryGetValue(name, out pi))
-						pi=null;
-					map.Add(pi);
+					PocoColumn pc;
+					if (!pd.Columns.TryGetValue(name, out pc))
+						pc = null;
+					map.Add(pc);
+
 				}
 				ColumnMap = map.ToArray();
 			}
@@ -282,23 +294,36 @@ namespace PetaPoco
 
 			for (var i = 0; i < r.FieldCount; i++)
 			{
-				PropertyInfo pi = ColumnMap[i];
-				if (pi == null)
+				PocoColumn pc = ColumnMap[i];
+				if (pc == null)
 					continue;
 
 				object val = r[i];
 
-				if ((!pi.PropertyType.IsValueType || Nullable.GetUnderlyingType(pi.PropertyType) != null) && val != null && val.GetType() == typeof(DBNull))
+				if ((!pc.PropertyInfo.PropertyType.IsValueType || Nullable.GetUnderlyingType(pc.PropertyInfo.PropertyType) != null) && val != null && val.GetType() == typeof(DBNull))
 					val = null;
+
+				// automatic long <=> int casts
+				if (val!=null && pc.PropertyInfo.PropertyType != val.GetType())
+				{
+					if (pc.PropertyInfo.PropertyType == typeof(int) && val.GetType() == typeof(long))
+					{
+						checked { val = (int)(long)val; };
+					}
+					if (pc.PropertyInfo.PropertyType == typeof(long) && val.GetType() == typeof(int))
+					{
+						val = (long)(int)val;
+					}
+				}
 
 				try
 				{
-					pi.SetValue(record, val, null);
+					pc.PropertyInfo.SetValue(record, val, null);
 				}
 				catch (Exception x)
 				{
-					throw new Exception(string.Format("Failed to set property '{0}' on object of type '{1}' - {2}",
-																pi.Name, typeof(T).Name, x.Message));
+					throw new Exception(string.Format("Failed to set property '{0}' for column '{1}' on object of type '{2}' - {3}",
+																pc.PropertyInfo.Name, pc.ColumnName, typeof(T).Name, x.Message));
 				}
 			}
 
@@ -372,7 +397,7 @@ namespace PetaPoco
 
 			// Get the poco data for this type
 			var pd = PocoData.ForType(typeof(T));
-			return string.Format("SELECT {0} FROM {1} {2}", pd.ColumnList, pd.TableName, sql);
+			return string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
 		}
 
 		// Return a typed list of pocos
@@ -388,7 +413,7 @@ namespace PetaPoco
 						{
 							var l = new List<T>();
 							var pd = PocoData.ForType(typeof(T));
-							PropertyInfo[] ColumnMap = null;
+							PocoColumn[] ColumnMap = null;
 							while (r.Read())
 							{
 								l.Add(CreatePoco<T>(r, pd, ref ColumnMap));
@@ -495,7 +520,7 @@ namespace PetaPoco
 				{
 					IDataReader r;
 					var pd = PocoData.ForType(typeof(T));
-					PropertyInfo[] ColumnMap=null;
+					PocoColumn[] ColumnMap=null;
 					try
 					{
 						r = cmd.ExecuteReader();
@@ -578,7 +603,7 @@ namespace PetaPoco
 		// Insert a poco into a table.  If the poco has a property with the same name 
 		// as the primary key the id of the new record is assigned to it.  Either way,
 		// the new id is returned.
-		public object Insert(string tableName, string primaryKey, object poco)
+		public object Insert(string tableName, string primaryKeyName, object poco)
 		{
 			try
 			{
@@ -592,13 +617,13 @@ namespace PetaPoco
 						var index = 0;
 						foreach (var i in pd.Columns)
 						{
-							// Don't insert the primary key
-							if (primaryKey != null && i.Key == primaryKey)
+							// Don't insert the primary key or result only columns
+							if ((primaryKeyName != null && i.Key == primaryKeyName) || i.Value.ResultColumn)
 								continue;
 
 							names.Add(i.Key);
 							values.Add(string.Format("{0}{1}", _paramPrefix, index++));
-							AddParam(cmd, i.Value.GetValue(poco, null), _paramPrefix);
+							AddParam(cmd, i.Value.PropertyInfo.GetValue(poco, null), _paramPrefix);
 						}
 
 						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2}); SELECT @@IDENTITY AS NewID;",
@@ -614,12 +639,12 @@ namespace PetaPoco
 						var id = cmd.ExecuteScalar();
 
 						// Assign the ID back to the primary key property
-						if (primaryKey != null)
+						if (primaryKeyName != null)
 						{
-							PropertyInfo piKey;
-							if (pd.Columns.TryGetValue(primaryKey, out piKey))
+							PocoColumn pc;
+							if (pd.Columns.TryGetValue(primaryKeyName, out pc))
 							{
-								piKey.SetValue(poco, id, null);
+								pc.PropertyInfo.SetValue(poco, id, null);
 							}
 						}
 
@@ -665,9 +690,13 @@ namespace PetaPoco
 							if (i.Key == primaryKeyName)
 							{
 								if (primaryKeyValue == null)
-									primaryKeyValue = i.Value.GetValue(poco, null);
+									primaryKeyValue = i.Value.PropertyInfo.GetValue(poco, null);
 								continue;
 							}
+
+							// Dont update result only columns
+							if (i.Value.ResultColumn)
+								continue;
 
 							// Build the sql
 							if (index > 0)
@@ -675,7 +704,7 @@ namespace PetaPoco
 							sb.AppendFormat("{0} = {1}{2}", i.Key, _paramPrefix, index++);
 
 							// Store the parameter in the command
-							AddParam(cmd, i.Value.GetValue(poco, null), _paramPrefix);
+							AddParam(cmd, i.Value.PropertyInfo.GetValue(poco, null), _paramPrefix);
 						}
 
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
@@ -737,8 +766,12 @@ namespace PetaPoco
 			// If primary key value not specified, pick it up from the object
 			if (primaryKeyValue == null)
 			{
-				var pi = poco.GetType().GetProperty(primaryKeyName);
-				primaryKeyValue = pi.GetValue(poco, null);
+				var pd = PocoData.ForType(poco.GetType());
+				PocoColumn pc;
+				if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+				{
+					primaryKeyValue = pc.PropertyInfo.GetValue(poco, null);
+				}
 			}
 
 			// Do it
@@ -768,10 +801,20 @@ namespace PetaPoco
 		// Check if a poco represents a new record
 		public bool IsNew(string primaryKeyName, object poco)
 		{
-			// Get the property info for the primary key column
-			var pi = poco.GetType().GetProperty(primaryKeyName);
-			if (pi == null)
-				throw new ArgumentException("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName);
+			// If primary key value not specified, pick it up from the object
+			var pd = PocoData.ForType(poco.GetType());
+			PropertyInfo pi;
+			PocoColumn pc;
+			if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+			{
+				pi = pc.PropertyInfo;
+			}
+			else
+			{
+				pi = poco.GetType().GetProperty(primaryKeyName);
+				if (pi == null)
+					throw new ArgumentException("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName);
+			}
 
 			// Get it's value
 			var pk = pi.GetValue(poco, null);
@@ -847,6 +890,12 @@ namespace PetaPoco
 		}
 
 
+		class PocoColumn
+		{
+			public string ColumnName;
+			public PropertyInfo PropertyInfo;
+			public bool ResultColumn;
+		}
 		class PocoData
 		{
 			static Dictionary<Type, PocoData> m_PocoData = new Dictionary<Type, PocoData>();
@@ -876,12 +925,14 @@ namespace PetaPoco
 
 				// Work out bound properties
 				bool ExplicitColumns = t.GetCustomAttributes(typeof(ExplicitColumns), true).Length > 0;
-				Columns = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
+				Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
 				foreach (var pi in t.GetProperties())
 				{
+					// Work out if properties is to be included
+					var ColAttrs = pi.GetCustomAttributes(typeof(Column), true);
 					if (ExplicitColumns)
 					{
-						if (pi.GetCustomAttributes(typeof(Column), true).Length == 0)
+						if (ColAttrs.Length == 0)
 							continue;
 					}
 					else
@@ -890,16 +941,31 @@ namespace PetaPoco
 							continue;
 					}
 
-					Columns.Add(pi.Name, pi);
+					// Work out the DB column name
+					var pc = new PocoColumn();
+					if (ColAttrs.Length > 0)
+					{
+						var colattr = (Column)ColAttrs[0];
+						pc.ColumnName = colattr.Name;
+						if ((colattr as ResultColumn)!=null)
+							pc.ResultColumn=true;
+					}
+					if (pc.ColumnName == null)
+						pc.ColumnName = pi.Name;
+					pc.PropertyInfo = pi;
+
+					// Store it
+					Columns.Add(pc.ColumnName, pc);
 				}
 
-				ColumnList = string.Join(", ", (from x in Columns select x.Key).ToArray());
+				// Build column list for automatic select
+				QueryColumns = string.Join(", ", (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray());
 			}
 
 			public string TableName { get; private set; }
 			public string PrimaryKey { get; private set; }
-			public string ColumnList { get; private set; }
-			public Dictionary<string, PropertyInfo> Columns { get; private set; }
+			public string QueryColumns { get; private set; }
+			public Dictionary<string, PocoColumn> Columns { get; private set; }
 		}
 
 
