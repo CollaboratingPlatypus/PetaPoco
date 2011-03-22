@@ -14,7 +14,6 @@ WORK IN PROGRESS:  This project is under active development.  Currently MySQL su
 SQL Server support is completely untested.  I'm updating this project nearly every day (sometimes more) so if you
 find something wrong, please [let me know](/contact).
 
-
 ## Download ##
 
 PetaPoco is available from:
@@ -64,6 +63,35 @@ Or, to get a single record:
 
 	var a = db.SingleOrDefault<article>("SELECT * FROM articles WHERE article_id=@0", 123));
 	
+
+### Paged Fetches
+
+PetaPoco can automatically perform paged requests.
+
+	
+	var result=db.FetchPage<article>(0, 20, // <-- page number and items per page
+			"SELECT * FROM articles WHERE category=@0 ORDER BY date_posted DESC", "coolstuff");
+
+In return you'll get a PagedFetch object:
+
+	public class PagedFetch<T> where T:new()
+	{
+		public long CurrentPage { get; set; }
+		public long ItemsPerPage { get; set; }
+		public long TotalPages { get; set; }
+		public long TotalItems { get; set; }
+		public List<T> Items { get; set; }
+	}
+
+Behind the scenes, PetaPoco does the following:
+
+1. Synthesizes and executes a query to retrieve the total number of matching records
+2. Modifies your original query to request just a subset of the entire record set
+
+You now have everything to display a page of data and a pager control all wrapped up in one handy 
+little object!
+
+
 ### Query vs Fetch ###
 
 The Database class has two methods for retrieving records `Query` and `Fetch`.  These are pretty
@@ -76,6 +104,7 @@ To execute non-query commands, use the Execute method
 
 	db.Execute("DELETE FROM articles WHERE draft<>0");
 	
+
 ### Inserts, Updates and Deletes ###
 
 PetaPoco has helpers for insert, update and delete operations.
@@ -104,7 +133,7 @@ Updates are similar:
 	// Save it
 	db.Update("articles", "article_id", a);
 	
-Or you can pass an anonymous type update a subset of fields.  In this case only article's title field will be updated.
+Or you can pass an anonymous type to update a subset of fields.  In this case only the article's title field will be updated.
 
 	db.Update("articles", "article_id", new { title="New title" }, 123);
 	
@@ -157,7 +186,7 @@ There are also other overloads for Update and Delete:
 	db.Delete<article>("WHERE article_id=@0", 123);
 	
 	// Update an article
-	db.Update<article>("SET title=@0 WHERE article_id=@0", "New Title", 123);
+	db.Update<article>("SET title=@0 WHERE article_id=@1", "New Title", 123);
 	
 	
 You can also tell it to ignore certain fields:
@@ -188,14 +217,14 @@ mapped.
 		[PetaPoco.Column] public string content { get; set; }
 	}
 
-(this works great with partial classes, put all your table binding stuff in one .cs file and calculated and 
-other useful properties can be added with out thinking about the ORM layer).
+This works great with partial classes. Put all your table binding stuff in one .cs file and calculated and 
+other useful properties can be added in a separate file with out thinking about the data layer).
 
 ### Hey! Aren't there already standard attributes for decorating a POCO's database info?
 
 Well I could use them but there are so few that PetaPoco supports that I didn't want to cause confusion over what it could do.
 
-### Hey! Wait a minute... they're not POCO objects?
+### Hey! Wait a minute... they're not POCO objects!
 
 Your right, the attributes really do break the strict concept of [POCO](http://en.wikipedia.org/wiki/Plain_Old_CLR_Object), 
 but if you can live with that they really do making working with PetaPoco easy.
@@ -404,8 +433,10 @@ you can easily track where an when there are problems with your SQL.
 
 ## That's it.
 
-This was knocked together over about a 24-hour period and I'm yet to use it in a real project, but I'm about to. 
-I expect it will be updated reasonably regularly over the coming weeks so check back often.
+This was knocked together over about a 3-day period.  I've ported a number of real project the previously used
+SubSonic and all seem to be working fine... none officially deployed at this point.
+
+I expect more updates reasonably regularly over the coming weeks so check back often.
 
 Let me know what you think - comments, suggestions and criticisms are welcome [here](http://toptensoftware.com/contact).
 
