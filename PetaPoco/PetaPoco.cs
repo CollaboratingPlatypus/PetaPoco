@@ -373,7 +373,7 @@ namespace PetaPoco
 					using (var cmd = CreateCommand(conn, sql, args))
 					{
 						object val = cmd.ExecuteScalar();
-						return (T)val;
+						return (T)Convert.ChangeType(val, typeof(T));
 					}
 				}
 			}
@@ -490,7 +490,8 @@ namespace PetaPoco
 			if (IsSqlServer())
 			{
 				// Ugh really?
-				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) WHERE __rn>{2} AND __rn<={3}",
+				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
+				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>{2} AND __rn<={3}",
 										sqlOrderBy, sqlSelectRemoved, page * itemsPerPage, (page + 1) * itemsPerPage);
 			}
 			else
@@ -644,7 +645,7 @@ namespace PetaPoco
 							PocoColumn pc;
 							if (pd.Columns.TryGetValue(primaryKeyName, out pc))
 							{
-								pc.PropertyInfo.SetValue(poco, id, null);
+								pc.PropertyInfo.SetValue(poco, Convert.ChangeType(id, pc.PropertyInfo.PropertyType), null);
 							}
 						}
 
