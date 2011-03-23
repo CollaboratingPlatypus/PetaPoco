@@ -1,0 +1,453 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using NUnit.Framework;
+using PetaPoco;
+
+namespace PetaPoco.Tests
+{
+//	[TestFixture("sqlserver")]
+//	[TestFixture("mysql")]
+	public class Tests : AssertionHelper
+	{
+		public Tests(string connectionStringName)
+		{
+			_connectionStringName = connectionStringName;
+		}
+
+		string _connectionStringName;
+		Random r = new Random();
+		Database db;
+
+		[TestFixtureSetUp]
+		public void CreateDB()
+		{
+			db = new Database(_connectionStringName);
+			db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_init.sql", _connectionStringName)));
+		}
+
+		[TestFixtureTearDown]
+		public void DeleteDB()
+		{
+			db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_done.sql", _connectionStringName)));
+		}
+
+		long GetRecordCount()
+		{
+			return db.ExecuteScalar<long>("SELECT COUNT(*) FROM petapoco");
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			// Delete everything
+			db.Delete<deco>("");
+
+			// Should be clean
+			Expect(GetRecordCount(), Is.EqualTo(0));
+		}
+
+		poco CreatePoco()
+		{
+			// Need a rounded date as DB can't store millis
+			var now = DateTime.UtcNow;
+			now = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+
+			// Setup a record
+			var o = new poco();
+			o.title = string.Format("insert {0}", r.Next());
+			o.draft = true;
+			o.content = string.Format("insert {0}", r.Next());
+			o.date_created = now;
+
+			return o;
+		}
+
+		deco CreateDeco()
+		{
+			// Need a rounded date as DB can't store millis
+			var now = DateTime.UtcNow;
+			now = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+
+			// Setup a record
+			var o = new deco();
+			o.title = string.Format("insert {0}", r.Next());
+			o.draft = true;
+			o.content = string.Format("insert {0}", r.Next());
+			o.date_created = now;
+
+			return o;
+		}
+
+		void Assert(poco a, poco b)
+		{
+			Expect(a.id, Is.EqualTo(b.id));
+			Expect(a.title, Is.EqualTo(b.title));
+			Expect(a.draft, Is.EqualTo(b.draft));
+			Expect(a.content, Is.EqualTo(b.content));
+			Expect(a.date_created, Is.EqualTo(b.date_created));
+		}
+
+		void Assert(deco a, deco b)
+		{
+			Expect(a.id, Is.EqualTo(b.id));
+			Expect(a.title, Is.EqualTo(b.title));
+			Expect(a.draft, Is.EqualTo(b.draft));
+			Expect(a.content, Is.EqualTo(b.content));
+			Expect(a.date_created, Is.EqualTo(b.date_created));
+		}
+
+		// Insert some records, return the id of the first
+		long InsertRecords(int count)
+		{
+			long lFirst = 0;
+			for (int i = 0; i < count; i++)
+			{
+				var o=CreatePoco();
+				db.Insert("petapoco", "id", o);
+				if (i == 0)
+				{
+					lFirst = o.id;
+					Expect(o.id, Is.Not.EqualTo(0));
+				}
+			}
+
+			return lFirst;
+		}
+
+		[Test]
+		public void poco_Crud()
+		{
+			// Create a random record
+			var o = CreatePoco();
+
+			Expect(db.IsNew("id", o), Is.True);
+
+			// Insert it
+			db.Insert("petapoco", "id", o);
+			Expect(o.id, Is.Not.EqualTo(0));
+
+			Expect(db.IsNew("id", o), Is.False);
+
+			// Retrieve it
+			var o2 = db.Single<poco>("SELECT * FROM petapoco WHERE id=@0", o.id);
+
+			Expect(db.IsNew("id", o2), Is.False);
+
+			// Check it
+			Assert(o, o2);
+
+			// Update it
+			o2.title = "New Title";
+			db.Save("petapoco", "id", o2);
+
+			// Retrieve itagain
+			var o3 = db.Single<poco>("SELECT * FROM petapoco WHERE id=@0", o.id);
+
+			// Check it
+			Assert(o2, o3);
+
+			// Delete it
+			db.Delete("petapoco", "id", o3);
+
+			// Should be gone!
+			var o4 = db.SingleOrDefault<poco>("SELECT * FROM petapoco WHERE id=@0", o.id);
+			Expect(o4, Is.Null);
+		}
+
+		[Test]
+		public void deco_Crud()
+		{
+			// Create a random record
+			var o = CreateDeco();
+			Expect(db.IsNew(o), Is.True);
+
+			// Insert it
+			db.Insert(o);
+			Expect(o.id, Is.Not.EqualTo(0));
+
+			Expect(db.IsNew(o), Is.False);
+			
+			// Retrieve it
+			var o2 = db.Single<deco>("SELECT * FROM petapoco WHERE id=@0", o.id);
+
+			Expect(db.IsNew(o2), Is.False);
+
+			// Check it
+			Assert(o, o2);
+
+			// Update it
+			o2.title = "New Title";
+			db.Save(o2);
+
+			// Retrieve itagain
+			var o3 = db.Single<deco>("SELECT * FROM petapoco WHERE id=@0", o.id);
+
+			// Check it
+			Assert(o2, o3);
+
+			// Delete it
+			db.Delete(o3);
+
+			// Should be gone!
+			var o4 = db.SingleOrDefault<deco>("SELECT * FROM petapoco WHERE id=@0", o.id);
+			Expect(o4, Is.Null);
+		}
+
+		[Test]
+		public void Fetch()
+		{
+			// Create some records
+			const int count = 5;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.Fetch<poco>("SELECT * from petapoco ORDER BY id");
+			Expect(r.Count, Is.EqualTo(count));
+
+			// Check em
+			for (int i = 0; i < count; i++)
+			{
+				Expect(r[i].id, Is.EqualTo(id + i));
+			}
+
+		}
+
+		[Test]
+		public void Query()
+		{
+			// Create some records
+			const int count = 5;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.Query<poco>("SELECT * from petapoco ORDER BY id");
+
+			// Check em
+			int i = 0;
+			foreach (var p in r)
+			{
+				Expect(p.id, Is.EqualTo(id + i));
+				i++;
+			}
+			Expect(i, Is.EqualTo(count));
+		}
+
+		[Test]
+		public void FetchPage()
+		{
+			// In this test we're checking that the page count is correct when there are
+			// not-exactly pagesize*N records (ie: a partial page at the end)
+
+			// Create some records
+			const int count = 13;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.FetchPage<poco>(1, 5, "SELECT * from petapoco ORDER BY id");
+
+			// Check em
+			int i = 0;
+			foreach (var p in r.Items)
+			{
+				Expect(p.id, Is.EqualTo(id + i + 5));
+				i++;
+			}
+
+			// Check other stats
+			Expect(r.Items.Count, Is.EqualTo(5));
+			Expect(r.CurrentPage, Is.EqualTo(1));
+			Expect(r.ItemsPerPage, Is.EqualTo(5));
+			Expect(r.TotalItems, Is.EqualTo(13));
+			Expect(r.TotalPages, Is.EqualTo(3));
+		}
+
+		[Test]
+		public void FetchPage_boundary()
+		{
+			// In this test we're checking that the page count is correct when there are
+			// exactly pagesize*N records.
+
+			// Create some records
+			const int count = 15;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.FetchPage<poco>(2, 5, "SELECT * from petapoco ORDER BY id");
+
+			// Check other stats
+			Expect(r.Items.Count, Is.EqualTo(5));
+			Expect(r.CurrentPage, Is.EqualTo(2));
+			Expect(r.ItemsPerPage, Is.EqualTo(5));
+			Expect(r.TotalItems, Is.EqualTo(15));
+			Expect(r.TotalPages, Is.EqualTo(3));
+		}
+
+		[Test]
+		public void deco_Delete()
+		{
+			// Create some records
+			const int count = 15;
+			long id = InsertRecords(count);
+
+			// Delete some
+			db.Delete<deco>("WHERE id>=@0", id + 5);
+
+			// Check they match
+			Expect(GetRecordCount(), Is.EqualTo(5));
+		}
+
+		[Test]
+		public void deco_Update()
+		{
+			// Create some records
+			const int count = 15;
+			long id = InsertRecords(count);
+
+			// Update some
+			db.Update<deco>("SET title=@0 WHERE id>=@1", "zap", id + 5);
+
+			// Check some updated
+			foreach (var d in db.Query<deco>("ORDER BY Id"))
+			{
+				if (d.id >= id + 5)
+				{
+					Expect(d.title, Is.EqualTo("zap"));
+				}
+				else
+				{
+					Expect(d.title, Is.Not.EqualTo("zap"));
+				}
+			}
+		}
+
+		[Test]
+		public void deco_ExplicitAttribute()
+		{
+			// Create a records
+			long id = InsertRecords(1);
+
+			// Retrieve it in two different ways
+			var a = db.SingleOrDefault<deco>("WHERE id=@0", id);
+			var b = db.SingleOrDefault<deco_explicit>("WHERE id=@0", id);
+			var c = db.SingleOrDefault<deco_explicit>("SELECT * FROM petapoco WHERE id=@0", id);
+
+			// b record should have ignored the content
+			Expect(a.content, Is.Not.Null);
+			Expect(b.content, Is.Null);
+			Expect(c.content, Is.Null);
+		}
+
+
+		[Test]
+		public void deco_IgnoreAttribute()
+		{
+			// Create a records
+			long id = InsertRecords(1);
+
+			// Retrieve it in two different ways
+			var a = db.SingleOrDefault<deco>("WHERE id=@0", id);
+			var b = db.SingleOrDefault<deco_non_explicit>("WHERE id=@0", id);
+			var c = db.SingleOrDefault<deco_non_explicit>("SELECT * FROM petapoco WHERE id=@0", id);
+
+			// b record should have ignored the content
+			Expect(a.content, Is.Not.Null);
+			Expect(b.content, Is.Null);
+			Expect(c.content, Is.Null);
+		}
+
+		[Test]
+		public void Transaction_complete()
+		{
+			using (var scope = db.Transaction)
+			{
+				InsertRecords(10);
+				scope.Complete();
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(10));
+		}
+
+		[Test]
+		public void Transaction_cancelled()
+		{
+			using (var scope = db.Transaction)
+			{
+				InsertRecords(10);
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Transaction_nested_nn()
+		{
+			using (var scope1 = db.Transaction)
+			{
+				InsertRecords(10);
+
+				using (var scope2 = db.Transaction)
+				{
+					InsertRecords(10);
+				}
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Transaction_nested_yn()
+		{
+			using (var scope1 = db.Transaction)
+			{
+				InsertRecords(10);
+
+				using (var scope2 = db.Transaction)
+				{
+					InsertRecords(10);
+				}
+				scope1.Complete();
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Transaction_nested_ny()
+		{
+			using (var scope1 = db.Transaction)
+			{
+				InsertRecords(10);
+
+				using (var scope2 = db.Transaction)
+				{
+					InsertRecords(10);
+					scope2.Complete();
+				}
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Transaction_nested_yy()
+		{
+			using (var scope1 = db.Transaction)
+			{
+				InsertRecords(10);
+
+				using (var scope2 = db.Transaction)
+				{
+					InsertRecords(10);
+					scope2.Complete();
+				}
+
+				scope1.Complete();
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(20));
+		}
+	}
+
+}

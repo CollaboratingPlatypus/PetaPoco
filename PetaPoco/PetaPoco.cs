@@ -253,6 +253,7 @@ namespace PetaPoco
 			result = _factory.CreateCommand();
 			result.Connection = connection;
 			result.CommandText = sql;
+			result.Transaction = _transaction;
 			if (args.Length > 0)
 			{
 				foreach (var item in args)
@@ -880,24 +881,29 @@ namespace PetaPoco
 			get
 			{
 				var sb = new StringBuilder();
+				if (_lastSql == null)
+					return "";
 				sb.Append(_lastSql);
-				sb.Append("\r\n\r\n");
-				for (int i = 0; i < _lastArgs.Length; i++)
+				if (_lastArgs != null)
 				{
-					sb.AppendFormat("{0} - {1}\r\n", i, _lastArgs[i].ToString());
+					sb.Append("\r\n\r\n");
+					for (int i = 0; i < _lastArgs.Length; i++)
+					{
+						sb.AppendFormat("{0} - {1}\r\n", i, _lastArgs[i].ToString());
+					}
 				}
 				return sb.ToString();
 			}
 		}
 
 
-		class PocoColumn
+		internal class PocoColumn
 		{
 			public string ColumnName;
 			public PropertyInfo PropertyInfo;
 			public bool ResultColumn;
 		}
-		class PocoData
+		internal class PocoData
 		{
 			static Dictionary<Type, PocoData> m_PocoData = new Dictionary<Type, PocoData>();
 			public static PocoData ForType(Type t)
