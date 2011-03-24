@@ -24,7 +24,6 @@ This project is currently a work in progress under active development.
 
 * MySQL support is solid and deployed in at least one production environment.
 * SQL Server is known to work in unit test cases.
-* The T4 template currently has issues with SQL Server.  I have a fix but haven't released it just yet.
 
 Performance wise, the production envirnment mentioned above was using SubSonic/Linq.  After porting to PetaPoco/SQL
 (which took about a day) the request rate has gone up, CPU load has dropped from 80% to 5% and personally I think
