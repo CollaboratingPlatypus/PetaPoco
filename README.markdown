@@ -3,16 +3,34 @@
 <h2 class="tagline">A tiny ORM-ish thing for your POCOs</h2>
 
 PetaPoco is a tiny .NET data access layer inspired by Rob Conery's [Massive](http://blog.wekeroad.com/helpy-stuff/and-i-shall-call-it-massive) 
-project but for use with non-dynamic [POCO](http://en.wikipedia.org/wiki/Plain_Old_CLR_Object) objects.  It came about because I needed a 
-data-access layer that was tiny, fast, easy to use and could run on .NET 3.5 and/or Mono 2.6 and later.  (ie: no support for dynamic).  Rob's 
-claim of Massive being only 400 lines of code intruiged me and I wondered if something similar could be done without dynamics.
+project but for use with non-dynamic [POCO](http://en.wikipedia.org/wiki/Plain_Old_CLR_Object) objects.  It came about because I was finding
+many of my projects that used SubSonic/Linq were slow or becoming mixed bags of Linq and [CodingHorror](http://www.subsonicproject.com/docs/CodingHorror).
 
-So, what's with the name?  Well if Massive is massive, this is peta-massive (it's about twice the size 
-after all) and it works with POCOs ... so PetaPoco!!
+I needed a data acess layer that was:
 
-WORK IN PROGRESS:  This project is under active development.  Currently MySQL support is reasonably solid, but 
-SQL Server support is completely untested.  I'm updating this project nearly every day (sometimes more) so if you
-find something wrong, please [let me know](/contact).
+* tiny
+* fast
+* easy to use and similar to SubSonic
+* could run on .NET 3.5 and/or Mono 2.6 (ie: no support for dynamic).  
+
+Rob's claim of Massive being only 400 lines of code intruiged me and I wondered if something similar could be done without dynamics.
+
+So, what's with the name?  Well if Massive is massive, this is "Peta" massive (at about 1,200 lines it's triple the size after all) and since it 
+works with "Poco"s ... "PetaPoco" seemed like a fun name!!
+
+## Current Status
+
+This project is currently a work in progress under active development.
+
+* MySQL support is solid and deployed in at least one production environment.
+* SQL Server is known to work in unit test cases.
+* The T4 template currently has issues with SQL Server.  I have a fix but haven't released it just yet.
+
+Performance wise, the production envirnment mentioned above was using SubSonic/Linq.  After porting to PetaPoco/SQL
+(which took about a day) the request rate has gone up, CPU load has dropped from 80% to 5% and personally I think
+the code is cleaner.
+
+I'm updating this project nearly every day (sometimes more). If you find something wrong please [let me know](/contact).
 
 ## Download ##
 
@@ -29,6 +47,11 @@ namespace to make it obvious what comes from where but in reality you'd probably
 
 Also, all of these examples have been hand-typed and never compiled.  There are probably
 typos.  If so, please [let me know](http://www.toptensoftware.com/contact).
+
+### No Assembly ###
+
+PetaPoco is supplied as a single file - [PetaPoco.cs](https://github.com/toptensoftware/PetaPoco/blob/master/PetaPoco/PetaPoco.cs).  With no dependencies other than
+what's in the GAC, just add this file to your project and you're set to go...
 
 ### Running Queries ###
 
