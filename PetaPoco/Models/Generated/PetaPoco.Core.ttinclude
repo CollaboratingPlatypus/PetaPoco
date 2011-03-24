@@ -91,7 +91,8 @@ string CheckNullable(Column col)
 string GetConnectionString(string connectionStringName, out string providerName)
 {
     var _CurrentProject = GetCurrentProject();
-    providerName=null;
+
+	providerName=null;
     
     string result="";
     ExeConfigurationFileMap configFile = new ExeConfigurationFileMap();
@@ -127,6 +128,9 @@ string GetConnectionString(string connectionStringName, out string providerName)
             result="There is no connection string name called '"+connectionStringName+"'";
         }
     }
+
+//	if (String.IsNullOrEmpty(providerName))
+//		providerName="System.Data.SqlClient";
     
     return result;
 }
@@ -237,10 +241,11 @@ List<Table> LoadTables()
         
         if (string.Compare(_providerName, "System.Data.SqlClient", true)==0)
         {
+		
 			reader=new SqlServerSchemaReader();
         }
         
-        result=reader.ReadSchema(conn, _factory);
+	    result=reader.ReadSchema(conn, _factory);
         
         conn.Close();
     }
@@ -278,17 +283,20 @@ class SqlServerSchemaReader : ISchemaReader
 					tbl.Name=rdr["TABLE_NAME"].ToString();
 					tbl.CleanName=CleanUp(tbl.Name);
 					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
-					tbl.Columns=LoadColumns(tbl);
-		            
-					// Mark the primary key
-					string PrimaryKey=GetPK(tbl.Name);
-					var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
-					if(pkColumn!=null)
-						pkColumn.IsPK=true;
-		            
 					result.Add(tbl);
 				}
 			}
+		}
+
+		foreach (var tbl in result)
+		{
+			tbl.Columns=LoadColumns(tbl);
+		            
+			// Mark the primary key
+			string PrimaryKey=GetPK(tbl.Name);
+			var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
+			if(pkColumn!=null)
+				pkColumn.IsPK=true;
 		}
 	    
 

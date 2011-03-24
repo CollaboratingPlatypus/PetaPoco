@@ -3,7 +3,7 @@
 	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 		<id>PetaPoco</id>
 		<title>PetaPoco- A tiny ORMish thing for your POCOs</title>
-		<version>1.4</version>
+		<version>1.5</version>
 		<authors>Topten Software</authors>
 		<owners>Topten Software</owners>
 		<licenseUrl>http://www.toptensoftware.com/petapoco/license</licenseUrl>
@@ -11,7 +11,7 @@
 		<iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>
-PetaPoco is a tiny (approx 1,000 lines) .NET data access layer inspired by Massive, but for use with non-dynamic POCO objects.  
+PetaPoco is a tiny (approx 1,200 lines) .NET data access layer inspired by Massive, but for use with non-dynamic POCO objects.  
 		</description>
 		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
 	</metadata>

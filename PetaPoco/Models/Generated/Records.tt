@@ -1,7 +1,7 @@
 <#@ include file="PetaPoco.Core.ttinclude" #>
 <#
 	// Settings
-    ConnectionStringName = "jab";
+    ConnectionStringName = "sqlserver";
     Namespace = ConnectionStringName;
     DatabaseName = ConnectionStringName;
     string RepoName = DatabaseName + "DB";
@@ -9,7 +9,6 @@
     
     // Load tables
 	var tables = LoadTables();
-	
 #>
 <#@ include file="PetaPoco.Generator.ttinclude" #>
 
