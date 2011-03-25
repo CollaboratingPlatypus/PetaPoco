@@ -7,6 +7,7 @@ CREATE TABLE petapoco (
 	title			varchar(127) NOT NULL,
 	draft			bit NOT NULL,
 	date_created	datetime NOT NULL,
+	date_edited		datetime NULL,
 	content			VARCHAR(MAX) NOT NULL,
 	
 	PRIMARY KEY (id)

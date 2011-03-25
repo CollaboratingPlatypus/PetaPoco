@@ -60,6 +60,7 @@ namespace PetaPoco.Tests
 			o.draft = true;
 			o.content = string.Format("insert {0}", r.Next());
 			o.date_created = now;
+			o.date_edited = now;
 
 			return o;
 		}
@@ -76,6 +77,7 @@ namespace PetaPoco.Tests
 			o.draft = true;
 			o.content = string.Format("insert {0}", r.Next());
 			o.date_created = now;
+			o.date_edited = now;
 
 			return o;
 		}
@@ -87,6 +89,7 @@ namespace PetaPoco.Tests
 			Expect(a.draft, Is.EqualTo(b.draft));
 			Expect(a.content, Is.EqualTo(b.content));
 			Expect(a.date_created, Is.EqualTo(b.date_created));
+			Expect(a.date_edited, Is.EqualTo(b.date_edited));
 		}
 
 		void Assert(deco a, deco b)
@@ -447,6 +450,52 @@ namespace PetaPoco.Tests
 			}
 
 			Expect(GetRecordCount(), Is.EqualTo(20));
+		}
+
+		[Test]
+		public void DateTimesAreUtc()
+		{
+			var id = InsertRecords(1);
+			var a2 = db.SingleOrDefault<deco>("WHERE id=@0", id);
+			Expect(a2.date_created.Kind, Is.EqualTo(DateTimeKind.Utc));
+			Expect(a2.date_edited.Value.Kind, Is.EqualTo(DateTimeKind.Utc));
+		}
+
+		[Test]
+		public void DateTimeNullable()
+		{
+			// Need a rounded date as DB can't store millis
+			var now = DateTime.UtcNow;
+			now = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+
+			// Setup a record
+			var a = new deco();
+			a.title = string.Format("insert {0}", r.Next());
+			a.draft = true;
+			a.content = string.Format("insert {0}", r.Next());
+			a.date_created = now;
+			a.date_edited = null;
+
+			db.Insert(a);
+
+			// Retrieve it
+			var b = db.SingleOrDefault<deco>("WHERE id=@0", a.id);
+			Expect(b.id, Is.EqualTo(a.id));
+			Expect(b.date_edited.HasValue, Is.EqualTo(false));
+
+			// Update it to NULL
+			b.date_edited = now;
+			db.Update(b);
+			var c = db.SingleOrDefault<deco>("WHERE id=@0", a.id);
+			Expect(c.id, Is.EqualTo(a.id));
+			Expect(c.date_edited.HasValue, Is.EqualTo(true));
+
+			// Update it to not NULL
+			c.date_edited = null;
+			db.Update(c);
+			var d = db.SingleOrDefault<deco>("WHERE id=@0", a.id);
+			Expect(d.id, Is.EqualTo(a.id));
+			Expect(d.date_edited.HasValue, Is.EqualTo(false));
 		}
 	}
 

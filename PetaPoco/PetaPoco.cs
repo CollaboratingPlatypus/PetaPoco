@@ -270,8 +270,22 @@ namespace PetaPoco
 			return CreateCommand(connection.Connection, sql, args);
 		}
 
+		public virtual object ConvertValue(PropertyInfo dest, object src)
+		{
+			if (src == null || src.GetType() == typeof(DBNull))
+				return null;
+
+			if (src.GetType() == typeof(DateTime))
+				return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc);
+
+			if (!dest.PropertyType.IsAssignableFrom(src.GetType()))
+				return Convert.ChangeType(src, dest.PropertyType, null);
+
+			return src;
+		}
+
 		// Create a poco object for the current record in a data reader
-		static T CreatePoco<T>(IDataReader r, PocoData pd, ref PocoColumn[] ColumnMap) where T : new()
+		T CreatePoco<T>(IDataReader r, PocoData pd, ref PocoColumn[] ColumnMap) where T : new()
 		{
 			var record = new T();
 
@@ -299,27 +313,9 @@ namespace PetaPoco
 				if (pc == null)
 					continue;
 
-				object val = r[i];
-
-				if ((!pc.PropertyInfo.PropertyType.IsValueType || Nullable.GetUnderlyingType(pc.PropertyInfo.PropertyType) != null) && val != null && val.GetType() == typeof(DBNull))
-					val = null;
-
-				// automatic long <=> int casts
-				if (val!=null && pc.PropertyInfo.PropertyType != val.GetType())
-				{
-					if (pc.PropertyInfo.PropertyType == typeof(int) && val.GetType() == typeof(long))
-					{
-						checked { val = (int)(long)val; };
-					}
-					if (pc.PropertyInfo.PropertyType == typeof(long) && val.GetType() == typeof(int))
-					{
-						val = (long)(int)val;
-					}
-				}
-
 				try
 				{
-					pc.PropertyInfo.SetValue(record, val, null);
+					pc.PropertyInfo.SetValue(record, ConvertValue(pc.PropertyInfo, r[i]), null);
 				}
 				catch (Exception x)
 				{
