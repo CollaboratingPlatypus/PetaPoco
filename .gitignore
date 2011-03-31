@@ -1,5 +1,5 @@
 bin
 obj
-*.csproj
-*.nupkg
 *.suo
+*.nupkg
+
