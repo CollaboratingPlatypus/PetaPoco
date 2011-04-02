@@ -520,7 +520,7 @@ namespace PetaPoco
 			return result;
 		}
 
-		public Page<T> FetchPage<T>(long page, long itemsPerPage, Sql sql) where T : new()
+		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) where T : new()
 		{
 			return Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 		}
