@@ -248,7 +248,7 @@ namespace PetaPoco.Tests
 			long id = InsertRecords(count);
 
 			// Fetch em
-			var r = db.FetchPage<poco>(1, 5, "SELECT * from petapoco ORDER BY id");
+			var r = db.Page<poco>(2, 5, "SELECT * from petapoco ORDER BY id");
 
 			// Check em
 			int i = 0;
@@ -260,7 +260,7 @@ namespace PetaPoco.Tests
 
 			// Check other stats
 			Expect(r.Items.Count, Is.EqualTo(5));
-			Expect(r.CurrentPage, Is.EqualTo(1));
+			Expect(r.CurrentPage, Is.EqualTo(2));
 			Expect(r.ItemsPerPage, Is.EqualTo(5));
 			Expect(r.TotalItems, Is.EqualTo(13));
 			Expect(r.TotalPages, Is.EqualTo(3));
@@ -277,11 +277,11 @@ namespace PetaPoco.Tests
 			long id = InsertRecords(count);
 
 			// Fetch em
-			var r = db.FetchPage<poco>(2, 5, "SELECT * from petapoco ORDER BY id");
+			var r = db.Page<poco>(3, 5, "SELECT * from petapoco ORDER BY id");
 
 			// Check other stats
 			Expect(r.Items.Count, Is.EqualTo(5));
-			Expect(r.CurrentPage, Is.EqualTo(2));
+			Expect(r.CurrentPage, Is.EqualTo(3));
 			Expect(r.ItemsPerPage, Is.EqualTo(5));
 			Expect(r.TotalItems, Is.EqualTo(15));
 			Expect(r.TotalPages, Is.EqualTo(3));

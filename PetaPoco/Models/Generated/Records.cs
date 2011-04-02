@@ -76,13 +76,22 @@ namespace sqlserver
 			public static T First(Sql sql) { return repo.First<T>(sql); }
 			public static List<T> Fetch(string sql, params object[] args) { return repo.Fetch<T>(sql, args); }
 			public static List<T> Fetch(Sql sql) { return repo.Fetch<T>(sql); }
-			public static PagedFetch<T> FetchPage(long page, long itemsPerPage, string sql, params object[] args) { return repo.FetchPage<T>(page, itemsPerPage, sql, args); }
-			public static PagedFetch<T> FetchPage(long page, long itemsPerPage, Sql sql) { return repo.FetchPage<T>(page, itemsPerPage, sql); }
+			public static Page<T> FetchPage(long page, long itemsPerPage, string sql, params object[] args) { return repo.Page<T>(page, itemsPerPage, sql, args); }
+			public static Page<T> FetchPage(long page, long itemsPerPage, Sql sql) { return repo.FetchPage<T>(page, itemsPerPage, sql); }
 			public static IEnumerable<T> Query(string sql, params object[] args) { return repo.Query<T>(sql, args); }
 			public static IEnumerable<T> Query(Sql sql) { return repo.Query<T>(sql); }
 		}
 	}
 	
+
+    
+	[TableName("names")]
+	[ExplicitColumns]
+    public partial class name : sqlserverDB.Record<name>  
+    {
+        [Column] public long id { get; set; }
+        [Column] public string title { get; set; }
+	}
 
     
 	[TableName("articles")]

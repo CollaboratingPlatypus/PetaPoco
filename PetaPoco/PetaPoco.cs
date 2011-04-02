@@ -62,7 +62,7 @@ namespace PetaPoco
 	}
 
 	// Results from paged request
-	public class PagedFetch<T> where T:new()
+	public class Page<T> where T:new()
 	{
 		public long CurrentPage { get; set; }
 		public long TotalPages { get; set; }
@@ -74,6 +74,11 @@ namespace PetaPoco
 	// Database class ... this is where most of the action happens
 	public class Database
 	{
+		public Database(string connectionString, string providerName)
+		{
+			CommonConstruct(connectionString, providerName);
+		}
+
 		// Constructor
 		public Database(string connectionStringName)
 		{
@@ -82,11 +87,11 @@ namespace PetaPoco
 				connectionStringName = ConfigurationManager.ConnectionStrings[0].Name;
 
 			// Work out connection string and provider name
-			_providerName = "System.Data.SqlClient";
+			var providerName = "System.Data.SqlClient";
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
 				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
-					_providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
+					providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
 			}
 			else
 			{
@@ -94,10 +99,21 @@ namespace PetaPoco
 			}
 
 			// Store factory and connection string
+			var connectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
+
+			// Init
+			CommonConstruct(connectionString, providerName);
+		}
+
+		void CommonConstruct(string connectionString, string providerName)
+		{
+			// Store settings
+			_connectionString = connectionString;
+			_providerName = providerName;
 			_factory = DbProviderFactories.GetFactory(_providerName);
-			_connectionString = ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString;
 			_transactionDepth = 0;
 
+			// Check options
 			if (_connectionString.IndexOf("Allow User Variables=true") >= 0 && IsMySql())
 			{
 				_paramPrefix = "?";
@@ -462,7 +478,7 @@ namespace PetaPoco
 		}
 
 	
-		public PagedFetch<T> FetchPage<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
+		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
 		{
 			// Add auto select clause
 			sql=AddSelectClause<T>(sql);
@@ -473,7 +489,7 @@ namespace PetaPoco
 				throw new Exception("Unable to parse SQL statement for paged query");
 
 			// Setup the paged result
-			var result = new PagedFetch<T>();
+			var result = new Page<T>();
 			result.CurrentPage = page;
 			result.ItemsPerPage = itemsPerPage;
 			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
@@ -489,12 +505,12 @@ namespace PetaPoco
 				// Ugh really?
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>{2} AND __rn<={3}",
-										sqlOrderBy, sqlSelectRemoved, page * itemsPerPage, (page + 1) * itemsPerPage);
+										sqlOrderBy, sqlSelectRemoved, (page-1) * itemsPerPage, page * itemsPerPage);
 			}
 			else
 			{
 				// Nice
-				sqlPage = string.Format("{0}\nLIMIT {1} OFFSET {2}", sql, itemsPerPage, page * itemsPerPage);
+				sqlPage = string.Format("{0}\nLIMIT {1} OFFSET {2}", sql, itemsPerPage, (page-1) * itemsPerPage);
 			}
 
 			// Get the records
@@ -504,9 +520,9 @@ namespace PetaPoco
 			return result;
 		}
 
-		public PagedFetch<T> FetchPage<T>(long page, long itemsPerPage, Sql sql) where T : new()
+		public Page<T> FetchPage<T>(long page, long itemsPerPage, Sql sql) where T : new()
 		{
-			return FetchPage<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
+			return Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 		}
 
 		// Return an enumerable collection of pocos
@@ -891,7 +907,6 @@ namespace PetaPoco
 				return sb.ToString();
 			}
 		}
-
 
 		internal class PocoColumn
 		{
