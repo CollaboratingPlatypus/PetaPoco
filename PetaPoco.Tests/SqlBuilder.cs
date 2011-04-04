@@ -192,6 +192,31 @@ namespace PetaPoco.Tests
 			Expect(sql.Arguments[1], Is.EqualTo("a1"));
 			Expect(sql.Arguments[2], Is.EqualTo("a2"));
 		}
+
+		[Test]
+		public void ConsecutiveWhere()
+		{
+			var sql = new Sql()
+						.Append("SELECT * FROM blah");
+
+			sql.Append("WHERE x");
+			sql.Append("WHERE y");
+
+			Expect(sql.SQL, Is.EqualTo("SELECT * FROM blah\nWHERE x\nAND y"));
+		}
+
+		[Test]
+		public void ConsecutiveOrderBy()
+		{
+			var sql = new Sql()
+						.Append("SELECT * FROM blah");
+
+			sql.Append("ORDER BY x");
+			sql.Append("ORDER BY y");
+
+			Expect(sql.SQL, Is.EqualTo("SELECT * FROM blah\nORDER BY x\n, y"));
+		}
 	}
 
 }
+

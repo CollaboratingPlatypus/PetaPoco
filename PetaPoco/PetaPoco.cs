@@ -1150,7 +1150,7 @@ namespace PetaPoco
 			// Build it
 			var sb = new StringBuilder();
 			var args = new List<object>();
-			Build(sb, args);
+			Build(sb, args, null);
 			_sqlFinal = sb.ToString();
 			_argsFinal = args.ToArray();
 		}
@@ -1208,7 +1208,12 @@ namespace PetaPoco
 			return Append(new Sql("FROM " + String.Join(", ", (from x in args select x.ToString()).ToArray())));
 		}
 
-		public void Build(StringBuilder sb, List<object> args)
+		static bool Is(Sql sql, string sqltype)
+		{
+			return sql!=null && sql._sql!=null && sql._sql.StartsWith(sqltype, StringComparison.InvariantCultureIgnoreCase);
+		}
+
+		public void Build(StringBuilder sb, List<object> args, Sql lhs)
 		{
 			if (!String.IsNullOrEmpty(_sql))
 			{
@@ -1220,12 +1225,17 @@ namespace PetaPoco
 
 				var sql = Database.ProcessArgs(_sql, _args, args);
 
+				if (Is(lhs, "WHERE ") && Is(this, "WHERE "))
+					sql = "AND " + sql.Substring(6);
+				if (Is(lhs, "ORDER BY ") && Is(this, "ORDER BY "))
+					sql=", " + sql.Substring(9);
+
 				sb.Append(sql);
 			}
 
 			// Now do rhs
 			if (_rhs != null)
-				_rhs.Build(sb, args);
+				_rhs.Build(sb, args, this);
 		}
 	}
 }
