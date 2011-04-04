@@ -453,6 +453,31 @@ namespace PetaPoco.Tests
 		}
 
 		[Test]
+		public void Transaction_nested_yny()
+		{
+			using (var scope1 = db.Transaction)
+			{
+				InsertRecords(10);
+
+				using (var scope2 = db.Transaction)
+				{
+					InsertRecords(10);
+					//scope2.Complete();
+				}
+
+				using (var scope3 = db.Transaction)
+				{
+					InsertRecords(10);
+					scope3.Complete();
+				}
+
+				scope1.Complete();
+			}
+
+			Expect(GetRecordCount(), Is.EqualTo(0));
+		}
+
+		[Test]
 		public void DateTimesAreUtc()
 		{
 			var id = InsertRecords(1);

@@ -162,10 +162,11 @@ namespace PetaPoco
 		{
 			_transactionDepth++;
 
-			if (_transaction == null)
+			if (_transactionDepth == 1)
 			{
 				_sharedConnection = OpenConnection();
 				_transaction = _sharedConnection.BeginTransaction();
+				_transactionCancelled = false;
 				OnBeginTransaction();
 			}
 
@@ -175,6 +176,12 @@ namespace PetaPoco
 		void CleanupTransaction()
 		{
 			OnEndTransaction();
+
+			if (_transactionCancelled)
+				_transaction.Rollback();
+			else
+				_transaction.Commit();
+
 
 			_transaction.Dispose();
 			_transaction = null;
@@ -188,14 +195,9 @@ namespace PetaPoco
 		// Abort the entire outer most transaction scope
 		public void AbortTransaction()
 		{
-			_transactionDepth--;
-
-			if (_transaction != null)
-			{
-				// Rollback transaction
-				_transaction.Rollback();
+			_transactionCancelled = true;
+			if ((--_transactionDepth) == 0)
 				CleanupTransaction();
-			}
 		}
 
 		// Complete the transaction
@@ -203,15 +205,8 @@ namespace PetaPoco
 		// by a CompleteTransaction.
 		public void CompleteTransaction()
 		{
-			_transactionDepth--;
-
-			if (_transactionDepth == 0 && _transaction != null)
-			{
-				// Commit transaction
-				_transaction.Commit();
+			if ((--_transactionDepth) == 0)
 				CleanupTransaction();
-			}
-
 		}
 
 		// Add a parameter to a DB command
@@ -1026,6 +1021,7 @@ namespace PetaPoco
 		DbConnection _sharedConnection;
 		DbTransaction _transaction;
 		int _transactionDepth;
+		bool _transactionCancelled;
 		string _lastSql;
 		object[] _lastArgs;
 	}
