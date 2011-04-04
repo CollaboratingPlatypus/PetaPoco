@@ -955,7 +955,7 @@ namespace PetaPoco
 
 		public interface IColumnMapper
 		{
-			bool MapPropertyToColumn(PropertyInfo pi, out string column);
+			bool MapPropertyToColumn(PropertyInfo pi, ref string columnName, ref bool resultColumn);
 		}
 
 		public static IColumnMapper ColumnMapper
@@ -1029,7 +1029,7 @@ namespace PetaPoco
 					if (pc.ColumnName == null)
 					{
 						pc.ColumnName = pi.Name;
-						if (Database.ColumnMapper != null && !Database.ColumnMapper.MapPropertyToColumn(pi, out pc.ColumnName))
+						if (Database.ColumnMapper != null && !Database.ColumnMapper.MapPropertyToColumn(pi, ref pc.ColumnName, ref pc.ResultColumn))
 								continue;
 					}
 
