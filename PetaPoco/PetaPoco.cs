@@ -209,6 +209,51 @@ namespace PetaPoco
 				CleanupTransaction();
 		}
 
+		static Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		public static string ProcessArgs(string _sql, object[] args_src, List<object> args_dest)
+		{
+			return rxParams.Replace(_sql, m =>
+			{
+				string param = m.Value.Substring(1);
+
+				int paramIndex;
+				if (int.TryParse(param, out paramIndex))
+				{
+					// Numbered parameter
+					if (paramIndex < 0 || paramIndex >= args_src.Length)
+					{
+						throw new ArgumentOutOfRangeException(string.Format("Parameter '@{0}' specified but only {1} parameters supplied (in `{2}`)", paramIndex, args_src.Length, _sql));
+					}
+
+					args_dest.Add(args_src[paramIndex]);
+
+				}
+				else
+				{
+					// Look for a property on one of the arguments with this name
+					bool found = false;
+					foreach (var o in args_src)
+					{
+						var pi = o.GetType().GetProperty(param);
+						if (pi != null)
+						{
+							args_dest.Add(pi.GetValue(o, null));
+							found = true;
+							break;
+						}
+					}
+
+					// Check found
+					if (!found)
+					{
+						throw new ArgumentException(string.Format("Parameter '@{0}' specified but none of the passed arguments have a property with this name (in '{1}')", param, _sql));
+					}
+				}
+				return "@" + (args_dest.Count - 1).ToString();
+			}
+			);
+		}
+
 		// Add a parameter to a DB command
 		static void AddParam(DbCommand cmd, object item, string ParameterPrefix)
 		{
@@ -245,6 +290,11 @@ namespace PetaPoco
 		// Create a command
 		public DbCommand CreateCommand(DbConnection connection, string sql, params object[] args)
 		{
+			// Perform named argument replacements
+			var new_args = new List<object>();
+			sql = ProcessArgs(sql, args, new_args);
+			args = new_args.ToArray();
+
 			// If we're in MySQL "Allow User Variables", we need to fix up parameter prefixes
 			if (_paramPrefix == "?")
 			{
@@ -1152,47 +1202,7 @@ namespace PetaPoco
 					sb.Append("\n");
 				}
 
-				var rxParams = new Regex(@"(?<!@)@\w+");
-				var sql = rxParams.Replace(_sql, m =>
-				{
-					string param = m.Value.Substring(1);
-
-					int paramIndex;
-					if (int.TryParse(param, out paramIndex))
-					{
-						// Numbered parameter
-						if (paramIndex < 0 || paramIndex >= _args.Length)
-						{
-							throw new ArgumentOutOfRangeException(string.Format("Parameter '@{0}' specified but only {1} parameters supplied (in `{2}`)", paramIndex, _args.Length, _sql));
-						}
-
-						args.Add(_args[paramIndex]);
-
-					}
-					else
-					{
-						// Look for a property on one of the arguments with this name
-						bool found = false;
-						foreach (var o in _args)
-						{
-							var pi = o.GetType().GetProperty(param);
-							if (pi != null)
-							{
-								args.Add(pi.GetValue(o, null));
-								found = true;
-								break;
-							}
-						}
-
-						// Check found
-						if (!found)
-						{
-							throw new ArgumentException(string.Format("Parameter '@{0}' specified but none of the passed arguments have a property with this name (in '{1}')", param, _sql));
-						}
-					}
-					return "@" + (args.Count - 1).ToString();
-				}
-				);
+				var sql = Database.ProcessArgs(_sql, _args, args);
 
 				sb.Append(sql);
 			}

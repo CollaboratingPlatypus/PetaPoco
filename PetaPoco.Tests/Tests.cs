@@ -522,6 +522,21 @@ namespace PetaPoco.Tests
 			Expect(d.id, Is.EqualTo(a.id));
 			Expect(d.date_edited.HasValue, Is.EqualTo(false));
 		}
+
+		[Test]
+		public void NamedArgs()
+		{
+			long first=InsertRecords(10);
+
+			var items=db.Fetch<deco>("WHERE id >= @min_id AND id <= @max_id", 
+						new 
+						{ 
+							min_id = first + 3, 
+							max_id = first + 6 
+						}
+					);
+			Expect(items.Count, Is.EqualTo(4));
+		}
 	}
 
 }
