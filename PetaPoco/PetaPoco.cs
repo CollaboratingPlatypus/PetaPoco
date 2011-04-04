@@ -953,6 +953,17 @@ namespace PetaPoco
 			}
 		}
 
+		public interface IColumnMapper
+		{
+			bool MapPropertyToColumn(PropertyInfo pi, out string column);
+		}
+
+		public static IColumnMapper ColumnMapper
+		{
+			get;
+			set;
+		}
+
 		internal class PocoColumn
 		{
 			public string ColumnName;
@@ -1004,8 +1015,10 @@ namespace PetaPoco
 							continue;
 					}
 
-					// Work out the DB column name
 					var pc = new PocoColumn();
+					pc.PropertyInfo = pi;
+
+					// Work out the DB column name
 					if (ColAttrs.Length > 0)
 					{
 						var colattr = (Column)ColAttrs[0];
@@ -1014,8 +1027,11 @@ namespace PetaPoco
 							pc.ResultColumn=true;
 					}
 					if (pc.ColumnName == null)
+					{
 						pc.ColumnName = pi.Name;
-					pc.PropertyInfo = pi;
+						if (Database.ColumnMapper != null && !Database.ColumnMapper.MapPropertyToColumn(pi, out pc.ColumnName))
+								continue;
+					}
 
 					// Store it
 					Columns.Add(pc.ColumnName, pc);
