@@ -71,6 +71,12 @@ namespace PetaPoco
 		public List<T> Items { get; set; }
 	}
 
+	public interface IMapper
+	{
+		void GetTableInfo(Type t, ref string tableName, ref string primaryKey);
+		bool MapPropertyToColumn(PropertyInfo pi, ref string columnName, ref bool resultColumn);
+	}
+
 	// Database class ... this is where most of the action happens
 	public class Database
 	{
@@ -953,12 +959,7 @@ namespace PetaPoco
 			}
 		}
 
-		public interface IColumnMapper
-		{
-			bool MapPropertyToColumn(PropertyInfo pi, ref string columnName, ref bool resultColumn);
-		}
-
-		public static IColumnMapper ColumnMapper
+		public static IMapper Mapper
 		{
 			get;
 			set;
@@ -991,11 +992,17 @@ namespace PetaPoco
 			{
 				// Get the table name
 				var a = t.GetCustomAttributes(typeof(TableName), true);
-				TableName = a.Length == 0 ? t.Name : (a[0] as TableName).Value;
+				var tempTableName = a.Length == 0 ? t.Name : (a[0] as TableName).Value;
 
 				// Get the primary key
 				a = t.GetCustomAttributes(typeof(PrimaryKey), true);
-				PrimaryKey = a.Length == 0 ? "ID" : (a[0] as PrimaryKey).Value;
+				var tempPrimaryKey = a.Length == 0 ? "ID" : (a[0] as PrimaryKey).Value;
+
+				// Call column mapper
+				if (Database.Mapper!=null)
+					Database.Mapper.GetTableInfo(t, ref tempTableName, ref tempPrimaryKey);
+				TableName = tempTableName;
+				PrimaryKey = tempPrimaryKey;
 
 				// Work out bound properties
 				bool ExplicitColumns = t.GetCustomAttributes(typeof(ExplicitColumns), true).Length > 0;
@@ -1029,7 +1036,7 @@ namespace PetaPoco
 					if (pc.ColumnName == null)
 					{
 						pc.ColumnName = pi.Name;
-						if (Database.ColumnMapper != null && !Database.ColumnMapper.MapPropertyToColumn(pi, ref pc.ColumnName, ref pc.ResultColumn))
+						if (Database.Mapper != null && !Database.Mapper.MapPropertyToColumn(pi, ref pc.ColumnName, ref pc.ResultColumn))
 								continue;
 					}
 
