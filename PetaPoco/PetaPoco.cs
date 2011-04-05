@@ -22,7 +22,7 @@ namespace PetaPoco
 	{
 	}
 
-	// For explicit pocos, marks property as a column
+	// For explicit pocos, marks property as a column and optionally supplies column name
 	[AttributeUsage(AttributeTargets.Property)]
 	public class Column : Attribute
 	{
@@ -31,7 +31,7 @@ namespace PetaPoco
 		public string Name { get; set; }
 	}
 
-	// For explicit pocos, marks property as a column
+	// For explicit pocos, marks property as a result column and optionally supplies column name
 	[AttributeUsage(AttributeTargets.Property)]
 	public class ResultColumn : Column
 	{
@@ -126,6 +126,9 @@ namespace PetaPoco
 		void CommonConstruct()
 		{
 			_transactionDepth = 0;
+			EnableAutoSelect = true;
+			EnableNamedParams = true;
+			ForceDateTimesToUtc = true;
 
 			if (_providerName != null)
 				_factory = DbProviderFactories.GetFactory(_providerName);
@@ -146,7 +149,7 @@ namespace PetaPoco
 		bool IsSqlServer() { return string.Compare(_providerName, "System.Data.SqlClient", true) == 0; }
 
 		// Open a connection (can be nested)
-		void OpenSharedConnection()
+		public void OpenSharedConnection()
 		{
 			if (_sharedConnectionDepth == 0)
 			{
@@ -158,7 +161,7 @@ namespace PetaPoco
 		}
 
 		// Close a previously opened connection
-		void CloseSharedConnection()
+		public void CloseSharedConnection()
 		{
 			_sharedConnectionDepth--;
 			if (_sharedConnectionDepth == 0)
@@ -289,6 +292,8 @@ namespace PetaPoco
 				else if (item.GetType() == typeof(string))
 				{
 					p.Size = (item as string).Length + 1;
+					if (p.Size < 4000)
+						p.Size = 4000;
 					p.Value = item;
 				}
 				else
@@ -303,10 +308,13 @@ namespace PetaPoco
 		// Create a command
 		public DbCommand CreateCommand(DbConnection connection, string sql, params object[] args)
 		{
-			// Perform named argument replacements
-			var new_args = new List<object>();
-			sql = ProcessParams(sql, args, new_args);
-			args = new_args.ToArray();
+			if (EnableNamedParams)
+			{
+				// Perform named argument replacements
+				var new_args = new List<object>();
+				sql = ProcessParams(sql, args, new_args);
+				args = new_args.ToArray();
+			}
 
 			// If we're in MySQL "Allow User Variables", we need to fix up parameter prefixes
 			if (_paramPrefix == "?")
@@ -323,24 +331,41 @@ namespace PetaPoco
 			_lastSql = sql;
 			_lastArgs = args;
 
-			DbCommand result = null;
-			result = connection.CreateCommand();
-			result.Connection = connection;
-			result.CommandText = sql;
-			result.Transaction = _transaction;
-			if (args.Length > 0)
+			DbCommand cmd = connection.CreateCommand();
+			cmd.CommandText = sql;
+			cmd.Transaction = _transaction;
+			foreach (var item in args)
 			{
-				foreach (var item in args)
+				var p = cmd.CreateParameter();
+				p.ParameterName = string.Format("{0}{1}", _paramPrefix, cmd.Parameters.Count);
+				if (item == null)
 				{
-					AddParam(result, item, _paramPrefix);
+					p.Value = DBNull.Value;
 				}
-			}
-			return result;
-		}
+				else
+				{
+					if (item.GetType() == typeof(Guid))
+					{
+						p.Value = item.ToString();
+						p.DbType = DbType.String;
+						p.Size = 4000;
+					}
+					else if (item.GetType() == typeof(string))
+					{
+						p.Size = (item as string).Length + 1;
+						if (p.Size < 4000)
+							p.Size = 4000;
+						p.Value = item;
+					}
+					else
+					{
+						p.Value = item;
+					}
+				}
 
-		DbCommand CreateCommand(ShareableConnection connection, string sql, params object[] args)
-		{
-			return CreateCommand(connection.Connection, sql, args);
+				cmd.Parameters.Add(p);
+			}
+			return cmd;
 		}
 
 		// Override this to log/capture exceptions
@@ -355,12 +380,17 @@ namespace PetaPoco
 		{
 			try
 			{
-				using (var conn = new ShareableConnection(this))
+				OpenSharedConnection();
+				try
 				{
-					using (var cmd = CreateCommand(conn, sql, args))
+					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
 						return cmd.ExecuteNonQuery();
 					}
+				}
+				finally
+				{
+					CloseSharedConnection();
 				}
 			}
 			catch (Exception x)
@@ -380,13 +410,18 @@ namespace PetaPoco
 		{
 			try
 			{
-				using (var conn = new ShareableConnection(this))
+				OpenSharedConnection();
+				try
 				{
-					using (var cmd = CreateCommand(conn, sql, args))
+					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
 						object val = cmd.ExecuteScalar();
 						return (T)Convert.ChangeType(val, typeof(T));
 					}
+				}
+				finally
+				{
+					CloseSharedConnection();
 				}
 			}
 			catch (Exception x)
@@ -401,10 +436,11 @@ namespace PetaPoco
 			return ExecuteScalar<T>(sql.SQL, sql.Arguments);
 		}
 
+		Regex rxSelect = new Regex(@"^\s*SELECT\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
 			// Already present?
-			if (sql.Trim().StartsWith("SELECT", StringComparison.InvariantCultureIgnoreCase))
+			if (rxSelect.IsMatch(sql))
 				return sql;
 
 			// Get the poco data for this type
@@ -412,20 +448,29 @@ namespace PetaPoco
 			return string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
 		}
 
+		public bool EnableAutoSelect { get; set; }
+		public bool EnableNamedParams { get; set; }
+		public bool ForceDateTimesToUtc { get; set; }
+
 		// Return a typed list of pocos
 		public List<T> Fetch<T>(string sql, params object[] args) where T : new()
 		{
+			// Auto select clause?
+			if (EnableAutoSelect)
+				sql = AddSelectClause<T>(sql);
+
 			try
 			{
-				using (var conn = new ShareableConnection(this))
+				OpenSharedConnection();
+				try
 				{
-					using (var cmd = CreateCommand(conn, AddSelectClause<T>(sql), args))
+					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
 						using (var r = cmd.ExecuteReader())
 						{
 							var l = new List<T>();
 							var pd = PocoData.ForType(typeof(T));
-							var factory = pd.GetFactory<T>(sql + "-" + conn.Connection.ConnectionString, r);
+							var factory = pd.GetFactory<T>(sql + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
 							while (r.Read())
 							{
 								l.Add(factory(r));
@@ -434,6 +479,10 @@ namespace PetaPoco
 						}
 					}
 				}
+				finally
+				{
+					CloseSharedConnection();
+				}
 			}
 			catch (Exception x)
 			{
@@ -441,6 +490,86 @@ namespace PetaPoco
 				throw;
 			}
 		}
+
+		// Optimized version when only needing a single record
+		public T FirstOrDefault<T>(string sql, params object[] args) where T : new()
+		{
+			// Auto select clause?
+			if (EnableAutoSelect)
+				sql = AddSelectClause<T>(sql);
+
+			try
+			{
+				OpenSharedConnection();
+				try
+				{
+					using (var cmd = CreateCommand(_sharedConnection, sql, args))
+					{
+						using (var r = cmd.ExecuteReader())
+						{
+							if (!r.Read())
+								return default(T);
+
+							var pd = PocoData.ForType(typeof(T));
+							var factory = pd.GetFactory<T>(sql + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
+							return factory(r);
+						}
+					}
+				}
+				finally
+				{
+					CloseSharedConnection();
+				}
+			}
+			catch (Exception x)
+			{
+				OnException(x);
+				throw;
+			}
+		}
+
+		// Optimized version when only wanting a single record
+		public T SingleOrDefault<T>(string sql, params object[] args) where T : new()
+		{
+			// Auto select clause?
+			if (EnableAutoSelect)
+				sql = AddSelectClause<T>(sql);
+
+			try
+			{
+				OpenSharedConnection();
+				try
+				{
+					using (var cmd = CreateCommand(_sharedConnection, sql, args))
+					{
+						using (var r = cmd.ExecuteReader())
+						{
+							if (!r.Read())
+								return default(T);
+
+							var pd = PocoData.ForType(typeof(T));
+							var factory = pd.GetFactory<T>(sql + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
+							T ret = factory(r);
+
+							if (r.Read())
+								throw new InvalidOperationException("Sequence contains more than one element");
+
+							return ret;
+						}
+					}
+				}
+				finally
+				{
+					CloseSharedConnection();
+				}
+			}
+			catch (Exception x)
+			{
+				OnException(x);
+				throw;
+			}
+		}
+
 
 		// Warning: scary regex follows
 		static Regex rxColumns = new Regex(@"^\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b",
@@ -479,7 +608,8 @@ namespace PetaPoco
 		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
 		{
 			// Add auto select clause
-			sql = AddSelectClause<T>(sql);
+			if (EnableAutoSelect)
+				sql = AddSelectClause<T>(sql);
 
 			// Split the SQL into the bits we need
 			string sqlCount, sqlSelectRemoved, sqlOrderBy;
@@ -526,9 +656,12 @@ namespace PetaPoco
 		// Return an enumerable collection of pocos
 		public IEnumerable<T> Query<T>(string sql, params object[] args) where T : new()
 		{
+			if (EnableAutoSelect)
+				sql = AddSelectClause<T>(sql);
+
 			using (var conn = new ShareableConnection(this))
 			{
-				using (var cmd = CreateCommand(conn, AddSelectClause<T>(sql), args))
+				using (var cmd = CreateCommand(conn.Connection, sql, args))
 				{
 					IDataReader r;
 					var pd = PocoData.ForType(typeof(T));
@@ -541,7 +674,7 @@ namespace PetaPoco
 						OnException(x);
 						throw;
 					}
-					var factory = pd.GetFactory<T>(sql + "-" + conn.Connection.ConnectionString, r);
+					var factory = pd.GetFactory<T>(sql + "-" + conn.Connection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
 					using (r)
 					{
 						while (true)
@@ -566,45 +699,49 @@ namespace PetaPoco
 			}
 		}
 
-		public T Single<T>(string sql, params object[] args) where T : new()
-		{
-			return Query<T>(sql, args).Single();
-		}
-		public T SingleOrDefault<T>(string sql, params object[] args) where T : new()
-		{
-			return Fetch<T>(sql, args).SingleOrDefault();
-		}
-		public T First<T>(string sql, params object[] args) where T : new()
-		{
-			return Query<T>(sql, args).First();
-		}
-		public T FirstOrDefault<T>(string sql, params object[] args) where T : new()
-		{
-			return Query<T>(sql, args).FirstOrDefault();
-		}
 		public List<T> Fetch<T>(Sql sql) where T : new()
 		{
 			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
+
 		public IEnumerable<T> Query<T>(Sql sql) where T : new()
 		{
 			return Query<T>(sql.SQL, sql.Arguments);
 		}
+
+
+		public T Single<T>(string sql, params object[] args) where T : new()
+		{
+			T val = SingleOrDefault<T>(sql, args);
+			if (val != null)
+				return val;
+			else
+				throw new InvalidOperationException("The sequence contains no elements");
+		}
+		public T First<T>(string sql, params object[] args) where T : new()
+		{
+			T val = FirstOrDefault<T>(sql, args);
+			if (val != null)
+				return val;
+			else
+				throw new InvalidOperationException("The sequence contains no elements");
+		}
+
 		public T Single<T>(Sql sql) where T : new()
 		{
-			return Query<T>(sql).Single();
+			return Single<T>(sql.SQL, sql.Arguments);
 		}
 		public T SingleOrDefault<T>(Sql sql) where T : new()
 		{
-			return Query<T>(sql).SingleOrDefault();
-		}
-		public T First<T>(Sql sql) where T : new()
-		{
-			return Query<T>(sql).First();
+			return SingleOrDefault<T>(sql.SQL, sql.Arguments);
 		}
 		public T FirstOrDefault<T>(Sql sql) where T : new()
 		{
-			return Query<T>(sql).FirstOrDefault();
+			return FirstOrDefault<T>(sql.SQL, sql.Arguments);
+		}
+		public T First<T>(Sql sql) where T : new()
+		{
+			return First<T>(sql.SQL, sql.Arguments);
 		}
 
 		// Insert a poco into a table.  If the poco has a property with the same name 
@@ -614,9 +751,10 @@ namespace PetaPoco
 		{
 			try
 			{
-				using (var conn = new ShareableConnection(this))
+				OpenSharedConnection();
+				try
 				{
-					using (var cmd = CreateCommand(conn, ""))
+					using (var cmd = CreateCommand(_sharedConnection, ""))
 					{
 						var pd = PocoData.ForType(poco.GetType());
 						var names = new List<string>();
@@ -658,6 +796,10 @@ namespace PetaPoco
 						return id;
 					}
 				}
+				finally
+				{
+					CloseSharedConnection();
+				}
 			}
 			catch (Exception x)
 			{
@@ -678,9 +820,10 @@ namespace PetaPoco
 		{
 			try
 			{
-				using (var conn = new ShareableConnection(this))
+				OpenSharedConnection();
+				try
 				{
-					using (var cmd = CreateCommand(conn, ""))
+					using (var cmd = CreateCommand(_sharedConnection, ""))
 					{
 						var sb = new StringBuilder();
 						var index = 0;
@@ -723,6 +866,10 @@ namespace PetaPoco
 						// Do it
 						return cmd.ExecuteNonQuery();
 					}
+				}
+				finally
+				{
+					CloseSharedConnection();
 				}
 			}
 			catch (Exception x)
@@ -983,20 +1130,24 @@ namespace PetaPoco
 			}
 
 			// Create factory function that can convert a IDataReader record into a POCO
-			public Func<IDataReader, T> GetFactory<T>(string key, IDataReader r)
+			public Func<IDataReader, T> GetFactory<T>(string key, bool ForceDateTimesToUtc, IDataReader r)
 			{
-				lock (m_Converters)
+				lock (PocoFactories)
 				{
-					lock (PocoFactories)
-					{
-						// Have we already created it?
-						object factory;
-						if (PocoFactories.TryGetValue(key, out factory))
-							return factory as Func<IDataReader, T>;
+					// Have we already created it?
+					object factory;
+					if (PocoFactories.TryGetValue(key, out factory))
+						return factory as Func<IDataReader, T>;
 
+					lock (m_Converters)
+					{
 						// Create the method
 						var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), typeof(T), new Type[] { typeof(IDataReader) }, true);
 						var il = m.GetILGenerator();
+
+						// Running under mono?
+						int p = (int)Environment.OSVersion.Platform;
+						bool Mono = (p == 4) || (p == 6) || (p == 128);
 
 						// var poco=new T()
 						il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
@@ -1032,7 +1183,7 @@ namespace PetaPoco
 							}
 
 							// Standard DateTime->Utc mapper
-							if (converter == null && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
+							if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
 							{
 								converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
 							}
@@ -1043,22 +1194,31 @@ namespace PetaPoco
 								converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
 							}
 
-							// Quick assign
+							// Fast
 							bool Handled = false;
 							if (converter == null)
 							{
 								var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] { typeof(int) });
-								if (valuegetter != null && valuegetter.ReturnType == dstType)
+								if (valuegetter != null
+										&& valuegetter.ReturnType == srcType
+										&& (valuegetter.ReturnType == dstType || valuegetter.ReturnType == Nullable.GetUnderlyingType(dstType)))
 								{
 									il.Emit(OpCodes.Ldarg_0);										// *,rdr
 									il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
 									il.Emit(OpCodes.Callvirt, valuegetter);							// *,value
+
+									// Mono give IL error if we don't explicitly create Nullable instance for the assignment
+									if (Mono && Nullable.GetUnderlyingType(dstType) != null)
+									{
+										il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] { Nullable.GetUnderlyingType(dstType) }));
+									}
+
 									il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod());		// poco
 									Handled = true;
 								}
 							}
 
-							// Slower assign
+							// Not so fast
 							if (!Handled)
 							{
 								// Setup stack for call to converter
@@ -1073,7 +1233,6 @@ namespace PetaPoco
 									il.Emit(OpCodes.Ldsfld, fldConverters);
 									il.Emit(OpCodes.Ldc_I4, converterIndex);
 									il.Emit(OpCodes.Callvirt, fnListGetItem);					// Converter
-
 								}
 
 								// "value = rdr.GetValue(i)"
@@ -1084,7 +1243,6 @@ namespace PetaPoco
 								// Call the converter
 								if (converter != null)
 									il.Emit(OpCodes.Callvirt, fnInvoke);
-
 
 								// Assign it
 								il.Emit(OpCodes.Unbox_Any, pc.PropertyInfo.PropertyType);		// poco,poco,value
