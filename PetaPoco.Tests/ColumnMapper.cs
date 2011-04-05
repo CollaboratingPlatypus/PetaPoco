@@ -54,6 +54,11 @@ namespace PetaPoco.Tests
 			return true;
 		}
 
+
+		public Func<object, object> GetValueConverter(System.Reflection.PropertyInfo pi, Type SourceType)
+		{
+			return null;
+		}
 	}
 
 	[TestFixture]
