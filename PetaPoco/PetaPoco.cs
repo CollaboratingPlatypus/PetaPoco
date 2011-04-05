@@ -36,7 +36,7 @@ namespace PetaPoco
 	public class ResultColumn : Column
 	{
 		public ResultColumn() { }
-		public ResultColumn(string name) : base(name) {  }
+		public ResultColumn(string name) : base(name) { }
 	}
 
 	// Specify the table name of a poco
@@ -63,7 +63,7 @@ namespace PetaPoco
 	}
 
 	// Results from paged request
-	public class Page<T> where T:new()
+	public class Page<T> where T : new()
 	{
 		public long CurrentPage { get; set; }
 		public long TotalPages { get; set; }
@@ -130,14 +130,14 @@ namespace PetaPoco
 			if (_providerName != null)
 				_factory = DbProviderFactories.GetFactory(_providerName);
 
-			if (_connectionString!=null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && IsMySql())
+			if (_connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && IsMySql())
 				_paramPrefix = "?";
 		}
 
 		// Automatically close one open shared connection
 		public void Dispose()
 		{
-			if (_sharedConnectionDepth>0)
+			if (_sharedConnectionDepth > 0)
 				CloseSharedConnection();
 		}
 
@@ -479,7 +479,7 @@ namespace PetaPoco
 		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
 		{
 			// Add auto select clause
-			sql=AddSelectClause<T>(sql);
+			sql = AddSelectClause<T>(sql);
 
 			// Split the SQL into the bits we need
 			string sqlCount, sqlSelectRemoved, sqlOrderBy;
@@ -492,7 +492,7 @@ namespace PetaPoco
 			result.ItemsPerPage = itemsPerPage;
 			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
 			result.TotalPages = result.TotalItems / itemsPerPage;
-			if ((result.TotalItems % itemsPerPage)!=0)
+			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
 
 
@@ -503,12 +503,12 @@ namespace PetaPoco
 				// Ugh really?
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>{2} AND __rn<={3}",
-										sqlOrderBy, sqlSelectRemoved, (page-1) * itemsPerPage, page * itemsPerPage);
+										sqlOrderBy, sqlSelectRemoved, (page - 1) * itemsPerPage, page * itemsPerPage);
 			}
 			else
 			{
 				// Nice
-				sqlPage = string.Format("{0}\nLIMIT {1} OFFSET {2}", sql, itemsPerPage, (page-1) * itemsPerPage);
+				sqlPage = string.Format("{0}\nLIMIT {1} OFFSET {2}", sql, itemsPerPage, (page - 1) * itemsPerPage);
 			}
 
 			// Get the records
@@ -551,7 +551,7 @@ namespace PetaPoco
 							{
 								if (!r.Read())
 									yield break;
-								poco=factory(r);
+								poco = factory(r);
 							}
 							catch (Exception x)
 							{
@@ -933,7 +933,7 @@ namespace PetaPoco
 				var tempPrimaryKey = a.Length == 0 ? "ID" : (a[0] as PrimaryKey).Value;
 
 				// Call column mapper
-				if (Database.Mapper!=null)
+				if (Database.Mapper != null)
 					Database.Mapper.GetTableInfo(t, ref tempTableName, ref tempPrimaryKey);
 				TableName = tempTableName;
 				PrimaryKey = tempPrimaryKey;
@@ -964,14 +964,14 @@ namespace PetaPoco
 					{
 						var colattr = (Column)ColAttrs[0];
 						pc.ColumnName = colattr.Name;
-						if ((colattr as ResultColumn)!=null)
-							pc.ResultColumn=true;
+						if ((colattr as ResultColumn) != null)
+							pc.ResultColumn = true;
 					}
 					if (pc.ColumnName == null)
 					{
 						pc.ColumnName = pi.Name;
 						if (Database.Mapper != null && !Database.Mapper.MapPropertyToColumn(pi, ref pc.ColumnName, ref pc.ResultColumn))
-								continue;
+							continue;
 					}
 
 					// Store it
@@ -1048,7 +1048,7 @@ namespace PetaPoco
 							if (converter == null)
 							{
 								var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] { typeof(int) });
-								if (valuegetter != null && valuegetter.ReturnType==srcType)
+								if (valuegetter != null && valuegetter.ReturnType == dstType)
 								{
 									il.Emit(OpCodes.Ldarg_0);										// *,rdr
 									il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
@@ -1276,7 +1276,7 @@ namespace PetaPoco
 
 		static bool Is(Sql sql, string sqltype)
 		{
-			return sql!=null && sql._sql!=null && sql._sql.StartsWith(sqltype, StringComparison.InvariantCultureIgnoreCase);
+			return sql != null && sql._sql != null && sql._sql.StartsWith(sqltype, StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		public void Build(StringBuilder sb, List<object> args, Sql lhs)
@@ -1294,7 +1294,7 @@ namespace PetaPoco
 				if (Is(lhs, "WHERE ") && Is(this, "WHERE "))
 					sql = "AND " + sql.Substring(6);
 				if (Is(lhs, "ORDER BY ") && Is(this, "ORDER BY "))
-					sql=", " + sql.Substring(9);
+					sql = ", " + sql.Substring(9);
 
 				sb.Append(sql);
 			}
