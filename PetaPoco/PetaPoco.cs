@@ -1145,10 +1145,6 @@ namespace PetaPoco
 						var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), typeof(T), new Type[] { typeof(IDataReader) }, true);
 						var il = m.GetILGenerator();
 
-						// Running under mono?
-						int p = (int)Environment.OSVersion.Platform;
-						bool Mono = (p == 4) || (p == 6) || (p == 128);
-
 						// var poco=new T()
 						il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
 
@@ -1207,8 +1203,8 @@ namespace PetaPoco
 									il.Emit(OpCodes.Ldc_I4, i);										// *,rdr,i
 									il.Emit(OpCodes.Callvirt, valuegetter);							// *,value
 
-									// Mono give IL error if we don't explicitly create Nullable instance for the assignment
-									if (Mono && Nullable.GetUnderlyingType(dstType) != null)
+									// Convert to Nullable
+									if (Nullable.GetUnderlyingType(dstType) != null)
 									{
 										il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] { Nullable.GetUnderlyingType(dstType) }));
 									}
