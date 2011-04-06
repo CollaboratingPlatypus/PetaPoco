@@ -5,17 +5,17 @@ using System.Linq;
 using System.Web;
 using PetaPoco;
 
-namespace sqlserver
+namespace sqlserverce
 {
-	public partial class sqlserverDB : Database
+	public partial class sqlserverceDB : Database
 	{
-		public sqlserverDB() 
-			: base("sqlserver")
+		public sqlserverceDB() 
+			: base("sqlserverce")
 		{
 			CommonConstruct();
 		}
 
-		public sqlserverDB(string connectionStringName) 
+		public sqlserverceDB(string connectionStringName) 
 			: base(connectionStringName)
 		{
 			CommonConstruct();
@@ -25,11 +25,11 @@ namespace sqlserver
 		
 		public interface IFactory
 		{
-			sqlserverDB GetInstance();
+			sqlserverceDB GetInstance();
 		}
 		
 		public static IFactory Factory { get; set; }
-        public static sqlserverDB GetInstance()
+        public static sqlserverceDB GetInstance()
         {
 			if (_instance!=null)
 				return _instance;
@@ -37,10 +37,10 @@ namespace sqlserver
 			if (Factory!=null)
 				return Factory.GetInstance();
 			else
-				return new sqlserverDB();
+				return new sqlserverceDB();
         }
 
-		[ThreadStatic] static sqlserverDB _instance;
+		[ThreadStatic] static sqlserverceDB _instance;
 		
 		public override void OnBeginTransaction()
 		{
@@ -56,7 +56,7 @@ namespace sqlserver
         
 		public class Record<T> where T:new()
 		{
-			public static sqlserverDB repo { get { return sqlserverDB.GetInstance(); } }
+			public static sqlserverceDB repo { get { return sqlserverceDB.GetInstance(); } }
 			public bool IsNew() { return repo.IsNew(this); }
 			public void Save() { repo.Save(this); }
 			public object Insert() { return repo.Insert(this); }
@@ -85,24 +85,25 @@ namespace sqlserver
 	
 
     
-	[TableName("names")]
+	[TableName("petapoco")]
+	[PrimaryKey("id")]
 	[ExplicitColumns]
-    public partial class name : sqlserverDB.Record<name>  
-    {
-        [Column] public long id { get; set; }
-        [Column] public string title { get; set; }
-	}
-
-    
-	[TableName("articles")]
-	[ExplicitColumns]
-    public partial class article : sqlserverDB.Record<article>  
+    public partial class petapoco : sqlserverceDB.Record<petapoco>  
     {
         [Column] public long id { get; set; }
         [Column] public string title { get; set; }
         [Column] public bool draft { get; set; }
         [Column] public DateTime date_created { get; set; }
+        [Column] public DateTime? date_edited { get; set; }
         [Column] public string content { get; set; }
+	}
+
+    
+	[TableName("test")]
+	[ExplicitColumns]
+    public partial class test : sqlserverceDB.Record<test>  
+    {
+        [Column] public long id { get; set; }
 	}
 
 }

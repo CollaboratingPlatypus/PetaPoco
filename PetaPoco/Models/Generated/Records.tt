@@ -1,7 +1,7 @@
 <#@ include file="PetaPoco.Core.ttinclude" #>
 <#
 	// Settings
-    ConnectionStringName = "sqlserver";
+    ConnectionStringName = "sqlserverce";
     Namespace = ConnectionStringName;
     DatabaseName = ConnectionStringName;
     string RepoName = DatabaseName + "DB";

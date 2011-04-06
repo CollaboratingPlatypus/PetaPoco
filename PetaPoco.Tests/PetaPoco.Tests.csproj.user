@@ -10,4 +10,14 @@
     <StartProgram>C:\Program Files (x86)\NUnit 2.5.6\bin\net-2.0\nunit.exe</StartProgram>
     <StartArguments>PetaPoco.Tests.dll /run</StartArguments>
   </PropertyGroup>
+  <PropertyGroup>
+    <PublishUrlHistory />
+    <InstallUrlHistory />
+    <SupportUrlHistory />
+    <UpdateUrlHistory />
+    <BootstrapperUrlHistory />
+    <ErrorReportUrlHistory />
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
 </Project>

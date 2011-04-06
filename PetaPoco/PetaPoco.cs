@@ -122,6 +122,14 @@ namespace PetaPoco
 			CommonConstruct();
 		}
 
+		enum DBType
+		{
+			SqlServer,
+			SqlServerCE,
+			MySql,
+		}
+		DBType _dbType = DBType.SqlServer;
+
 		// Common initialization
 		void CommonConstruct()
 		{
@@ -131,9 +139,22 @@ namespace PetaPoco
 			ForceDateTimesToUtc = true;
 
 			if (_providerName != null)
+			{
 				_factory = DbProviderFactories.GetFactory(_providerName);
+				if (_factory.GetType().Name == "MySqlClientFactory")
+					_dbType = DBType.MySql;
+				else if (_factory.GetType().Name == "SqlCeProviderFactory")
+					_dbType = DBType.SqlServerCE;
+			}
+			else
+			{
+				if (_sharedConnection.GetType().Name == "MySqlConnection")
+					_dbType = DBType.MySql;
+				else if (_sharedConnection.GetType().Name == "SqlCeConnection")
+					_dbType = DBType.SqlServerCE;
+			}
 
-			if (_connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && IsMySql())
+			if (_connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && _dbType==DBType.MySql)
 				_paramPrefix = "?";
 		}
 
@@ -143,10 +164,6 @@ namespace PetaPoco
 			if (_sharedConnectionDepth > 0)
 				CloseSharedConnection();
 		}
-
-		// Who are we talking too?
-		bool IsMySql() { return string.Compare(_providerName, "MySql.Data.MySqlClient", true) == 0; }
-		bool IsSqlServer() { return string.Compare(_providerName, "System.Data.SqlClient", true) == 0; }
 
 		// Open a connection (can be nested)
 		public void OpenSharedConnection()
@@ -628,16 +645,18 @@ namespace PetaPoco
 
 			// Build the SQL for the actual final result
 			string sqlPage;
-			if (IsSqlServer())
+			if (_dbType==DBType.SqlServer)
 			{
-				// Ugh really?
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>{2} AND __rn<={3}",
 										sqlOrderBy, sqlSelectRemoved, (page - 1) * itemsPerPage, page * itemsPerPage);
 			}
+			else if (_dbType==DBType.SqlServerCE)
+			{
+				sqlPage = string.Format("{0}\nOFFSET {2} ROWS FETCH NEXT {1} ROWS ONLY", sql, itemsPerPage, (page - 1) * itemsPerPage);
+			}
 			else
 			{
-				// Nice
 				sqlPage = string.Format("{0}\nLIMIT {1} OFFSET {2}", sql, itemsPerPage, (page - 1) * itemsPerPage);
 			}
 
@@ -771,7 +790,7 @@ namespace PetaPoco
 							AddParam(cmd, i.Value.PropertyInfo.GetValue(poco, null), _paramPrefix);
 						}
 
-						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2}); SELECT @@IDENTITY AS NewID;",
+						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
 								tableName,
 								string.Join(",", names.ToArray()),
 								string.Join(",", values.ToArray())
@@ -780,8 +799,17 @@ namespace PetaPoco
 						_lastSql = cmd.CommandText;
 						_lastArgs = values.ToArray();
 
-						// Insert the record, should get back it's ID
-						var id = cmd.ExecuteScalar();
+						object id;
+						if (_dbType!=DBType.SqlServerCE)
+						{
+							cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
+							id = cmd.ExecuteScalar();
+						}
+						else
+						{
+							cmd.ExecuteNonQuery();
+							id = ExecuteScalar<object>("SELECT @@IDENTITY AS NewID;");
+						}
 
 						// Assign the ID back to the primary key property
 						if (primaryKeyName != null)

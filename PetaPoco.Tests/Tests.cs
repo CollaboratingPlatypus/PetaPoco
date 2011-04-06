@@ -8,6 +8,7 @@ using PetaPoco;
 namespace PetaPoco.Tests
 {
 	[TestFixture("sqlserver")]
+	[TestFixture("sqlserverce")]
 	[TestFixture("mysql")]
 	public class Tests : AssertionHelper
 	{
