@@ -28,36 +28,9 @@ namespace PetaPoco.DevBed
 		static void Main(string[] args)
 		{
 
-			
 			var db=new PetaPoco.Database("mysql");
-
-			/*
-			var l1 = db.FetchIL<article>("ORDER BY article_id");
-			var l2 = db.Fetch<article>("ORDER BY article_id");
-
-
-			var sw2 = new System.Diagnostics.Stopwatch();
-			sw2.Start();
-			for (int i = 0; i < 100; i++)
-			{
-				l2 = db.Fetch<article>("ORDER BY article_id");
-			}
-			sw2.Stop();
-
-			var sw1 = new System.Diagnostics.Stopwatch();
-			sw1.Start();
-			for (int i = 0; i < 100; i++)
-			{
-				l1 = db.FetchIL<article>("ORDER BY article_id");
-			}
-			sw1.Stop();
-
-			Console.WriteLine("MSIL:      {0}", sw1.ElapsedTicks);
-			Console.WriteLine("Reflection:{0}", sw2.ElapsedTicks);
-			Console.WriteLine("Percent:   {0}", (double)(sw2.ElapsedTicks - sw1.ElapsedTicks)*100/(double)(sw2.ElapsedTicks));
-			 */
-
-			foreach (var a in db.Fetch<article>("ORDER BY article_id"))
+			var page = db.Page<article>(5,5,"ORDER BY article_id");
+			foreach (var a in page.Items)
 			{
 				Console.WriteLine("{0}\t{1}", a.article_id, a.title);
 			}

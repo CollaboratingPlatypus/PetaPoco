@@ -538,6 +538,91 @@ namespace PetaPoco.Tests
 					);
 			Expect(items.Count, Is.EqualTo(4));
 		}
+
+		[Test]
+		public void SingleOrDefault_Empty()
+		{
+			Expect(db.SingleOrDefault<deco>("WHERE id=@0", 0), Is.Null);
+		}
+
+		[Test]
+		public void SingleOrDefault_Single()
+		{
+			var id = InsertRecords(1);
+			Expect(db.SingleOrDefault<deco>("WHERE id=@0", id), Is.Not.Null);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void SingleOrDefault_Multiple()
+		{
+			var id = InsertRecords(2);
+			db.SingleOrDefault<deco>("WHERE id>=@0", id);
+		}
+
+		[Test]
+		public void FirstOrDefault_Empty()
+		{
+			Expect(db.FirstOrDefault<deco>("WHERE id=@0", 0), Is.Null);
+		}
+
+		[Test]
+		public void FirstOrDefault_First()
+		{
+			var id = InsertRecords(1);
+			Expect(db.FirstOrDefault<deco>("WHERE id=@0", id), Is.Not.Null);
+		}
+
+		[Test]
+		public void FirstOrDefault_Multiple()
+		{
+			var id = InsertRecords(2);
+			Expect(db.FirstOrDefault<deco>("WHERE id>=@0", id), Is.Not.Null);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void Single_Empty()
+		{
+			db.Single<deco>("WHERE id=@0", 0);
+		}
+
+		[Test]
+		public void Single_Single()
+		{
+			var id = InsertRecords(1);
+			Expect(db.Single<deco>("WHERE id=@0", id), Is.Not.Null);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void Single_Multiple()
+		{
+			var id = InsertRecords(2);
+			db.Single<deco>("WHERE id>=@0", id);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void First_Empty()
+		{
+			db.First<deco>("WHERE id=@0", 0);
+		}
+
+		[Test]
+		public void First_First()
+		{
+			var id = InsertRecords(1);
+			Expect(db.First<deco>("WHERE id=@0", id), Is.Not.Null);
+		}
+
+		[Test]
+		public void First_Multiple()
+		{
+			var id = InsertRecords(2);
+			Expect(db.First<deco>("WHERE id>=@0", id), Is.Not.Null);
+		}
+
 	}
 
 }
