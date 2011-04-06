@@ -648,16 +648,19 @@ namespace PetaPoco
 			if (_dbType==DBType.SqlServer)
 			{
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
-				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>{2} AND __rn<={3}",
-										sqlOrderBy, sqlSelectRemoved, (page - 1) * itemsPerPage, page * itemsPerPage);
+				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>@{2} AND __rn<=@{3}",
+										sqlOrderBy, sqlSelectRemoved, args.Length, args.Length+1);
+				args = args.Concat(new object[] { (page - 1) * itemsPerPage, page * itemsPerPage }).ToArray();
 			}
 			else if (_dbType==DBType.SqlServerCE)
 			{
-				sqlPage = string.Format("{0}\nOFFSET {2} ROWS FETCH NEXT {1} ROWS ONLY", sql, itemsPerPage, (page - 1) * itemsPerPage);
+				sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", sql, args.Length, args.Length + 1);
+				args = args.Concat(new object[] { (page - 1) * itemsPerPage, itemsPerPage }).ToArray();
 			}
 			else
 			{
-				sqlPage = string.Format("{0}\nLIMIT {1} OFFSET {2}", sql, itemsPerPage, (page - 1) * itemsPerPage);
+				sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length+1);
+				args = args.Concat(new object[] { itemsPerPage, (page - 1) * itemsPerPage}).ToArray();
 			}
 
 			// Get the records
