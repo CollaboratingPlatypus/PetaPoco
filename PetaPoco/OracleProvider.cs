@@ -8,17 +8,45 @@ using System.Reflection;
 
 namespace PetaPoco
 {
-	// Thanks to Adam Schroder (@schotime) for this.
-	//
-	// This extra file provides an implementation of DbProviderFactory for early versions of the Oracle
-	// drivers that don't include include it.  For later versions of Oracle, the standard OracleProviderFactory
-	// class should work fine
-	//
-	// Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands
-	//
-	// Currently untested.
-	//
-	// Usage:   new PetaPoco.Database("<connstring>", new PetaPoco.OracleProvider())
+	/* 
+	Thanks to Adam Schroder (@schotime) for this.
+	
+	This extra file provides an implementation of DbProviderFactory for early versions of the Oracle
+	drivers that don't include include it.  For later versions of Oracle, the standard OracleProviderFactory
+	class should work fine
+	
+	Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands
+	
+	Currently untested.
+	
+	Usage:   
+		
+			new PetaPoco.Database("<connstring>", new PetaPoco.OracleProvider())
+	
+	Or in your app/web config (be sure to change ASSEMBLYNAME to the name of your 
+	assembly containing OracleProvider.cs)
+	
+		<connectionStrings>
+			<add
+				name="oracle"
+				connectionString="WHATEVER"
+				providerName="Oracle"
+				/>
+		</connectionStrings>
+
+		<system.data>
+			<DbProviderFactories>
+				<add name="PetaPoco Oracle Provider" invariant="Oracle" description="PetaPoco Oracle Provider" 
+								type="PetaPoco.OracleProvider, ASSEMBLYNAME" />
+			</DbProviderFactories>
+		</system.data>
+	 
+	
+
+	 */
+
+
+
 
 	public class OracleProvider : DbProviderFactory
 	{
@@ -28,7 +56,10 @@ namespace PetaPoco
 		private static Type _connectionType;
 		private static Type _commandType;
 
-		static OracleProvider()
+		// Required for DbProviderFactories.GetFactory() to work.
+		public static OracleProvider Instance = new OracleProvider();
+
+		public OracleProvider()
 		{
 			_connectionType = ReflectHelper.TypeFromAssembly(_connectionTypeName, _assemblyName);
 			_commandType = ReflectHelper.TypeFromAssembly(_commandTypeName, _assemblyName);
