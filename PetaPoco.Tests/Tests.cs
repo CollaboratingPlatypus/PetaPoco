@@ -649,6 +649,32 @@ namespace PetaPoco.Tests
 			Expect(db.First<deco>("WHERE id>=@0", id), Is.Not.Null);
 		}
 
+		[Test]
+		public void AutoSelect_SelectPresent()
+		{
+			var id = InsertRecords(1);
+			var a = db.SingleOrDefault<deco>("SELECT * FROM petapoco WHERE id=@0", id);
+			Expect(a, Is.Not.Null);
+			Expect(a.id, Is.EqualTo(id));
+		}
+
+		[Test]
+		public void AutoSelect_SelectMissingFromMissing()
+		{
+			var id = InsertRecords(1);
+			var a = db.SingleOrDefault<deco>("WHERE id=@0", id);
+			Expect(a, Is.Not.Null);
+			Expect(a.id, Is.EqualTo(id));
+		}
+
+		[Test]
+		public void AutoSelect_SelectMissingFromPresent()
+		{
+			var id = InsertRecords(1);
+			var a = db.SingleOrDefault<deco>("FROM petapoco WHERE id=@0", id);
+			Expect(a, Is.Not.Null);
+			Expect(a.id, Is.EqualTo(id));
+		}
 	}
 
 }

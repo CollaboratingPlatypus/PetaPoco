@@ -429,12 +429,16 @@ namespace PetaPoco
 		}
 
 		Regex rxSelect = new Regex(@"^\s*SELECT\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		Regex rxFrom = new Regex(@"^\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
 			if (!rxSelect.IsMatch(sql))
 			{
 				var pd = PocoData.ForType(typeof(T));
-				sql=string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+				if (!rxFrom.IsMatch(sql))
+					sql=string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+				else
+					sql = string.Format("SELECT {0} {1}", pd.QueryColumns, sql);
 			}
 			return sql;
 		}
