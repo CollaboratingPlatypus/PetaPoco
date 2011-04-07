@@ -47,6 +47,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Npgsql">
+      <HintPath>..\..\..\..\..\..\Program Files\PostgreSQL\.NET Provider\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.5.6.10205, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -91,6 +94,8 @@
     <EmbeddedResource Include="sqlserver_done.sql" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="postgresql_done.sql" />
+    <EmbeddedResource Include="postgresql_init.sql" />
     <Content Include="petapoco.sdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

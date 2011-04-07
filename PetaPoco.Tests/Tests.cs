@@ -10,10 +10,13 @@ namespace PetaPoco.Tests
 	[TestFixture("sqlserver")]
 	[TestFixture("sqlserverce")]
 	[TestFixture("mysql")]
+	[TestFixture("postgresql")]
 	public class Tests : AssertionHelper
 	{
 		public Tests(string connectionStringName)
 		{
+			var x = new Npgsql.NpgsqlConnection();
+			var a = AppDomain.CurrentDomain.GetAssemblies();
 			_connectionStringName = connectionStringName;
 		}
 
@@ -25,6 +28,7 @@ namespace PetaPoco.Tests
 		public void CreateDB()
 		{
 			db = new Database(_connectionStringName);
+			db.OpenSharedConnection();		// <-- Wow, this is crucial to getting SqlCE to perform.
 			db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_init.sql", _connectionStringName)));
 		}
 

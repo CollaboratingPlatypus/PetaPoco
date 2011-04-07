@@ -127,6 +127,7 @@ namespace PetaPoco
 			SqlServer,
 			SqlServerCE,
 			MySql,
+			PostgreSQL,
 		}
 		DBType _dbType = DBType.SqlServer;
 
@@ -139,22 +140,14 @@ namespace PetaPoco
 			ForceDateTimesToUtc = true;
 
 			if (_providerName != null)
-			{
 				_factory = DbProviderFactories.GetFactory(_providerName);
-				if (_factory.GetType().Name == "MySqlClientFactory")
-					_dbType = DBType.MySql;
-				else if (_factory.GetType().Name == "SqlCeProviderFactory")
-					_dbType = DBType.SqlServerCE;
-			}
-			else
-			{
-				if (_sharedConnection.GetType().Name == "MySqlConnection")
-					_dbType = DBType.MySql;
-				else if (_sharedConnection.GetType().Name == "SqlCeConnection")
-					_dbType = DBType.SqlServerCE;
-			}
 
-			if (_connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && _dbType==DBType.MySql)
+			string dbtype = (_factory==null ? _sharedConnection.GetType() : _factory.GetType()).Name;
+			if (dbtype.StartsWith("MySql"))			_dbType = DBType.MySql;
+			else if (dbtype.StartsWith("SqlCe"))	_dbType = DBType.SqlServerCE;
+			else if (dbtype.StartsWith("Npgsql"))	_dbType = DBType.PostgreSQL;
+
+			if (_connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && _dbType == DBType.MySql)
 				_paramPrefix = "?";
 		}
 
@@ -645,22 +638,22 @@ namespace PetaPoco
 
 			// Build the SQL for the actual final result
 			string sqlPage;
-			if (_dbType==DBType.SqlServer)
+			if (_dbType == DBType.SqlServer)
 			{
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>@{2} AND __rn<=@{3}",
-										sqlOrderBy, sqlSelectRemoved, args.Length, args.Length+1);
+										sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
 				args = args.Concat(new object[] { (page - 1) * itemsPerPage, page * itemsPerPage }).ToArray();
 			}
-			else if (_dbType==DBType.SqlServerCE)
+			else if (_dbType == DBType.SqlServerCE)
 			{
 				sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", sql, args.Length, args.Length + 1);
 				args = args.Concat(new object[] { (page - 1) * itemsPerPage, itemsPerPage }).ToArray();
 			}
 			else
 			{
-				sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length+1);
-				args = args.Concat(new object[] { itemsPerPage, (page - 1) * itemsPerPage}).ToArray();
+				sqlPage = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", sql, args.Length, args.Length + 1);
+				args = args.Concat(new object[] { itemsPerPage, (page - 1) * itemsPerPage }).ToArray();
 			}
 
 			// Get the records
@@ -803,16 +796,27 @@ namespace PetaPoco
 						_lastArgs = values.ToArray();
 
 						object id;
-						if (_dbType!=DBType.SqlServerCE)
+						switch (_dbType)
 						{
-							cmd.CommandText += string.Format(";\nSELECT {0} AS NewID;", (_dbType == DBType.SqlServer ? "SCOPE_IDENTITY()" : "@@IDENTITY"));
-							id = cmd.ExecuteScalar();
+							case DBType.SqlServerCE:
+								cmd.ExecuteNonQuery();
+								id = ExecuteScalar<object>("SELECT @@IDENTITY AS NewID;");
+								break;
+							case DBType.SqlServer:
+								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
+								id = cmd.ExecuteScalar();
+								break;
+							case DBType.PostgreSQL:
+								//cmd.CommandText += string.Format(";\nSELECT currval('{0}_{1}_seq') AS NewID;", tableName, primaryKeyName);
+								cmd.CommandText += string.Format("returning {0} as NewID", primaryKeyName);
+								id = cmd.ExecuteScalar();
+								break;
+							default:
+								cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
+								id = cmd.ExecuteScalar();
+								break;
 						}
-						else
-						{
-							cmd.ExecuteNonQuery();
-							id = ExecuteScalar<object>("SELECT @@IDENTITY AS NewID;");
-						}
+
 
 						// Assign the ID back to the primary key property
 						if (primaryKeyName != null)

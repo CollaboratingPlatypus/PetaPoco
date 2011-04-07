@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace PetaPoco.DevBed
 {
@@ -27,7 +28,6 @@ namespace PetaPoco.DevBed
 	{
 		static void Main(string[] args)
 		{
-
 			var db=new PetaPoco.Database("mysql");
 			var page = db.Page<article>(5,5,"ORDER BY article_id");
 			foreach (var a in page.Items)
