@@ -1302,7 +1302,7 @@ namespace PetaPoco
 			_args = args;
 		}
 
-		public static Sql builder
+		public static Sql Builder
 		{
 			get { return new Sql(); }
 		}
