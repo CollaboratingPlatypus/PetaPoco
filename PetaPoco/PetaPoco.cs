@@ -147,7 +147,7 @@ namespace PetaPoco
 			else if (dbtype.StartsWith("SqlCe"))	_dbType = DBType.SqlServerCE;
 			else if (dbtype.StartsWith("Npgsql"))	_dbType = DBType.PostgreSQL;
 
-			if (_connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0 && _dbType == DBType.MySql)
+			if (_dbType == DBType.MySql && _connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0)
 				_paramPrefix = "?";
 		}
 
@@ -303,7 +303,7 @@ namespace PetaPoco
 				{
 					p.Size = (item as string).Length + 1;
 					if (p.Size < 4000)
-						p.Size = 4000;
+						p.Size = 4000;		// Help query plan caching by using common size
 					p.Value = item;
 				}
 				else
@@ -318,9 +318,9 @@ namespace PetaPoco
 		// Create a command
 		public DbCommand CreateCommand(DbConnection connection, string sql, params object[] args)
 		{
+			// Perform named argument replacements
 			if (EnableNamedParams)
 			{
-				// Perform named argument replacements
 				var new_args = new List<object>();
 				sql = ProcessParams(sql, args, new_args);
 				args = new_args.ToArray();
@@ -329,51 +329,21 @@ namespace PetaPoco
 			// If we're in MySQL "Allow User Variables", we need to fix up parameter prefixes
 			if (_paramPrefix == "?")
 			{
-				// Convert "@parameter" -> "?parameter"
+				// Convert "@parameter" -> "?parameter", @@uservar -> @uservar and @@@systemvar -> @@systemvar
 				Regex paramReg = new Regex(@"(?<!@)@\w+");
 				sql = paramReg.Replace(sql, m => "?" + m.Value.Substring(1));
-
-				// Convert @@uservar -> @uservar and @@@systemvar -> @@systemvar
 				sql = sql.Replace("@@", "@");
 			}
 
-			// Save the last sql and args
+			// Create the command and add parameters
 			_lastSql = sql;
 			_lastArgs = args;
-
 			DbCommand cmd = connection.CreateCommand();
 			cmd.CommandText = sql;
 			cmd.Transaction = _transaction;
 			foreach (var item in args)
 			{
-				var p = cmd.CreateParameter();
-				p.ParameterName = string.Format("{0}{1}", _paramPrefix, cmd.Parameters.Count);
-				if (item == null)
-				{
-					p.Value = DBNull.Value;
-				}
-				else
-				{
-					if (item.GetType() == typeof(Guid))
-					{
-						p.Value = item.ToString();
-						p.DbType = DbType.String;
-						p.Size = 4000;
-					}
-					else if (item.GetType() == typeof(string))
-					{
-						p.Size = (item as string).Length + 1;
-						if (p.Size < 4000)
-							p.Size = 4000;
-						p.Value = item;
-					}
-					else
-					{
-						p.Value = item;
-					}
-				}
-
-				cmd.Parameters.Add(p);
+				AddParam(cmd, item, _paramPrefix);
 			}
 			return cmd;
 		}
@@ -449,13 +419,12 @@ namespace PetaPoco
 		Regex rxSelect = new Regex(@"^\s*SELECT\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
-			// Already present?
-			if (rxSelect.IsMatch(sql))
-				return sql;
-
-			// Get the poco data for this type
-			var pd = PocoData.ForType(typeof(T));
-			return string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+			if (!rxSelect.IsMatch(sql))
+			{
+				var pd = PocoData.ForType(typeof(T));
+				sql=string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+			}
+			return sql;
 		}
 
 		public bool EnableAutoSelect { get; set; }
@@ -465,7 +434,6 @@ namespace PetaPoco
 		// Return a typed list of pocos
 		public List<T> Fetch<T>(string sql, params object[] args) where T : new()
 		{
-			// Auto select clause?
 			if (EnableAutoSelect)
 				sql = AddSelectClause<T>(sql);
 
@@ -501,91 +469,13 @@ namespace PetaPoco
 			}
 		}
 
-		// Optimized version when only needing a single record
-		public T FirstOrDefault<T>(string sql, params object[] args) where T : new()
+		public List<T> Fetch<T>(Sql sql) where T : new()
 		{
-			// Auto select clause?
-			if (EnableAutoSelect)
-				sql = AddSelectClause<T>(sql);
-
-			try
-			{
-				OpenSharedConnection();
-				try
-				{
-					using (var cmd = CreateCommand(_sharedConnection, sql, args))
-					{
-						using (var r = cmd.ExecuteReader())
-						{
-							if (!r.Read())
-								return default(T);
-
-							var pd = PocoData.ForType(typeof(T));
-							var factory = pd.GetFactory<T>(sql + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
-							return factory(r);
-						}
-					}
-				}
-				finally
-				{
-					CloseSharedConnection();
-				}
-			}
-			catch (Exception x)
-			{
-				OnException(x);
-				throw;
-			}
+			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
 
-		// Optimized version when only wanting a single record
-		public T SingleOrDefault<T>(string sql, params object[] args) where T : new()
-		{
-			// Auto select clause?
-			if (EnableAutoSelect)
-				sql = AddSelectClause<T>(sql);
-
-			try
-			{
-				OpenSharedConnection();
-				try
-				{
-					using (var cmd = CreateCommand(_sharedConnection, sql, args))
-					{
-						using (var r = cmd.ExecuteReader())
-						{
-							if (!r.Read())
-								return default(T);
-
-							var pd = PocoData.ForType(typeof(T));
-							var factory = pd.GetFactory<T>(sql + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
-							T ret = factory(r);
-
-							if (r.Read())
-								throw new InvalidOperationException("Sequence contains more than one element");
-
-							return ret;
-						}
-					}
-				}
-				finally
-				{
-					CloseSharedConnection();
-				}
-			}
-			catch (Exception x)
-			{
-				OnException(x);
-				throw;
-			}
-		}
-
-
-		// Warning: scary regex follows
-		static Regex rxColumns = new Regex(@"^\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b",
-							RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
-							RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static Regex rxColumns = new Regex(@"^\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
 			sqlSelectRemoved = null;
@@ -714,11 +604,6 @@ namespace PetaPoco
 			}
 		}
 
-		public List<T> Fetch<T>(Sql sql) where T : new()
-		{
-			return Fetch<T>(sql.SQL, sql.Arguments);
-		}
-
 		public IEnumerable<T> Query<T>(Sql sql) where T : new()
 		{
 			return Query<T>(sql.SQL, sql.Arguments);
@@ -727,19 +612,19 @@ namespace PetaPoco
 
 		public T Single<T>(string sql, params object[] args) where T : new()
 		{
-			T val = SingleOrDefault<T>(sql, args);
-			if (val != null)
-				return val;
-			else
-				throw new InvalidOperationException("The sequence contains no elements");
+			return Fetch<T>(sql, args).Single();
+		}
+		public T SingleOrDefault<T>(string sql, params object[] args) where T : new()
+		{
+			return Fetch<T>(sql, args).SingleOrDefault();
 		}
 		public T First<T>(string sql, params object[] args) where T : new()
 		{
-			T val = FirstOrDefault<T>(sql, args);
-			if (val != null)
-				return val;
-			else
-				throw new InvalidOperationException("The sequence contains no elements");
+			return Fetch<T>(sql, args).First();
+		}
+		public T FirstOrDefault<T>(string sql, params object[] args) where T : new()
+		{
+			return Fetch<T>(sql, args).FirstOrDefault();
 		}
 
 		public T Single<T>(Sql sql) where T : new()
@@ -748,11 +633,11 @@ namespace PetaPoco
 		}
 		public T SingleOrDefault<T>(Sql sql) where T : new()
 		{
-			return SingleOrDefault<T>(sql.SQL, sql.Arguments);
+			return Fetch<T>(sql).SingleOrDefault();
 		}
 		public T FirstOrDefault<T>(Sql sql) where T : new()
 		{
-			return FirstOrDefault<T>(sql.SQL, sql.Arguments);
+			return Fetch<T>(sql).FirstOrDefault();
 		}
 		public T First<T>(Sql sql) where T : new()
 		{
@@ -807,7 +692,6 @@ namespace PetaPoco
 								id = cmd.ExecuteScalar();
 								break;
 							case DBType.PostgreSQL:
-								//cmd.CommandText += string.Format(";\nSELECT currval('{0}_{1}_seq') AS NewID;", tableName, primaryKeyName);
 								cmd.CommandText += string.Format("returning {0} as NewID", primaryKeyName);
 								id = cmd.ExecuteScalar();
 								break;
@@ -816,7 +700,6 @@ namespace PetaPoco
 								id = cmd.ExecuteScalar();
 								break;
 						}
-
 
 						// Assign the ID back to the primary key property
 						if (primaryKeyName != null)
@@ -887,12 +770,7 @@ namespace PetaPoco
 						}
 
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
-								tableName,
-								sb.ToString(),
-								primaryKeyName,
-								_paramPrefix,
-								index++
-								);
+											tableName, sb.ToString(), primaryKeyName, _paramPrefix,	index++);
 						AddParam(cmd, primaryKeyValue, _paramPrefix);
 
 						_lastSql = cmd.CommandText;
