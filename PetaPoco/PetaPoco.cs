@@ -504,30 +504,18 @@ namespace PetaPoco
 			return true;
 		}
 
-		// Fetch a page	
-		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
+		public void BuildPageQueries<T>(long page, long itemsPerPage, string sql, ref object[] args, out string sqlCount, out string sqlPage) where T : new()
 		{
 			// Add auto select clause
 			if (EnableAutoSelect)
 				sql = AddSelectClause<T>(sql);
 
 			// Split the SQL into the bits we need
-			string sqlCount, sqlSelectRemoved, sqlOrderBy;
+			string sqlSelectRemoved, sqlOrderBy;
 			if (!SplitSqlForPaging(sql, out sqlCount, out sqlSelectRemoved, out sqlOrderBy))
 				throw new Exception("Unable to parse SQL statement for paged query");
 
-			// Setup the paged result
-			var result = new Page<T>();
-			result.CurrentPage = page;
-			result.ItemsPerPage = itemsPerPage;
-			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
-			result.TotalPages = result.TotalItems / itemsPerPage;
-			if ((result.TotalItems % itemsPerPage) != 0)
-				result.TotalPages++;
-
-
 			// Build the SQL for the actual final result
-			string sqlPage;
 			if (_dbType == DBType.SqlServer)
 			{
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
@@ -546,6 +534,23 @@ namespace PetaPoco
 				args = args.Concat(new object[] { itemsPerPage, (page - 1) * itemsPerPage }).ToArray();
 			}
 
+		}
+
+		// Fetch a page	
+		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
+		{
+			string sqlCount, sqlPage;
+			BuildPageQueries<T>(page, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
+
+			// Setup the paged result
+			var result = new Page<T>();
+			result.CurrentPage = page;
+			result.ItemsPerPage = itemsPerPage;
+			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
+			result.TotalPages = result.TotalItems / itemsPerPage;
+			if ((result.TotalItems % itemsPerPage) != 0)
+				result.TotalPages++;
+
 			// Get the records
 			result.Items = Fetch<T>(sqlPage, args);
 
@@ -556,6 +561,19 @@ namespace PetaPoco
 		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) where T : new()
 		{
 			return Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
+		}
+
+
+		public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
+		{
+			string sqlCount, sqlPage;
+			BuildPageQueries<T>(page, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
+			return Fetch<T>(sqlPage, args);
+		}
+
+		public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) where T : new()
+		{
+			return Fetch<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 		}
 
 		// Return an enumerable collection of pocos

@@ -243,7 +243,7 @@ namespace PetaPoco.Tests
 		}
 
 		[Test]
-		public void FetchPage()
+		public void Page()
 		{
 			// In this test we're checking that the page count is correct when there are
 			// not-exactly pagesize*N records (ie: a partial page at the end)
@@ -272,7 +272,29 @@ namespace PetaPoco.Tests
 		}
 
 		[Test]
-		public void FetchPage_boundary()
+		public void FetchPage()
+		{
+			// Create some records
+			const int count = 13;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.Fetch<poco>(2, 5, "SELECT * from petapoco ORDER BY id");
+
+			// Check em
+			int i = 0;
+			foreach (var p in r)
+			{
+				Expect(p.id, Is.EqualTo(id + i + 5));
+				i++;
+			}
+
+			// Check other stats
+			Expect(r.Count, Is.EqualTo(5));
+		}
+
+		[Test]
+		public void Page_boundary()
 		{
 			// In this test we're checking that the page count is correct when there are
 			// exactly pagesize*N records.
