@@ -1302,6 +1302,11 @@ namespace PetaPoco
 			_args = args;
 		}
 
+		public static Sql builder
+		{
+			get { return new Sql(); }
+		}
+
 		string _sql;
 		object[] _args;
 		Sql _rhs;
