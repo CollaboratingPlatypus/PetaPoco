@@ -805,7 +805,7 @@ namespace PetaPoco
 						object id;
 						if (_dbType!=DBType.SqlServerCE)
 						{
-							cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
+							cmd.CommandText += string.Format(";\nSELECT {0} AS NewID;", (_dbType == DBType.SqlServer ? "SCOPE_IDENTITY()" : "@@IDENTITY"));
 							id = cmd.ExecuteScalar();
 						}
 						else
