@@ -12,3 +12,4 @@ CREATE TABLE petapoco (
 	
 	PRIMARY KEY (id)
 );
+

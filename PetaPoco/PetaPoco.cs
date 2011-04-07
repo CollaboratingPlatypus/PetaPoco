@@ -98,6 +98,13 @@ namespace PetaPoco
 			CommonConstruct();
 		}
 
+		public Database(string connectionString, DbProviderFactory provider)
+		{
+			_connectionString = connectionString;
+			_factory = provider;
+			CommonConstruct();
+		}
+
 		public Database(string connectionStringName)
 		{
 			// Use first?
@@ -128,6 +135,7 @@ namespace PetaPoco
 			SqlServerCE,
 			MySql,
 			PostgreSQL,
+			Oracle,
 		}
 		DBType _dbType = DBType.SqlServer;
 
@@ -146,9 +154,12 @@ namespace PetaPoco
 			if (dbtype.StartsWith("MySql"))			_dbType = DBType.MySql;
 			else if (dbtype.StartsWith("SqlCe"))	_dbType = DBType.SqlServerCE;
 			else if (dbtype.StartsWith("Npgsql"))	_dbType = DBType.PostgreSQL;
+			else if (dbtype.StartsWith("Oracle"))	_dbType = DBType.Oracle;
 
 			if (_dbType == DBType.MySql && _connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0)
 				_paramPrefix = "?";
+			if (_dbType == DBType.Oracle)
+				_paramPrefix = ":";
 		}
 
 		// Automatically close one open shared connection
@@ -338,7 +349,8 @@ namespace PetaPoco
 			// Create the command and add parameters
 			_lastSql = sql;
 			_lastArgs = args;
-			DbCommand cmd = connection.CreateCommand();
+			DbCommand cmd = _factory == null ? connection.CreateCommand() : _factory.CreateCommand();
+			cmd.Connection = connection;
 			cmd.CommandText = sql;
 			cmd.Transaction = _transaction;
 			foreach (var item in args)
@@ -516,7 +528,7 @@ namespace PetaPoco
 				throw new Exception("Unable to parse SQL statement for paged query");
 
 			// Build the SQL for the actual final result
-			if (_dbType == DBType.SqlServer)
+			if (_dbType == DBType.SqlServer || _dbType==DBType.Oracle)
 			{
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>@{2} AND __rn<=@{3}",

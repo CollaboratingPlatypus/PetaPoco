@@ -53,6 +53,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Records.tt</DependentUpon>
     </Compile>
+    <Compile Include="OracleProvider.cs" />
     <Compile Include="PetaPoco.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
