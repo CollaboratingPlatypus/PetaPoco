@@ -48,10 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Generated\Records.cs">
+    <Compile Include="Models\Generated\Database.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Records.tt</DependentUpon>
+      <DependentUpon>Database.tt</DependentUpon>
     </Compile>
     <Compile Include="OracleProvider.cs" />
     <Compile Include="PetaPoco.cs" />
@@ -61,9 +61,9 @@
     <None Include="App.config" />
     <None Include="Models\Generated\PetaPoco.Core.ttinclude" />
     <None Include="Models\Generated\PetaPoco.Generator.ttinclude" />
-    <None Include="Models\Generated\Records.tt">
+    <None Include="Models\Generated\Database.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Records.cs</LastGenOutput>
+      <LastGenOutput>Database.cs</LastGenOutput>
     </None>
     <None Include="PetaPoco.nuspec">
       <SubType>Designer</SubType>

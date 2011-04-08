@@ -1,0 +1,16 @@
+<#@ include file="PetaPoco.Core.ttinclude" #>
+<#
+	// Settings
+    ConnectionStringName = "";			// Uses last connection string in config if not specified
+    Namespace = "";
+    RepoName = "";
+    GenerateOperations = true;
+
+    // Read schema and generate output
+	var tables = LoadTables();
+	if (tables.Count>0)
+	{
+#>
+<#@ include file="PetaPoco.Generator.ttinclude" #>
+<# } #>
+

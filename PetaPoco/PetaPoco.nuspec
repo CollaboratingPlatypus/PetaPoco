@@ -3,7 +3,7 @@
 	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 		<id>PetaPoco</id>
 		<title>PetaPoco- A tiny ORMish thing for your POCOs</title>
-		<version>2.0.5</version>
+		<version>2.0.6</version>
 		<authors>Topten Software</authors>
 		<owners>Topten Software</owners>
 		<licenseUrl>http://www.toptensoftware.com/petapoco/license</licenseUrl>
@@ -17,7 +17,7 @@ PetaPoco is a tiny (approx 1,200 lines) .NET data access layer inspired by Massi
 	</metadata>
 	<files>
 		<file src="PetaPoco.cs" target="Content\Models" />
-		<file src="Models\Generated\PetaPoco*" target="Content\Models\Generated" />
 		<file src="Models\Generated\*.tt" target="Content\Models\Generated" />
+		<file src="Models\Generated\PetaPoco*" target="Content\Models\Generated" />
 	</files>
 </package>
