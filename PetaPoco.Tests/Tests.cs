@@ -15,8 +15,6 @@ namespace PetaPoco.Tests
 	{
 		public Tests(string connectionStringName)
 		{
-			var x = new Npgsql.NpgsqlConnection();
-			var a = AppDomain.CurrentDomain.GetAssemblies();
 			_connectionStringName = connectionStringName;
 		}
 

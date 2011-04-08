@@ -32,9 +32,6 @@ namespace PetaPoco.DevBed
 	{
 		static void Main(string[] args)
 		{
-			var db=new PetaPoco.Database("oracle");
-			db.Execute("SELECT * FROM BLAH");
-
 		}
 	}
 }

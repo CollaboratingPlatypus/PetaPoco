@@ -216,6 +216,48 @@ namespace PetaPoco.Tests
 
 			Expect(sql.SQL, Is.EqualTo("SELECT * FROM blah\nORDER BY x\n, y"));
 		}
+
+		[Test]
+		public void param_expansion_1()
+		{
+			// Simple collection parameter expansion
+			var sql = Sql.Builder.Append("@0 IN (@1) @2", 20, new int[] { 1, 2, 3 }, 30);
+			Expect(sql.SQL, Is.EqualTo("@0 IN (@1,@2,@3) @4"));
+			Expect(sql.Arguments.Length, Is.EqualTo(5));
+			Expect(sql.Arguments[0], Is.EqualTo(20));
+			Expect(sql.Arguments[1], Is.EqualTo(1));
+			Expect(sql.Arguments[2], Is.EqualTo(2));
+			Expect(sql.Arguments[3], Is.EqualTo(3));
+			Expect(sql.Arguments[4], Is.EqualTo(30));
+		}
+
+		[Test]
+		public void param_expansion_2()
+		{
+			// Out of order expansion
+			var sql = Sql.Builder.Append("IN (@3) (@1)", null, new int[] { 1, 2, 3 }, null, new int[] { 4, 5, 6 });
+			Expect(sql.SQL, Is.EqualTo("IN (@0,@1,@2) (@3,@4,@5)"));
+			Expect(sql.Arguments.Length, Is.EqualTo(6));
+			Expect(sql.Arguments[0], Is.EqualTo(4));
+			Expect(sql.Arguments[1], Is.EqualTo(5));
+			Expect(sql.Arguments[2], Is.EqualTo(6));
+			Expect(sql.Arguments[3], Is.EqualTo(1));
+			Expect(sql.Arguments[4], Is.EqualTo(2));
+			Expect(sql.Arguments[5], Is.EqualTo(3));
+		}
+
+		[Test]
+		public void param_expansion_named()
+		{
+			// Expand a named parameter
+			var sql = Sql.Builder.Append("IN (@numbers)", new { numbers = (new int[] { 1, 2, 3 }) } );
+			Expect(sql.SQL, Is.EqualTo("IN (@0,@1,@2)"));
+			Expect(sql.Arguments.Length, Is.EqualTo(3));
+			Expect(sql.Arguments[0], Is.EqualTo(1));
+			Expect(sql.Arguments[1], Is.EqualTo(2));
+			Expect(sql.Arguments[2], Is.EqualTo(3));
+		}
+
 	}
 
 }

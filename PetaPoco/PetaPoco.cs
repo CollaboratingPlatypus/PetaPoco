@@ -83,7 +83,7 @@ namespace PetaPoco
 	// Database class ... this is where most of the action happens
 	public class Database : IDisposable
 	{
-		public Database(DbConnection connection)
+		public Database(IDbConnection connection)
 		{
 			_sharedConnection = connection;
 			_connectionString = connection.ConnectionString;
@@ -150,11 +150,11 @@ namespace PetaPoco
 			if (_providerName != null)
 				_factory = DbProviderFactories.GetFactory(_providerName);
 
-			string dbtype = (_factory==null ? _sharedConnection.GetType() : _factory.GetType()).Name;
-			if (dbtype.StartsWith("MySql"))			_dbType = DBType.MySql;
-			else if (dbtype.StartsWith("SqlCe"))	_dbType = DBType.SqlServerCE;
-			else if (dbtype.StartsWith("Npgsql"))	_dbType = DBType.PostgreSQL;
-			else if (dbtype.StartsWith("Oracle"))	_dbType = DBType.Oracle;
+			string dbtype = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
+			if (dbtype.StartsWith("MySql")) _dbType = DBType.MySql;
+			else if (dbtype.StartsWith("SqlCe")) _dbType = DBType.SqlServerCE;
+			else if (dbtype.StartsWith("Npgsql")) _dbType = DBType.PostgreSQL;
+			else if (dbtype.StartsWith("Oracle")) _dbType = DBType.Oracle;
 
 			if (_dbType == DBType.MySql && _connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0)
 				_paramPrefix = "?";
@@ -261,24 +261,27 @@ namespace PetaPoco
 			{
 				string param = m.Value.Substring(1);
 
+				object arg_val;
+
 				int paramIndex;
 				if (int.TryParse(param, out paramIndex))
 				{
 					// Numbered parameter
 					if (paramIndex < 0 || paramIndex >= args_src.Length)
 						throw new ArgumentOutOfRangeException(string.Format("Parameter '@{0}' specified but only {1} parameters supplied (in `{2}`)", paramIndex, args_src.Length, _sql));
-					args_dest.Add(args_src[paramIndex]);
+					arg_val = args_src[paramIndex];
 				}
 				else
 				{
 					// Look for a property on one of the arguments with this name
 					bool found = false;
+					arg_val = null;
 					foreach (var o in args_src)
 					{
 						var pi = o.GetType().GetProperty(param);
 						if (pi != null)
 						{
-							args_dest.Add(pi.GetValue(o, null));
+							arg_val = pi.GetValue(o, null);
 							found = true;
 							break;
 						}
@@ -288,13 +291,28 @@ namespace PetaPoco
 						throw new ArgumentException(string.Format("Parameter '@{0}' specified but none of the passed arguments have a property with this name (in '{1}')", param, _sql));
 				}
 
-				return "@" + (args_dest.Count - 1).ToString();
+				// Expand collections to parameter lists
+				if ((arg_val as string) == null && (arg_val as System.Collections.IEnumerable)!=null)
+				{
+					var sb = new StringBuilder();
+					foreach (var i in arg_val as System.Collections.IEnumerable)
+					{
+						sb.Append((sb.Length == 0 ? "@" : ",@") + args_dest.Count.ToString());
+						args_dest.Add(i);
+					}
+					return sb.ToString();
+				}
+				else
+				{
+					args_dest.Add(arg_val);
+					return "@" + (args_dest.Count - 1).ToString();
+				}
 			}
 			);
 		}
 
 		// Add a parameter to a DB command
-		static void AddParam(DbCommand cmd, object item, string ParameterPrefix)
+		static void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
 		{
 			var p = cmd.CreateParameter();
 			p.ParameterName = string.Format("{0}{1}", ParameterPrefix, cmd.Parameters.Count);
@@ -327,7 +345,7 @@ namespace PetaPoco
 		}
 
 		// Create a command
-		public DbCommand CreateCommand(DbConnection connection, string sql, params object[] args)
+		public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args)
 		{
 			// Perform named argument replacements
 			if (EnableNamedParams)
@@ -337,19 +355,18 @@ namespace PetaPoco
 				args = new_args.ToArray();
 			}
 
-			// If we're in MySQL "Allow User Variables", we need to fix up parameter prefixes
-			if (_paramPrefix == "?")
+			// Perform parameter prefix replacements
+			if (_paramPrefix != "@")
 			{
-				// Convert "@parameter" -> "?parameter", @@uservar -> @uservar and @@@systemvar -> @@systemvar
 				Regex paramReg = new Regex(@"(?<!@)@\w+");
-				sql = paramReg.Replace(sql, m => "?" + m.Value.Substring(1));
-				sql = sql.Replace("@@", "@");
+				sql = paramReg.Replace(sql, m => _paramPrefix + m.Value.Substring(1));
+				sql = sql.Replace("@@", "@");		   // <- double @@ escapes a single @
 			}
 
 			// Create the command and add parameters
 			_lastSql = sql;
 			_lastArgs = args;
-			DbCommand cmd = _factory == null ? connection.CreateCommand() : _factory.CreateCommand();
+			IDbCommand cmd = _factory == null ? connection.CreateCommand() : _factory.CreateCommand();
 			cmd.Connection = connection;
 			cmd.CommandText = sql;
 			cmd.Transaction = _transaction;
@@ -436,7 +453,7 @@ namespace PetaPoco
 			{
 				var pd = PocoData.ForType(typeof(T));
 				if (!rxFrom.IsMatch(sql))
-					sql=string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+					sql = string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
 				else
 					sql = string.Format("SELECT {0} {1}", pd.QueryColumns, sql);
 			}
@@ -532,10 +549,10 @@ namespace PetaPoco
 				throw new Exception("Unable to parse SQL statement for paged query");
 
 			// Build the SQL for the actual final result
-			if (_dbType == DBType.SqlServer || _dbType==DBType.Oracle)
+			if (_dbType == DBType.SqlServer || _dbType == DBType.Oracle)
 			{
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
-				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) AS __rn, {1}) as __paged WHERE __rn>@{2} AND __rn<=@{3}",
+				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
 										sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
 				args = args.Concat(new object[] { (page - 1) * itemsPerPage, page * itemsPerPage }).ToArray();
 			}
@@ -598,9 +615,10 @@ namespace PetaPoco
 			if (EnableAutoSelect)
 				sql = AddSelectClause<T>(sql);
 
-			using (var conn = new ShareableConnection(this))
+			OpenSharedConnection();
+			try
 			{
-				using (var cmd = CreateCommand(conn.Connection, sql, args))
+				using (var cmd = CreateCommand(_sharedConnection, sql, args))
 				{
 					IDataReader r;
 					var pd = PocoData.ForType(typeof(T));
@@ -613,7 +631,7 @@ namespace PetaPoco
 						OnException(x);
 						throw;
 					}
-					var factory = pd.GetFactory<T>(sql + "-" + conn.Connection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
+					var factory = pd.GetFactory<T>(sql + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
 					using (r)
 					{
 						while (true)
@@ -635,6 +653,10 @@ namespace PetaPoco
 						}
 					}
 				}
+			}
+			finally
+			{
+				CloseSharedConnection();
 			}
 		}
 
@@ -729,6 +751,10 @@ namespace PetaPoco
 								cmd.CommandText += string.Format("returning {0} as NewID", primaryKeyName);
 								id = cmd.ExecuteScalar();
 								break;
+							case DBType.Oracle:
+								cmd.ExecuteNonQuery();
+								id = -1;	// Support sequences here later
+								break;										
 							default:
 								cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
 								id = cmd.ExecuteScalar();
@@ -804,7 +830,7 @@ namespace PetaPoco
 						}
 
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
-											tableName, sb.ToString(), primaryKeyName, _paramPrefix,	index++);
+											tableName, sb.ToString(), primaryKeyName, _paramPrefix, index++);
 						AddParam(cmd, primaryKeyValue, _paramPrefix);
 
 						_lastSql = cmd.CommandText;
@@ -1223,40 +1249,12 @@ namespace PetaPoco
 		}
 
 
-		// ShareableConnection represents either a shared connection used by a transaction,
-		// or a one-off connection if not in a transaction.
-		// Non-shared connections are disposed 
-		class ShareableConnection : IDisposable
-		{
-			public ShareableConnection(Database db)
-			{
-				_db = db;
-				_db.OpenSharedConnection();
-			}
-
-			public DbConnection Connection
-			{
-				get
-				{
-					return _db._sharedConnection;
-				}
-			}
-
-			Database _db;
-
-			public void Dispose()
-			{
-				_db.CloseSharedConnection();
-			}
-		}
-
-
 		// Member variables
 		string _connectionString;
 		string _providerName;
 		DbProviderFactory _factory;
-		DbConnection _sharedConnection;
-		DbTransaction _transaction;
+		IDbConnection _sharedConnection;
+		IDbTransaction _transaction;
 		int _sharedConnectionDepth;
 		int _transactionDepth;
 		bool _transactionCancelled;
