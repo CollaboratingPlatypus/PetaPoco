@@ -292,7 +292,9 @@ namespace PetaPoco
 				}
 
 				// Expand collections to parameter lists
-				if ((arg_val as string) == null && (arg_val as System.Collections.IEnumerable)!=null)
+				if ((arg_val as System.Collections.IEnumerable) != null && 
+					(arg_val as string) == null && 
+					(arg_val as byte[]) == null)
 				{
 					var sb = new StringBuilder();
 					foreach (var i in arg_val as System.Collections.IEnumerable)
