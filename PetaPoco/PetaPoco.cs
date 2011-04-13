@@ -324,7 +324,11 @@ namespace PetaPoco
 			}
 			else
 			{
-				if (item.GetType() == typeof(Guid))
+				if (item.GetType().IsEnum)		// PostgreSQL .NET driver wont cast enum to int
+				{
+					p.Value = (int)item;
+				}
+				else if (item.GetType() == typeof(Guid))
 				{
 					p.Value = item.ToString();
 					p.DbType = DbType.String;
@@ -1104,6 +1108,12 @@ namespace PetaPoco
 				QueryColumns = string.Join(", ", (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray());
 			}
 
+			bool IsIntegralType(Type t)
+			{
+				var tc=Type.GetTypeCode(t);
+				return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
+			}
+
 			// Create factory function that can convert a IDataReader record into a POCO
 			public Func<IDataReader, T> GetFactory<T>(string key, bool ForceDateTimesToUtc, IDataReader r)
 			{
@@ -1159,10 +1169,20 @@ namespace PetaPoco
 								converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
 							}
 
-							// Forced type conversion
-							if (converter == null && !dstType.IsAssignableFrom(srcType))
+							// Forced type conversion including integral types -> enum
+							if (converter == null)
 							{
-								converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+								if (dstType.IsEnum && IsIntegralType(srcType))
+								{
+									if (srcType != typeof(int))
+									{
+										converter = delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
+									}
+								}
+								else if (!dstType.IsAssignableFrom(srcType))
+								{
+									converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+								}
 							}
 
 							// Fast

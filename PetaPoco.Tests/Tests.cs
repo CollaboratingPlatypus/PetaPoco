@@ -64,6 +64,7 @@ namespace PetaPoco.Tests
 			o.content = string.Format("insert {0}", r.Next());
 			o.date_created = now;
 			o.date_edited = now;
+			o.state = State.Yes;
 
 			return o;
 		}
@@ -81,6 +82,7 @@ namespace PetaPoco.Tests
 			o.content = string.Format("insert {0}", r.Next());
 			o.date_created = now;
 			o.date_edited = now;
+			o.state = State.Maybe;
 
 			return o;
 		}
@@ -93,6 +95,7 @@ namespace PetaPoco.Tests
 			Expect(a.content, Is.EqualTo(b.content));
 			Expect(a.date_created, Is.EqualTo(b.date_created));
 			Expect(a.date_edited, Is.EqualTo(b.date_edited));
+			Expect(a.state, Is.EqualTo(b.state));
 		}
 
 		void Assert(deco a, deco b)
@@ -102,6 +105,7 @@ namespace PetaPoco.Tests
 			Expect(a.draft, Is.EqualTo(b.draft));
 			Expect(a.content, Is.EqualTo(b.content));
 			Expect(a.date_created, Is.EqualTo(b.date_created));
+			Expect(a.state, Is.EqualTo(b.state));
 		}
 
 		// Insert some records, return the id of the first

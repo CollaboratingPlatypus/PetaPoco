@@ -6,6 +6,14 @@ using PetaPoco;
 
 namespace PetaPoco.Tests
 {
+
+	enum State
+	{
+		Yes,
+		No,
+		Maybe,
+	}
+
 	// Non-decorated true poco
 	class poco
 	{
@@ -15,6 +23,7 @@ namespace PetaPoco.Tests
 		public DateTime date_created { get; set; }
 		public DateTime? date_edited { get; set; }
 		public string content { get; set; }
+		public State state { get; set; }
 	}
 
 
@@ -30,6 +39,7 @@ namespace PetaPoco.Tests
 		[Column] public DateTime date_created { get; set; }
 		[Column] public DateTime? date_edited { get; set; }
 		[Column] public string content { get; set; }
+		[Column] public State state { get; set; }
 	}
 	// Attributed not-so-true poco
 	[TableName("petapoco")]
@@ -37,14 +47,11 @@ namespace PetaPoco.Tests
 	[ExplicitColumns]
 	class deco_explicit
 	{
-		[Column]
-		public long id { get; set; }
-		[Column]
-		public string title { get; set; }
-		[Column]
-		public bool draft { get; set; }
-		[Column]
-		public DateTime date_created { get; set; }
+		[Column] public long id { get; set; }
+		[Column] public string title { get; set; }
+		[Column] public bool draft { get; set; }
+		[Column] public DateTime date_created { get; set; }
+		[Column] public State state { get; set; }
 		public string content { get; set; }
 	}
 
@@ -57,6 +64,7 @@ namespace PetaPoco.Tests
 		public string title { get; set; }
 		public bool draft { get; set; }
 		public DateTime date_created { get; set; }
+		public State state { get; set; }
 		[Ignore] public string content { get; set; }
 	}
 }
