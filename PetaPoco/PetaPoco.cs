@@ -695,7 +695,14 @@ namespace PetaPoco
 			return Query<T>(sql.SQL, sql.Arguments);
 		}
 
-
+		public T Single<T>(object primaryKey) where T : new()
+		{
+			return Single<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey);
+		}
+		public T SingleOrDefault<T>(object primaryKey) where T : new()
+		{
+			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey);
+		}
 		public T Single<T>(string sql, params object[] args) where T : new()
 		{
 			return Query<T>(sql, args).Single();

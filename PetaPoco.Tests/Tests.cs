@@ -655,6 +655,33 @@ namespace PetaPoco.Tests
 		}
 
 		[Test]
+		public void SingleOrDefault_PK_Empty()
+		{
+			Expect(db.SingleOrDefault<deco>(0), Is.Null);
+		}
+
+		[Test]
+		public void SingleOrDefault_PK_Single()
+		{
+			var id = InsertRecords(1);
+			Expect(db.SingleOrDefault<deco>(id), Is.Not.Null);
+		}
+
+		[Test]
+		[ExpectedException(typeof(InvalidOperationException))]
+		public void Single_PK_Empty()
+		{
+			db.Single<deco>(0);
+		}
+
+		[Test]
+		public void Single_PK_Single()
+		{
+			var id = InsertRecords(1);
+			Expect(db.Single<deco>(id), Is.Not.Null);
+		}
+
+		[Test]
 		public void AutoSelect_SelectPresent()
 		{
 			var id = InsertRecords(1);

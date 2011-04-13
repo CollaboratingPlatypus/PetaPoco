@@ -75,10 +75,12 @@ namespace postgresql
 			public static int Update(Sql sql) { return repo.Delete<T>(sql); }
 			public static int Delete(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Delete(Sql sql) { return repo.Delete<T>(sql); }
+			public static T SingleOrDefault(object primaryKey) { return repo.SingleOrDefault<T>(primaryKey); }
 			public static T SingleOrDefault(string sql, params object[] args) { return repo.SingleOrDefault<T>(sql, args); }
 			public static T SingleOrDefault(Sql sql) { return repo.SingleOrDefault<T>(sql); }
 			public static T FirstOrDefault(string sql, params object[] args) { return repo.FirstOrDefault<T>(sql, args); }
 			public static T FirstOrDefault(Sql sql) { return repo.FirstOrDefault<T>(sql); }
+			public static T Single(object primaryKey) { return repo.Single<T>(primaryKey); }
 			public static T Single(string sql, params object[] args) { return repo.Single<T>(sql, args); }
 			public static T Single(Sql sql) { return repo.Single<T>(sql); }
 			public static T First(string sql, params object[] args) { return repo.First<T>(sql, args); }
