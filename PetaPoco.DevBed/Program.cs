@@ -9,22 +9,22 @@ namespace PetaPoco.DevBed
 {
 
 	// Attributed not-so-true poco
-	[TableName("petapoco")]
-	[PrimaryKey("id")]
-	[ExplicitColumns]
+	[TableNameAttribute("petapoco")]
+	[PrimaryKeyAttribute("id")]
+	[ExplicitColumnsAttribute]
 	class deco
 	{
-		[Column]
+		[ColumnAttribute]
 		public long id { get; set; }
-		[Column]
+		[ColumnAttribute]
 		public string title { get; set; }
-		[Column]
+		[ColumnAttribute]
 		public bool draft { get; set; }
-		[Column]
+		[ColumnAttribute]
 		public DateTime date_created { get; set; }
-		[Column]
+		[ColumnAttribute]
 		public DateTime? date_edited { get; set; }
-		[Column]
+		[ColumnAttribute]
 		public string content { get; set; }
 	}
 

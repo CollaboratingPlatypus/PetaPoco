@@ -107,6 +107,7 @@ namespace postgresql
         [Column] public DateTime date_created { get; set; }
         [Column] public DateTime? date_edited { get; set; }
         [Column] public string content { get; set; }
+        [Column] public int state { get; set; }
 	}
 
 }

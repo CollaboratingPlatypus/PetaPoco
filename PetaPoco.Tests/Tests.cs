@@ -116,6 +116,9 @@ namespace PetaPoco.Tests
 			{
 				var o=CreatePoco();
 				db.Insert("petapoco", "id", o);
+
+				var lc = db.LastCommand;
+
 				if (i == 0)
 				{
 					lFirst = o.id;
