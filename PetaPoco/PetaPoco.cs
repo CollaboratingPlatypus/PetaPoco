@@ -1,4 +1,19 @@
-﻿using System;
+﻿/* PetaPoco.cs - A Tiny ORMish thing for your POCO's.
+ * Copyright © 2011 Topten Software.  All Rights Reserved.
+ * 
+ * Licensed under Apache License 2.0. See here http://www.toptensoftware.com/petapoco/license
+ * 
+ * Thanks to everyone who's sent feedback, suggestions, improvements and bug fixes.  
+ * 
+ * Special thanks to:
+ * 
+ *  - Rob Conery (@robconery) for original inspiration (ie:Massive) and for letting me use the 
+ *		Subsonic T4 templates as basis for PetaPoco's.
+ *  - Rob Sullivan (@DataChomp) for hard core DBA advice
+ *  - Adam Schroder (@schotime) for lots of suggestions, improvements and Oracle support
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
