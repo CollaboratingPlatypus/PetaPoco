@@ -402,7 +402,8 @@ namespace PetaPoco
 				cmd.GetType().GetProperty("BindByName").SetValue(cmd, true, null);
 			}
 
-			SaveLastCommand(cmd);
+			if (!String.IsNullOrEmpty(sql))
+				DoPreExecute(cmd);
 
 			return cmd;
 		}
@@ -413,6 +414,10 @@ namespace PetaPoco
 			System.Diagnostics.Debug.WriteLine(x.ToString());
 			System.Diagnostics.Debug.WriteLine(LastCommand);
 		}
+
+		// Override this to log commands, or modify command before execution
+		public virtual void OnExecutingCommand(IDbCommand cmd) { }
+
 
 		// Execute a non-query command
 		public int Execute(string sql, params object[] args)
@@ -781,28 +786,31 @@ namespace PetaPoco
 								string.Join(",", values.ToArray())
 								);
 
-						SaveLastCommand(cmd);
 
 						object id;
 						switch (_dbType)
 						{
 							case DBType.SqlServerCE:
+								DoPreExecute(cmd);
 								cmd.ExecuteNonQuery();
 								id = ExecuteScalar<object>("SELECT @@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
 								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
+								DoPreExecute(cmd);
 								id = cmd.ExecuteScalar();
 								break;
 							case DBType.PostgreSQL:
 								if (primaryKeyName != null)
 								{
 									cmd.CommandText += string.Format("returning {0} as NewID", primaryKeyName);
+									DoPreExecute(cmd);
 									id = cmd.ExecuteScalar();
 								}
 								else
 								{
 									id = -1;
+									DoPreExecute(cmd);
 									cmd.ExecuteNonQuery();
 								}
 								break;
@@ -816,17 +824,20 @@ namespace PetaPoco
 									param.Direction = ParameterDirection.ReturnValue;
 									param.DbType = DbType.Int64;
 									cmd.Parameters.Add(param);
+									DoPreExecute(cmd);
 									cmd.ExecuteNonQuery();
 									id = param.Value;
 								}
 								else
 								{
 									id = -1;
+									DoPreExecute(cmd);
 									cmd.ExecuteNonQuery();
 								}
 								break;
 							default:
 								cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
+								DoPreExecute(cmd);
 								id = cmd.ExecuteScalar();
 								break;
 						}
@@ -904,7 +915,7 @@ namespace PetaPoco
 											tableName, sb.ToString(), primaryKeyName, _paramPrefix, index++);
 						AddParam(cmd, primaryKeyValue, _paramPrefix);
 
-						SaveLastCommand(cmd);
+						DoPreExecute(cmd);
 
 						// Do it
 						return cmd.ExecuteNonQuery();
@@ -1062,8 +1073,9 @@ namespace PetaPoco
 			Save(pd.TableName, pd.PrimaryKey, poco);
 		}
 
-		void SaveLastCommand(IDbCommand cmd)
+		void DoPreExecute(IDbCommand cmd)
 		{
+			OnExecutingCommand(cmd);
 			_lastSql = cmd.CommandText;
 			_lastArgs = (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray();
 		}
@@ -1404,7 +1416,7 @@ namespace PetaPoco
 		string _sqlFinal;
 		object[] _argsFinal;
 
-		void Build()
+		private void Build()
 		{
 			// already built?
 			if (_sqlFinal != null)
@@ -1451,26 +1463,6 @@ namespace PetaPoco
 			return Append(new Sql(sql, args));
 		}
 
-		public Sql Where(string sql, params object[] args)
-		{
-			return Append(new Sql("WHERE " + sql, args));
-		}
-
-		public Sql OrderBy(params object[] columns)
-		{
-			return Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
-		}
-
-		public Sql Select(params object[] columns)
-		{
-			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
-		}
-
-		public Sql From(params object[] tables)
-		{
-			return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
-		}
-
 		static bool Is(Sql sql, string sqltype)
 		{
 			return sql != null && sql._sql != null && sql._sql.StartsWith(sqltype, StringComparison.InvariantCultureIgnoreCase);
@@ -1500,5 +1492,55 @@ namespace PetaPoco
 			if (_rhs != null)
 				_rhs.Build(sb, args, this);
 		}
+
+		public Sql Where(string sql, params object[] args)
+		{
+			return Append(new Sql("WHERE " + sql, args));
+		}
+
+		public Sql OrderBy(params object[] columns)
+		{
+			return Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+		}
+
+		public Sql Select(params object[] columns)
+		{
+			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+		}
+
+		public Sql From(params object[] tables)
+		{
+			return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
+		}
+
+		public Sql GroupBy(params object[] columns)
+		{
+			return Append(new Sql("GROUP BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+		}
+
+		private SqlJoinClause Join(string JoinType, string table)
+		{
+			return new SqlJoinClause(Append(new Sql(JoinType + table)));
+		}
+
+		public SqlJoinClause InnerJoin(string table) { return Join("INNER JOIN ", table); }
+		public SqlJoinClause LeftJoin(string table) { return Join("LEFT JOIN ", table); }
+		public SqlJoinClause LeftOuterJoin(string table) { return Join("LEFT OUTER JOIN ", table); }
+
+		public class SqlJoinClause
+		{
+			private readonly Sql _sql;
+
+			public SqlJoinClause(Sql sql)
+			{
+				_sql = sql;
+			}
+
+			public Sql On(string onClause, params object[] args)
+			{
+				return _sql.Append("ON " + onClause, args);
+			}
+		}
 	}
+
 }
