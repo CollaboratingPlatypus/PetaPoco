@@ -28,8 +28,8 @@ namespace PetaPoco.Tests
 
 
 	// Attributed not-so-true poco
-	[TableNameAttribute("petapoco")]
-	[PrimaryKeyAttribute("id")]
+	[TableName("petapoco")]
+	[PrimaryKey("id", sequenceName="article_id_seq")]
 	[ExplicitColumnsAttribute]
 	class deco
 	{
@@ -42,8 +42,8 @@ namespace PetaPoco.Tests
 		[ColumnAttribute] public State state { get; set; }
 	}
 	// Attributed not-so-true poco
-	[TableNameAttribute("petapoco")]
-	[PrimaryKeyAttribute("id")]
+	[TableName("petapoco")]
+	[PrimaryKey("id")]
 	[ExplicitColumnsAttribute]
 	class deco_explicit
 	{
@@ -56,8 +56,8 @@ namespace PetaPoco.Tests
 	}
 
 	// Attributed not-so-true poco
-	[TableNameAttribute("petapoco")]
-	[PrimaryKeyAttribute("id")]
+	[TableName("petapoco")]
+	[PrimaryKey("id")]
 	class deco_non_explicit
 	{
 		public long id { get; set; }

@@ -258,6 +258,16 @@ namespace PetaPoco.Tests
 			Expect(sql.Arguments[2], Is.EqualTo(3));
 		}
 
+		[Test]
+		public void join()
+		{
+			var sql = Sql.Builder
+				.Select("*")
+				.From("articles")
+				.LeftJoin("comments").On("articles.article_id=comments.article_id");
+			Expect(sql.SQL, Is.EqualTo("SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id"));
+		}
+
 	}
 
 }
