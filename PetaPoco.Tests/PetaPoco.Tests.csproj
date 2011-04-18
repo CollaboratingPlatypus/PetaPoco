@@ -10,9 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PetaPoco.Tests</RootNamespace>
     <AssemblyName>PetaPoco.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -47,6 +47,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Npgsql">
       <HintPath>..\..\..\..\..\..\Program Files\PostgreSQL\.NET Provider\Npgsql.dll</HintPath>
     </Reference>
@@ -69,12 +70,6 @@
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PetaPoco\PetaPoco.csproj">
-      <Project>{33699753-151D-4100-8F12-9AE1AEB5C5BD}</Project>
-      <Name>PetaPoco</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -123,6 +118,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PetaPoco\PetaPoco.csproj">
+      <Project>{33699753-151D-4100-8F12-9AE1AEB5C5BD}</Project>
+      <Name>PetaPoco</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

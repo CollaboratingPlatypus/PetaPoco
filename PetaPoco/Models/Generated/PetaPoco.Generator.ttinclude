@@ -72,6 +72,8 @@ namespace <#=Namespace #>
 			public static int Update(Sql sql) { return repo.Delete<T>(sql); }
 			public static int Delete(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Delete(Sql sql) { return repo.Delete<T>(sql); }
+			public static int Delete(object primaryKey) { return repo.Delete<T>(primaryKey); }
+			public static bool Exists(object primaryKey) { return repo.Exists<T>(primaryKey); }
 			public static T SingleOrDefault(object primaryKey) { return repo.SingleOrDefault<T>(primaryKey); }
 			public static T SingleOrDefault(string sql, params object[] args) { return repo.SingleOrDefault<T>(sql, args); }
 			public static T SingleOrDefault(Sql sql) { return repo.SingleOrDefault<T>(sql); }
