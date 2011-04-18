@@ -512,39 +512,7 @@ namespace PetaPoco
 		// Return a typed list of pocos
 		public List<T> Fetch<T>(string sql, params object[] args) where T : new()
 		{
-			if (EnableAutoSelect)
-				sql = AddSelectClause<T>(sql);
-
-			try
-			{
-				OpenSharedConnection();
-				try
-				{
-					using (var cmd = CreateCommand(_sharedConnection, sql, args))
-					{
-						using (var r = cmd.ExecuteReader())
-						{
-							var l = new List<T>();
-							var pd = PocoData.ForType(typeof(T));
-							var factory = pd.GetFactory<T>(cmd.CommandText + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
-							while (r.Read())
-							{
-								l.Add(factory(r));
-							}
-							return l;
-						}
-					}
-				}
-				finally
-				{
-					CloseSharedConnection();
-				}
-			}
-			catch (Exception x)
-			{
-				OnException(x);
-				throw;
-			}
+			return Query<T>(sql, args).ToList();
 		}
 
 		public List<T> Fetch<T>(Sql sql) where T : new()
@@ -710,6 +678,10 @@ namespace PetaPoco
 			return Query<T>(sql.SQL, sql.Arguments);
 		}
 
+		public bool Exists<T>(object primaryKey) where T : new()
+		{
+			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey) != null;
+		}
 		public T Single<T>(object primaryKey) where T : new()
 		{
 			return Single<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey);
@@ -775,7 +747,7 @@ namespace PetaPoco
 								continue;
 
 							// Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-							if (primaryKeyName != null && i.Key == primaryKeyName)
+							if (primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true)==0)
 							{
 								if (_dbType == DBType.Oracle && !string.IsNullOrEmpty(pd.SequenceName))
 								{
@@ -901,7 +873,7 @@ namespace PetaPoco
 						foreach (var i in pd.Columns)
 						{
 							// Don't update the primary key, but grab the value if we don't have it
-							if (i.Key == primaryKeyName)
+							if (string.Compare(i.Key, primaryKeyName)==0)
 							{
 								if (primaryKeyValue == null)
 									primaryKeyValue = i.Value.PropertyInfo.GetValue(poco, null);
@@ -998,6 +970,14 @@ namespace PetaPoco
 		{
 			var pd = PocoData.ForType(poco.GetType());
 			return Delete(pd.TableName, pd.PrimaryKey, poco);
+		}
+
+		public int Delete<T>(object pocoOrPrimaryKey)
+		{
+			if (pocoOrPrimaryKey.GetType() == typeof(T))
+				return Delete(pocoOrPrimaryKey);
+			var pd = PocoData.ForType(typeof(T));
+			return Delete(pd.TableName, pd.PrimaryKey, null, pocoOrPrimaryKey);
 		}
 
 		public int Delete<T>(string sql, params object[] args)
