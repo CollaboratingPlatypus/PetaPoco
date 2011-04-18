@@ -683,7 +683,7 @@ namespace PetaPoco
 
 		public bool Exists<T>(object primaryKey) where T : new()
 		{
-			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey)!=null;
+			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey) != null;
 		}
 		public T Single<T>(object primaryKey) where T : new()
 		{
@@ -750,7 +750,7 @@ namespace PetaPoco
 								continue;
 
 							// Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-							if (primaryKeyName != null && i.Key == primaryKeyName)
+							if (primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true)==0)
 							{
 								if (_dbType == DBType.Oracle && !string.IsNullOrEmpty(pd.SequenceName))
 								{
@@ -876,7 +876,7 @@ namespace PetaPoco
 						foreach (var i in pd.Columns)
 						{
 							// Don't update the primary key, but grab the value if we don't have it
-							if (i.Key == primaryKeyName)
+							if (string.Compare(i.Key, primaryKeyName)==0)
 							{
 								if (primaryKeyValue == null)
 									primaryKeyValue = i.Value.GetValue(poco);
