@@ -873,7 +873,7 @@ namespace PetaPoco
 						foreach (var i in pd.Columns)
 						{
 							// Don't update the primary key, but grab the value if we don't have it
-							if (string.Compare(i.Key, primaryKeyName)==0)
+							if (string.Compare(i.Key, primaryKeyName, true)==0)
 							{
 								if (primaryKeyValue == null)
 									primaryKeyValue = i.Value.PropertyInfo.GetValue(poco, null);
