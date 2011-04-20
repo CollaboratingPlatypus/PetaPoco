@@ -368,18 +368,19 @@ namespace PetaPoco
 				}
 				else if (item.GetType() == typeof(string))
 				{
-					p.Size = Math.Max((item as string).Length + 1, 4000);
+					p.Size = Math.Max((item as string).Length + 1, 4000);		// Help query plan caching by using common size
 					p.Value = item;
+				}
+				else if (item.GetType() == typeof(AnsiString))
+				{
+					// Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
+					p.Size = Math.Max((item as string).Length + 1, 4000);
+					p.Value = (item as AnsiString).Value;
+					p.DbType = DbType.AnsiString;
 				}
 				else if (item.GetType() == typeof(bool) && _dbType != DBType.PostgreSQL)
 				{
 					p.Value = ((bool)item) ? 1 : 0;
-				}
-				else if (item.GetType() == typeof(AnsiString))
-				{
-					p.Size = Math.Max((item as string).Length + 1, 4000);		// Help query plan caching by using common size
-					p.Value = (item as AnsiString).Value;
-					p.DbType = DbType.AnsiString;
 				}
 				else
 				{
