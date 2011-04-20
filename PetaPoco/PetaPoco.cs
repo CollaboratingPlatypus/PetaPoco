@@ -86,6 +86,15 @@ namespace PetaPoco
 		public List<T> Items { get; set; }
 	}
 
+	public class AnsiString
+	{
+		public AnsiString(string str)
+		{
+			Value = str;
+		}
+		public string Value { get; private set; }
+	}
+
 	// Optionally provide and implementation of this to Database.Mapper
 	public interface IMapper
 	{
@@ -362,14 +371,18 @@ namespace PetaPoco
 				}
 				else if (item.GetType() == typeof(string))
 				{
-					p.Size = (item as string).Length + 1;
-					if (p.Size < 4000)
-						p.Size = 4000;		// Help query plan caching by using common size
+					p.Size = Math.Max((item as string).Length + 1, 4000);		// Help query plan caching by using common size
 					p.Value = item;
+				}
+				else if (item.GetType() == typeof(AnsiString))
+				{
+					// Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
+					p.Size = Math.Max((item as string).Length + 1, 4000);
+					p.Value = (item as AnsiString).Value;
+					p.DbType = DbType.AnsiString;
 				}
 				else if (item.GetType() == typeof(bool) && _dbType != DBType.PostgreSQL)
 				{
-					// Default bool conversion
 					p.Value = ((bool)item) ? 1 : 0;
 				}
 				else
