@@ -63,24 +63,24 @@ namespace postgresql
 				_instance=null;
 		}
         
-		public class Record<T> where T:new()
+		public class Record<T,TPrimaryKey> where T:new()
 		{
 			public static postgresqlDB repo { get { return postgresqlDB.GetInstance(); } }
 			public bool IsNew() { return repo.IsNew(this); }
 			public void Save() { repo.Save(this); }
-			public object Insert() { return repo.Insert(this); }
+			public TPrimaryKey Insert() { return (TPrimaryKey)repo.Insert(this); }
 			public int Update() { return repo.Update(this); }
 			public int Delete() { return repo.Delete(this); }
 			public static int Update(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Update(Sql sql) { return repo.Delete<T>(sql); }
 			public static int Delete(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Delete(Sql sql) { return repo.Delete<T>(sql); }
-			public static T SingleOrDefault(object primaryKey) { return repo.SingleOrDefault<T>(primaryKey); }
+			public static T SingleOrDefault(TPrimaryKey primaryKey) { return repo.SingleOrDefault<T>(primaryKey); }
 			public static T SingleOrDefault(string sql, params object[] args) { return repo.SingleOrDefault<T>(sql, args); }
 			public static T SingleOrDefault(Sql sql) { return repo.SingleOrDefault<T>(sql); }
 			public static T FirstOrDefault(string sql, params object[] args) { return repo.FirstOrDefault<T>(sql, args); }
 			public static T FirstOrDefault(Sql sql) { return repo.FirstOrDefault<T>(sql); }
-			public static T Single(object primaryKey) { return repo.Single<T>(primaryKey); }
+			public static T Single(TPrimaryKey primaryKey) { return repo.Single<T>(primaryKey); }
 			public static T Single(string sql, params object[] args) { return repo.Single<T>(sql, args); }
 			public static T Single(Sql sql) { return repo.Single<T>(sql); }
 			public static T First(string sql, params object[] args) { return repo.First<T>(sql, args); }
@@ -101,7 +101,7 @@ namespace postgresql
 	[TableName("petapoco")]
 	[PrimaryKey("id")]
 	[ExplicitColumns]
-    public partial class petapoco : postgresqlDB.Record<petapoco>  
+    public partial class petapoco : postgresqlDB.Record<petapoco, long>  
     {
         [Column] public long id { get; set; }
         [Column] public string title { get; set; }
