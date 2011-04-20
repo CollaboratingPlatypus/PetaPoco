@@ -9,6 +9,7 @@ CREATE TABLE petapoco (
 	date_edited		datetime NULL,
 	content			longtext NOT NULL,
 	state			smallint UNSIGNED NOT NULL,
+	`col w space`	int NOT NULL,
 	
 	PRIMARY KEY (id)
 ) ENGINE=INNODB;

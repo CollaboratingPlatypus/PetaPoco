@@ -82,7 +82,7 @@ namespace PetaPoco.Tests
 			Expect(pd.Columns["prop1"].PropertyInfo.Name, Is.EqualTo("prop1"));
 			Expect(pd.Columns["remapped2"].ColumnName, Is.EqualTo("remapped2"));
 			Expect(pd.Columns["prop3"].ColumnName, Is.EqualTo("prop3"));
-			Expect(pd.QueryColumns, Is.EqualTo("prop1, remapped2"));
+			Expect(string.Join(", ", pd.QueryColumns), Is.EqualTo("prop1, remapped2"));
 			Expect(pd.PrimaryKey, Is.EqualTo("id"));
 			Expect(pd.TableName, Is.EqualTo("petapoco"));
 		}

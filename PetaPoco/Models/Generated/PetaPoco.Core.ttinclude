@@ -117,7 +117,7 @@ static string CleanUp(string tableName)
     string result=tableName;
 	
     //strip blanks
-    result=result.Replace(" ","");
+    result=new Regex("[^A-Za-z0-9_]").Replace(result,"_");
 	
     //put your logic here...
 	

@@ -1,4 +1,5 @@
-﻿DROP TABLE IF EXISTS petapoco;
+﻿
+DROP TABLE IF EXISTS petapoco;
 
 CREATE TABLE petapoco (
 	id				bigserial NOT NULL,
@@ -8,6 +9,7 @@ CREATE TABLE petapoco (
 	date_edited		timestamp NULL,
 	content			text NOT NULL,
 	state			int NOT NULL,
+	"col w space"   int NOT NULL,
 
 	PRIMARY KEY (id)
 );

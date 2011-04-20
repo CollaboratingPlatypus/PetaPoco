@@ -510,10 +510,11 @@ namespace PetaPoco
 			if (!rxSelect.IsMatch(sql))
 			{
 				var pd = PocoData.ForType(typeof(T));
+				string cols = string.Join(", ", (from c in pd.QueryColumns select EscapeColumnName(c)).ToArray());
 				if (!rxFrom.IsMatch(sql))
-					sql = string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+					sql = string.Format("SELECT {0} FROM {1} {2}", cols, pd.TableName, sql);
 				else
-					sql = string.Format("SELECT {0} {1}", pd.QueryColumns, sql);
+					sql = string.Format("SELECT {0} {1}", cols, sql);
 			}
 			return sql;
 		}
@@ -737,6 +738,21 @@ namespace PetaPoco
 			return Query<T>(sql).FirstOrDefault();
 		}
 
+		public string EscapeColumnName(string str)
+		{
+			switch (_dbType)
+			{
+				case DBType.MySql:
+					return string.Format("`{0}`", str);
+
+				case DBType.PostgreSQL:
+					return string.Format("\"{0}\"", str);
+
+				default:
+					return string.Format("[{0}]", str);
+			}
+		}
+
 		// Insert a poco into a table.  If the poco has a property with the same name 
 		// as the primary key the id of the new record is assigned to it.  Either way,
 		// the new id is returned.
@@ -770,7 +786,7 @@ namespace PetaPoco
 								continue;
 							}
 
-							names.Add(i.Key);
+							names.Add(EscapeColumnName(i.Key));
 							values.Add(string.Format("{0}{1}", _paramPrefix, index++));
 							AddParam(cmd, i.Value.PropertyInfo.GetValue(poco, null), _paramPrefix);
 						}
@@ -900,7 +916,7 @@ namespace PetaPoco
 							// Build the sql
 							if (index > 0)
 								sb.Append(", ");
-							sb.AppendFormat("{0} = {1}{2}", i.Key, _paramPrefix, index++);
+							sb.AppendFormat("{0} = {1}{2}", EscapeColumnName(i.Key), _paramPrefix, index++);
 
 							// Store the parameter in the command
 							AddParam(cmd, i.Value.PropertyInfo.GetValue(poco, null), _paramPrefix);
@@ -1192,7 +1208,8 @@ namespace PetaPoco
 				}
 
 				// Build column list for automatic select
-				QueryColumns = string.Join(", ", (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray());
+				QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
+
 			}
 
 			bool IsIntegralType(Type t)
@@ -1351,7 +1368,7 @@ namespace PetaPoco
 			public string TableName { get; private set; }
 			public string PrimaryKey { get; private set; }
 			public string SequenceName { get; private set; }
-			public string QueryColumns { get; private set; }
+			public string[] QueryColumns { get; private set; }
 			public Dictionary<string, PocoColumn> Columns { get; private set; }
 			Dictionary<string, object> PocoFactories = new Dictionary<string, object>();
 		}
