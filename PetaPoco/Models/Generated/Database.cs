@@ -4,9 +4,9 @@
 // 
 // The following connection settings were used to generate this file
 // 
-//     Connection String Name: `postgresql`
-//     Provider:               `Npgsql`
-//     Connection String:      `Server=127.0.0.1;User id=postgres;password=**zapped**;`
+//     Connection String Name: `sqlserverce`
+//     Provider:               `System.Data.SqlServerCe.4.0`
+//     Connection String:      `Data Source=C:\Users\bradr\dev\Source\PetaPoco\PetaPoco.Tests\petapoco.sdf`
 
 using System;
 using System.Collections.Generic;
@@ -14,17 +14,17 @@ using System.Linq;
 using System.Web;
 using PetaPoco;
 
-namespace postgresql
+namespace sqlserverce
 {
-	public partial class postgresqlDB : Database
+	public partial class sqlserverceDB : Database
 	{
-		public postgresqlDB() 
-			: base("postgresql")
+		public sqlserverceDB() 
+			: base("sqlserverce")
 		{
 			CommonConstruct();
 		}
 
-		public postgresqlDB(string connectionStringName) 
+		public sqlserverceDB(string connectionStringName) 
 			: base(connectionStringName)
 		{
 			CommonConstruct();
@@ -34,11 +34,11 @@ namespace postgresql
 		
 		public interface IFactory
 		{
-			postgresqlDB GetInstance();
+			sqlserverceDB GetInstance();
 		}
 		
 		public static IFactory Factory { get; set; }
-        public static postgresqlDB GetInstance()
+        public static sqlserverceDB GetInstance()
         {
 			if (_instance!=null)
 				return _instance;
@@ -46,10 +46,10 @@ namespace postgresql
 			if (Factory!=null)
 				return Factory.GetInstance();
 			else
-				return new postgresqlDB();
+				return new sqlserverceDB();
         }
 
-		[ThreadStatic] static postgresqlDB _instance;
+		[ThreadStatic] static sqlserverceDB _instance;
 		
 		public override void OnBeginTransaction()
 		{
@@ -65,7 +65,7 @@ namespace postgresql
         
 		public class Record<T> where T:new()
 		{
-			public static postgresqlDB repo { get { return postgresqlDB.GetInstance(); } }
+			public static sqlserverceDB repo { get { return sqlserverceDB.GetInstance(); } }
 			public bool IsNew() { return repo.IsNew(this); }
 			public void Save() { repo.Save(this); }
 			public object Insert() { return repo.Insert(this); }
@@ -103,7 +103,7 @@ namespace postgresql
 	[TableName("petapoco")]
 	[PrimaryKey("id")]
 	[ExplicitColumns]
-    public partial class petapoco : postgresqlDB.Record<petapoco>  
+    public partial class petapoco : sqlserverceDB.Record<petapoco>  
     {
         [Column] public long id { get; set; }
         [Column] public string title { get; set; }
@@ -112,6 +112,7 @@ namespace postgresql
         [Column] public DateTime? date_edited { get; set; }
         [Column] public string content { get; set; }
         [Column] public int state { get; set; }
+        [Column("col w space")] public int col_w_space { get; set; }
 	}
 
 }

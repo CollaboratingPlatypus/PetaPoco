@@ -8,8 +8,7 @@
  * and Adam Schroder (@schotime) for lots of suggestions, improvements and Oracle support
  */
 
-// Uncomment this if you want to run on .NET 3.5
-// #define PETAPOCO_NO_DYNAMIC
+// Define PETAPOCO_NO_DYNAMIC in your project settings on .NET 3.5
 
 using System;
 using System.Collections.Generic;
@@ -513,10 +512,11 @@ namespace PetaPoco
 			if (!rxSelect.IsMatch(sql))
 			{
 				var pd = PocoData.ForType(typeof(T));
+				string cols = string.Join(", ", (from c in pd.QueryColumns select EscapeColumnName(c)).ToArray());
 				if (!rxFrom.IsMatch(sql))
-					sql = string.Format("SELECT {0} FROM {1} {2}", pd.QueryColumns, pd.TableName, sql);
+					sql = string.Format("SELECT {0} FROM {1} {2}", cols, pd.TableName, sql);
 				else
-					sql = string.Format("SELECT {0} {1}", pd.QueryColumns, sql);
+					sql = string.Format("SELECT {0} {1}", cols, sql);
 			}
 			return sql;
 		}
@@ -696,15 +696,15 @@ namespace PetaPoco
 
 		public bool Exists<T>(object primaryKey) where T : new()
 		{
-			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey) != null;
+			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).PrimaryKey)), primaryKey) != null;
 		}
 		public T Single<T>(object primaryKey) where T : new()
 		{
-			return Single<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey);
+			return Single<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).PrimaryKey)), primaryKey);
 		}
 		public T SingleOrDefault<T>(object primaryKey) where T : new()
 		{
-			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", PocoData.ForType(typeof(T)).PrimaryKey), primaryKey);
+			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).PrimaryKey)), primaryKey);
 		}
 		public T Single<T>(string sql, params object[] args) where T : new()
 		{
@@ -740,6 +740,21 @@ namespace PetaPoco
 			return Query<T>(sql).FirstOrDefault();
 		}
 
+		public string EscapeColumnName(string str)
+		{
+			switch (_dbType)
+			{
+				case DBType.MySql:
+					return string.Format("`{0}`", str);
+
+				case DBType.PostgreSQL:
+					return string.Format("\"{0}\"", str);
+
+				default:
+					return string.Format("[{0}]", str);
+			}
+		}
+
 		// Insert a poco into a table.  If the poco has a property with the same name 
 		// as the primary key the id of the new record is assigned to it.  Either way,
 		// the new id is returned.
@@ -773,7 +788,7 @@ namespace PetaPoco
 								continue;
 							}
 
-							names.Add(i.Key);
+							names.Add(EscapeColumnName(i.Key));
 							values.Add(string.Format("{0}{1}", _paramPrefix, index++));
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
@@ -801,7 +816,7 @@ namespace PetaPoco
 							case DBType.PostgreSQL:
 								if (primaryKeyName != null)
 								{
-									cmd.CommandText += string.Format("returning {0} as NewID", primaryKeyName);
+									cmd.CommandText += string.Format("returning {0} as NewID", EscapeColumnName(primaryKeyName));
 									DoPreExecute(cmd);
 									id = cmd.ExecuteScalar();
 								}
@@ -815,7 +830,7 @@ namespace PetaPoco
 							case DBType.Oracle:
 								if (primaryKeyName != null)
 								{
-									cmd.CommandText += string.Format(" returning {0} into :newid", primaryKeyName);
+									cmd.CommandText += string.Format(" returning {0} into :newid", EscapeColumnName(primaryKeyName));
 									var param = cmd.CreateParameter();
 									param.ParameterName = ":newid";
 									param.Value = DBNull.Value;
@@ -903,14 +918,14 @@ namespace PetaPoco
 							// Build the sql
 							if (index > 0)
 								sb.Append(", ");
-							sb.AppendFormat("{0} = {1}{2}", i.Key, _paramPrefix, index++);
+							sb.AppendFormat("{0} = {1}{2}", EscapeColumnName(i.Key), _paramPrefix, index++);
 
 							// Store the parameter in the command
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
 
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
-											tableName, sb.ToString(), primaryKeyName, _paramPrefix, index++);
+											tableName, sb.ToString(), EscapeColumnName(primaryKeyName), _paramPrefix, index++);
 						AddParam(cmd, primaryKeyValue, _paramPrefix);
 
 						DoPreExecute(cmd);
@@ -978,7 +993,7 @@ namespace PetaPoco
 			}
 
 			// Do it
-			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", tableName, primaryKeyName);
+			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", tableName, EscapeColumnName(primaryKeyName));
 			return Execute(sql, primaryKeyValue);
 		}
 
@@ -1243,7 +1258,8 @@ namespace PetaPoco
 				}
 
 				// Build column list for automatic select
-				QueryColumns = string.Join(", ", (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray());
+				QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
+
 			}
 
 			bool IsIntegralType(Type t)
@@ -1474,7 +1490,7 @@ namespace PetaPoco
 			public string TableName { get; private set; }
 			public string PrimaryKey { get; private set; }
 			public string SequenceName { get; private set; }
-			public string QueryColumns { get; private set; }
+			public string[] QueryColumns { get; private set; }
 			public Dictionary<string, PocoColumn> Columns { get; private set; }
 			Dictionary<string, object> PocoFactories = new Dictionary<string, object>();
 		}

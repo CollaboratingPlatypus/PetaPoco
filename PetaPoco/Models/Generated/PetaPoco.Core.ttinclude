@@ -112,16 +112,13 @@ public class Column
 
 
 
-static string CleanUp(string tableName)
+static string CleanUp(string str)
 {
-    string result=tableName;
+	Regex rcCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
+	str = rcCleanUp.Replace(str, "_");
+	if (char.IsDigit(str[0])) str = "_" + str;
 	
-    //strip blanks
-    result=result.Replace(" ","");
-	
-    //put your logic here...
-	
-    return result;
+    return str;
 }
 
 string CheckNullable(Column col)

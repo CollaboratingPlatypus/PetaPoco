@@ -114,7 +114,11 @@ foreach(Column col in tbl.Columns)
 {
 		// Column bindings
 #>
+<# if (col.Name!=col.PropertyName) { #>
+        [Column("<#=col.Name#>")] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+<# } else { #>
         [Column] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+<# } #>
 <#
 }
 #>
