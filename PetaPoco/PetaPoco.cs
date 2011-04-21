@@ -376,7 +376,7 @@ namespace PetaPoco
 				else if (item.GetType() == typeof(AnsiString))
 				{
 					// Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
-					p.Size = Math.Max((item as string).Length + 1, 4000);
+					p.Size = Math.Max((item as AnsiString).Value.Length + 1, 4000);
 					p.Value = (item as AnsiString).Value;
 					p.DbType = DbType.AnsiString;
 				}
