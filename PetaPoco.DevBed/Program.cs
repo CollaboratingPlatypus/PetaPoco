@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Dynamic;
 
 namespace PetaPoco.DevBed
 {
@@ -28,8 +29,10 @@ namespace PetaPoco.DevBed
 		public string content { get; set; }
 	}
 
+
 	class Program
 	{
+
 		static void Main(string[] args)
 		{
 		}

@@ -9,7 +9,7 @@ CREATE TABLE petapoco (
 	date_edited		timestamp NULL,
 	content			text NOT NULL,
 	state			int NOT NULL,
-	"col w space"   int NOT NULL,
+	"col w space"   int,
 
 	PRIMARY KEY (id)
 );
