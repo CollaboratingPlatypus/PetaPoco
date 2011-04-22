@@ -98,7 +98,7 @@ namespace <#=Namespace #>
 	
 
 <#
-foreach(Table tbl in tables)
+foreach(Table tbl in from t in tables where !t.Ignore select t)
 {
 #>
     
@@ -117,7 +117,7 @@ foreach(Table tbl in tables)
     public partial class <#=tbl.ClassName#> <# if (GenerateOperations) { #>: <#=RepoName#>.Record<<#=tbl.ClassName#>> <# } #> 
     {
 <#
-foreach(Column col in tbl.Columns)
+foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 {
 		// Column bindings
 #>

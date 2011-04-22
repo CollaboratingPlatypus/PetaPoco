@@ -11,7 +11,7 @@
 		<iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>
-PetaPoco is a tiny (approx 1,500 lines) .NET data access layer inspired by Massive, but for use with non-dynamic POCO objects.
+PetaPoco is a tiny, single file .NET data access layer inspired by Massive, but also supports non-dynamic POCO objects.
 
 This package includes the core PetaPoco library + T4 templates to generate POCO classes from your database
 		</description>

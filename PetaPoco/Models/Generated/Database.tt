@@ -1,23 +1,24 @@
 <#@ include file="PetaPoco.Core.ttinclude" #>
 <#
 	// Settings
-    ConnectionStringName = "sqlserverce";			// Uses last connection string in config if not specified
+    ConnectionStringName = "";			// Uses last connection string in config if not specified
     Namespace = "";
     RepoName = "";
     GenerateOperations = true;
 
-    // Read schema and generate output
+    // Read schema
 	var tables = LoadTables();
 
 /*
-	tables["petapoco2"].ClassName="my_petapoco";
-	tables["petapoco2"].AutoIncrement=false;
-	tables["petapoco2"]["name"].PropertyName="my_name";
-	tables.IgnoreColumn("petapoco2", "name");
-	tables.RenameColumn("petapoco2", "email", "my_email");
-	tables.SetAutoIncrement("petapoco2", false);
+	// Tweak Schema
+	tables["tablename"].Ignore = true;							// To ignore a table
+	tables["tablename"].ClassName = "newname";					// To change the class name of a table
+	tables["tablename"]["columnname"].Ignore = true;			// To ignore a column
+	tables["tablename"]["columnname"].PropertyName="newname";	// To change the property name of a column
+	tables["tablename"]["columnname"].PropertyType="bool";		// To change the property type of a column
 */
 
+	// Generate output
 	if (tables.Count>0)
 	{
 #>

@@ -92,6 +92,7 @@ public class Table
     public string CleanName;
     public string ClassName;
 	public string SequenceName;
+	public bool Ignore;
 
     public Column PK
     {
@@ -124,6 +125,7 @@ public class Column
     public bool IsPK;
     public bool IsNullable;
 	public bool IsAutoIncrement;
+	public bool Ignore;
 }
 
 public class Tables : List<Table>
@@ -160,7 +162,12 @@ static string CleanUp(string str)
 string CheckNullable(Column col)
 {
     string result="";
-    if(col.IsNullable && col.PropertyType !="byte[]" && col.PropertyType !="string")
+    if(col.IsNullable && 
+		col.PropertyType !="byte[]" && 
+		col.PropertyType !="string" &&
+		col.PropertyType !="Microsoft.SqlServer.Types.SqlGeography" &&
+		col.PropertyType !="Microsoft.SqlServer.Types.SqlGeometry"
+		)
         result="?";
     return result;
 }
@@ -561,6 +568,12 @@ class SqlServerSchemaReader : SchemaReader
 			case "timestamp":
 				sysType=  "byte[]";
 				 break;
+			case "geography":
+				sysType = "Microsoft.SqlServer.Types.SqlGeography";
+				break;
+			case "geometry":
+				sysType = "Microsoft.SqlServer.Types.SqlGeometry";
+				break;
 		}
 		return sysType;
 	}
@@ -1120,7 +1133,7 @@ class OracleSchemaReader : SchemaReader
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString(), (rdr["DataType"] == DBNull.Value ? null : rdr["DataType"].ToString()));
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
-					col.AutoIncrement=true;
+					col.IsAutoIncrement=true;
 					result.Add(col);
 				}
 			}
