@@ -112,7 +112,17 @@ namespace sqlserverce
         [Column] public DateTime? date_edited { get; set; }
         [Column] public string content { get; set; }
         [Column] public int state { get; set; }
-        [Column("col w space")] public int col_w_space { get; set; }
+        [Column("col w space")] public int? col_w_space { get; set; }
+	}
+
+    
+	[TableName("petapoco2")]
+	[PrimaryKey("email", autoIncrement=false)]
+	[ExplicitColumns]
+    public partial class petapoco2 : sqlserverceDB.Record<petapoco2>  
+    {
+        [Column] public string email { get; set; }
+        [Column] public string name { get; set; }
 	}
 
 }

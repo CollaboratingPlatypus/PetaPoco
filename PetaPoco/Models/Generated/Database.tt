@@ -8,6 +8,16 @@
 
     // Read schema and generate output
 	var tables = LoadTables();
+
+/*
+	tables["petapoco2"].ClassName="my_petapoco";
+	tables["petapoco2"].AutoIncrement=false;
+	tables["petapoco2"]["name"].PropertyName="my_name";
+	tables.IgnoreColumn("petapoco2", "name");
+	tables.RenameColumn("petapoco2", "email", "my_email");
+	tables.SetAutoIncrement("petapoco2", false);
+*/
+
 	if (tables.Count>0)
 	{
 #>

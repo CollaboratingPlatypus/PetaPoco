@@ -87,10 +87,11 @@ bool GenerateOperations = false;
 
 public class Table
 {
-    public List<Column> Columns;
+    public List<Column> Columns;	
     public string Name;
     public string CleanName;
     public string ClassName;
+	public string SequenceName;
 
     public Column PK
     {
@@ -99,6 +100,20 @@ public class Table
             return this.Columns.SingleOrDefault(x=>x.IsPK);
         }
     }
+
+	public Column GetColumn(string columnName)
+	{
+		return Columns.Single(x=>string.Compare(x.Name, columnName, true)==0);
+	}
+
+	public Column this[string columnName]
+	{
+		get
+		{
+			return GetColumn(columnName);
+		}
+	}
+
 }
 
 public class Column
@@ -108,8 +123,29 @@ public class Column
     public string PropertyType;
     public bool IsPK;
     public bool IsNullable;
+	public bool IsAutoIncrement;
 }
 
+public class Tables : List<Table>
+{
+	public Tables()
+	{
+	}
+	
+	public Table GetTable(string tableName)
+	{
+		return this.Single(x=>string.Compare(x.Name, tableName, true)==0);
+	}
+
+	public Table this[string tableName]
+	{
+		get
+		{
+			return GetTable(tableName);
+		}
+	}
+
+}
 
 
 static string CleanUp(string str)
@@ -267,7 +303,8 @@ static string zap_password(string connectionString)
 }
 
 
-List<Table> LoadTables()
+
+Tables LoadTables()
 {
 	InitConnectionString();
 
@@ -295,12 +332,12 @@ List<Table> LoadTables()
 		WriteLine("// Failed to load provider `{0}` - {1}", ProviderName, error);
 		WriteLine("// -----------------------------------------------------------------------------------------");
 		WriteLine("");
-		return new List<Table>();
+		return new Tables();
 	}
 
 	try
 	{
-		List<Table> result;
+		Tables result;
 		using(var conn=_factory.CreateConnection())
 		{
 			conn.ConnectionString=ConnectionString;         
@@ -336,7 +373,7 @@ List<Table> LoadTables()
 
 			reader.outer=this;
 			result=reader.ReadSchema(conn, _factory);
-        
+
 			conn.Close();
 
 		    return result;
@@ -351,7 +388,7 @@ List<Table> LoadTables()
 		WriteLine("// Failed to read database schema - {0}", error);
 		WriteLine("// -----------------------------------------------------------------------------------------");
 		WriteLine("");
-		return new List<Table>();
+		return new Tables();
 	}
 
         
@@ -359,7 +396,7 @@ List<Table> LoadTables()
 
 abstract class SchemaReader
 {
-	public abstract List<Table> ReadSchema(DbConnection connection, DbProviderFactory factory);
+	public abstract Tables ReadSchema(DbConnection connection, DbProviderFactory factory);
 	public GeneratedTextTransformation outer;
 	public void WriteLine(string o)
 	{
@@ -371,9 +408,9 @@ abstract class SchemaReader
 class SqlServerSchemaReader : SchemaReader
 {
 	// SchemaReader.ReadSchema
-	public override List<Table> ReadSchema(DbConnection connection, DbProviderFactory factory)
+	public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
 	{
-		var result=new List<Table>();
+		var result=new Tables();
 		
 		_connection=connection;
 		_factory=factory;
@@ -407,7 +444,9 @@ class SqlServerSchemaReader : SchemaReader
 			string PrimaryKey=GetPK(tbl.Name);
 			var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
 			if(pkColumn!=null)
+			{
 				pkColumn.IsPK=true;
+			}
 		}
 	    
 
@@ -441,6 +480,7 @@ class SqlServerSchemaReader : SchemaReader
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
+					col.IsAutoIncrement=((int)rdr["IsIdentity"])==1;
 					result.Add(col);
 				}
 			}
@@ -552,9 +592,9 @@ class SqlServerSchemaReader : SchemaReader
 class SqlServerCeSchemaReader : SchemaReader
 {
 	// SchemaReader.ReadSchema
-	public override List<Table> ReadSchema(DbConnection connection, DbProviderFactory factory)
+	public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
 	{
-		var result=new List<Table>();
+		var result=new Tables();
 		
 		_connection=connection;
 		_factory=factory;
@@ -621,6 +661,7 @@ class SqlServerCeSchemaReader : SchemaReader
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
+					col.IsAutoIncrement=rdr["AUTOINC_INCREMENT"]!=DBNull.Value;
 					result.Add(col);
 				}
 			}
@@ -719,6 +760,7 @@ class SqlServerCeSchemaReader : SchemaReader
 			ORDINAL_POSITION AS OrdinalPosition, 
 			COLUMN_DEFAULT AS DefaultSetting, 
 			IS_NULLABLE AS IsNullable, DATA_TYPE AS DataType, 
+			AUTOINC_INCREMENT,
 			CHARACTER_MAXIMUM_LENGTH AS MaxLength, 
 			DATETIME_PRECISION AS DatePrecision
 		FROM  INFORMATION_SCHEMA.COLUMNS
@@ -731,9 +773,9 @@ class SqlServerCeSchemaReader : SchemaReader
 class PostGreSqlSchemaReader : SchemaReader
 {
 	// SchemaReader.ReadSchema
-	public override List<Table> ReadSchema(DbConnection connection, DbProviderFactory factory)
+	public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
 	{
-		var result=new List<Table>();
+		var result=new Tables();
 		
 		_connection=connection;
 		_factory=factory;
@@ -800,6 +842,7 @@ class PostGreSqlSchemaReader : SchemaReader
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["udt_name"].ToString());
 					col.IsNullable=rdr["is_nullable"].ToString()=="YES";
+					col.IsAutoIncrement = rdr["column_default"].ToString().StartsWith("nextval(");
 					result.Add(col);
 				}
 			}
@@ -891,7 +934,7 @@ class PostGreSqlSchemaReader : SchemaReader
 			";
 
 	const string COLUMN_SQL=@"
-			SELECT column_name, is_nullable, udt_name 
+			SELECT column_name, is_nullable, udt_name, column_default
 			FROM information_schema.columns 
 			WHERE table_name=@tableName;
 			";
@@ -901,9 +944,9 @@ class PostGreSqlSchemaReader : SchemaReader
 class MySqlSchemaReader : SchemaReader
 {
 	// SchemaReader.ReadSchema
-	public override List<Table> ReadSchema(DbConnection connection, DbProviderFactory factory)
+	public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
 	{
-		var result=new List<Table>();
+		var result=new Tables();
 	
         //this will return everything for the DB
         var schema  = connection.GetSchema("COLUMNS");
@@ -937,6 +980,8 @@ class MySqlSchemaReader : SchemaReader
                 col.PropertyType=GetPropertyType(row["DATA_TYPE"].ToString());
                 col.IsNullable=row["IS_NULLABLE"].ToString()=="YES";
                 col.IsPK=row["COLUMN_KEY"].ToString()=="PRI";
+				col.IsAutoIncrement=row["extra"].ToString().ToLower().IndexOf("auto_increment")>=0;
+
                 item.Columns.Add(col);
             }
         }
@@ -1003,9 +1048,9 @@ class MySqlSchemaReader : SchemaReader
 class OracleSchemaReader : SchemaReader
 {
 	// SchemaReader.ReadSchema
-	public override List<Table> ReadSchema(DbConnection connection, DbProviderFactory factory)
+	public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
 	{
-		var result=new List<Table>();
+		var result=new Tables();
 		
 		_connection=connection;
 		_factory=factory;
@@ -1075,6 +1120,7 @@ class OracleSchemaReader : SchemaReader
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString(), (rdr["DataType"] == DBNull.Value ? null : rdr["DataType"].ToString()));
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
+					col.AutoIncrement=true;
 					result.Add(col);
 				}
 			}

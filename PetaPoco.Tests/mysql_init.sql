@@ -13,3 +13,11 @@ CREATE TABLE petapoco (
 	
 	PRIMARY KEY (id)
 ) ENGINE=INNODB;
+
+DROP TABLE IF EXISTS petapoco2;
+
+CREATE TABLE petapoco2 (
+	email		varchar(127) NOT NULL,
+	name		varchar(127) NOT NULL,
+	PRIMARY KEY (email)
+) ENGINE=INNODB;

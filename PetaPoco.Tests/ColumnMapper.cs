@@ -16,12 +16,12 @@ namespace PetaPoco.Tests
 
 	public class MyColumnMapper : PetaPoco.IMapper
 	{
-		public void GetTableInfo(Type t, ref string tableName, ref string primaryKey, ref string sequenceName)
+		public void GetTableInfo(Type t, TableInfo ti)
 		{
 			if (t == typeof(Poco2))
 			{
-				tableName = "petapoco";
-				primaryKey = "id";
+				ti.TableName = "petapoco";
+				ti.PrimaryKey = "id";
 			}
 		}
 		public bool MapPropertyToColumn(System.Reflection.PropertyInfo pi, ref string columnName, ref bool resultColumn)
@@ -83,8 +83,8 @@ namespace PetaPoco.Tests
 			Expect(pd.Columns["remapped2"].ColumnName, Is.EqualTo("remapped2"));
 			Expect(pd.Columns["prop3"].ColumnName, Is.EqualTo("prop3"));
 			Expect(string.Join(", ", pd.QueryColumns), Is.EqualTo("prop1, remapped2"));
-			Expect(pd.PrimaryKey, Is.EqualTo("id"));
-			Expect(pd.TableName, Is.EqualTo("petapoco"));
+			Expect(pd.TableInfo.PrimaryKey, Is.EqualTo("id"));
+			Expect(pd.TableInfo.TableName, Is.EqualTo("petapoco"));
 		}
 	}
 }

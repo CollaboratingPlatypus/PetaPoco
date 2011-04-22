@@ -33,7 +33,7 @@ namespace PetaPoco.Tests
 		[TestFixtureTearDown]
 		public void DeleteDB()
 		{
-			db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_done.sql", _connectionStringName)));
+			//db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_done.sql", _connectionStringName)));
 		}
 
 		long GetRecordCount()
@@ -46,6 +46,7 @@ namespace PetaPoco.Tests
 		{
 			// Delete everything
 			db.Delete<deco>("");
+			db.Delete<petapoco2>("");
 
 			// Should be clean
 			Expect(GetRecordCount(), Is.EqualTo(0));
@@ -779,6 +780,18 @@ namespace PetaPoco.Tests
 			// Should be gone!
 			var o4 = db.SingleOrDefault<dynamic>("SELECT * FROM petapoco WHERE id=@0", o.id);
 			Expect(o4==null, Is.True);
+		}
+
+		[Test]
+		public void Manual_PrimaryKey()
+		{
+			var o=new petapoco2();
+			o.email="blah@blah.com";
+			o.name="Mr Blah";
+			db.Insert(o);
+
+			var o2 = db.SingleOrDefault<petapoco2>("WHERE email=@0", "blah@blah.com");
+			Expect(o2.name, Is.EqualTo("Mr Blah"));
 		}
 	}
 

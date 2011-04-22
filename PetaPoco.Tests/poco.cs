@@ -71,4 +71,12 @@ namespace PetaPoco.Tests
 		[Ignore] public string content { get; set; }
 		[Column("col w space")] public int col_w_space { get; set; }
 	}
+
+	[TableName("petapoco2")]
+	[PrimaryKey("email", autoIncrement=false)]
+	class petapoco2
+	{
+		public string email { get; set; }
+		public string name { get; set; }
+	}
 }

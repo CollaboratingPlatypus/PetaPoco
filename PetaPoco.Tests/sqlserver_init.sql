@@ -15,3 +15,11 @@ CREATE TABLE petapoco (
 	PRIMARY KEY (id)
 );
 
+IF OBJECT_ID('dbo.petapoco2','U') IS NOT NULL
+	DROP TABLE dbo.petapoco2;
+
+CREATE TABLE petapoco2 (
+	email		varchar(127) NOT NULL,
+	name		varchar(127) NOT NULL,
+	PRIMARY KEY (email)
+);
