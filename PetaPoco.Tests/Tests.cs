@@ -793,6 +793,14 @@ namespace PetaPoco.Tests
 			var o2 = db.SingleOrDefault<petapoco2>("WHERE email=@0", "blah@blah.com");
 			Expect(o2.name, Is.EqualTo("Mr Blah"));
 		}
+
+		[Test]
+		public void SingleValueRequest()
+		{
+			var id = InsertRecords(1);
+			var id2 = db.SingleOrDefault<long>("SELECT id from petapoco WHERE id=@0", id);
+			Expect(id, Is.EqualTo(id2));
+		}
 	}
 
 }

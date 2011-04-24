@@ -78,7 +78,7 @@ namespace PetaPoco
 	}
 
 	// Results from paged request
-	public class Page<T> where T : new()
+	public class Page<T> 
 	{
 		public long CurrentPage { get; set; }
 		public long TotalPages { get; set; }
@@ -538,12 +538,12 @@ namespace PetaPoco
 		public bool ForceDateTimesToUtc { get; set; }
 
 		// Return a typed list of pocos
-		public List<T> Fetch<T>(string sql, params object[] args) where T : new()
+		public List<T> Fetch<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).ToList();
 		}
 
-		public List<T> Fetch<T>(Sql sql) where T : new()
+		public List<T> Fetch<T>(Sql sql) 
 		{
 			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
@@ -578,7 +578,7 @@ namespace PetaPoco
 			return true;
 		}
 
-		public void BuildPageQueries<T>(long page, long itemsPerPage, string sql, ref object[] args, out string sqlCount, out string sqlPage) where T : new()
+		public void BuildPageQueries<T>(long page, long itemsPerPage, string sql, ref object[] args, out string sqlCount, out string sqlPage) 
 		{
 			// Add auto select clause
 			if (EnableAutoSelect)
@@ -611,7 +611,7 @@ namespace PetaPoco
 		}
 
 		// Fetch a page	
-		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
+		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) 
 		{
 			string sqlCount, sqlPage;
 			BuildPageQueries<T>(page, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
@@ -632,26 +632,26 @@ namespace PetaPoco
 			return result;
 		}
 
-		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) where T : new()
+		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) 
 		{
 			return Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 		}
 
 
-		public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) where T : new()
+		public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) 
 		{
 			string sqlCount, sqlPage;
 			BuildPageQueries<T>(page, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
 			return Fetch<T>(sqlPage, args);
 		}
 
-		public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) where T : new()
+		public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) 
 		{
 			return Fetch<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 		}
 
 		// Return an enumerable collection of pocos
-		public IEnumerable<T> Query<T>(string sql, params object[] args) where T : new()
+		public IEnumerable<T> Query<T>(string sql, params object[] args) 
 		{
 			if (EnableAutoSelect)
 				sql = AddSelectClause<T>(sql);
@@ -701,53 +701,53 @@ namespace PetaPoco
 			}
 		}
 
-		public IEnumerable<T> Query<T>(Sql sql) where T : new()
+		public IEnumerable<T> Query<T>(Sql sql) 
 		{
 			return Query<T>(sql.SQL, sql.Arguments);
 		}
 
-		public bool Exists<T>(object primaryKey) where T : new()
+		public bool Exists<T>(object primaryKey) 
 		{
 			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey) != null;
 		}
-		public T Single<T>(object primaryKey) where T : new()
+		public T Single<T>(object primaryKey) 
 		{
 			return Single<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
-		public T SingleOrDefault<T>(object primaryKey) where T : new()
+		public T SingleOrDefault<T>(object primaryKey) 
 		{
 			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
-		public T Single<T>(string sql, params object[] args) where T : new()
+		public T Single<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).Single();
 		}
-		public T SingleOrDefault<T>(string sql, params object[] args) where T : new()
+		public T SingleOrDefault<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).SingleOrDefault();
 		}
-		public T First<T>(string sql, params object[] args) where T : new()
+		public T First<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).First();
 		}
-		public T FirstOrDefault<T>(string sql, params object[] args) where T : new()
+		public T FirstOrDefault<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).FirstOrDefault();
 		}
 
-		public T Single<T>(Sql sql) where T : new()
+		public T Single<T>(Sql sql) 
 		{
 			return Query<T>(sql).Single();
 		}
-		public T SingleOrDefault<T>(Sql sql) where T : new()
+		public T SingleOrDefault<T>(Sql sql) 
 		{
 			return Query<T>(sql).SingleOrDefault();
 		}
-		public T First<T>(Sql sql) where T : new()
+		public T First<T>(Sql sql) 
 		{
 			return Query<T>(sql).First();
 		}
-		public T FirstOrDefault<T>(Sql sql) where T : new()
+		public T FirstOrDefault<T>(Sql sql) 
 		{
 			return Query<T>(sql).FirstOrDefault();
 		}
@@ -1381,6 +1381,11 @@ namespace PetaPoco
 						}
 						else
 #endif
+						if (typeof(T).IsValueType || typeof(T)==typeof(string) || typeof(T)==typeof(byte[]))
+						{
+							return (rdr) => (T)rdr.GetValue(0);
+						}
+						else
 						{
 							// var poco=new T()
 							il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
