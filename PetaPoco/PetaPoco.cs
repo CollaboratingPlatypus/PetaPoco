@@ -419,10 +419,8 @@ namespace PetaPoco
 
 			// Perform parameter prefix replacements
 			if (_paramPrefix != "@")
-			{
 				sql = rxParamsPrefix.Replace(sql, m => _paramPrefix + m.Value.Substring(1));
-				sql = sql.Replace("@@", "@");		   // <- double @@ escapes a single @
-			}
+			sql = sql.Replace("@@", "@");		   // <- double @@ escapes a single @
 
 			// Create the command and add parameters
 			IDbCommand cmd = _factory == null ? connection.CreateCommand() : _factory.CreateCommand();
@@ -831,7 +829,7 @@ namespace PetaPoco
 							case DBType.SqlServerCE:
 								DoPreExecute(cmd);
 								cmd.ExecuteNonQuery();
-								id = ExecuteScalar<object>("SELECT @@IDENTITY AS NewID;");
+								id = ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
 								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
