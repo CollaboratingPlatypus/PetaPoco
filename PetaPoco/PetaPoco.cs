@@ -760,6 +760,7 @@ namespace PetaPoco
 					return string.Format("`{0}`", str);
 
 				case DBType.PostgreSQL:
+				case DBType.Oracle:
 					return string.Format("\"{0}\"", str);
 
 				default:
