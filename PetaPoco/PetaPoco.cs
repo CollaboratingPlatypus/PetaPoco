@@ -1666,7 +1666,7 @@ namespace PetaPoco
 
 		public Sql Where(string sql, params object[] args)
 		{
-			return Append(new Sql("WHERE " + sql, args));
+			return Append(new Sql("WHERE (" + sql + ")", args));
 		}
 
 		public Sql OrderBy(params object[] columns)
