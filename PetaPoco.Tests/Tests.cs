@@ -33,7 +33,7 @@ namespace PetaPoco.Tests
 		[TestFixtureTearDown]
 		public void DeleteDB()
 		{
-			//db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_done.sql", _connectionStringName)));
+			db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_done.sql", _connectionStringName)));
 		}
 
 		long GetRecordCount()

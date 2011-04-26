@@ -100,6 +100,16 @@ namespace postgresql
 	
 
     
+	[TableName("petapoco2")]
+	[PrimaryKey("email", autoIncrement=false)]
+	[ExplicitColumns]
+    public partial class petapoco2 : postgresqlDB.Record<petapoco2>  
+    {
+        [Column] public string email { get; set; }
+        [Column] public string name { get; set; }
+	}
+
+    
 	[TableName("petapoco")]
 	[PrimaryKey("id")]
 	[ExplicitColumns]
@@ -113,16 +123,6 @@ namespace postgresql
         [Column] public string content { get; set; }
         [Column] public int state { get; set; }
         [Column("col w space")] public int? col_w_space { get; set; }
-	}
-
-    
-	[TableName("petapoco2")]
-	[PrimaryKey("email", autoIncrement=false)]
-	[ExplicitColumns]
-    public partial class petapoco2 : postgresqlDB.Record<petapoco2>  
-    {
-        [Column] public string email { get; set; }
-        [Column] public string name { get; set; }
 	}
 
 }

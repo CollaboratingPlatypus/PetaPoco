@@ -383,6 +383,15 @@ Tables LoadTables()
 
 			conn.Close();
 
+			var rxClean = new Regex("^(Equals|GetHashCode|GetType|ToString|repo|Save|IsNew|Insert|Update|Delete|Exists|SingleOrDefault|Single|First|FirstOrDefault|Fetch|Page|Query)$");
+			foreach (var t in result)
+			{
+				foreach (var c in t.Columns)
+				{
+					c.PropertyName = rxClean.Replace(c.PropertyName, "_$1");
+				}
+			}
+
 		    return result;
 		}
 	}
