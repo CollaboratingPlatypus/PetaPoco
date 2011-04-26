@@ -522,9 +522,9 @@ namespace PetaPoco
 			if (!rxSelect.IsMatch(sql))
 			{
 				var pd = PocoData.ForType(typeof(T));
-				string cols = string.Join(", ", (from c in pd.QueryColumns select EscapeColumnName(c)).ToArray());
+				string cols = string.Join(", ", (from c in pd.QueryColumns select EscapeSqlIdentifier(c)).ToArray());
 				if (!rxFrom.IsMatch(sql))
-					sql = string.Format("SELECT {0} FROM {1} {2}", cols, pd.TableInfo.TableName, sql);
+					sql = string.Format("SELECT {0} FROM {1} {2}", cols, EscapeSqlIdentifier(pd.TableInfo.TableName), sql);
 				else
 					sql = string.Format("SELECT {0} {1}", cols, sql);
 			}
@@ -706,15 +706,15 @@ namespace PetaPoco
 
 		public bool Exists<T>(object primaryKey) 
 		{
-			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey) != null;
+			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey) != null;
 		}
 		public T Single<T>(object primaryKey) 
 		{
-			return Single<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
+			return Single<T>(string.Format("WHERE {0}=@0", EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
 		public T SingleOrDefault<T>(object primaryKey) 
 		{
-			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", EscapeColumnName(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
+			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
 		public T Single<T>(string sql, params object[] args) 
 		{
@@ -750,7 +750,7 @@ namespace PetaPoco
 			return Query<T>(sql).FirstOrDefault();
 		}
 
-		public string EscapeColumnName(string str)
+		public string EscapeSqlIdentifier(string str)
 		{
 			switch (_dbType)
 			{
@@ -804,13 +804,13 @@ namespace PetaPoco
 								continue;
 							}
 
-							names.Add(EscapeColumnName(i.Key));
+							names.Add(EscapeSqlIdentifier(i.Key));
 							values.Add(string.Format("{0}{1}", _paramPrefix, index++));
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
 
 						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
-								tableName,
+								EscapeSqlIdentifier(tableName),
 								string.Join(",", names.ToArray()),
 								string.Join(",", values.ToArray())
 								);
@@ -839,7 +839,7 @@ namespace PetaPoco
 							case DBType.PostgreSQL:
 								if (primaryKeyName != null)
 								{
-									cmd.CommandText += string.Format("returning {0} as NewID", EscapeColumnName(primaryKeyName));
+									cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(primaryKeyName));
 									DoPreExecute(cmd);
 									id = cmd.ExecuteScalar();
 								}
@@ -853,7 +853,7 @@ namespace PetaPoco
 							case DBType.Oracle:
 								if (primaryKeyName != null)
 								{
-									cmd.CommandText += string.Format(" returning {0} into :newid", EscapeColumnName(primaryKeyName));
+									cmd.CommandText += string.Format(" returning {0} into :newid", EscapeSqlIdentifier(primaryKeyName));
 									var param = cmd.CreateParameter();
 									param.ParameterName = ":newid";
 									param.Value = DBNull.Value;
@@ -941,14 +941,14 @@ namespace PetaPoco
 							// Build the sql
 							if (index > 0)
 								sb.Append(", ");
-							sb.AppendFormat("{0} = {1}{2}", EscapeColumnName(i.Key), _paramPrefix, index++);
+							sb.AppendFormat("{0} = {1}{2}", EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
 
 							// Store the parameter in the command
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
 
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
-											tableName, sb.ToString(), EscapeColumnName(primaryKeyName), _paramPrefix, index++);
+											EscapeSqlIdentifier(tableName), sb.ToString(), EscapeSqlIdentifier(primaryKeyName), _paramPrefix, index++);
 						AddParam(cmd, primaryKeyValue, _paramPrefix);
 
 						DoPreExecute(cmd);
@@ -988,13 +988,13 @@ namespace PetaPoco
 		public int Update<T>(string sql, params object[] args)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(string.Format("UPDATE {0} {1}", pd.TableInfo.TableName, sql), args);
+			return Execute(string.Format("UPDATE {0} {1}", EscapeSqlIdentifier(pd.TableInfo.TableName), sql), args);
 		}
 
 		public int Update<T>(Sql sql)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(new Sql(string.Format("UPDATE {0}", pd.TableInfo.TableName)).Append(sql));
+			return Execute(new Sql(string.Format("UPDATE {0}", EscapeSqlIdentifier(pd.TableInfo.TableName))).Append(sql));
 		}
 
 		public int Delete(string tableName, string primaryKeyName, object poco)
@@ -1016,7 +1016,7 @@ namespace PetaPoco
 			}
 
 			// Do it
-			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", tableName, EscapeColumnName(primaryKeyName));
+			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", EscapeSqlIdentifier(tableName), EscapeSqlIdentifier(primaryKeyName));
 			return Execute(sql, primaryKeyValue);
 		}
 
@@ -1037,13 +1037,13 @@ namespace PetaPoco
 		public int Delete<T>(string sql, params object[] args)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(string.Format("DELETE FROM {0} {1}", pd.TableInfo.TableName, sql), args);
+			return Execute(string.Format("DELETE FROM {0} {1}", EscapeSqlIdentifier(pd.TableInfo.TableName), sql), args);
 		}
 
 		public int Delete<T>(Sql sql)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(new Sql(string.Format("DELETE FROM {0}", pd.TableInfo.TableName)).Append(sql));
+			return Execute(new Sql(string.Format("DELETE FROM {0}", EscapeSqlIdentifier(pd.TableInfo.TableName))).Append(sql));
 		}
 
 		// Check if a poco represents a new record
