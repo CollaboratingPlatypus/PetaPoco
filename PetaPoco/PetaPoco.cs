@@ -532,9 +532,10 @@ namespace PetaPoco
 			if (!rxSelect.IsMatch(sql))
 			{
 				var pd = PocoData.ForType(typeof(T));
-				string cols = string.Join(", ", (from c in pd.QueryColumns select EscapeSqlIdentifier(c)).ToArray());
+				var tableName = EscapeSqlIdentifier(pd.TableInfo.TableName);
+				string cols = string.Join(", ", (from c in pd.QueryColumns select tableName + "." + EscapeSqlIdentifier(c)).ToArray());
 				if (!rxFrom.IsMatch(sql))
-					sql = string.Format("SELECT {0} FROM {1} {2}", cols, EscapeSqlIdentifier(pd.TableInfo.TableName), sql);
+					sql = string.Format("SELECT {0} FROM {1} {2}", cols, tableName, sql);
 				else
 					sql = string.Format("SELECT {0} {1}", cols, sql);
 			}
