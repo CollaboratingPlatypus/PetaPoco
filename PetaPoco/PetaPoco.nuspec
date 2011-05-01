@@ -3,7 +3,7 @@
 	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 		<id>PetaPoco</id>
 		<title>PetaPoco - A tiny ORMish thing for your POCOs (Core + T4 Templates)</title>
-		<version>3.0.0</version>
+		<version>3.0.1</version>
 		<authors>Topten Software</authors>
 		<owners>Topten Software</owners>
 		<licenseUrl>http://www.toptensoftware.com/petapoco/license</licenseUrl>
@@ -16,6 +16,10 @@ PetaPoco is a tiny, single file .NET data access layer inspired by Massive that 
 This package includes the core PetaPoco library + T4 templates to generate POCO classes from your database
 		</description>
 		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
+		<frameworkAssemblies>
+			<frameworkAssembly assemblyName="System.Data" />
+			<frameworkAssembly assemblyName="System.Configuration" />
+		</frameworkAssemblies>
 	</metadata>
 	<files>
 		<file src="PetaPoco.cs" target="Content\Models" />
