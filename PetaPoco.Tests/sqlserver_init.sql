@@ -11,6 +11,7 @@ CREATE TABLE petapoco (
 	content			VARCHAR(MAX) NOT NULL,
 	state			int NOT NULL,
 	[col w space]	int,
+	nullreal		real NULL,
 	
 	PRIMARY KEY (id)
 );

@@ -67,6 +67,7 @@ namespace PetaPoco.Tests
 			o.date_edited = now;
 			o.state = State.Yes;
 			o.col_w_space = 23;
+			o.nullreal = 24;
 
 			return o;
 		}
@@ -86,6 +87,7 @@ namespace PetaPoco.Tests
 			o.date_edited = now;
 			o.state = State.Maybe;
 			o.col_w_space = 23;
+			o.nullreal = 24;
 
 			return o;
 		}
@@ -100,6 +102,7 @@ namespace PetaPoco.Tests
 			Expect(a.date_edited, Is.EqualTo(b.date_edited));
 			Expect(a.state, Is.EqualTo(b.state));
 			Expect(a.col_w_space, Is.EqualTo(b.col_w_space));
+			Expect(a.nullreal, Is.EqualTo(b.nullreal));
 		}
 
 		void Assert(deco a, deco b)
@@ -111,6 +114,7 @@ namespace PetaPoco.Tests
 			Expect(a.date_created, Is.EqualTo(b.date_created));
 			Expect(a.state, Is.EqualTo(b.state));
 			Expect(a.col_w_space, Is.EqualTo(b.col_w_space));
+			Expect(a.nullreal, Is.EqualTo(b.nullreal));
 		}
 
 		// Insert some records, return the id of the first

@@ -17,6 +17,10 @@ This package includes the just the core PetaPoco library (ie: no T4 templates)
 
 		</description>
 		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
+		<!--frameworkAssemblies>
+			<frameworkAssembly assemblyName="System.Data" />
+			<frameworkAssembly assemblyName="System.Configuration" />
+		</frameworkAssemblies-->
 	</metadata>
 	<files>
 		<file src="PetaPoco.cs" target="Content\Models" />

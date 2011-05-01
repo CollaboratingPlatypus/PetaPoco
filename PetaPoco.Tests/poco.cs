@@ -25,6 +25,7 @@ namespace PetaPoco.Tests
 		public string content { get; set; }
 		public State state { get; set; }
 		[Column("col w space")] public int col_w_space { get; set; }
+		public float? nullreal { get; set; }
 	}
 
 
@@ -34,14 +35,15 @@ namespace PetaPoco.Tests
 	[ExplicitColumns]
 	class deco
 	{
-		[Column]public long id { get; set; }
-		[Column]public string title { get; set; }
-		[Column]public bool draft { get; set; }
-		[Column]public DateTime date_created { get; set; }
-		[Column]public DateTime? date_edited { get; set; }
-		[Column]public string content { get; set; }
-		[Column]public State state { get; set; }
+		[Column] public long id { get; set; }
+		[Column] public string title { get; set; }
+		[Column] public bool draft { get; set; }
+		[Column] public DateTime date_created { get; set; }
+		[Column] public DateTime? date_edited { get; set; }
+		[Column] public string content { get; set; }
+		[Column] public State state { get; set; }
 		[Column("col w space")] public int col_w_space { get; set; }
+		[Column] public float? nullreal { get; set; }
 	}
 	// Attributed not-so-true poco
 	[TableName("petapoco")]
@@ -56,6 +58,7 @@ namespace PetaPoco.Tests
 		[Column]public State state { get; set; }
 		public string content { get; set; }
 		[Column("col w space")]public int col_w_space { get; set; }
+		[Column] public float? nullreal { get; set; }
 	}
 
 	// Attributed not-so-true poco
@@ -70,6 +73,7 @@ namespace PetaPoco.Tests
 		public State state { get; set; }
 		[Ignore] public string content { get; set; }
 		[Column("col w space")] public int col_w_space { get; set; }
+		public float? nullreal { get; set; }
 	}
 
 	[TableName("petapoco2")]

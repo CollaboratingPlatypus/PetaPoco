@@ -559,6 +559,8 @@ class SqlServerSchemaReader : SchemaReader
 				sysType="double";
 				break;
 			case "real":
+				sysType="float";
+				break;
 			case "numeric":
 			case "smallmoney":
 			case "decimal":
@@ -746,6 +748,8 @@ class SqlServerCeSchemaReader : SchemaReader
 				sysType="double";
 				break;
 			case "real":
+				sysType="float";
+				break;
 			case "numeric":
 			case "smallmoney":
 			case "decimal":
@@ -1036,10 +1040,11 @@ class MySqlSchemaReader : SchemaReader
 				propType=  "DateTime";
 				  break;
 			case "float":
+				propType="float";
+				break;
 			case "double":
 				propType="double";
 				break;
-			case "real":
 			case "numeric":
 			case "smallmoney":
 			case "decimal":
