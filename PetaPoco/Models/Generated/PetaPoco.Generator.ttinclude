@@ -68,8 +68,8 @@ namespace <#=Namespace #>
 			public object Insert() { return repo.Insert(this); }
 			public int Update() { return repo.Update(this); }
 			public int Delete() { return repo.Delete(this); }
-			public static int Update(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
-			public static int Update(Sql sql) { return repo.Delete<T>(sql); }
+			public static int Update(string sql, params object[] args) { return repo.Update<T>(sql, args); }
+			public static int Update(Sql sql) { return repo.Update<T>(sql); }
 			public static int Delete(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Delete(Sql sql) { return repo.Delete<T>(sql); }
 			public static int Delete(object primaryKey) { return repo.Delete<T>(primaryKey); }
