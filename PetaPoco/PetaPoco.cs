@@ -462,7 +462,7 @@ namespace PetaPoco
 
 		// Override this to log commands, or modify command before execution
 		public virtual void OnExecutingCommand(IDbCommand cmd) { }
-
+		public virtual void OnExecutedCommand(IDbCommand cmd) { }
 
 		// Execute a non-query command
 		public int Execute(string sql, params object[] args)
@@ -474,7 +474,9 @@ namespace PetaPoco
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
-						return cmd.ExecuteNonQuery();
+						var retv=cmd.ExecuteNonQuery();
+						OnExecutedCommand(cmd);
+						return retv;
 					}
 				}
 				finally
@@ -505,6 +507,7 @@ namespace PetaPoco
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
 						object val = cmd.ExecuteScalar();
+						OnExecutedCommand(cmd);
 						return (T)Convert.ChangeType(val, typeof(T));
 					}
 				}
@@ -677,6 +680,7 @@ namespace PetaPoco
 					try
 					{
 						r = cmd.ExecuteReader();
+						OnExecutedCommand(cmd);
 					}
 					catch (Exception x)
 					{
@@ -837,6 +841,7 @@ namespace PetaPoco
 						{
 							DoPreExecute(cmd);
 							cmd.ExecuteNonQuery();
+							OnExecutedCommand(cmd);
 							return true;
 						}
 
@@ -847,12 +852,14 @@ namespace PetaPoco
 							case DBType.SqlServerCE:
 								DoPreExecute(cmd);
 								cmd.ExecuteNonQuery();
+								OnExecutedCommand(cmd);
 								id = ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
 								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
 								DoPreExecute(cmd);
 								id = cmd.ExecuteScalar();
+								OnExecutedCommand(cmd);
 								break;
 							case DBType.PostgreSQL:
 								if (primaryKeyName != null)
@@ -867,6 +874,7 @@ namespace PetaPoco
 									DoPreExecute(cmd);
 									cmd.ExecuteNonQuery();
 								}
+								OnExecutedCommand(cmd);
 								break;
 							case DBType.Oracle:
 								if (primaryKeyName != null)
@@ -888,11 +896,13 @@ namespace PetaPoco
 									DoPreExecute(cmd);
 									cmd.ExecuteNonQuery();
 								}
+								OnExecutedCommand(cmd);
 								break;
 							default:
 								cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
 								DoPreExecute(cmd);
 								id = cmd.ExecuteScalar();
+								OnExecutedCommand(cmd);
 								break;
 						}
 
@@ -972,7 +982,9 @@ namespace PetaPoco
 						DoPreExecute(cmd);
 
 						// Do it
-						return cmd.ExecuteNonQuery();
+						var retv=cmd.ExecuteNonQuery();
+						OnExecutedCommand(cmd);
+						return retv;
 					}
 				}
 				finally
