@@ -1164,23 +1164,32 @@ namespace PetaPoco
 		public object[] LastArgs { get { return _lastArgs; } }
 		public string LastCommand
 		{
-			get
-			{
-				var sb = new StringBuilder();
-				if (_lastSql == null)
-					return "";
-				sb.Append(_lastSql);
-				if (_lastArgs != null && _lastArgs.Length > 0)
-				{
-					sb.Append("\r\n\r\n");
-					for (int i = 0; i < _lastArgs.Length; i++)
-					{
-						sb.AppendFormat("{0}{1} [{2}] = \"{3}\"\r\n", _paramPrefix, i, _lastArgs[i].GetType().Name, _lastArgs[i]);
-					}
-				}
-				return sb.ToString();
-			}
+			get { return FormatCommand(_lastSql, _lastArgs); }
 		}
+
+		public string FormatCommand(IDbCommand cmd)
+		{
+			return FormatCommand(cmd.CommandText, (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray());
+		}
+
+		public string FormatCommand(string sql, object[] args)
+		{
+			var sb = new StringBuilder();
+			if (sql == null)
+				return "";
+			sb.Append(sql);
+			if (args != null && args.Length > 0)
+			{
+				sb.Append("\n");
+				for (int i = 0; i < args.Length; i++)
+				{
+					sb.AppendFormat("\t -> {0}{1} [{2}] = \"{3}\"\n", _paramPrefix, i, args[i].GetType().Name, args[i]);
+				}
+				sb.Remove(sb.Length - 1, 1);
+			}
+			return sb.ToString();
+		}
+
 
 		public static IMapper Mapper
 		{
