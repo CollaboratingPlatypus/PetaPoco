@@ -404,7 +404,7 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_complete()
 		{
-			using (var scope = db.Transaction)
+			using (var scope = db.GetTransaction())
 			{
 				InsertRecords(10);
 				scope.Complete();
@@ -416,7 +416,7 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_cancelled()
 		{
-			using (var scope = db.Transaction)
+			using (var scope = db.GetTransaction())
 			{
 				InsertRecords(10);
 			}
@@ -427,11 +427,11 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_nested_nn()
 		{
-			using (var scope1 = db.Transaction)
+			using (var scope1 = db.GetTransaction())
 			{
 				InsertRecords(10);
 
-				using (var scope2 = db.Transaction)
+				using (var scope2 = db.GetTransaction())
 				{
 					InsertRecords(10);
 				}
@@ -443,11 +443,11 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_nested_yn()
 		{
-			using (var scope1 = db.Transaction)
+			using (var scope1 = db.GetTransaction())
 			{
 				InsertRecords(10);
 
-				using (var scope2 = db.Transaction)
+				using (var scope2 = db.GetTransaction())
 				{
 					InsertRecords(10);
 				}
@@ -460,11 +460,11 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_nested_ny()
 		{
-			using (var scope1 = db.Transaction)
+			using (var scope1 = db.GetTransaction())
 			{
 				InsertRecords(10);
 
-				using (var scope2 = db.Transaction)
+				using (var scope2 = db.GetTransaction())
 				{
 					InsertRecords(10);
 					scope2.Complete();
@@ -477,11 +477,11 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_nested_yy()
 		{
-			using (var scope1 = db.Transaction)
+			using (var scope1 = db.GetTransaction())
 			{
 				InsertRecords(10);
 
-				using (var scope2 = db.Transaction)
+				using (var scope2 = db.GetTransaction())
 				{
 					InsertRecords(10);
 					scope2.Complete();
@@ -496,17 +496,17 @@ namespace PetaPoco.Tests
 		[Test]
 		public void Transaction_nested_yny()
 		{
-			using (var scope1 = db.Transaction)
+			using (var scope1 = db.GetTransaction())
 			{
 				InsertRecords(10);
 
-				using (var scope2 = db.Transaction)
+				using (var scope2 = db.GetTransaction())
 				{
 					InsertRecords(10);
 					//scope2.Complete();
 				}
 
-				using (var scope3 = db.Transaction)
+				using (var scope3 = db.GetTransaction())
 				{
 					InsertRecords(10);
 					scope3.Complete();
