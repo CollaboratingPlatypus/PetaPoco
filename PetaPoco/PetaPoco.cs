@@ -77,6 +77,12 @@ namespace PetaPoco
 		public bool autoIncrement { get; set; }
 	}
 
+	[AttributeUsage(AttributeTargets.Property)]
+	public class AutoJoinAttribute : Attribute
+	{
+		public AutoJoinAttribute() { }
+	}
+
 	// Results from paged request
 	public class Page<T> 
 	{
@@ -693,7 +699,7 @@ namespace PetaPoco
 						OnException(x);
 						throw;
 					}
-					var factory = pd.GetFactory<T>(cmd.CommandText + "-" + _sharedConnection.ConnectionString + ForceDateTimesToUtc.ToString(), ForceDateTimesToUtc, r);
+					var factory = pd.GetFactory<T>(cmd.CommandText, _sharedConnection.ConnectionString, ForceDateTimesToUtc, 0, r.FieldCount, r);
 					using (r)
 					{
 						while (true)
@@ -722,6 +728,227 @@ namespace PetaPoco
 			}
 		}
 
+		class TM {};		// Placeholder "TypeMissing"
+
+		// Multi Fetch
+		public List<TRet> Fetch<T1, T2, TRet>(Func<T1, T2, TRet> cb, string sql, params object[] args) { return Query<T1, T2, TRet>(cb, sql, args).ToList(); }
+		public List<TRet> Fetch<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, string sql, params object[] args) { return Query<T1, T2, T3, TRet>(cb, sql, args).ToList(); }
+		public List<TRet> Fetch<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, string sql, params object[] args) { return Query<T1, T2, T3, T4, TRet>(cb, sql, args).ToList(); }
+		public List<TRet> Fetch<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, string sql, params object[] args) { return Query<T1, T2, T3, T4, T5, TRet>(cb, sql, args).ToList(); }
+
+		// Multi Query
+		public IEnumerable<TRet> Query<T1, T2, TRet>(Func<T1, T2, TRet> cb, string sql, params object[] args) { return MultiPocoQuery<T1, T2, TM, TM, TM, TRet>(cb, sql, args); }
+		public IEnumerable<TRet> Query<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, string sql, params object[] args) { return MultiPocoQuery<T1, T2, T3, TM, TM, TRet>(cb, sql, args); }
+		public IEnumerable<TRet> Query<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, string sql, params object[] args) { return MultiPocoQuery<T1, T2, T3, T4, TM, TRet>(cb, sql, args); }
+		public IEnumerable<TRet> Query<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, string sql, params object[] args) { return MultiPocoQuery<T1, T2, T3, T4, T5, TRet>(cb, sql, args); }
+
+		// Multi Fetch (SQL builder)
+		public List<TRet> Fetch<T1, T2, TRet>(Func<T1, T2, TRet> cb, Sql sql) { return Query<T1, T2, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
+		public List<TRet> Fetch<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, Sql sql) { return Query<T1, T2, T3, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
+		public List<TRet> Fetch<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, Sql sql) { return Query<T1, T2, T3, T4, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
+		public List<TRet> Fetch<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, Sql sql) { return Query<T1, T2, T3, T4, T5, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
+
+		// Multi Query (SQL builder)
+		public IEnumerable<TRet> Query<T1, T2, TRet>(Func<T1, T2, TRet> cb, Sql sql) { return MultiPocoQuery<T1, T2, TM, TM, TM, TRet>(cb, sql.SQL, sql.Arguments); }
+		public IEnumerable<TRet> Query<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, Sql sql) { return MultiPocoQuery<T1, T2, T3, TM, TM, TRet>(cb, sql.SQL, sql.Arguments); }
+		public IEnumerable<TRet> Query<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, Sql sql) { return MultiPocoQuery<T1, T2, T3, T4, TM, TRet>(cb, sql.SQL, sql.Arguments); }
+		public IEnumerable<TRet> Query<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, Sql sql) { return MultiPocoQuery<T1, T2, T3, T4, T5, TRet>(cb, sql.SQL, sql.Arguments); }
+
+		// Multi Fetch (Simple)
+		public List<T1> Fetch<T1, T2>(string sql, params object[] args) { return Query<T1, T2>(sql, args).ToList(); }
+		public List<T1> Fetch<T1, T2, T3>(string sql, params object[] args) { return Query<T1, T2, T3>(sql, args).ToList(); }
+		public List<T1> Fetch<T1, T2, T3, T4>(string sql, params object[] args) { return Query<T1, T2, T3, T4>(sql, args).ToList(); }
+		public List<T1> Fetch<T1, T2, T3, T4, T5>(string sql, params object[] args) { return Query<T1, T2, T3, T4, T5>(sql, args).ToList(); }
+
+		// Multi Query (Simple)
+		public IEnumerable<T1> Query<T1, T2>(string sql, params object[] args) { return MultiPocoQuery<T1, T2, TM, TM, TM, T1>(null, sql, args); }
+		public IEnumerable<T1> Query<T1, T2, T3>(string sql, params object[] args) { return MultiPocoQuery<T1, T2, T3, TM, TM, T1>(null, sql, args); }
+		public IEnumerable<T1> Query<T1, T2, T3, T4>(string sql, params object[] args) { return MultiPocoQuery<T1, T2, T3, T4, TM, T1>(null, sql, args); }
+		public IEnumerable<T1> Query<T1, T2, T3, T4, T5>(string sql, params object[] args) { return MultiPocoQuery<T1, T2, T3, T4, T5, T1>(null, sql, args); }
+
+		// Multi Fetch (Simple) (SQL builder)
+		public List<T1> Fetch<T1, T2>(Sql sql) { return Query<T1, T2>(sql.SQL, sql.Arguments).ToList(); }
+		public List<T1> Fetch<T1, T2, T3>(Sql sql) { return Query<T1, T2, T3>(sql.SQL, sql.Arguments).ToList(); }
+		public List<T1> Fetch<T1, T2, T3, T4>(Sql sql) { return Query<T1, T2, T3, T4>(sql.SQL, sql.Arguments).ToList(); }
+		public List<T1> Fetch<T1, T2, T3, T4, T5>(Sql sql) { return Query<T1, T2, T3, T4, T5>(sql.SQL, sql.Arguments).ToList(); }
+
+		// Multi Query (Simple) (SQL builder)
+		public IEnumerable<T1> Query<T1, T2>(Sql sql) { return MultiPocoQuery<T1, T2, TM, TM, TM, T1>(null, sql.SQL, sql.Arguments); }
+		public IEnumerable<T1> Query<T1, T2, T3>(Sql sql) { return MultiPocoQuery<T1, T2, T3, TM, TM, T1>(null, sql.SQL, sql.Arguments); }
+		public IEnumerable<T1> Query<T1, T2, T3, T4>(Sql sql) { return MultiPocoQuery<T1, T2, T3, T4, TM, T1>(null, sql.SQL, sql.Arguments); }
+		public IEnumerable<T1> Query<T1, T2, T3, T4, T5>(Sql sql) { return MultiPocoQuery<T1, T2, T3, T4, T5, T1>(null, sql.SQL, sql.Arguments); }
+
+
+		// Find the split point in a result set for two different pocos and return the poco factory for the first
+		Func<IDataReader, T> FindSplitPoint<T, TNext>(string sql, IDataReader r, ref int pos)
+		{
+			// Last?
+			if (typeof(TNext) == typeof(TM))
+				return PocoData.ForType(typeof(T)).GetFactory<T>(sql, _sharedConnection.ConnectionString, ForceDateTimesToUtc, pos, r.FieldCount - pos, r);
+
+			// Get PocoData for the two types
+			PocoData pdThis = PocoData.ForType(typeof(T));
+			PocoData pdNext = PocoData.ForType(typeof(TNext));
+
+			// Find split point
+			int firstColumn = pos;
+			var usedColumns = new Dictionary<string, bool>();
+			for (; pos<r.FieldCount; pos++)
+			{
+				// Split if field name has already been used, or if the field doesn't exist in current poco but does in the next
+				string fieldName = r.GetName(pos);
+				if (usedColumns.ContainsKey(fieldName) || (!pdThis.Columns.ContainsKey(fieldName) && pdNext.Columns.ContainsKey(fieldName)))
+				{
+					return pdThis.GetFactory<T>(sql, _sharedConnection.ConnectionString, ForceDateTimesToUtc, firstColumn, pos - firstColumn, r);
+				}
+				usedColumns.Add(fieldName, true);
+			}
+
+			throw new InvalidOperationException(string.Format("Couldn't find split point between {0} and {1}", typeof(T), typeof(TNext)));
+		}
+
+		Func<IDataReader, object, TRet> CreateMultiPocoFactory<T1, T2, T3, T4, T5, TRet>(string sql, IDataReader r)
+		{
+			int pos = 0;
+			var f1 = FindSplitPoint<T1, T2>(sql, r, ref pos);
+			var f2 = FindSplitPoint<T2, T3>(sql, r, ref pos);
+			if (typeof(T3) == typeof(TM))
+				return delegate(IDataReader x, object cb) {	return ((Func<T1, T2, TRet>)cb)(f1(x), f2(x)); };
+
+			var f3 = FindSplitPoint<T3, T4>(sql, r, ref pos);
+			if (typeof(T4)==typeof(TM))
+				return delegate(IDataReader x, object cb) { return ((Func<T1, T2, T3, TRet>)cb)(f1(x), f2(x), f3(x)); };
+
+			var f4 = FindSplitPoint<T4, T5>(sql, r, ref pos);
+			if (typeof(T5)==typeof(TM))
+				return delegate(IDataReader x, object cb) { return ((Func<T1, T2, T3, T4, TRet>)cb)(f1(x), f2(x), f3(x), f4(x)); };
+
+			var f5 = FindSplitPoint<T5, TM>(sql, r, ref pos);
+			return delegate(IDataReader x, object cb) { return ((Func<T1, T2, T3, T4, T5, TRet>)cb)(f1(x), f2(x), f3(x), f4(x), f5(x)); };
+		}
+
+		// Create a delegate that can create the pocos for a multi-poco query
+		static Dictionary<string, object> MultiPocoFactories = new Dictionary<string, object>();
+		Func<IDataReader, object, TRet> GetMultiPocoFactory<T1, T2, T3, T4, T5, TRet>(string sql, IDataReader r)
+		{
+			lock (MultiPocoFactories)
+			{
+				string key = string.Format("{0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}", typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(TRet), _sharedConnection.ConnectionString, ForceDateTimesToUtc, sql);
+				object oFactory;
+				if (MultiPocoFactories.TryGetValue(key, out oFactory))
+					return (Func<IDataReader, object, TRet>)oFactory;
+
+				var Factory = CreateMultiPocoFactory<T1,T2,T3,T4,T5,TRet>(sql, r);
+				MultiPocoFactories.Add(key, Factory);
+				return Factory;
+			}
+
+		}
+
+		// Automagically guess the property relationships between various POCOs and create a delegate
+		// that will set them up
+		object GetAutoMapper<T1, T2, T3, T4, T5>()
+		{
+			// Build a list of the types
+			var types = new List<Type>();
+			types.Add(typeof(T1));
+			types.Add(typeof(T2));
+			if (typeof(T3)!=typeof(TM)) types.Add(typeof(T3));
+			if (typeof(T4)!=typeof(TM)) types.Add(typeof(T4));
+			if (typeof(T5)!=typeof(TM)) types.Add(typeof(T5));
+
+			// Create a method
+			var m = new DynamicMethod("petapoco_automapper", typeof(T1), types.ToArray(), true);
+			var il = m.GetILGenerator();
+
+			for (int i = 1; i < types.Count; i++)
+			{
+				bool handled = false;
+				for (int j = i-1; j >= 0; j--)
+				{
+					// Find the property
+					var candidates = from p in types[j].GetProperties() where p.PropertyType == types[i] select p;
+					if (candidates.Count() == 0)
+						continue;
+					if (candidates.Count() > 1)
+						throw new InvalidOperationException(string.Format("Can't auto join {0} as {1} has more than one property of type {0}", types[i], types[j]));
+
+					// Generate code
+					il.Emit(OpCodes.Ldarg_S, j);
+					il.Emit(OpCodes.Ldarg_S, i);
+					il.Emit(OpCodes.Callvirt, candidates.First().GetSetMethod());
+					handled = true;
+				}
+
+				if (!handled)
+					throw new InvalidOperationException(string.Format("Can't auto join {0}", types[i]));
+			}
+
+			il.Emit(OpCodes.Ldarg_0);
+			il.Emit(OpCodes.Ret);
+
+			switch (types.Count)
+			{
+				case 2: return m.CreateDelegate(typeof(Func<T1, T2, T1>));
+				case 3: return m.CreateDelegate(typeof(Func<T1, T2, T3, T1>));
+				case 4: return m.CreateDelegate(typeof(Func<T1, T2, T3, T4, T1>));
+				case 5: return m.CreateDelegate(typeof(Func<T1, T2, T3, T4, T5, T1>));
+			}
+
+			return null;
+		}
+
+		// Actual implementation of the multi-poco query
+		IEnumerable<TRet> MultiPocoQuery<T1, T2, T3, T4, T5, TRet>(object cb, string sql, params object[] args)
+		{
+			OpenSharedConnection();
+			try
+			{
+				using (var cmd = CreateCommand(_sharedConnection, sql, args))
+				{
+					IDataReader r;
+					try
+					{
+						r = cmd.ExecuteReader();
+						OnExecutedCommand(cmd);
+					}
+					catch (Exception x)
+					{
+						OnException(x);
+						throw;
+					}
+					var factory = GetMultiPocoFactory<T1,T2,T3,T4,T5,TRet>(sql,r);
+					if (cb == null)
+						cb = GetAutoMapper<T1,T2,T3,T4,T5>();
+					using (r)
+					{
+						while (true)
+						{
+							TRet poco;
+							try
+							{
+								if (!r.Read())
+									yield break;
+								poco = factory(r, cb);
+							}
+							catch (Exception x)
+							{
+								OnException(x);
+								throw;
+							}
+
+							yield return poco;
+						}
+					}
+				}
+			}
+			finally
+			{
+				CloseSharedConnection();
+			}
+		}
+
+			
 		public IEnumerable<T> Query<T>(Sql sql) 
 		{
 			return Query<T>(sql.SQL, sql.Arguments);
@@ -1340,10 +1567,12 @@ namespace PetaPoco
 			}
 
 			// Create factory function that can convert a IDataReader record into a POCO
-			public Func<IDataReader, T> GetFactory<T>(string key, bool ForceDateTimesToUtc, IDataReader r)
+			public Func<IDataReader, T> GetFactory<T>(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
 			{
 				lock (PocoFactories)
 				{
+					var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
+
 					// Have we already created it?
 					object factory;
 					if (PocoFactories.TryGetValue(key, out factory))
@@ -1364,7 +1593,7 @@ namespace PetaPoco
 							MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
 
 							// Enumerate all fields generating a set assignment for the column
-							for (int i = 0; i < r.FieldCount; i++)
+							for (int i = firstColumn; i < firstColumn + countColumns; i++)
 							{
 								var srcType = r.GetFieldType(i);
 
@@ -1435,7 +1664,7 @@ namespace PetaPoco
 							il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
 
 							// Enumerate all fields generating a set assignment for the column
-							for (int i = 0; i < r.FieldCount; i++)
+							for (int i = firstColumn; i < firstColumn + countColumns; i++)
 							{
 								// Get the PocoColumn for this db column, ignore if not known
 								PocoColumn pc;
