@@ -1,4 +1,4 @@
-﻿/* PetaPoco v3.0.1 - A Tiny ORMish thing for your POCO's.
+﻿/* PetaPoco v3.0.2 - A Tiny ORMish thing for your POCO's.
  * Copyright © 2011 Topten Software.  All Rights Reserved.
  * 
  * Apache License 2.0 - http://www.toptensoftware.com/petapoco/license
