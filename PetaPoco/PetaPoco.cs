@@ -370,6 +370,15 @@ namespace PetaPoco
 		// Add a parameter to a DB command
 		void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
 		{
+			// Support passed in parameters
+			var idbParam = item as IDbDataParameter;
+            if (idbParam != null)
+            {
+                idbParam.ParameterName = string.Format("{0}{1}", ParameterPrefix, cmd.Parameters.Count);
+                cmd.Parameters.Add(idbParam);
+                return;
+            }
+
 			// Convert value to from poco type to db type
 			if (Database.Mapper != null && item!=null)
 			{
@@ -386,29 +395,30 @@ namespace PetaPoco
 			}
 			else
 			{
-				if (item.GetType().IsEnum)		// PostgreSQL .NET driver wont cast enum to int
+				var t = item.GetType();
+				if (t.IsEnum)		// PostgreSQL .NET driver wont cast enum to int
 				{
 					p.Value = (int)item;
 				}
-				else if (item.GetType() == typeof(Guid))
+				else if (t == typeof(Guid))
 				{
 					p.Value = item.ToString();
 					p.DbType = DbType.String;
 					p.Size = 4000;
 				}
-				else if (item.GetType() == typeof(string))
+				else if (t == typeof(string))
 				{
 					p.Size = Math.Max((item as string).Length + 1, 4000);		// Help query plan caching by using common size
 					p.Value = item;
 				}
-				else if (item.GetType() == typeof(AnsiString))
+				else if (t == typeof(AnsiString))
 				{
 					// Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
 					p.Size = Math.Max((item as AnsiString).Value.Length + 1, 4000);
 					p.Value = (item as AnsiString).Value;
 					p.DbType = DbType.AnsiString;
 				}
-				else if (item.GetType() == typeof(bool) && _dbType != DBType.PostgreSQL)
+				else if (t == typeof(bool) && _dbType != DBType.PostgreSQL)
 				{
 					p.Value = ((bool)item) ? 1 : 0;
 				}
