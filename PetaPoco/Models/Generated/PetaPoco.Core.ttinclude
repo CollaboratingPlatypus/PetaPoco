@@ -558,6 +558,7 @@ class SqlServerSchemaReader : SchemaReader
 			case "smalldatetime":
 			case "datetime":
 			case "date":
+			case "time":
 				sysType=  "DateTime";
 				  break;
 			case "float":
@@ -747,6 +748,7 @@ class SqlServerCeSchemaReader : SchemaReader
 			case "smalldatetime":
 			case "datetime":
 			case "date":
+			case "time":
 				sysType=  "DateTime";
 				  break;
 			case "float":
