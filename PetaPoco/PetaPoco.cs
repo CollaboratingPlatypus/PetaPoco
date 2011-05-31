@@ -428,6 +428,17 @@ namespace PetaPoco
 				{
 					p.Value = ((bool)item) ? 1 : 0;
 				}
+				else if (item.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
+				{
+					p.GetType().GetProperty("UdtTypeName").SetValue(p, "geography", null); //geography is the equivalent SQL Server Type
+					p.Value = item;
+				}
+
+				else if (item.GetType().Name == "SqlGeometry") //SqlGeometry is a CLR Type
+				{
+					p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
+					p.Value = item;
+				}
 				else
 				{
 					p.Value = item;
