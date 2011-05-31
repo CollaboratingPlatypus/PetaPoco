@@ -410,7 +410,7 @@ namespace PetaPoco
 				{
 					p.Value = item.ToString();
 					p.DbType = DbType.String;
-					p.Size = 4000;
+					p.Size = 40;
 				}
 				else if (t == typeof(string))
 				{
