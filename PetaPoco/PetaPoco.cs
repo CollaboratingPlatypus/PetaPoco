@@ -565,6 +565,9 @@ namespace PetaPoco
 		Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
+			if (sql.StartsWith(";"))
+				return sql.Substring(1);
+
 			if (!rxSelect.IsMatch(sql))
 			{
 				var pd = PocoData.ForType(typeof(T));
