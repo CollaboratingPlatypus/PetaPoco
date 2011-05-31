@@ -1,7 +1,7 @@
 <#@ include file="PetaPoco.Core.ttinclude" #>
 <#
 	// Settings
-    ConnectionStringName = "";			// Uses last connection string in config if not specified
+    ConnectionStringName = "mysql";			// Uses last connection string in config if not specified
     Namespace = "";
     RepoName = "";
     GenerateOperations = true;

@@ -1003,7 +1003,7 @@ class MySqlSchemaReader : SchemaReader
                 Column col=new Column();
                 col.Name=row["COLUMN_NAME"].ToString();
                 col.PropertyName=CleanUp(col.Name);
-                col.PropertyType=GetPropertyType(row["DATA_TYPE"].ToString());
+                col.PropertyType=GetPropertyType(row);
                 col.IsNullable=row["IS_NULLABLE"].ToString()=="YES";
                 col.IsPK=row["COLUMN_KEY"].ToString()=="PRI";
 				col.IsAutoIncrement=row["extra"].ToString().ToLower().IndexOf("auto_increment")>=0;
@@ -1016,19 +1016,20 @@ class MySqlSchemaReader : SchemaReader
 	
 	}
 
-	static string GetPropertyType(string sqlType)
+	static string GetPropertyType(DataRow row)
 	{
+		bool bUnsigned = row["COLUMN_TYPE"].ToString().IndexOf("unsigned")>=0;
 		string propType="string";
-		switch (sqlType) 
+		switch (row["DATA_TYPE"].ToString()) 
 		{
 			case "bigint":
-				propType= "long";
+				propType= bUnsigned ? "ulong" : "long";
 				break;
 			case "int":
-				propType= "int";
+				propType= bUnsigned ? "uint" : "int";
 				break;
 			case "smallint":
-				propType= "short";
+				propType= bUnsigned ? "ushort" : "short";
 				break;
 			case "guid":
 				propType=  "Guid";

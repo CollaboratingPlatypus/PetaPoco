@@ -4,9 +4,9 @@
 // 
 // The following connection settings were used to generate this file
 // 
-//     Connection String Name: `postgresql`
-//     Provider:               `Npgsql`
-//     Connection String:      `Server=127.0.0.1;User id=postgres;password=**zapped**;`
+//     Connection String Name: `mysql`
+//     Provider:               `MySql.Data.MySqlClient`
+//     Connection String:      `server=jab;database=jab;user id=jab;password=**zapped**;Allow User Variables=true`
 
 using System;
 using System.Collections.Generic;
@@ -14,17 +14,17 @@ using System.Linq;
 using System.Web;
 using PetaPoco;
 
-namespace postgresql
+namespace mysql
 {
-	public partial class postgresqlDB : Database
+	public partial class mysqlDB : Database
 	{
-		public postgresqlDB() 
-			: base("postgresql")
+		public mysqlDB() 
+			: base("mysql")
 		{
 			CommonConstruct();
 		}
 
-		public postgresqlDB(string connectionStringName) 
+		public mysqlDB(string connectionStringName) 
 			: base(connectionStringName)
 		{
 			CommonConstruct();
@@ -34,11 +34,11 @@ namespace postgresql
 		
 		public interface IFactory
 		{
-			postgresqlDB GetInstance();
+			mysqlDB GetInstance();
 		}
 		
 		public static IFactory Factory { get; set; }
-        public static postgresqlDB GetInstance()
+        public static mysqlDB GetInstance()
         {
 			if (_instance!=null)
 				return _instance;
@@ -46,10 +46,10 @@ namespace postgresql
 			if (Factory!=null)
 				return Factory.GetInstance();
 			else
-				return new postgresqlDB();
+				return new mysqlDB();
         }
 
-		[ThreadStatic] static postgresqlDB _instance;
+		[ThreadStatic] static mysqlDB _instance;
 		
 		public override void OnBeginTransaction()
 		{
@@ -65,14 +65,14 @@ namespace postgresql
         
 		public class Record<T> where T:new()
 		{
-			public static postgresqlDB repo { get { return postgresqlDB.GetInstance(); } }
+			public static mysqlDB repo { get { return mysqlDB.GetInstance(); } }
 			public bool IsNew() { return repo.IsNew(this); }
 			public void Save() { repo.Save(this); }
 			public object Insert() { return repo.Insert(this); }
 			public int Update() { return repo.Update(this); }
 			public int Delete() { return repo.Delete(this); }
-			public static int Update(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
-			public static int Update(Sql sql) { return repo.Delete<T>(sql); }
+			public static int Update(string sql, params object[] args) { return repo.Update<T>(sql, args); }
+			public static int Update(Sql sql) { return repo.Update<T>(sql); }
 			public static int Delete(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Delete(Sql sql) { return repo.Delete<T>(sql); }
 			public static int Delete(object primaryKey) { return repo.Delete<T>(primaryKey); }
@@ -100,29 +100,212 @@ namespace postgresql
 	
 
     
-	[TableName("petapoco2")]
-	[PrimaryKey("email", autoIncrement=false)]
+	[TableName("article_categories")]
+	[PrimaryKey("article_category_id")]
 	[ExplicitColumns]
-    public partial class petapoco2 : postgresqlDB.Record<petapoco2>  
+    public partial class article_category : mysqlDB.Record<article_category>  
     {
+        [Column] public long article_category_id { get; set; }
+        [Column] public long article_id { get; set; }
+        [Column] public long category_id { get; set; }
+	}
+
+    
+	[TableName("articles")]
+	[PrimaryKey("article_id")]
+	[ExplicitColumns]
+    public partial class article : mysqlDB.Record<article>  
+    {
+        [Column] public long article_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public long user_id { get; set; }
+        [Column] public DateTime? date_created { get; set; }
+        [Column] public string title { get; set; }
+        [Column] public string content { get; set; }
+        [Column] public bool draft { get; set; }
+        [Column] public long? wip_article_id { get; set; }
+        [Column] public long local_article_id { get; set; }
+	}
+
+    
+	[TableName("categories")]
+	[PrimaryKey("category_id")]
+	[ExplicitColumns]
+    public partial class category : mysqlDB.Record<category>  
+    {
+        [Column] public long category_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public string name { get; set; }
+        [Column] public string slug { get; set; }
+        [Column] public string description { get; set; }
+	}
+
+    
+	[TableName("comments")]
+	[PrimaryKey("comment_id")]
+	[ExplicitColumns]
+    public partial class comment : mysqlDB.Record<comment>  
+    {
+        [Column] public long comment_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public long article_id { get; set; }
+        [Column] public string name { get; set; }
         [Column] public string email { get; set; }
+        [Column] public string website { get; set; }
+        [Column] public DateTime date_posted { get; set; }
+        [Column] public string content { get; set; }
+        [Column] public bool pending { get; set; }
+        [Column] public string session_id { get; set; }
+	}
+
+    
+	[TableName("files")]
+	[PrimaryKey("file_id")]
+	[ExplicitColumns]
+    public partial class file : mysqlDB.Record<file>  
+    {
+        [Column] public long file_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public byte[] data { get; set; }
+        [Column] public string folder { get; set; }
+        [Column] public string filename { get; set; }
+        [Column] public DateTime date_created { get; set; }
+        [Column] public DateTime date_modified { get; set; }
+        [Column] public string etag { get; set; }
+	}
+
+    
+	[TableName("issue25")]
+	[PrimaryKey("id")]
+	[ExplicitColumns]
+    public partial class issue25 : mysqlDB.Record<issue25>  
+    {
+        [Column] public long id { get; set; }
+        [Column] public uint? val { get; set; }
+	}
+
+    
+	[TableName("lhs")]
+	[PrimaryKey("lhs_id")]
+	[ExplicitColumns]
+    public partial class lh : mysqlDB.Record<lh>  
+    {
+        [Column] public long lhs_id { get; set; }
+        [Column] public string name { get; set; }
+        [Column] public long rhs_id { get; set; }
+	}
+
+    
+	[TableName("redirects")]
+	[PrimaryKey("redirect_id")]
+	[ExplicitColumns]
+    public partial class redirect : mysqlDB.Record<redirect>  
+    {
+        [Column] public long redirect_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public int priority { get; set; }
+        [Column] public string expr { get; set; }
+        [Column] public string newpath { get; set; }
+        [Column] public bool rewrite { get; set; }
+        [Column] public bool disabled { get; set; }
+        [Column] public string description { get; set; }
+	}
+
+    
+	[TableName("rhs")]
+	[PrimaryKey("rhs_id")]
+	[ExplicitColumns]
+    public partial class rh : mysqlDB.Record<rh>  
+    {
+        [Column] public long rhs_id { get; set; }
         [Column] public string name { get; set; }
 	}
 
     
-	[TableName("petapoco")]
-	[PrimaryKey("id")]
+	[TableName("sessions")]
+	[PrimaryKey("session_id")]
 	[ExplicitColumns]
-    public partial class petapoco : postgresqlDB.Record<petapoco>  
+    public partial class session : mysqlDB.Record<session>  
     {
-        [Column] public long id { get; set; }
-        [Column] public string title { get; set; }
-        [Column] public bool draft { get; set; }
+        [Column] public long session_id { get; set; }
+        [Column] public string asp_application_name { get; set; }
+        [Column] public string asp_session_id { get; set; }
         [Column] public DateTime date_created { get; set; }
-        [Column] public DateTime? date_edited { get; set; }
+        [Column] public DateTime date_expires { get; set; }
+        [Column] public DateTime date_locked { get; set; }
+        [Column] public int lock_id { get; set; }
+        [Column] public int timeout { get; set; }
+        [Column] public bool locked { get; set; }
+        [Column] public byte[] session_data { get; set; }
+        [Column] public int flags { get; set; }
+	}
+
+    
+	[TableName("site_users")]
+	[PrimaryKey("site_user_id")]
+	[ExplicitColumns]
+    public partial class site_user : mysqlDB.Record<site_user>  
+    {
+        [Column] public long site_user_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public long user_id { get; set; }
+        [Column] public bool admin { get; set; }
+	}
+
+    
+	[TableName("sites")]
+	[PrimaryKey("site_id")]
+	[ExplicitColumns]
+    public partial class site : mysqlDB.Record<site>  
+    {
+        [Column] public long site_id { get; set; }
+        [Column] public DateTime date_created { get; set; }
+        [Column] public string short_name { get; set; }
+        [Column] public string display_name { get; set; }
+        [Column] public string custom_domain { get; set; }
+        [Column] public string custom_rss_feed { get; set; }
+        [Column] public string rss_copyright_notice { get; set; }
+        [Column] public string rss_description { get; set; }
+        [Column] public string rss_managing_editor { get; set; }
+        [Column] public int comment_mode { get; set; }
+        [Column] public int image_render_size { get; set; }
+        [Column] public int image_upload_size { get; set; }
+        [Column] public long next_article_id { get; set; }
+        [Column] public int articles_per_page { get; set; }
+	}
+
+    
+	[TableName("users")]
+	[PrimaryKey("user_id")]
+	[ExplicitColumns]
+    public partial class user : mysqlDB.Record<user>  
+    {
+        [Column] public long user_id { get; set; }
+        [Column] public DateTime date_created { get; set; }
+        [Column] public DateTime date_lastlogin { get; set; }
+        [Column] public bool active { get; set; }
+        [Column] public bool admin { get; set; }
+        [Column] public string email { get; set; }
+        [Column] public string password { get; set; }
+        [Column] public string display_name { get; set; }
+        [Column] public string activation_code { get; set; }
+	}
+
+    
+	[TableName("wip_articles")]
+	[PrimaryKey("wip_article_id")]
+	[ExplicitColumns]
+    public partial class wip_article : mysqlDB.Record<wip_article>  
+    {
+        [Column] public long wip_article_id { get; set; }
+        [Column] public long article_id { get; set; }
+        [Column] public long site_id { get; set; }
+        [Column] public long user_id { get; set; }
+        [Column] public DateTime? date_saved { get; set; }
+        [Column] public string title { get; set; }
+        [Column] public string date_created_string { get; set; }
         [Column] public string content { get; set; }
-        [Column] public int state { get; set; }
-        [Column("col w space")] public int? col_w_space { get; set; }
+        [Column] public string categories { get; set; }
 	}
 
 }
