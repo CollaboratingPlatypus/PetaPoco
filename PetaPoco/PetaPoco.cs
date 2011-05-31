@@ -1372,7 +1372,7 @@ namespace PetaPoco
 				else if (type == typeof(int))
 					return (int)pk == 0;
 				else if (type == typeof(uint))
-					return (int)pk == 0;
+					return (uint)pk == 0;
 
 				// Create a default instance and compare
 				return pk == Activator.CreateInstance(pk.GetType());
