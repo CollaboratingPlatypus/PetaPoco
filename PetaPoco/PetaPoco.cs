@@ -853,18 +853,42 @@ namespace PetaPoco
 
 		// Create a delegate that can create the pocos for a multi-poco query
 		static Dictionary<string, object> MultiPocoFactories = new Dictionary<string, object>();
+		public static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
 		Func<IDataReader, object, TRet> GetMultiPocoFactory<T1, T2, T3, T4, T5, TRet>(string sql, IDataReader r)
 		{
-			lock (MultiPocoFactories)
+			string key = string.Format("{0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}", typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(TRet), _sharedConnection.ConnectionString, ForceDateTimesToUtc, sql);
+
+			// Check cache
+			RWLock.EnterReadLock();
+			try
 			{
-				string key = string.Format("{0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}", typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(TRet), _sharedConnection.ConnectionString, ForceDateTimesToUtc, sql);
+				object oFactory;
+				if (MultiPocoFactories.TryGetValue(key, out oFactory))
+					return (Func<IDataReader, object, TRet>)oFactory;
+			}
+			finally
+			{
+				RWLock.ExitReadLock();
+			}
+
+			// Cache it
+			RWLock.EnterWriteLock();
+			try
+			{
+				// Check again
 				object oFactory;
 				if (MultiPocoFactories.TryGetValue(key, out oFactory))
 					return (Func<IDataReader, object, TRet>)oFactory;
 
-				var Factory = CreateMultiPocoFactory<T1,T2,T3,T4,T5,TRet>(sql, r);
+				// Create the factory
+				var Factory = CreateMultiPocoFactory<T1, T2, T3, T4, T5, TRet>(sql, r);
+
 				MultiPocoFactories.Add(key, Factory);
 				return Factory;
+			}
+			finally
+			{
+				RWLock.ExitWriteLock();
 			}
 
 		}
@@ -1505,16 +1529,39 @@ namespace PetaPoco
 				if (t == typeof(System.Dynamic.ExpandoObject))
 					throw new InvalidOperationException("Can't use dynamic types with this method");
 #endif
-				lock (m_PocoDatas)
+				// Check cache
+				Database.RWLock.EnterReadLock();
+				PocoData pd;
+				try
 				{
-					PocoData pd;
-					if (!m_PocoDatas.TryGetValue(t, out pd))
-					{
-						pd = new PocoData(t);
-						m_PocoDatas.Add(t, pd);
-					}
-					return pd;
+					if (m_PocoDatas.TryGetValue(t, out pd))
+						return pd;
 				}
+				finally
+				{
+					Database.RWLock.ExitReadLock();
+				}
+
+				
+				// Cache it
+				Database.RWLock.EnterWriteLock();
+				try
+				{
+					// Check again
+					if (m_PocoDatas.TryGetValue(t, out pd))
+						return pd;
+
+					// Create it
+					pd = new PocoData(t);
+
+					m_PocoDatas.Add(t, pd);
+				}
+				finally
+				{
+					Database.RWLock.ExitWriteLock();
+				}
+
+				return pd;
 			}
 
 			public PocoData()
@@ -1593,92 +1640,106 @@ namespace PetaPoco
 			// Create factory function that can convert a IDataReader record into a POCO
 			public Func<IDataReader, T> GetFactory<T>(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
 			{
-				lock (PocoFactories)
+				// Check cache
+				var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
+				Database.RWLock.EnterReadLock();
+				try
 				{
-					var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
-
 					// Have we already created it?
 					object factory;
 					if (PocoFactories.TryGetValue(key, out factory))
 						return factory as Func<IDataReader, T>;
+				}
+				finally
+				{
+					Database.RWLock.ExitReadLock();
+				}
 
-					lock (m_Converters)
-					{
-						// Create the method
-						var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), typeof(T), new Type[] { typeof(IDataReader) }, true);
-						var il = m.GetILGenerator();
+				// Take the writer lock
+				Database.RWLock.EnterWriteLock();
+
+				try
+				{
+					// Check again, just in case
+					object factory;
+					if (PocoFactories.TryGetValue(key, out factory))
+						return factory as Func<IDataReader, T>;
+					
+					// Create the method
+					var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), typeof(T), new Type[] { typeof(IDataReader) }, true);
+					var il = m.GetILGenerator();
 
 #if !PETAPOCO_NO_DYNAMIC
-						if (typeof(T) == typeof(object))
+					if (typeof(T) == typeof(object))
+					{
+						// var poco=new T()
+						il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes));			// obj
+
+						MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
+
+						// Enumerate all fields generating a set assignment for the column
+						for (int i = firstColumn; i < firstColumn + countColumns; i++)
 						{
-							// var poco=new T()
-							il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes));			// obj
+							var srcType = r.GetFieldType(i);
 
-							MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
+							il.Emit(OpCodes.Dup);						// obj, obj
+							il.Emit(OpCodes.Ldstr, r.GetName(i));		// obj, obj, fieldname
 
-							// Enumerate all fields generating a set assignment for the column
-							for (int i = firstColumn; i < firstColumn + countColumns; i++)
+							// Get the converter
+							Func<object, object> converter = null;
+							if (Database.Mapper != null)
+								converter = Database.Mapper.GetFromDbConverter(null, srcType);
+							if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
+								converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
+
+							// Setup stack for call to converter
+							int converterIndex = -1;
+							if (converter != null)
 							{
-								var srcType = r.GetFieldType(i);
+								// Add the converter
+								converterIndex = m_Converters.Count;
+								m_Converters.Add(converter);
 
-								il.Emit(OpCodes.Dup);						// obj, obj
-								il.Emit(OpCodes.Ldstr, r.GetName(i));		// obj, obj, fieldname
-
-								// Get the converter
-								Func<object, object> converter = null;
-								if (Database.Mapper != null)
-									converter = Database.Mapper.GetFromDbConverter(null, srcType);
-								if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
-									converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
-
-								// Setup stack for call to converter
-								int converterIndex = -1;
-								if (converter != null)
-								{
-									// Add the converter
-									converterIndex = m_Converters.Count;
-									m_Converters.Add(converter);
-
-									// Generate IL to push the converter onto the stack
-									il.Emit(OpCodes.Ldsfld, fldConverters);
-									il.Emit(OpCodes.Ldc_I4, converterIndex);
-									il.Emit(OpCodes.Callvirt, fnListGetItem);					// obj, obj, fieldname, Converter
-								}
-
-		
-								// r[i]
-								il.Emit(OpCodes.Ldarg_0);					// obj, obj, fieldname, converter?,    rdr
-								il.Emit(OpCodes.Ldc_I4, i);					// obj, obj, fieldname, converter?,  rdr,i
-								il.Emit(OpCodes.Callvirt, fnGetValue);		// obj, obj, fieldname, converter?,  value
-
-								// Convert DBNull to null
-								il.Emit(OpCodes.Dup);						// obj, obj, fieldname, converter?,  value, value
-								il.Emit(OpCodes.Isinst, typeof(DBNull));	// obj, obj, fieldname, converter?,  value, (value or null)
-								var lblNotNull = il.DefineLabel();
-								il.Emit(OpCodes.Brfalse_S, lblNotNull);		// obj, obj, fieldname, converter?,  value
-								il.Emit(OpCodes.Pop);						// obj, obj, fieldname, converter?
-								if (converter!=null)
-									il.Emit(OpCodes.Pop);					// obj, obj, fieldname, 
-								il.Emit(OpCodes.Ldnull);					// obj, obj, fieldname, null
-								if (converter != null)
-								{
-									var lblReady = il.DefineLabel();
-									il.Emit(OpCodes.Br_S, lblReady);
-									il.MarkLabel(lblNotNull);
-									il.Emit(OpCodes.Callvirt, fnInvoke);
-									il.MarkLabel(lblReady);
-								}
-								else
-								{
-									il.MarkLabel(lblNotNull);
-								}
-
-								il.Emit(OpCodes.Callvirt, fnAdd);
+								// Generate IL to push the converter onto the stack
+								il.Emit(OpCodes.Ldsfld, fldConverters);
+								il.Emit(OpCodes.Ldc_I4, converterIndex);
+								il.Emit(OpCodes.Callvirt, fnListGetItem);					// obj, obj, fieldname, Converter
 							}
+
+
+							// r[i]
+							il.Emit(OpCodes.Ldarg_0);					// obj, obj, fieldname, converter?,    rdr
+							il.Emit(OpCodes.Ldc_I4, i);					// obj, obj, fieldname, converter?,  rdr,i
+							il.Emit(OpCodes.Callvirt, fnGetValue);		// obj, obj, fieldname, converter?,  value
+
+							// Convert DBNull to null
+							il.Emit(OpCodes.Dup);						// obj, obj, fieldname, converter?,  value, value
+							il.Emit(OpCodes.Isinst, typeof(DBNull));	// obj, obj, fieldname, converter?,  value, (value or null)
+							var lblNotNull = il.DefineLabel();
+							il.Emit(OpCodes.Brfalse_S, lblNotNull);		// obj, obj, fieldname, converter?,  value
+							il.Emit(OpCodes.Pop);						// obj, obj, fieldname, converter?
+							if (converter != null)
+								il.Emit(OpCodes.Pop);					// obj, obj, fieldname, 
+							il.Emit(OpCodes.Ldnull);					// obj, obj, fieldname, null
+							if (converter != null)
+							{
+								var lblReady = il.DefineLabel();
+								il.Emit(OpCodes.Br_S, lblReady);
+								il.MarkLabel(lblNotNull);
+								il.Emit(OpCodes.Callvirt, fnInvoke);
+								il.MarkLabel(lblReady);
+							}
+							else
+							{
+								il.MarkLabel(lblNotNull);
+							}
+
+							il.Emit(OpCodes.Callvirt, fnAdd);
 						}
-						else
+					}
+					else
 #endif
-						if (typeof(T).IsValueType || typeof(T)==typeof(string) || typeof(T)==typeof(byte[]))
+						if (typeof(T).IsValueType || typeof(T) == typeof(string) || typeof(T) == typeof(byte[]))
 						{
 							return (rdr) => (T)rdr.GetValue(0);
 						}
@@ -1798,13 +1859,16 @@ namespace PetaPoco
 							}
 						}
 
-						il.Emit(OpCodes.Ret);
+					il.Emit(OpCodes.Ret);
 
-						// Cache it, return it
-						var del = (Func<IDataReader, T>)m.CreateDelegate(typeof(Func<IDataReader, T>));
-						PocoFactories.Add(key, del);
-						return del;
-					}
+					// Cache it, return it
+					var del = (Func<IDataReader, T>)m.CreateDelegate(typeof(Func<IDataReader, T>));
+					PocoFactories.Add(key, del);
+					return del;
+				}
+				finally
+				{
+					Database.RWLock.ExitWriteLock();
 				}
 			}
 
