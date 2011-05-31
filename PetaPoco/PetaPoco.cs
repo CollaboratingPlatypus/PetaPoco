@@ -376,15 +376,6 @@ namespace PetaPoco
 		// Add a parameter to a DB command
 		void AddParam(IDbCommand cmd, object item, string ParameterPrefix)
 		{
-			// Support passed in parameters
-			var idbParam = item as IDbDataParameter;
-            if (idbParam != null)
-            {
-                idbParam.ParameterName = string.Format("{0}{1}", ParameterPrefix, cmd.Parameters.Count);
-                cmd.Parameters.Add(idbParam);
-                return;
-            }
-
 			// Convert value to from poco type to db type
 			if (Database.Mapper != null && item!=null)
 			{
@@ -392,7 +383,16 @@ namespace PetaPoco
 				if (fn!=null)
 					item = fn(item);
 			}
-			
+
+			// Support passed in parameters
+			var idbParam = item as IDbDataParameter;
+			if (idbParam != null)
+			{
+				idbParam.ParameterName = string.Format("{0}{1}", ParameterPrefix, cmd.Parameters.Count);
+				cmd.Parameters.Add(idbParam);
+				return;
+			}
+
 			var p = cmd.CreateParameter();
 			p.ParameterName = string.Format("{0}{1}", ParameterPrefix, cmd.Parameters.Count);
 			if (item == null)
