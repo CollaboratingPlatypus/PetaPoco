@@ -150,14 +150,15 @@ public class Tables : List<Table>
 }
 
 
-static string CleanUp(string str)
+static Regex rxCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
+
+static Func<string, string> CleanUp = (str) =>
 {
-	Regex rcCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
-	str = rcCleanUp.Replace(str, "_");
+	str = rxCleanUp.Replace(str, "_");
 	if (char.IsDigit(str[0])) str = "_" + str;
 	
     return str;
-}
+};
 
 string CheckNullable(Column col)
 {
