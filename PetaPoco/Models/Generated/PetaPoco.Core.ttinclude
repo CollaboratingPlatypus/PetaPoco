@@ -82,6 +82,10 @@
 string ConnectionStringName = "";
 string Namespace = "";
 string RepoName = "";
+string ClassPrefix = "";
+string ClassSuffix = "";
+string SchemaName = null;
+bool IncludeViews = false;
 bool GenerateOperations = false;
 
 
@@ -89,6 +93,8 @@ public class Table
 {
     public List<Column> Columns;	
     public string Name;
+	public string Schema;
+	public bool IsView;
     public string CleanName;
     public string ClassName;
 	public string SequenceName;
@@ -324,6 +330,8 @@ Tables LoadTables()
 	WriteLine("//     Connection String Name: `{0}`", ConnectionStringName);
 	WriteLine("//     Provider:               `{0}`", ProviderName);
 	WriteLine("//     Connection String:      `{0}`", zap_password(ConnectionString));
+	WriteLine("//     Schema:                 `{0}`", SchemaName);
+	WriteLine("//     Include Views:          `{0}`", IncludeViews);
 	WriteLine("");
 
 	DbProviderFactory _factory;
@@ -382,11 +390,28 @@ Tables LoadTables()
 			reader.outer=this;
 			result=reader.ReadSchema(conn, _factory);
 
+			// Remove unrequired tables/views
+			for (int i=result.Count-1; i>=0; i--)
+			{
+				if (SchemaName!=null && string.Compare(result[i].Name, SchemaName, true)!=0)
+				{
+					result.RemoveAt(i);
+					continue;
+				}
+				if (!IncludeViews && result[i].IsView)
+				{
+					result.RemoveAt(i);
+					continue;
+				}
+			}
+
 			conn.Close();
+
 
 			var rxClean = new Regex("^(Equals|GetHashCode|GetType|ToString|repo|Save|IsNew|Insert|Update|Delete|Exists|SingleOrDefault|Single|First|FirstOrDefault|Fetch|Page|Query)$");
 			foreach (var t in result)
 			{
+				t.ClassName = ClassPrefix + t.ClassName + ClassSuffix;
 				foreach (var c in t.Columns)
 				{
 					c.PropertyName = rxClean.Replace(c.PropertyName, "_$1");
@@ -450,8 +475,11 @@ class SqlServerSchemaReader : SchemaReader
 				{
 					Table tbl=new Table();
 					tbl.Name=rdr["TABLE_NAME"].ToString();
+					tbl.Schema=rdr["TABLE_SCHEMA"].ToString();
+					tbl.IsView=string.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
 					tbl.CleanName=CleanUp(tbl.Name);
 					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
+
 					result.Add(tbl);
 				}
 			}
@@ -491,6 +519,11 @@ class SqlServerSchemaReader : SchemaReader
 			p.Value=tbl.Name;
 			cmd.Parameters.Add(p);
 
+			p = cmd.CreateParameter();
+			p.ParameterName = "@schemaName";
+			p.Value=tbl.Schema;
+			cmd.Parameters.Add(p);
+
 			var result=new List<Column>();
 			using (IDataReader rdr=cmd.ExecuteReader())
 			{
@@ -512,12 +545,12 @@ class SqlServerSchemaReader : SchemaReader
 
 	string GetPK(string table){
 		
-		string sql=@"SELECT KCU.COLUMN_NAME 
-			FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU
-			JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS TC
-			ON KCU.CONSTRAINT_NAME=TC.CONSTRAINT_NAME
-			WHERE TC.CONSTRAINT_TYPE='PRIMARY KEY'
-			AND KCU.TABLE_NAME=@tableName";
+		string sql=@"SELECT c.name AS ColumnName
+                FROM sys.indexes AS i 
+                INNER JOIN sys.index_columns AS ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id 
+                INNER JOIN sys.objects AS o ON i.object_id = o.object_id 
+                LEFT OUTER JOIN sys.columns AS c ON ic.object_id = c.object_id AND c.column_id = ic.column_id
+                WHERE (i.type = 1) AND (o.name = @tableName)";
 
 		using (var cmd=_factory.CreateCommand())
 		{
@@ -599,7 +632,7 @@ class SqlServerSchemaReader : SchemaReader
 
 	const string TABLE_SQL=@"SELECT *
 		FROM  INFORMATION_SCHEMA.TABLES
-		WHERE TABLE_TYPE='BASE TABLE'";
+		WHERE TABLE_TYPE='BASE TABLE' OR TABLE_TYPE='VIEW'";
 
 	const string COLUMN_SQL=@"SELECT 
 			TABLE_CATALOG AS [Database],
@@ -614,7 +647,7 @@ class SqlServerSchemaReader : SchemaReader
 			COLUMNPROPERTY(object_id('[' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']'), COLUMN_NAME, 'IsIdentity') AS IsIdentity,
 			COLUMNPROPERTY(object_id('[' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']'), COLUMN_NAME, 'IsComputed') as IsComputed
 		FROM  INFORMATION_SCHEMA.COLUMNS
-		WHERE TABLE_NAME=@tableName
+		WHERE TABLE_NAME=@tableName AND TABLE_SCHEMA=@schemaName
 		ORDER BY OrdinalPosition ASC";
 	  
 }
@@ -644,6 +677,8 @@ class SqlServerCeSchemaReader : SchemaReader
 					tbl.Name=rdr["TABLE_NAME"].ToString();
 					tbl.CleanName=CleanUp(tbl.Name);
 					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
+					tbl.Schema=null;
+					tbl.IsView=false;
 					result.Add(tbl);
 				}
 			}
@@ -826,6 +861,8 @@ class PostGreSqlSchemaReader : SchemaReader
 				{
 					Table tbl=new Table();
 					tbl.Name=rdr["table_name"].ToString();
+					tbl.Schema=rdr["table_schema"].ToString();
+					tbl.IsView=string.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
 					tbl.CleanName=CleanUp(tbl.Name);
 					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
 					result.Add(tbl);
@@ -962,7 +999,7 @@ class PostGreSqlSchemaReader : SchemaReader
 	const string TABLE_SQL=@"
 			SELECT table_name 
 			FROM information_schema.tables 
-			WHERE table_type='BASE TABLE' 
+			WHERE (table_type='BASE TABLE' OR table_type='VIEW')
 				AND table_schema NOT IN ('pg_catalog', 'information_schema');
 			";
 
@@ -981,23 +1018,33 @@ class MySqlSchemaReader : SchemaReader
 	{
 		var result=new Tables();
 	
+
+		var cmd=factory.CreateCommand();
+		cmd.Connection=connection;
+		cmd.CommandText=TABLE_SQL;
+
+		//pull the tables in a reader
+		using(cmd)
+		{
+			using (var rdr=cmd.ExecuteReader())
+			{
+				while(rdr.Read())
+				{
+					Table tbl=new Table();
+					tbl.Name=rdr["TABLE_NAME"].ToString();
+					tbl.Schema=rdr["TABLE_SCHEMA"].ToString();
+					tbl.IsView=string.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
+					tbl.CleanName=CleanUp(tbl.Name);
+					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
+					result.Add(tbl);
+				}
+			}
+		}
+
+
         //this will return everything for the DB
         var schema  = connection.GetSchema("COLUMNS");
 
-        //spin through once to get all the tables
-        foreach (DataRow row in schema.Rows)
-        {
-            if(!result.Any(x=>x.Name.Equals(row["TABLE_NAME"].ToString(),StringComparison.InvariantCultureIgnoreCase)))
-            {
-                //add it
-                Table tbl = new Table();
-				tbl.Name = row["TABLE_NAME"].ToString();
-                tbl.CleanName=CleanUp(tbl.Name);
-                tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
-                result.Add(tbl);
-            }
-        }
-        
         //loop again - but this time pull by table name
         foreach (var item in result) 
         {
@@ -1078,6 +1125,12 @@ class MySqlSchemaReader : SchemaReader
 		return propType;
 	}
 
+	const string TABLE_SQL=@"
+			SELECT * 
+			FROM information_schema.tables 
+			WHERE (table_type='BASE TABLE' OR table_type='VIEW')
+			";
+
 }
 
 class OracleSchemaReader : SchemaReader
@@ -1105,6 +1158,8 @@ class OracleSchemaReader : SchemaReader
 				{
 					Table tbl=new Table();
 					tbl.Name=rdr["TABLE_NAME"].ToString();
+					tbl.Schema = rdr["TABLE_SCHEMA"].ToString();
+					tbl.IsView=string.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
 					tbl.CleanName=CleanUp(tbl.Name);
 					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
 					result.Add(tbl);
