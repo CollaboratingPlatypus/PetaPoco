@@ -389,6 +389,10 @@ Tables LoadTables()
 				foreach (var c in t.Columns)
 				{
 					c.PropertyName = rxClean.Replace(c.PropertyName, "_$1");
+
+					// Make sure property name doesn't clash with class name
+					if (c.PropertyName == t.ClassName)
+						c.PropertyName = "_" + c.PropertyName;
 				}
 			}
 
