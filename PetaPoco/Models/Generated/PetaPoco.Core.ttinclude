@@ -393,7 +393,7 @@ Tables LoadTables()
 			// Remove unrequired tables/views
 			for (int i=result.Count-1; i>=0; i--)
 			{
-				if (SchemaName!=null && string.Compare(result[i].Name, SchemaName, true)!=0)
+				if (SchemaName!=null && string.Compare(result[i].Schema, SchemaName, true)!=0)
 				{
 					result.RemoveAt(i);
 					continue;
