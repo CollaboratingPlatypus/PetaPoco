@@ -1020,6 +1020,7 @@ namespace PetaPoco
 					var factory = GetMultiPocoFactory<TRet>(types, sql, r);
 					if (cb == null)
 						cb = GetAutoMapper(types.ToArray());
+					bool bNeedTerminator=false;
 					using (r)
 					{
 						while (true)
@@ -1028,7 +1029,7 @@ namespace PetaPoco
 							try
 							{
 								if (!r.Read())
-									yield break;
+									break;
 								poco = factory(r, cb);
 							}
 							catch (Exception x)
@@ -1037,7 +1038,18 @@ namespace PetaPoco
 								throw;
 							}
 
-							yield return poco;
+							if (poco != null)
+								yield return poco;
+							else
+								bNeedTerminator = true;
+						}
+						if (bNeedTerminator)
+						{
+							var poco = (TRet)(cb as Delegate).DynamicInvoke(new object[types.Length]);
+							if (poco != null)
+								yield return poco;
+							else
+								yield break;
 						}
 					}
 				}
