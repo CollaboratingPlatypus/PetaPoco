@@ -663,6 +663,9 @@ namespace PetaPoco
 			string sqlCount, sqlPage;
 			BuildPageQueries<T>(page, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
 
+			// Save the one-time command time out and use it for both queries
+			int saveTimeout = OneTimeCommandTimeout;
+
 			// Setup the paged result
 			var result = new Page<T>();
 			result.CurrentPage = page;
@@ -671,6 +674,8 @@ namespace PetaPoco
 			result.TotalPages = result.TotalItems / itemsPerPage;
 			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
+
+			OneTimeCommandTimeout = saveTimeout;
 
 			// Get the records
 			result.Items = Fetch<T>(sqlPage, args);
