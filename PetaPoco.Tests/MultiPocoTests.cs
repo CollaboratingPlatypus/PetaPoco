@@ -11,7 +11,7 @@ namespace PetaPoco.Tests
 	{
 		[TableName("posts")]
 		[PrimaryKey("id")]
-		class post
+		public class post
 		{
 			public long id { get; set; }
 			public string title { get; set; }
@@ -22,7 +22,7 @@ namespace PetaPoco.Tests
 
 		[TableName("authors")]
 		[PrimaryKey("id")]
-		class author
+		public class author
 		{
 			public long id { get; set; }
 			public string name { get; set; }
@@ -64,11 +64,11 @@ CREATE TABLE authors (
 
 
 			var a1 = new author();
-			a1.name = "Brad";
+			a1.name = "Bill";
 			db.Insert(a1);
 
 			var a2 = new author();
-			a2.name = "Jen";
+			a2.name = "Ted";
 			db.Insert(a2);
 
 			var p = new post();
@@ -100,9 +100,24 @@ DROP TABLE IF EXISTS authors;
 		[Test]
 		public void Basic()
 		{
-			var posts = db.Fetch<post, author>("SELECT * FROM posts LEFT JOIN authors ON posts.author = authors.id");
+			var posts = db.Fetch<post, author>("SELECT * FROM posts LEFT JOIN authors ON posts.author = authors.id ORDER BY posts.id");
 			Expect(posts.Count, Is.EqualTo(3));
-		}
+
+			Expect(posts[0].id, Is.EqualTo(1));
+			Expect(posts[0].title, Is.EqualTo("post1"));
+			Expect(posts[0].author, Is.EqualTo(1));
+			Expect(posts[0].author_obj.name, Is.EqualTo("Bill"));
+
+			Expect(posts[1].id, Is.EqualTo(2));
+			Expect(posts[1].title, Is.EqualTo("post2"));
+			Expect(posts[1].author, Is.EqualTo(1));
+			Expect(posts[1].author_obj.name, Is.EqualTo("Bill"));
+
+			Expect(posts[2].id, Is.EqualTo(3));
+			Expect(posts[2].title, Is.EqualTo("post3"));
+			Expect(posts[2].author, Is.EqualTo(2));
+			Expect(posts[2].author_obj.name, Is.EqualTo("Ted"));
+		}						
 
 	}
 
