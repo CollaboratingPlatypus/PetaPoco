@@ -3,7 +3,7 @@
 	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 		<id>PetaPoco</id>
 		<title>PetaPoco - A tiny ORMish thing for your POCOs (Core + T4 Templates)</title>
-		<version>3.0.2</version>
+		<version>4.0.1</version>
 		<authors>Topten Software</authors>
 		<owners>Topten Software</owners>
 		<licenseUrl>http://www.toptensoftware.com/petapoco/license</licenseUrl>

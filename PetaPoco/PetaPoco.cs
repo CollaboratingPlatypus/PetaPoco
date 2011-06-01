@@ -1,4 +1,4 @@
-﻿/* PetaPoco v3.0.2 - A Tiny ORMish thing for your POCO's.
+﻿/* PetaPoco v4.0.1 - A Tiny ORMish thing for your POCO's.
  * Copyright © 2011 Topten Software.  All Rights Reserved.
  * 
  * Apache License 2.0 - http://www.toptensoftware.com/petapoco/license
@@ -250,12 +250,6 @@ namespace PetaPoco
 		public IDbConnection Connection
 		{
 			get { return _sharedConnection; }
-		}
-
-		[Obsolete("Transaction property has been replaced by GetTransaction() method")]
-		public Transaction Transaction
-		{
-			get { return GetTransaction(); }
 		}
 
 		// Helper to create a transaction scope
