@@ -20,6 +20,8 @@ using System.Data;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Linq.Expressions;
+
 
 namespace PetaPoco
 {
@@ -91,6 +93,7 @@ namespace PetaPoco
 		public long TotalItems { get; set; }
 		public long ItemsPerPage { get; set; }
 		public List<T> Items { get; set; }
+		public object Context { get; set; }
 	}
 
 	// Pass as parameter value to force to DBType.AnsiString
@@ -857,7 +860,7 @@ namespace PetaPoco
 				il.Emit(OpCodes.Ret);
 
 				// Cache it
-				var del = m.CreateDelegate(Type.GetType(string.Format("System.Func`{0}", types.Length + 1)).MakeGenericType(types.Concat(types.Take(1)).ToArray()));
+				var del = m.CreateDelegate(Expression.GetFuncType(types.Concat(types.Take(1)).ToArray()));
 				AutoMappers.Add(key, del);
 				return del;
 			}
@@ -932,7 +935,7 @@ namespace PetaPoco
 			}
 
 			// By now we should have the callback and the N pocos all on the stack.  Call the callback and we're done
-			il.Emit(OpCodes.Callvirt, Type.GetType(string.Format("System.Func`{0}", types.Length + 1)).MakeGenericType(types.Concat(new Type[] { typeof(TRet) }).ToArray()).GetMethod("Invoke"));
+			il.Emit(OpCodes.Callvirt, Expression.GetFuncType(types.Concat(new Type[] { typeof(TRet) }).ToArray()).GetMethod("Invoke"));
 			il.Emit(OpCodes.Ret);
 
 			// Finish up
@@ -1938,7 +1941,7 @@ namespace PetaPoco
 					il.Emit(OpCodes.Ret);
 
 					// Cache it, return it
-					var del = m.CreateDelegate(Type.GetType("System.Func`2").MakeGenericType(typeof(IDataReader), type));
+					var del = m.CreateDelegate(Expression.GetFuncType(typeof(IDataReader), type));
 					PocoFactories.Add(key, del);
 					return del;
 				}

@@ -727,8 +727,6 @@ namespace PetaPoco.Tests
 			Expect(a.state, Is.EqualTo(b.state));
 		}
 
-
-
 		dynamic CreateExpando()
 		{
 			// Need a rounded date as DB can't store millis
@@ -785,7 +783,7 @@ namespace PetaPoco.Tests
 			var o4 = db.SingleOrDefault<dynamic>("SELECT * FROM petapoco WHERE id=@0", o.id);
 			Expect(o4==null, Is.True);
 		}
-
+	
 		[Test]
 		public void Manual_PrimaryKey()
 		{
