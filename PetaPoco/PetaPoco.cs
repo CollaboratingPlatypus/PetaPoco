@@ -853,7 +853,7 @@ namespace PetaPoco
 
 		// Create a delegate that can create the pocos for a multi-poco query
 		static Dictionary<string, object> MultiPocoFactories = new Dictionary<string, object>();
-		public static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
+		static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
 		Func<IDataReader, object, TRet> GetMultiPocoFactory<T1, T2, T3, T4, T5, TRet>(string sql, IDataReader r)
 		{
 			string key = string.Format("{0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}", typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(TRet), _sharedConnection.ConnectionString, ForceDateTimesToUtc, sql);
@@ -937,6 +937,7 @@ namespace PetaPoco
 
 			switch (types.Count)
 			{
+
 				case 2: return m.CreateDelegate(typeof(Func<T1, T2, T1>));
 				case 3: return m.CreateDelegate(typeof(Func<T1, T2, T3, T1>));
 				case 4: return m.CreateDelegate(typeof(Func<T1, T2, T3, T4, T1>));
@@ -1523,6 +1524,7 @@ namespace PetaPoco
 #endif
 					return ForType(t);
 			}
+			static System.Threading.ReaderWriterLockSlim RWLock = new System.Threading.ReaderWriterLockSlim();
 			public static PocoData ForType(Type t)
 			{
 #if !PETAPOCO_NO_DYNAMIC
@@ -1530,7 +1532,7 @@ namespace PetaPoco
 					throw new InvalidOperationException("Can't use dynamic types with this method");
 #endif
 				// Check cache
-				Database.RWLock.EnterReadLock();
+				RWLock.EnterReadLock();
 				PocoData pd;
 				try
 				{
@@ -1539,12 +1541,12 @@ namespace PetaPoco
 				}
 				finally
 				{
-					Database.RWLock.ExitReadLock();
+					RWLock.ExitReadLock();
 				}
 
 				
 				// Cache it
-				Database.RWLock.EnterWriteLock();
+				RWLock.EnterWriteLock();
 				try
 				{
 					// Check again
@@ -1558,7 +1560,7 @@ namespace PetaPoco
 				}
 				finally
 				{
-					Database.RWLock.ExitWriteLock();
+					RWLock.ExitWriteLock();
 				}
 
 				return pd;
@@ -1642,7 +1644,7 @@ namespace PetaPoco
 			{
 				// Check cache
 				var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
-				Database.RWLock.EnterReadLock();
+				RWLock.EnterReadLock();
 				try
 				{
 					// Have we already created it?
@@ -1652,11 +1654,11 @@ namespace PetaPoco
 				}
 				finally
 				{
-					Database.RWLock.ExitReadLock();
+					RWLock.ExitReadLock();
 				}
 
 				// Take the writer lock
-				Database.RWLock.EnterWriteLock();
+				RWLock.EnterWriteLock();
 
 				try
 				{
@@ -1868,7 +1870,7 @@ namespace PetaPoco
 				}
 				finally
 				{
-					Database.RWLock.ExitWriteLock();
+					RWLock.ExitWriteLock();
 				}
 			}
 
