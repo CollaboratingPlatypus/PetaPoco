@@ -1746,7 +1746,7 @@ namespace PetaPoco
 						else
 						{
 							// var poco=new T()
-							il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
+							il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
 
 							// Enumerate all fields generating a set assignment for the column
 							for (int i = firstColumn; i < firstColumn + countColumns; i++)
