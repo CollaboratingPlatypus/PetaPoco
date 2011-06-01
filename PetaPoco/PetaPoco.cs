@@ -1481,9 +1481,26 @@ namespace PetaPoco
 			Save(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
 		}
 
+		public int CommandTimeout { get; set; }
+		public int OneTimeCommandTimeout { get; set; }
+
 		void DoPreExecute(IDbCommand cmd)
 		{
+			// Setup command timeout
+			if (OneTimeCommandTimeout != 0)
+			{
+				cmd.CommandTimeout = OneTimeCommandTimeout;
+				OneTimeCommandTimeout = 0;
+			}
+			else if (CommandTimeout!=0)
+			{
+				cmd.CommandTimeout = CommandTimeout;
+			}
+			
+			// Call hook
 			OnExecutingCommand(cmd);
+
+			// Save it
 			_lastSql = cmd.CommandText;
 			_lastArgs = (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray();
 		}
