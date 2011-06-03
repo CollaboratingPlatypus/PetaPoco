@@ -87,6 +87,9 @@ string ClassSuffix = "";
 string SchemaName = null;
 bool IncludeViews = false;
 bool GenerateOperations = false;
+bool GenerateCommon = true;
+bool GeneratePocos = true;
+
 
 
 public class Table

@@ -12,6 +12,7 @@ using PetaPoco;
 
 namespace <#=Namespace #>
 {
+<# if (GenerateCommon) { #>
 	public partial class <#=RepoName#> : Database
 	{
 		public <#=RepoName#>() 
@@ -95,8 +96,9 @@ namespace <#=Namespace #>
 		}
 <# } #>
 	}
-	
+<# } #>	
 
+<# if (GeneratePocos) { #>
 <#
 foreach(Table tbl in from t in tables where !t.Ignore select t)
 {
@@ -126,12 +128,9 @@ foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 <# } else { #>
         [Column] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
 <# } #>
-<#
-}
-#>
+<# } #>
 	}
 
-<#
-}
-#>
+<# } #>
+<# } #>
 }
