@@ -286,6 +286,38 @@ namespace PetaPoco.Tests
 		}
 
 		[Test]
+		public void Page_NoOrderBy()
+		{
+			// Unordered paging not supported by Compact Edition
+			if (_connectionStringName == "sqlserverce")
+				return;
+			// In this test we're checking that the page count is correct when there are
+			// not-exactly pagesize*N records (ie: a partial page at the end)
+
+			// Create some records
+			const int count = 13;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.Page<poco>(2, 5, "SELECT * from petapoco");
+
+			// Check em
+			int i = 0;
+			foreach (var p in r.Items)
+			{
+				Expect(p.id, Is.EqualTo(id + i + 5));
+				i++;
+			}
+
+			// Check other stats
+			Expect(r.Items.Count, Is.EqualTo(5));
+			Expect(r.CurrentPage, Is.EqualTo(2));
+			Expect(r.ItemsPerPage, Is.EqualTo(5));
+			Expect(r.TotalItems, Is.EqualTo(13));
+			Expect(r.TotalPages, Is.EqualTo(3));
+		}
+
+		[Test]
 		public void FetchPage()
 		{
 			// Create some records

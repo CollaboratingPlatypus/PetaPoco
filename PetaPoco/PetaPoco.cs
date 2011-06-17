@@ -622,11 +622,15 @@ namespace PetaPoco
 			// Look for an "ORDER BY <whatever>" clause
 			m = rxOrderBy.Match(sqlCount);
 			if (!m.Success)
-				return false;
-
-			g = m.Groups[0];
-			sqlOrderBy = g.ToString();
-			sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
+			{
+				sqlOrderBy = null;
+			}
+			else
+			{
+				g = m.Groups[0];
+				sqlOrderBy = g.ToString();
+				sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
+			}
 
 			return true;
 		}
@@ -649,7 +653,7 @@ namespace PetaPoco
 			{
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
-										sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
+										sqlOrderBy==null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
 				args = args.Concat(new object[] { skip, skip+take }).ToArray();
 			}
 			else if (_dbType == DBType.SqlServerCE)
