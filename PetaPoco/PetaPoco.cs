@@ -115,13 +115,19 @@ namespace PetaPoco
 		public string SequenceName { get; set; }
 	}
 
-	// Optionally provide and implementation of this to Database.Mapper
+	// Optionally provide an implementation of this to Database.Mapper
 	public interface IMapper
 	{
 		void GetTableInfo(Type t, TableInfo ti);
 		bool MapPropertyToColumn(PropertyInfo pi, ref string columnName, ref bool resultColumn);
 		Func<object, object> GetFromDbConverter(PropertyInfo pi, Type SourceType);
 		Func<object, object> GetToDbConverter(Type SourceType);
+	}
+
+	// This will be merged with IMapper in the next major version
+	public interface IMapper2 : IMapper
+	{
+		Func<object, object> GetFromDbConverter(Type DestType, Type SourceType);
 	}
 
 	// Database class ... this is where most of the action happens
@@ -1777,9 +1783,9 @@ namespace PetaPoco
 
 			}
 
-			bool IsIntegralType(Type t)
+			static bool IsIntegralType(Type t)
 			{
-				var tc=Type.GetTypeCode(t);
+				var tc = Type.GetTypeCode(t);
 				return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
 			}
 
@@ -1806,11 +1812,12 @@ namespace PetaPoco
 
 				try
 				{
+
 					// Check again, just in case
 					Delegate factory;
 					if (PocoFactories.TryGetValue(key, out factory))
 						return factory;
-					
+
 					// Create the method
 					var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), type, new Type[] { typeof(IDataReader) }, true);
 					var il = m.GetILGenerator();
@@ -1839,19 +1846,7 @@ namespace PetaPoco
 								converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
 
 							// Setup stack for call to converter
-							int converterIndex = -1;
-							if (converter != null)
-							{
-								// Add the converter
-								converterIndex = m_Converters.Count;
-								m_Converters.Add(converter);
-
-								// Generate IL to push the converter onto the stack
-								il.Emit(OpCodes.Ldsfld, fldConverters);
-								il.Emit(OpCodes.Ldc_I4, converterIndex);
-								il.Emit(OpCodes.Callvirt, fnListGetItem);					// obj, obj, fieldname, Converter
-							}
-
+							AddConverterToStack(il, converter);
 
 							// r[i]
 							il.Emit(OpCodes.Ldarg_0);					// obj, obj, fieldname, converter?,    rdr
@@ -1885,15 +1880,12 @@ namespace PetaPoco
 					}
 					else
 #endif
-						if (type.IsValueType)
+						if (type.IsValueType || type == typeof(string) || type == typeof(byte[]))
 						{
-							il.Emit(OpCodes.Ldarg_0);										// rdr
-							il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
-							il.Emit(OpCodes.Callvirt, fnGetValue);							// value
-							il.Emit(OpCodes.Unbox_Any, type);								// value converted
-						}
-						else if (type == typeof(string) || type == typeof(byte[]))
-						{
+							// Do we need to install a converter?
+							var srcType = r.GetFieldType(0);
+							var converter = GetConverter(ForceDateTimesToUtc, null, srcType, type);
+
 							// "if (!rdr.IsDBNull(i))"
 							il.Emit(OpCodes.Ldarg_0);										// rdr
 							il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
@@ -1905,13 +1897,20 @@ namespace PetaPoco
 							il.Emit(OpCodes.Br_S, lblFin);
 
 							il.MarkLabel(lblCont);
+
+							// Setup stack for call to converter
+							AddConverterToStack(il, converter);
+
 							il.Emit(OpCodes.Ldarg_0);										// rdr
 							il.Emit(OpCodes.Ldc_I4_0);										// rdr,0
 							il.Emit(OpCodes.Callvirt, fnGetValue);							// value
 
-							il.Emit(OpCodes.Unbox_Any, type);								// value converted
+							// Call the converter
+							if (converter != null)
+								il.Emit(OpCodes.Callvirt, fnInvoke);
 
 							il.MarkLabel(lblFin);
+							il.Emit(OpCodes.Unbox_Any, type);								// value converted
 						}
 						else
 						{
@@ -1940,35 +1939,7 @@ namespace PetaPoco
 								il.Emit(OpCodes.Dup);											// poco,poco
 
 								// Do we need to install a converter?
-								Func<object, object> converter = null;
-
-								// Get converter from the mapper
-								if (Database.Mapper != null)
-								{
-									converter = Database.Mapper.GetFromDbConverter(pc.PropertyInfo, srcType);
-								}
-
-								// Standard DateTime->Utc mapper
-								if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
-								{
-									converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
-								}
-
-								// Forced type conversion including integral types -> enum
-								if (converter == null)
-								{
-									if (dstType.IsEnum && IsIntegralType(srcType))
-									{
-										if (srcType != typeof(int))
-										{
-											converter = delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
-										}
-									}
-									else if (!dstType.IsAssignableFrom(srcType))
-									{
-										converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
-									}
-								}
+								var converter = GetConverter(ForceDateTimesToUtc, pc, srcType, dstType);
 
 								// Fast
 								bool Handled = false;
@@ -1998,18 +1969,7 @@ namespace PetaPoco
 								if (!Handled)
 								{
 									// Setup stack for call to converter
-									int converterIndex = -1;
-									if (converter != null)
-									{
-										// Add the converter
-										converterIndex = m_Converters.Count;
-										m_Converters.Add(converter);
-
-										// Generate IL to push the converter onto the stack
-										il.Emit(OpCodes.Ldsfld, fldConverters);
-										il.Emit(OpCodes.Ldc_I4, converterIndex);
-										il.Emit(OpCodes.Callvirt, fnListGetItem);					// Converter
-									}
+									AddConverterToStack(il, converter);
 
 									// "value = rdr.GetValue(i)"
 									il.Emit(OpCodes.Ldarg_0);										// *,rdr
@@ -2048,6 +2008,67 @@ namespace PetaPoco
 					RWLock.ExitWriteLock();
 				}
 			}
+
+			private static void AddConverterToStack(ILGenerator il, Func<object, object> converter)
+			{
+				if (converter != null)
+				{
+					// Add the converter
+					int converterIndex = m_Converters.Count;
+					m_Converters.Add(converter);
+
+					// Generate IL to push the converter onto the stack
+					il.Emit(OpCodes.Ldsfld, fldConverters);
+					il.Emit(OpCodes.Ldc_I4, converterIndex);
+					il.Emit(OpCodes.Callvirt, fnListGetItem);					// Converter
+				}
+			}
+
+			private static Func<object, object> GetConverter(bool forceDateTimesToUtc, PocoColumn pc, Type srcType, Type dstType)
+			{
+				Func<object, object> converter = null;
+
+				// Get converter from the mapper
+				if (Database.Mapper != null)
+				{
+					if (pc != null)
+					{
+						converter = Database.Mapper.GetFromDbConverter(pc.PropertyInfo, srcType);
+					}
+					else
+					{
+						var m2 = Database.Mapper as IMapper2;
+						if (m2 != null)
+						{
+							converter = m2.GetFromDbConverter(dstType, srcType);
+						}
+					}
+				}
+
+				// Standard DateTime->Utc mapper
+				if (forceDateTimesToUtc && converter == null && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
+				{
+					converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
+				}
+
+				// Forced type conversion including integral types -> enum
+				if (converter == null)
+				{
+					if (dstType.IsEnum && IsIntegralType(srcType))
+					{
+						if (srcType != typeof(int))
+						{
+							converter = delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
+						}
+					}
+					else if (!dstType.IsAssignableFrom(srcType))
+					{
+						converter = delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+					}
+				}
+				return converter;
+			}
+
 
 			static T RecurseInheritedTypes<T>(Type t, Func<Type, T> cb)
 			{
