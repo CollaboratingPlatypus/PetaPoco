@@ -1284,8 +1284,14 @@ namespace PetaPoco
 			return Insert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
 		}
 
-		// Update a record with values from a poco.  primary key value can be either supplied or read from the poco
 		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+		{
+			return Update(tableName, primaryKeyName, poco, primaryKeyValue, null);
+		}
+
+
+		// Update a record with values from a poco.  primary key value can be either supplied or read from the poco
+		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
 		{
 			try
 			{
@@ -1297,27 +1303,53 @@ namespace PetaPoco
 						var sb = new StringBuilder();
 						var index = 0;
 						var pd = PocoData.ForObject(poco,primaryKeyName);
-						foreach (var i in pd.Columns)
+						if (columns == null)
 						{
-							// Don't update the primary key, but grab the value if we don't have it
-							if (string.Compare(i.Key, primaryKeyName, true)==0)
+							foreach (var i in pd.Columns)
 							{
-								if (primaryKeyValue == null)
-									primaryKeyValue = i.Value.GetValue(poco);
-								continue;
+								// Don't update the primary key, but grab the value if we don't have it
+								if (string.Compare(i.Key, primaryKeyName, true) == 0)
+								{
+									if (primaryKeyValue == null)
+										primaryKeyValue = i.Value.GetValue(poco);
+									continue;
+								}
+
+								// Dont update result only columns
+								if (i.Value.ResultColumn)
+									continue;
+
+								// Build the sql
+								if (index > 0)
+									sb.Append(", ");
+								sb.AppendFormat("{0} = {1}{2}", EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
+
+								// Store the parameter in the command
+								AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
+							}
+						}
+						else
+						{
+							foreach (var colname in columns)
+							{
+								var pc = pd.Columns[colname];
+
+								// Build the sql
+								if (index > 0)
+									sb.Append(", ");
+								sb.AppendFormat("{0} = {1}{2}", EscapeSqlIdentifier(colname), _paramPrefix, index++);
+
+								// Store the parameter in the command
+								AddParam(cmd, pc.GetValue(poco), _paramPrefix);
 							}
 
-							// Dont update result only columns
-							if (i.Value.ResultColumn)
-								continue;
+							// Grab primary key value
+							if (primaryKeyValue == null)
+							{
+								var pc = pd.Columns[primaryKeyName];
+								primaryKeyValue = pc.GetValue(poco);
+							}
 
-							// Build the sql
-							if (index > 0)
-								sb.Append(", ");
-							sb.AppendFormat("{0} = {1}{2}", EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
-
-							// Store the parameter in the command
-							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
 
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
@@ -1349,15 +1381,29 @@ namespace PetaPoco
 			return Update(tableName, primaryKeyName, poco, null);
 		}
 
+		public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
+		{
+			return Update(tableName, primaryKeyName, poco, null, columns);
+		}
+
+		public int Update(object poco, IEnumerable<string> columns)
+		{
+			return Update(poco, null, columns);
+		}
+
 		public int Update(object poco)
 		{
-			return Update(poco, null);
+			return Update(poco, null, null);
 		}
 
 		public int Update(object poco, object primaryKeyValue)
 		{
+			return Update(poco, primaryKeyValue, null);
+		}
+		public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
+		{
 			var pd = PocoData.ForType(poco.GetType());
-			return Update(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue);
+			return Update(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
 		}
 
 		public int Update<T>(string sql, params object[] args)
@@ -1964,6 +2010,13 @@ namespace PetaPoco
 
 								il.MarkLabel(lblNext);
 							}
+
+							var fnOnLoaded = RecurseInheritedTypes<MethodInfo>(type, (x) => x.GetMethod("OnLoaded", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
+							if (fnOnLoaded != null)
+							{
+								il.Emit(OpCodes.Dup);
+								il.Emit(OpCodes.Callvirt, fnOnLoaded);
+							}
 						}
 
 					il.Emit(OpCodes.Ret);
@@ -1977,6 +2030,18 @@ namespace PetaPoco
 				{
 					RWLock.ExitWriteLock();
 				}
+			}
+
+			static T RecurseInheritedTypes<T>(Type t, Func<Type, T> cb)
+			{
+				while (t != null)
+				{
+					T info = cb(t);
+					if (info != null)
+						return info;
+					t = t.BaseType;
+				}
+				return default(T);
 			}
 
 

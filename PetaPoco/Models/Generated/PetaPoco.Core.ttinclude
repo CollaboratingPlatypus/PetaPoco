@@ -89,7 +89,7 @@ bool IncludeViews = false;
 bool GenerateOperations = false;
 bool GenerateCommon = true;
 bool GeneratePocos = true;
-
+bool TrackModifiedColumns = false;
 
 
 public class Table

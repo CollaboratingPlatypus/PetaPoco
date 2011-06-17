@@ -65,12 +65,15 @@ namespace <#=Namespace #>
 		{
 			public static <#=RepoName#> repo { get { return <#=RepoName#>.GetInstance(); } }
 			public bool IsNew() { return repo.IsNew(this); }
-			public void Save() { repo.Save(this); }
 			public object Insert() { return repo.Insert(this); }
+<# if (!TrackModifiedColumns) { #>
+			public void Save() { repo.Save(this); }
 			public int Update() { return repo.Update(this); }
-			public int Delete() { return repo.Delete(this); }
+<# } #>
+			public int Update(IEnumerable<string> columns) { return repo.Update(this, columns); }
 			public static int Update(string sql, params object[] args) { return repo.Update<T>(sql, args); }
 			public static int Update(Sql sql) { return repo.Update<T>(sql); }
+			public int Delete() { return repo.Delete(this); }
 			public static int Delete(string sql, params object[] args) { return repo.Delete<T>(sql, args); }
 			public static int Delete(Sql sql) { return repo.Delete<T>(sql); }
 			public static int Delete(object primaryKey) { return repo.Delete<T>(primaryKey); }
@@ -93,6 +96,34 @@ namespace <#=Namespace #>
 			public static Page<T> Page(long page, long itemsPerPage, Sql sql) { return repo.Page<T>(page, itemsPerPage, sql); }
 			public static IEnumerable<T> Query(string sql, params object[] args) { return repo.Query<T>(sql, args); }
 			public static IEnumerable<T> Query(Sql sql) { return repo.Query<T>(sql); }
+<# if (TrackModifiedColumns) { #>			
+			private Dictionary<string,bool> ModifiedColumns;
+			private void OnLoaded()
+			{
+				ModifiedColumns = new Dictionary<string,bool>();
+			}
+			protected void MarkColumnModified(string column_name)
+			{
+				if (ModifiedColumns!=null)
+					ModifiedColumns[column_name]=true;
+			}
+			public int Update() 
+			{ 
+				if (ModifiedColumns==null)
+					return repo.Update(this); 
+
+				int retv = repo.Update(this, ModifiedColumns.Keys);
+				ModifiedColumns.Clear();
+				return retv;
+			}
+			public void Save() 
+			{ 
+				if (repo.IsNew(this))
+					repo.Insert(this);
+				else
+					Update();
+			}
+<# } #>
 		}
 <# } #>
 	}
@@ -123,14 +154,35 @@ foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 {
 		// Column bindings
 #>
+<# if (TrackModifiedColumns) { #>
 <# if (col.Name!=col.PropertyName) { #>
-        [Column("<#=col.Name#>")] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+        [Column("<#=col.Name#>")] 
 <# } else { #>
-        [Column] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+        [Column] 
+<# } #>
+		public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> 
+		{ 
+			get
+			{
+				return _<#=col.PropertyName #>;
+			}
+			set
+			{
+				_<#=col.PropertyName #> = value;
+				MarkColumnModified("<#=col.Name#>");
+			}
+		}
+		<#=col.PropertyType #><#=CheckNullable(col)#> _<#=col.PropertyName #>;
+
+<# } else { #>
+<# if (col.Name!=col.PropertyName) { #>
+		[Column("<#=col.Name#>")] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+<# } else { #>
+		[Column] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+<# } #>
 <# } #>
 <# } #>
 	}
-
 <# } #>
 <# } #>
 }
