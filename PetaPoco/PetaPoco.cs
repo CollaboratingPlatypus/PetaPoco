@@ -2121,7 +2121,7 @@ namespace PetaPoco
 			_db.BeginTransaction();
 		}
 
-		public void Complete()
+		public virtual void Complete()
 		{
 			_db.CompleteTransaction();
 			_db = null;
