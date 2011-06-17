@@ -234,6 +234,8 @@ namespace PetaPoco
 				_sharedConnection.ConnectionString = _connectionString;
 				_sharedConnection.Open();
 
+				_sharedConnection = OnConnectionOpened(_sharedConnection);
+
 				if (KeepConnectionAlive)
 					_sharedConnectionDepth++;		// Make sure you call Dispose
 			}
@@ -248,6 +250,7 @@ namespace PetaPoco
 				_sharedConnectionDepth--;
 				if (_sharedConnectionDepth == 0)
 				{
+					OnConnectionClosing(_sharedConnection);
 					_sharedConnection.Dispose();
 					_sharedConnection = null;
 				}
@@ -471,7 +474,7 @@ namespace PetaPoco
 			sql = sql.Replace("@@", "@");		   // <- double @@ escapes a single @
 
 			// Create the command and add parameters
-			IDbCommand cmd = _factory == null ? connection.CreateCommand() : _factory.CreateCommand();
+			IDbCommand cmd = connection.CreateCommand();
 			cmd.Connection = connection;
 			cmd.CommandText = sql;
 			cmd.Transaction = _transaction;
@@ -499,6 +502,8 @@ namespace PetaPoco
 		}
 
 		// Override this to log commands, or modify command before execution
+		public virtual IDbConnection OnConnectionOpened(IDbConnection conn) { return conn; }
+		public virtual void OnConnectionClosing(IDbConnection conn) { }
 		public virtual void OnExecutingCommand(IDbCommand cmd) { }
 		public virtual void OnExecutedCommand(IDbCommand cmd) { }
 
