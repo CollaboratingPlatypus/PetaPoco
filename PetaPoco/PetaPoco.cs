@@ -622,8 +622,13 @@ namespace PetaPoco
 
 			// Save column list and replace with COUNT(*)
 			Group g = m.Groups[1];
-			sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
 			sqlSelectRemoved = sql.Substring(g.Index);
+
+			if (rxDistinct.IsMatch(sqlSelectRemoved))
+				sqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
+			else
+				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
+
 
 			// Look for an "ORDER BY <whatever>" clause
 			m = rxOrderBy.Match(sqlCount);
@@ -660,7 +665,7 @@ namespace PetaPoco
 				sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
 				if (rxDistinct.IsMatch(sqlSelectRemoved))
 				{
-					sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") as peta_inner";
+					sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
 				}
 				sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
 										sqlOrderBy==null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);

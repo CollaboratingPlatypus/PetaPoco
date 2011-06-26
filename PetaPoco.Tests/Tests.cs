@@ -331,7 +331,7 @@ namespace PetaPoco.Tests
 			long id = InsertRecords(count);
 
 			// Fetch em
-			var r = db.Page<poco>(2, 5, "SELECT DISTINCT * from petapoco ORDER BY id");
+			var r = db.Page<poco>(2, 5, "SELECT DISTINCT id from petapoco ORDER BY id");
 
 			// Check em
 			int i = 0;
