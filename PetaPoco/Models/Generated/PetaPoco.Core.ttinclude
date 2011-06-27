@@ -865,7 +865,7 @@ class PostGreSqlSchemaReader : SchemaReader
 					Table tbl=new Table();
 					tbl.Name=rdr["table_name"].ToString();
 					tbl.Schema=rdr["table_schema"].ToString();
-					tbl.IsView=string.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
+					tbl.IsView=string.Compare(rdr["table_type"].ToString(), "View", true)==0;
 					tbl.CleanName=CleanUp(tbl.Name);
 					tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
 					result.Add(tbl);
@@ -1000,7 +1000,7 @@ class PostGreSqlSchemaReader : SchemaReader
 
 
 	const string TABLE_SQL=@"
-			SELECT table_name 
+			SELECT table_name, table_schema, table_type
 			FROM information_schema.tables 
 			WHERE (table_type='BASE TABLE' OR table_type='VIEW')
 				AND table_schema NOT IN ('pg_catalog', 'information_schema');

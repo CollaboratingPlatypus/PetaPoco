@@ -9,7 +9,7 @@
 	GenerateCommon = true;
 	ClassPrefix = "";
 	ClassSuffix = "";
-	TrackModifiedColumns = true;
+	TrackModifiedColumns = false;
 
     // Read schema
 	var tables = LoadTables();
