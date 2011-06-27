@@ -1657,7 +1657,7 @@ namespace PetaPoco
 			set;
 		}
 
-		internal class PocoColumn
+		public class PocoColumn
 		{
 			public string ColumnName;
 			public PropertyInfo PropertyInfo;
@@ -1666,7 +1666,7 @@ namespace PetaPoco
 			public virtual object GetValue(object target) { return PropertyInfo.GetValue(target, null); }
 			public virtual object ChangeType(object val) { return Convert.ChangeType(val, PropertyInfo.PropertyType); }
 		}
-		internal class ExpandoColumn : PocoColumn
+		public class ExpandoColumn : PocoColumn
 		{
 			public override void SetValue(object target, object val) { (target as IDictionary<string, object>)[ColumnName]=val; }
 			public override object GetValue(object target) 
@@ -1677,7 +1677,7 @@ namespace PetaPoco
 			}
 			public override object ChangeType(object val) { return val; }
 		}
-		internal class PocoData
+		public class PocoData
 		{
 			public static PocoData ForObject(object o, string primaryKeyName)
 			{
