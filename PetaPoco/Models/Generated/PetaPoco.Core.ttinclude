@@ -1112,8 +1112,10 @@ class MySqlSchemaReader : SchemaReader
 			case "bit":
 			case "bool":
 			case "boolean":
-			case "tinyint":
 				propType=  "bool";
+				break;
+			case "tinyint":
+				propType =  bUnsigned ? "byte" : "sbyte";
 				break;
 			case "image":
 			case "binary":
