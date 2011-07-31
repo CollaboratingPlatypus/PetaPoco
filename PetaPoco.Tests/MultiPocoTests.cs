@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using PetaTest;
 using PetaPoco;
 
 namespace PetaPoco.Tests
 {
-	public class MultiPocoTests : AssertionHelper
+	public class MultiPocoTests
 	{
 		[TableName("posts")]
 		[PrimaryKey("id")]
@@ -104,20 +104,20 @@ DROP TABLE IF EXISTS authors;
 		public void Basic()
 		{
 			var posts = db.Fetch<post, author>("SELECT * FROM posts LEFT JOIN authors ON posts.author = authors.id ORDER BY posts.id");
-			Expect(posts.Count, Is.EqualTo(3));
+			Assert.AreEqual(posts.Count, 3);
 
-			Expect(posts[0].id, Is.EqualTo(1));
-			Expect(posts[0].title, Is.EqualTo("post1"));
-			Expect(posts[0].author, Is.EqualTo(1));
-			Expect(posts[0].author_obj.name, Is.EqualTo("Bill"));
-			Expect(posts[1].id, Is.EqualTo(2));
-			Expect(posts[1].title, Is.EqualTo("post2"));
-			Expect(posts[1].author, Is.EqualTo(1));
-			Expect(posts[1].author_obj.name, Is.EqualTo("Bill"));
-			Expect(posts[2].id, Is.EqualTo(3));
-			Expect(posts[2].title, Is.EqualTo("post3"));
-			Expect(posts[2].author, Is.EqualTo(2));
-			Expect(posts[2].author_obj.name, Is.EqualTo("Ted"));
+			Assert.AreEqual(posts[0].id, 1);
+			Assert.AreEqual(posts[0].title, "post1");
+			Assert.AreEqual(posts[0].author, 1);
+			Assert.AreEqual(posts[0].author_obj.name, "Bill");
+			Assert.AreEqual(posts[1].id, 2);
+			Assert.AreEqual(posts[1].title, "post2");
+			Assert.AreEqual(posts[1].author, 1);
+			Assert.AreEqual(posts[1].author_obj.name, "Bill");
+			Assert.AreEqual(posts[2].id, 3);
+			Assert.AreEqual(posts[2].title, "post3");
+			Assert.AreEqual(posts[2].author, 2);
+			Assert.AreEqual(posts[2].author_obj.name, "Ted");
 		}
 
 		[Test]
@@ -131,20 +131,20 @@ DROP TABLE IF EXISTS authors;
 					},
 				"SELECT * FROM posts LEFT JOIN authors ON posts.author = authors.id ORDER BY posts.id");
 
-			Expect(posts.Count, Is.EqualTo(3));
-			Expect(posts[0].author_obj, Is.Not.SameAs(posts[1].author_obj));
-			Expect(posts[0].id, Is.EqualTo(1));
-			Expect(posts[0].title, Is.EqualTo("post1"));
-			Expect(posts[0].author, Is.EqualTo(1));
-			Expect(posts[0].author_obj.name, Is.EqualTo("Bill"));
-			Expect(posts[1].id, Is.EqualTo(2));
-			Expect(posts[1].title, Is.EqualTo("post2"));
-			Expect(posts[1].author, Is.EqualTo(1));
-			Expect(posts[1].author_obj.name, Is.EqualTo("Bill"));
-			Expect(posts[2].id, Is.EqualTo(3));
-			Expect(posts[2].title, Is.EqualTo("post3"));
-			Expect(posts[2].author, Is.EqualTo(2));
-			Expect(posts[2].author_obj.name, Is.EqualTo("Ted"));
+			Assert.AreEqual(posts.Count, 3);
+			Assert.AreNotSame(posts[0].author_obj, posts[1].author_obj);
+			Assert.AreEqual(posts[0].id, 1);
+			Assert.AreEqual(posts[0].title, "post1");
+			Assert.AreEqual(posts[0].author, 1);
+			Assert.AreEqual(posts[0].author_obj.name, "Bill");
+			Assert.AreEqual(posts[1].id, 2);
+			Assert.AreEqual(posts[1].title, "post2");
+			Assert.AreEqual(posts[1].author, 1);
+			Assert.AreEqual(posts[1].author_obj.name, "Bill");
+			Assert.AreEqual(posts[2].id, 3);
+			Assert.AreEqual(posts[2].title, "post3");
+			Assert.AreEqual(posts[2].author, 2);
+			Assert.AreEqual(posts[2].author_obj.name, "Ted");
 		}
 
 		// Relator callback to do many to one relationship mapping
@@ -180,23 +180,23 @@ DROP TABLE IF EXISTS authors;
 				);
 
 
-			Expect(posts.Count, Is.EqualTo(3));
-			Expect(posts[0].author_obj, Is.SameAs(posts[1].author_obj));
+			Assert.AreEqual(posts.Count, 3);
+			Assert.AreSame(posts[0].author_obj, posts[1].author_obj);
 
-			Expect(posts[0].id, Is.EqualTo(1));
-			Expect(posts[0].title, Is.EqualTo("post1"));
-			Expect(posts[0].author, Is.EqualTo(1));
-			Expect(posts[0].author_obj.name, Is.EqualTo("Bill"));
+			Assert.AreEqual(posts[0].id, 1);
+			Assert.AreEqual(posts[0].title, "post1");
+			Assert.AreEqual(posts[0].author, 1);
+			Assert.AreEqual(posts[0].author_obj.name, "Bill");
 
-			Expect(posts[1].id, Is.EqualTo(2));
-			Expect(posts[1].title, Is.EqualTo("post2"));
-			Expect(posts[1].author, Is.EqualTo(1));
-			Expect(posts[1].author_obj.name, Is.EqualTo("Bill"));
+			Assert.AreEqual(posts[1].id, 2);
+			Assert.AreEqual(posts[1].title, "post2");
+			Assert.AreEqual(posts[1].author, 1);
+			Assert.AreEqual(posts[1].author_obj.name, "Bill");
 
-			Expect(posts[2].id, Is.EqualTo(3));
-			Expect(posts[2].title, Is.EqualTo("post3"));
-			Expect(posts[2].author, Is.EqualTo(2));
-			Expect(posts[2].author_obj.name, Is.EqualTo("Ted"));
+			Assert.AreEqual(posts[2].id, 3);
+			Assert.AreEqual(posts[2].title, "post3");
+			Assert.AreEqual(posts[2].author, 2);
+			Assert.AreEqual(posts[2].author_obj.name, "Ted");
 		}
 
 		class AuthorPostRelator
@@ -259,14 +259,14 @@ DROP TABLE IF EXISTS authors;
 				"SELECT * FROM authors LEFT JOIN posts ON posts.author = authors.id ORDER BY posts.id"
 				);
 
-			Expect(authors.Count, Is.EqualTo(2));
-			Expect(authors[0].name, Is.EqualTo("Bill"));
-			Expect(authors[0].posts.Count, Is.EqualTo(2));
-			Expect(authors[0].posts[0].title, Is.EqualTo("post1"));
-			Expect(authors[0].posts[1].title, Is.EqualTo("post2"));
-			Expect(authors[1].name, Is.EqualTo("Ted"));
-			Expect(authors[1].posts.Count, Is.EqualTo(1));
-			Expect(authors[1].posts[0].title, Is.EqualTo("post3"));
+			Assert.AreEqual(authors.Count, 2);
+			Assert.AreEqual(authors[0].name, "Bill");
+			Assert.AreEqual(authors[0].posts.Count, 2);
+			Assert.AreEqual(authors[0].posts[0].title, "post1");
+			Assert.AreEqual(authors[0].posts[1].title, "post2");
+			Assert.AreEqual(authors[1].name, "Ted");
+			Assert.AreEqual(authors[1].posts.Count, 1);
+			Assert.AreEqual(authors[1].posts[0].title, "post3");
 		}
 
 		[Test]
@@ -292,20 +292,20 @@ DROP TABLE IF EXISTS authors;
 				);
 
 
-			Expect(posts.Count, Is.EqualTo(3));
-			Expect(posts[0].author_obj, Is.SameAs(posts[1].author_obj));
-			Expect(posts[0].id, Is.EqualTo(1));
-			Expect(posts[0].title, Is.EqualTo("post1"));
-			Expect(posts[0].author, Is.EqualTo(1));
-			Expect(posts[0].author_obj.name, Is.EqualTo("Bill"));
-			Expect(posts[1].id, Is.EqualTo(2));
-			Expect(posts[1].title, Is.EqualTo("post2"));
-			Expect(posts[1].author, Is.EqualTo(1));
-			Expect(posts[1].author_obj.name, Is.EqualTo("Bill"));
-			Expect(posts[2].id, Is.EqualTo(3));
-			Expect(posts[2].title, Is.EqualTo("post3"));
-			Expect(posts[2].author, Is.EqualTo(2));
-			Expect(posts[2].author_obj.name, Is.EqualTo("Ted"));
+			Assert.AreEqual(posts.Count, 3);
+			Assert.AreSame(posts[0].author_obj, posts[1].author_obj);
+			Assert.AreEqual(posts[0].id, 1);
+			Assert.AreEqual(posts[0].title, "post1");
+			Assert.AreEqual(posts[0].author, 1);
+			Assert.AreEqual(posts[0].author_obj.name, "Bill");
+			Assert.AreEqual(posts[1].id, 2);
+			Assert.AreEqual(posts[1].title, "post2");
+			Assert.AreEqual(posts[1].author, 1);
+			Assert.AreEqual(posts[1].author_obj.name, "Bill");
+			Assert.AreEqual(posts[2].id, 3);
+			Assert.AreEqual(posts[2].title, "post3");
+			Assert.AreEqual(posts[2].author, 2);
+			Assert.AreEqual(posts[2].author_obj.name, "Ted");
 		}
 
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using PetaTest;
 
 namespace PetaPoco.Tests
 {
@@ -67,7 +67,7 @@ namespace PetaPoco.Tests
 	}
 
 	[TestFixture]
-	public class ColumnMapper : AssertionHelper
+	public class ColumnMapper 
 	{
 
 
@@ -78,13 +78,13 @@ namespace PetaPoco.Tests
 			PetaPoco.Database.Mapper = new MyColumnMapper();
 			var pd=PetaPoco.Database.PocoData.ForType(typeof(Poco2));
 
-			Expect(pd.Columns.Count, Is.EqualTo(3));
-			Expect(pd.Columns["prop1"].PropertyInfo.Name, Is.EqualTo("prop1"));
-			Expect(pd.Columns["remapped2"].ColumnName, Is.EqualTo("remapped2"));
-			Expect(pd.Columns["prop3"].ColumnName, Is.EqualTo("prop3"));
-			Expect(string.Join(", ", pd.QueryColumns), Is.EqualTo("prop1, remapped2"));
-			Expect(pd.TableInfo.PrimaryKey, Is.EqualTo("id"));
-			Expect(pd.TableInfo.TableName, Is.EqualTo("petapoco"));
+			Assert.AreEqual(pd.Columns.Count, 3);
+			Assert.AreEqual(pd.Columns["prop1"].PropertyInfo.Name, "prop1");
+			Assert.AreEqual(pd.Columns["remapped2"].ColumnName, "remapped2");
+			Assert.AreEqual(pd.Columns["prop3"].ColumnName, "prop3");
+			Assert.AreEqual(string.Join(", ", pd.QueryColumns), "prop1, remapped2");
+			Assert.AreEqual(pd.TableInfo.PrimaryKey, "id");
+			Assert.AreEqual(pd.TableInfo.TableName, "petapoco");
 		}
 	}
 }

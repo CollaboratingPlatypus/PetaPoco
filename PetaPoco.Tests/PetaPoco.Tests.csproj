@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E6787C52-7549-44CD-AA6E-AB9D55946AB9}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PetaPoco.Tests</RootNamespace>
     <AssemblyName>PetaPoco.Tests</AssemblyName>
@@ -47,12 +47,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>PetaPoco.Tests.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Npgsql">
       <HintPath>..\..\..\..\..\..\Program Files\PostgreSQL\.NET Provider\Npgsql.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.5.6.10205, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -68,6 +70,8 @@
     <Compile Include="MultiPocoTests.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="ColumnMapper.cs" />
+    <Compile Include="PetaTest.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="SqlBuilder.cs" />
     <Compile Include="poco.cs" />
     <Compile Include="Tests.cs" />
@@ -78,6 +82,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="mysql_init.sql" />

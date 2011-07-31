@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using PetaTest;
 using PetaPoco;
 
 namespace PetaPoco.Tests
 {
 	[TestFixture]
-	public class SqlBuilder : AssertionHelper
+	public class SqlBuilder
 	{
 		public SqlBuilder()
 		{
@@ -22,8 +22,8 @@ namespace PetaPoco.Tests
 			sql.Append("LINE 2");
 			sql.Append("LINE 3");
 
-			Expect(sql.SQL, Is.EqualTo("LINE 1\nLINE 2\nLINE 3"));
-			Expect(sql.Arguments.Length, Is.EqualTo(0));
+			Assert.AreEqual(sql.SQL, "LINE 1\nLINE 2\nLINE 3");
+			Assert.AreEqual(sql.Arguments.Length, 0);
 		}
 
 		[Test]
@@ -32,9 +32,9 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @0", "a1");
 
-			Expect(sql.SQL, Is.EqualTo("arg @0"));
-			Expect(sql.Arguments.Length, Is.EqualTo(1));
-			Expect(sql.Arguments[0], Is.EqualTo("a1"));
+			Assert.AreEqual(sql.SQL, "arg @0");
+			Assert.AreEqual(sql.Arguments.Length, 1);
+			Assert.AreEqual(sql.Arguments[0], "a1");
 		}
 
 		[Test]
@@ -43,10 +43,10 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @0 @1", "a1", "a2");
 
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1"));
-			Expect(sql.Arguments.Length, Is.EqualTo(2));
-			Expect(sql.Arguments[0], Is.EqualTo("a1"));
-			Expect(sql.Arguments[1], Is.EqualTo("a2"));
+			Assert.AreEqual(sql.SQL, "arg @0 @1");
+			Assert.AreEqual(sql.Arguments.Length, 2);
+			Assert.AreEqual(sql.Arguments[0], "a1");
+			Assert.AreEqual(sql.Arguments[1], "a2");
 		}
 
 		[Test]
@@ -55,10 +55,10 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @0 @2", "a1", "a2", "a3");
 
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1"));
-			Expect(sql.Arguments.Length, Is.EqualTo(2));
-			Expect(sql.Arguments[0], Is.EqualTo("a1"));
-			Expect(sql.Arguments[1], Is.EqualTo("a3"));
+			Assert.AreEqual(sql.SQL, "arg @0 @1");
+			Assert.AreEqual(sql.Arguments.Length, 2);
+			Assert.AreEqual(sql.Arguments[0], "a1");
+			Assert.AreEqual(sql.Arguments[1], "a3");
 		}
 
 		[Test]
@@ -67,10 +67,10 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @2 @1", "a1", "a2", "a3");
 
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1"));
-			Expect(sql.Arguments.Length, Is.EqualTo(2));
-			Expect(sql.Arguments[0], Is.EqualTo("a3"));
-			Expect(sql.Arguments[1], Is.EqualTo("a2"));
+			Assert.AreEqual(sql.SQL, "arg @0 @1");
+			Assert.AreEqual(sql.Arguments.Length, 2);
+			Assert.AreEqual(sql.Arguments[0], "a3");
+			Assert.AreEqual(sql.Arguments[1], "a2");
 		}
 
 		[Test]
@@ -79,12 +79,12 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @0 @1 @0 @1", "a1", "a2");
 
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1 @2 @3"));
-			Expect(sql.Arguments.Length, Is.EqualTo(4));
-			Expect(sql.Arguments[0], Is.EqualTo("a1"));
-			Expect(sql.Arguments[1], Is.EqualTo("a2"));
-			Expect(sql.Arguments[2], Is.EqualTo("a1"));
-			Expect(sql.Arguments[3], Is.EqualTo("a2"));
+			Assert.AreEqual(sql.SQL, "arg @0 @1 @2 @3");
+			Assert.AreEqual(sql.Arguments.Length, 4);
+			Assert.AreEqual(sql.Arguments[0], "a1");
+			Assert.AreEqual(sql.Arguments[1], "a2");
+			Assert.AreEqual(sql.Arguments[2], "a1");
+			Assert.AreEqual(sql.Arguments[3], "a2");
 		}
 
 		[Test]
@@ -93,10 +93,10 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @@user1 @2 @1 @@@system1", "a1", "a2", "a3");
 
-			Expect(sql.SQL, Is.EqualTo("arg @@user1 @0 @1 @@@system1"));
-			Expect(sql.Arguments.Length, Is.EqualTo(2));
-			Expect(sql.Arguments[0], Is.EqualTo("a3"));
-			Expect(sql.Arguments[1], Is.EqualTo("a2"));
+			Assert.AreEqual(sql.SQL, "arg @@user1 @0 @1 @@@system1");
+			Assert.AreEqual(sql.Arguments.Length, 2);
+			Assert.AreEqual(sql.Arguments[0], "a3");
+			Assert.AreEqual(sql.Arguments[1], "a2");
 		}
 
 		[Test]
@@ -105,10 +105,10 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @name @password", new { name = "n", password = "p" });
 
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1"));
-			Expect(sql.Arguments.Length, Is.EqualTo(2));
-			Expect(sql.Arguments[0], Is.EqualTo("n"));
-			Expect(sql.Arguments[1], Is.EqualTo("p"));
+			Assert.AreEqual(sql.SQL, "arg @0 @1");
+			Assert.AreEqual(sql.Arguments.Length, 2);
+			Assert.AreEqual(sql.Arguments[0], "n");
+			Assert.AreEqual(sql.Arguments[1], "p");
 		}
 
 
@@ -119,13 +119,13 @@ namespace PetaPoco.Tests
 			var sql = new Sql();
 			sql.Append("arg @0 @name @1 @password @2", "a1", "a2", "a3", new { name = "n", password = "p" });
 
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1 @2 @3 @4"));
-			Expect(sql.Arguments.Length, Is.EqualTo(5));
-			Expect(sql.Arguments[0], Is.EqualTo("a1"));
-			Expect(sql.Arguments[1], Is.EqualTo("n"));
-			Expect(sql.Arguments[2], Is.EqualTo("a2"));
-			Expect(sql.Arguments[3], Is.EqualTo("p"));
-			Expect(sql.Arguments[4], Is.EqualTo("a3"));
+			Assert.AreEqual(sql.SQL, "arg @0 @1 @2 @3 @4");
+			Assert.AreEqual(sql.Arguments.Length, 5);
+			Assert.AreEqual(sql.Arguments[0], "a1");
+			Assert.AreEqual(sql.Arguments[1], "n");
+			Assert.AreEqual(sql.Arguments[2], "a2");
+			Assert.AreEqual(sql.Arguments[3], "p");
+			Assert.AreEqual(sql.Arguments[4], "a3");
 		}
 
 		[Test]
@@ -136,11 +136,11 @@ namespace PetaPoco.Tests
 			sql.Append("l2 @0", "a1");
 			sql.Append("l3 @0", "a2");
 
-			Expect(sql.SQL, Is.EqualTo("l1 @0\nl2 @1\nl3 @2"));
-			Expect(sql.Arguments.Length, Is.EqualTo(3));
-			Expect(sql.Arguments[0], Is.EqualTo("a0"));
-			Expect(sql.Arguments[1], Is.EqualTo("a1"));
-			Expect(sql.Arguments[2], Is.EqualTo("a2"));
+			Assert.AreEqual(sql.SQL, "l1 @0\nl2 @1\nl3 @2");
+			Assert.AreEqual(sql.Arguments.Length, 3);
+			Assert.AreEqual(sql.Arguments[0], "a0");
+			Assert.AreEqual(sql.Arguments[1], "a1");
+			Assert.AreEqual(sql.Arguments[2], "a2");
 		}
 
 		[Test]
@@ -151,29 +151,32 @@ namespace PetaPoco.Tests
 			sql.Append("l2 @0 @1", "a1", "a2");
 			sql.Append("l3 @0", "a3");
 
-			Expect(sql.SQL, Is.EqualTo("l1\nl2 @0 @1\nl3 @2"));
-			Expect(sql.Arguments.Length, Is.EqualTo(3));
-			Expect(sql.Arguments[0], Is.EqualTo("a1"));
-			Expect(sql.Arguments[1], Is.EqualTo("a2"));
-			Expect(sql.Arguments[2], Is.EqualTo("a3"));
+			Assert.AreEqual(sql.SQL, "l1\nl2 @0 @1\nl3 @2");
+			Assert.AreEqual(sql.Arguments.Length, 3);
+			Assert.AreEqual(sql.Arguments[0], "a1");
+			Assert.AreEqual(sql.Arguments[1], "a2");
+			Assert.AreEqual(sql.Arguments[2], "a3");
 		}
 
 		[Test]
-		[ExpectedException(typeof(ArgumentOutOfRangeException))]
 		public void invalid_arg_index()
 		{
-			var sql = new Sql();
-			sql.Append("arg @0 @1", "a0");
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1"));
+			Assert.Throws<ArgumentOutOfRangeException>(()=>{
+				var sql = new Sql();
+				sql.Append("arg @0 @1", "a0");
+				Assert.AreEqual(sql.SQL, "arg @0 @1");
+			});
 		}
 
 		[Test]
-		[ExpectedException(typeof(ArgumentException))]
 		public void invalid_arg_name()
 		{
-			var sql = new Sql();
-			sql.Append("arg @name1 @name2", new { x = 1, y = 2 });
-			Expect(sql.SQL, Is.EqualTo("arg @0 @1"));
+			Assert.Throws<ArgumentException>(() =>
+			{
+				var sql = new Sql();
+				sql.Append("arg @name1 @name2", new { x = 1, y = 2 });
+				Assert.AreEqual(sql.SQL, "arg @0 @1");
+			});
 		}
 
 		[Test]
@@ -183,14 +186,14 @@ namespace PetaPoco.Tests
 			var sql1 = new Sql("l1 @0", "a1");
 			var sql2 = new Sql("l2 @0", "a2");
 
-			Expect(sql.Append(sql1), Is.SameAs(sql));
-			Expect(sql.Append(sql2), Is.SameAs(sql));
+			Assert.AreSame(sql.Append(sql1), sql);
+			Assert.AreSame(sql.Append(sql2), sql);
 
-			Expect(sql.SQL, Is.EqualTo("l0 @0\nl1 @1\nl2 @2"));
-			Expect(sql.Arguments.Length, Is.EqualTo(3));
-			Expect(sql.Arguments[0], Is.EqualTo("a0"));
-			Expect(sql.Arguments[1], Is.EqualTo("a1"));
-			Expect(sql.Arguments[2], Is.EqualTo("a2"));
+			Assert.AreEqual(sql.SQL, "l0 @0\nl1 @1\nl2 @2");
+			Assert.AreEqual(sql.Arguments.Length, 3);
+			Assert.AreEqual(sql.Arguments[0], "a0");
+			Assert.AreEqual(sql.Arguments[1], "a1");
+			Assert.AreEqual(sql.Arguments[2], "a2");
 		}
 
 		[Test]
@@ -202,7 +205,7 @@ namespace PetaPoco.Tests
 			sql.Append("WHERE x");
 			sql.Append("WHERE y");
 
-			Expect(sql.SQL, Is.EqualTo("SELECT * FROM blah\nWHERE x\nAND y"));
+			Assert.AreEqual(sql.SQL, "SELECT * FROM blah\nWHERE x\nAND y");
 		}
 
 		[Test]
@@ -214,7 +217,7 @@ namespace PetaPoco.Tests
 			sql.Append("ORDER BY x");
 			sql.Append("ORDER BY y");
 
-			Expect(sql.SQL, Is.EqualTo("SELECT * FROM blah\nORDER BY x\n, y"));
+			Assert.AreEqual(sql.SQL, "SELECT * FROM blah\nORDER BY x\n, y");
 		}
 
 		[Test]
@@ -222,13 +225,13 @@ namespace PetaPoco.Tests
 		{
 			// Simple collection parameter expansion
 			var sql = Sql.Builder.Append("@0 IN (@1) @2", 20, new int[] { 1, 2, 3 }, 30);
-			Expect(sql.SQL, Is.EqualTo("@0 IN (@1,@2,@3) @4"));
-			Expect(sql.Arguments.Length, Is.EqualTo(5));
-			Expect(sql.Arguments[0], Is.EqualTo(20));
-			Expect(sql.Arguments[1], Is.EqualTo(1));
-			Expect(sql.Arguments[2], Is.EqualTo(2));
-			Expect(sql.Arguments[3], Is.EqualTo(3));
-			Expect(sql.Arguments[4], Is.EqualTo(30));
+			Assert.AreEqual(sql.SQL, "@0 IN (@1,@2,@3) @4");
+			Assert.AreEqual(sql.Arguments.Length, 5);
+			Assert.AreEqual(sql.Arguments[0], 20);
+			Assert.AreEqual(sql.Arguments[1], 1);
+			Assert.AreEqual(sql.Arguments[2], 2);
+			Assert.AreEqual(sql.Arguments[3], 3);
+			Assert.AreEqual(sql.Arguments[4], 30);
 		}
 
 		[Test]
@@ -236,14 +239,14 @@ namespace PetaPoco.Tests
 		{
 			// Out of order expansion
 			var sql = Sql.Builder.Append("IN (@3) (@1)", null, new int[] { 1, 2, 3 }, null, new int[] { 4, 5, 6 });
-			Expect(sql.SQL, Is.EqualTo("IN (@0,@1,@2) (@3,@4,@5)"));
-			Expect(sql.Arguments.Length, Is.EqualTo(6));
-			Expect(sql.Arguments[0], Is.EqualTo(4));
-			Expect(sql.Arguments[1], Is.EqualTo(5));
-			Expect(sql.Arguments[2], Is.EqualTo(6));
-			Expect(sql.Arguments[3], Is.EqualTo(1));
-			Expect(sql.Arguments[4], Is.EqualTo(2));
-			Expect(sql.Arguments[5], Is.EqualTo(3));
+			Assert.AreEqual(sql.SQL, "IN (@0,@1,@2) (@3,@4,@5)");
+			Assert.AreEqual(sql.Arguments.Length, 6);
+			Assert.AreEqual(sql.Arguments[0], 4);
+			Assert.AreEqual(sql.Arguments[1], 5);
+			Assert.AreEqual(sql.Arguments[2], 6);
+			Assert.AreEqual(sql.Arguments[3], 1);
+			Assert.AreEqual(sql.Arguments[4], 2);
+			Assert.AreEqual(sql.Arguments[5], 3);
 		}
 
 		[Test]
@@ -251,11 +254,11 @@ namespace PetaPoco.Tests
 		{
 			// Expand a named parameter
 			var sql = Sql.Builder.Append("IN (@numbers)", new { numbers = (new int[] { 1, 2, 3 }) } );
-			Expect(sql.SQL, Is.EqualTo("IN (@0,@1,@2)"));
-			Expect(sql.Arguments.Length, Is.EqualTo(3));
-			Expect(sql.Arguments[0], Is.EqualTo(1));
-			Expect(sql.Arguments[1], Is.EqualTo(2));
-			Expect(sql.Arguments[2], Is.EqualTo(3));
+			Assert.AreEqual(sql.SQL, "IN (@0,@1,@2)");
+			Assert.AreEqual(sql.Arguments.Length, 3);
+			Assert.AreEqual(sql.Arguments[0], 1);
+			Assert.AreEqual(sql.Arguments[1], 2);
+			Assert.AreEqual(sql.Arguments[2], 3);
 		}
 
 		[Test]
@@ -265,7 +268,7 @@ namespace PetaPoco.Tests
 				.Select("*")
 				.From("articles")
 				.LeftJoin("comments").On("articles.article_id=comments.article_id");
-			Expect(sql.SQL, Is.EqualTo("SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id"));
+			Assert.AreEqual(sql.SQL, "SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id");
 		}
 
 	}

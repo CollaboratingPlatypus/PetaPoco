@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using PetaTest;
 
 namespace PetaPoco.Tests
 {
 	[TestFixture]
-	class Misc : AssertionHelper
+	class Misc
 	{
 		Database db = new Database("sqlserver");
 
 		[Test]
 		public void EscapeColumnName()
 		{
-			Expect(db.EscapeSqlIdentifier("column.name"), Is.EqualTo("[column.name]"));
-			Expect(db.EscapeSqlIdentifier("column name"), Is.EqualTo("[column name]"));
+			Assert.AreEqual(db.EscapeSqlIdentifier("column.name"), "[column.name]");
+			Assert.AreEqual(db.EscapeSqlIdentifier("column name"), "[column name]");
 		}
 
 		[Test]
 		public void EscapeTableName()
 		{
-			Expect(db.EscapeTableName("column.name"), Is.EqualTo("column.name"));
-			Expect(db.EscapeTableName("column name"), Is.EqualTo("[column name]"));
+			Assert.AreEqual(db.EscapeTableName("column.name"), "column.name");
+			Assert.AreEqual(db.EscapeTableName("column name"), "[column name]");
 		}
 	}
 }

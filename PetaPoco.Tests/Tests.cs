@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using PetaTest;
 using PetaPoco;
 
 namespace PetaPoco.Tests
@@ -11,7 +11,7 @@ namespace PetaPoco.Tests
 	[TestFixture("sqlserverce")]
 	[TestFixture("mysql")]
 	[TestFixture("postgresql")]
-	public class Tests : AssertionHelper
+	public class Tests
 	{
 		public Tests(string connectionStringName)
 		{
@@ -49,7 +49,7 @@ namespace PetaPoco.Tests
 			db.Delete<petapoco2>("");
 
 			// Should be clean
-			Expect(GetRecordCount(), Is.EqualTo(0));
+			Assert.AreEqual(GetRecordCount(), 0);
 		}
 
 		poco CreatePoco()
@@ -92,29 +92,29 @@ namespace PetaPoco.Tests
 			return o;
 		}
 
-		void Assert(poco a, poco b)
+		void AssertPocos(poco a, poco b)
 		{
-			Expect(a.id, Is.EqualTo(b.id));
-			Expect(a.title, Is.EqualTo(b.title));
-			Expect(a.draft, Is.EqualTo(b.draft));
-			Expect(a.content, Is.EqualTo(b.content));
-			Expect(a.date_created, Is.EqualTo(b.date_created));
-			Expect(a.date_edited, Is.EqualTo(b.date_edited));
-			Expect(a.state, Is.EqualTo(b.state));
-			Expect(a.col_w_space, Is.EqualTo(b.col_w_space));
-			Expect(a.nullreal, Is.EqualTo(b.nullreal));
+			Assert.AreEqual(a.id, b.id);
+			Assert.AreEqual(a.title, b.title);
+			Assert.AreEqual(a.draft, b.draft);
+			Assert.AreEqual(a.content, b.content);
+			Assert.AreEqual(a.date_created, b.date_created);
+			Assert.AreEqual(a.date_edited, b.date_edited);
+			Assert.AreEqual(a.state, b.state);
+			Assert.AreEqual(a.col_w_space, b.col_w_space);
+			Assert.AreEqual(a.nullreal, b.nullreal);
 		}
 
-		void Assert(deco a, deco b)
+		void AssertPocos(deco a, deco b)
 		{
-			Expect(a.id, Is.EqualTo(b.id));
-			Expect(a.title, Is.EqualTo(b.title));
-			Expect(a.draft, Is.EqualTo(b.draft));
-			Expect(a.content, Is.EqualTo(b.content));
-			Expect(a.date_created, Is.EqualTo(b.date_created));
-			Expect(a.state, Is.EqualTo(b.state));
-			Expect(a.col_w_space, Is.EqualTo(b.col_w_space));
-			Expect(a.nullreal, Is.EqualTo(b.nullreal));
+			Assert.AreEqual(a.id, b.id);
+			Assert.AreEqual(a.title, b.title);
+			Assert.AreEqual(a.draft, b.draft);
+			Assert.AreEqual(a.content, b.content);
+			Assert.AreEqual(a.date_created, b.date_created);
+			Assert.AreEqual(a.state, b.state);
+			Assert.AreEqual(a.col_w_space, b.col_w_space);
+			Assert.AreEqual(a.nullreal, b.nullreal);
 		}
 
 		// Insert some records, return the id of the first
@@ -131,7 +131,7 @@ namespace PetaPoco.Tests
 				if (i == 0)
 				{
 					lFirst = o.id;
-					Expect(o.id, Is.Not.EqualTo(0));
+					Assert.AreNotEqual(o.id, 0);
 				}
 			}
 
@@ -144,21 +144,21 @@ namespace PetaPoco.Tests
 			// Create a random record
 			var o = CreatePoco();
 
-			Expect(db.IsNew("id", o), Is.True);
+			Assert.IsTrue(db.IsNew("id", o));
 
 			// Insert it
 			db.Insert("petapoco", "id", o);
-			Expect(o.id, Is.Not.EqualTo(0));
+			Assert.AreNotEqual(o.id, 0);
 
-			Expect(db.IsNew("id", o), Is.False);
+			Assert.IsFalse(db.IsNew("id", o));
 
 			// Retrieve it
 			var o2 = db.Single<poco>("SELECT * FROM petapoco WHERE id=@0", o.id);
 
-			Expect(db.IsNew("id", o2), Is.False);
+			Assert.IsFalse(db.IsNew("id", o2));
 
 			// Check it
-			Assert(o, o2);
+			AssertPocos(o, o2);
 
 			// Update it
 			o2.title = "New Title";
@@ -168,14 +168,14 @@ namespace PetaPoco.Tests
 			var o3 = db.Single<poco>("SELECT * FROM petapoco WHERE id=@0", o.id);
 
 			// Check it
-			Assert(o2, o3);
+			AssertPocos(o2, o3);
 
 			// Delete it
 			db.Delete("petapoco", "id", o3);
 
 			// Should be gone!
 			var o4 = db.SingleOrDefault<poco>("SELECT * FROM petapoco WHERE id=@0", o.id);
-			Expect(o4, Is.Null);
+			Assert.IsNull(o4);
 		}
 
 		[Test]
@@ -183,21 +183,21 @@ namespace PetaPoco.Tests
 		{
 			// Create a random record
 			var o = CreateDeco();
-			Expect(db.IsNew(o), Is.True);
+			Assert.IsTrue(db.IsNew(o));
 
 			// Insert it
 			db.Insert(o);
-			Expect(o.id, Is.Not.EqualTo(0));
+			Assert.AreNotEqual(o.id, 0);
 
-			Expect(db.IsNew(o), Is.False);
+			Assert.IsFalse(db.IsNew(o));
 			
 			// Retrieve it
 			var o2 = db.Single<deco>("SELECT * FROM petapoco WHERE id=@0", o.id);
 
-			Expect(db.IsNew(o2), Is.False);
+			Assert.IsFalse(db.IsNew(o2));
 
 			// Check it
-			Assert(o, o2);
+			AssertPocos(o, o2);
 
 			// Update it
 			o2.title = "New Title";
@@ -207,14 +207,14 @@ namespace PetaPoco.Tests
 			var o3 = db.Single<deco>("SELECT * FROM petapoco WHERE id=@0", o.id);
 
 			// Check it
-			Assert(o2, o3);
+			AssertPocos(o2, o3);
 
 			// Delete it
 			db.Delete(o3);
 
 			// Should be gone!
 			var o4 = db.SingleOrDefault<deco>("SELECT * FROM petapoco WHERE id=@0", o.id);
-			Expect(o4, Is.Null);
+			Assert.IsNull(o4);
 		}
 
 		[Test]
@@ -226,12 +226,12 @@ namespace PetaPoco.Tests
 
 			// Fetch em
 			var r = db.Fetch<poco>("SELECT * from petapoco ORDER BY id");
-			Expect(r.Count, Is.EqualTo(count));
+			Assert.AreEqual(r.Count, count);
 
 			// Check em
 			for (int i = 0; i < count; i++)
 			{
-				Expect(r[i].id, Is.EqualTo(id + i));
+				Assert.AreEqual(r[i].id, id + i);
 			}
 
 		}
@@ -250,10 +250,10 @@ namespace PetaPoco.Tests
 			int i = 0;
 			foreach (var p in r)
 			{
-				Expect(p.id, Is.EqualTo(id + i));
+				Assert.AreEqual(p.id, id + i);
 				i++;
 			}
-			Expect(i, Is.EqualTo(count));
+			Assert.AreEqual(i, count);
 		}
 
 		[Test]
@@ -273,16 +273,16 @@ namespace PetaPoco.Tests
 			int i = 0;
 			foreach (var p in r.Items)
 			{
-				Expect(p.id, Is.EqualTo(id + i + 5));
+				Assert.AreEqual(p.id, id + i + 5);
 				i++;
 			}
 
 			// Check other stats
-			Expect(r.Items.Count, Is.EqualTo(5));
-			Expect(r.CurrentPage, Is.EqualTo(2));
-			Expect(r.ItemsPerPage, Is.EqualTo(5));
-			Expect(r.TotalItems, Is.EqualTo(13));
-			Expect(r.TotalPages, Is.EqualTo(3));
+			Assert.AreEqual(r.Items.Count, 5);
+			Assert.AreEqual(r.CurrentPage, 2);
+			Assert.AreEqual(r.ItemsPerPage, 5);
+			Assert.AreEqual(r.TotalItems, 13);
+			Assert.AreEqual(r.TotalPages, 3);
 		}
 
 		[Test]
@@ -305,16 +305,16 @@ namespace PetaPoco.Tests
 			int i = 0;
 			foreach (var p in r.Items)
 			{
-				Expect(p.id, Is.EqualTo(id + i + 5));
+				Assert.AreEqual(p.id, id + i + 5);
 				i++;
 			}
 
 			// Check other stats
-			Expect(r.Items.Count, Is.EqualTo(5));
-			Expect(r.CurrentPage, Is.EqualTo(2));
-			Expect(r.ItemsPerPage, Is.EqualTo(5));
-			Expect(r.TotalItems, Is.EqualTo(13));
-			Expect(r.TotalPages, Is.EqualTo(3));
+			Assert.AreEqual(r.Items.Count, 5);
+			Assert.AreEqual(r.CurrentPage, 2);
+			Assert.AreEqual(r.ItemsPerPage, 5);
+			Assert.AreEqual(r.TotalItems, 13);
+			Assert.AreEqual(r.TotalPages, 3);
 		}
 
 		[Test]
@@ -337,16 +337,16 @@ namespace PetaPoco.Tests
 			int i = 0;
 			foreach (var p in r.Items)
 			{
-				Expect(p.id, Is.EqualTo(id + i + 5));
+				Assert.AreEqual(p.id, id + i + 5);
 				i++;
 			}
 
 			// Check other stats
-			Expect(r.Items.Count, Is.EqualTo(5));
-			Expect(r.CurrentPage, Is.EqualTo(2));
-			Expect(r.ItemsPerPage, Is.EqualTo(5));
-			Expect(r.TotalItems, Is.EqualTo(13));
-			Expect(r.TotalPages, Is.EqualTo(3));
+			Assert.AreEqual(r.Items.Count, 5);
+			Assert.AreEqual(r.CurrentPage, 2);
+			Assert.AreEqual(r.ItemsPerPage, 5);
+			Assert.AreEqual(r.TotalItems, 13);
+			Assert.AreEqual(r.TotalPages, 3);
 		}
 
 		[Test]
@@ -363,12 +363,12 @@ namespace PetaPoco.Tests
 			int i = 0;
 			foreach (var p in r)
 			{
-				Expect(p.id, Is.EqualTo(id + i + 5));
+				Assert.AreEqual(p.id, id + i + 5);
 				i++;
 			}
 
 			// Check other stats
-			Expect(r.Count, Is.EqualTo(5));
+			Assert.AreEqual(r.Count, 5);
 		}
 
 		[Test]
@@ -385,11 +385,11 @@ namespace PetaPoco.Tests
 			var r = db.Page<poco>(3, 5, "SELECT * from petapoco ORDER BY id");
 
 			// Check other stats
-			Expect(r.Items.Count, Is.EqualTo(5));
-			Expect(r.CurrentPage, Is.EqualTo(3));
-			Expect(r.ItemsPerPage, Is.EqualTo(5));
-			Expect(r.TotalItems, Is.EqualTo(15));
-			Expect(r.TotalPages, Is.EqualTo(3));
+			Assert.AreEqual(r.Items.Count, 5);
+			Assert.AreEqual(r.CurrentPage, 3);
+			Assert.AreEqual(r.ItemsPerPage, 5);
+			Assert.AreEqual(r.TotalItems, 15);
+			Assert.AreEqual(r.TotalPages, 3);
 		}
 
 		[Test]
@@ -403,7 +403,7 @@ namespace PetaPoco.Tests
 			db.Delete<deco>("WHERE id>=@0", id + 5);
 
 			// Check they match
-			Expect(GetRecordCount(), Is.EqualTo(5));
+			Assert.AreEqual(GetRecordCount(), 5);
 		}
 
 		[Test]
@@ -421,11 +421,11 @@ namespace PetaPoco.Tests
 			{
 				if (d.id >= id + 5)
 				{
-					Expect(d.title, Is.EqualTo("zap"));
+					Assert.AreEqual(d.title, "zap");
 				}
 				else
 				{
-					Expect(d.title, Is.Not.EqualTo("zap"));
+					Assert.AreNotEqual(d.title, "zap");
 				}
 			}
 		}
@@ -442,9 +442,9 @@ namespace PetaPoco.Tests
 			var c = db.SingleOrDefault<deco_explicit>("SELECT * FROM petapoco WHERE id=@0", id);
 
 			// b record should have ignored the content
-			Expect(a.content, Is.Not.Null);
-			Expect(b.content, Is.Null);
-			Expect(c.content, Is.Null);
+			Assert.IsNotNull(a.content);
+			Assert.IsNull(b.content);
+			Assert.IsNull(c.content);
 		}
 
 
@@ -460,9 +460,9 @@ namespace PetaPoco.Tests
 			var c = db.SingleOrDefault<deco_non_explicit>("SELECT * FROM petapoco WHERE id=@0", id);
 
 			// b record should have ignored the content
-			Expect(a.content, Is.Not.Null);
-			Expect(b.content, Is.Null);
-			Expect(c.content, Is.Null);
+			Assert.IsNotNull(a.content);
+			Assert.IsNull(b.content);
+			Assert.IsNull(c.content);
 		}
 
 		[Test]
@@ -474,7 +474,7 @@ namespace PetaPoco.Tests
 				scope.Complete();
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(10));
+			Assert.AreEqual(GetRecordCount(), 10);
 		}
 
 		[Test]
@@ -485,7 +485,7 @@ namespace PetaPoco.Tests
 				InsertRecords(10);
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(0));
+			Assert.AreEqual(GetRecordCount(), 0);
 		}
 
 		[Test]
@@ -501,7 +501,7 @@ namespace PetaPoco.Tests
 				}
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(0));
+			Assert.AreEqual(GetRecordCount(), 0);
 		}
 
 		[Test]
@@ -518,7 +518,7 @@ namespace PetaPoco.Tests
 				scope1.Complete();
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(0));
+			Assert.AreEqual(GetRecordCount(), 0);
 		}
 
 		[Test]
@@ -535,7 +535,7 @@ namespace PetaPoco.Tests
 				}
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(0));
+			Assert.AreEqual(GetRecordCount(), 0);
 		}
 
 		[Test]
@@ -554,7 +554,7 @@ namespace PetaPoco.Tests
 				scope1.Complete();
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(20));
+			Assert.AreEqual(GetRecordCount(), 20);
 		}
 
 		[Test]
@@ -579,7 +579,7 @@ namespace PetaPoco.Tests
 				scope1.Complete();
 			}
 
-			Expect(GetRecordCount(), Is.EqualTo(0));
+			Assert.AreEqual(GetRecordCount(), 0);
 		}
 
 		[Test]
@@ -587,8 +587,8 @@ namespace PetaPoco.Tests
 		{
 			var id = InsertRecords(1);
 			var a2 = db.SingleOrDefault<deco>("WHERE id=@0", id);
-			Expect(a2.date_created.Kind, Is.EqualTo(DateTimeKind.Utc));
-			Expect(a2.date_edited.Value.Kind, Is.EqualTo(DateTimeKind.Utc));
+			Assert.AreEqual(a2.date_created.Kind, DateTimeKind.Utc);
+			Assert.AreEqual(a2.date_edited.Value.Kind, DateTimeKind.Utc);
 		}
 
 		[Test]
@@ -610,22 +610,22 @@ namespace PetaPoco.Tests
 
 			// Retrieve it
 			var b = db.SingleOrDefault<deco>("WHERE id=@0", a.id);
-			Expect(b.id, Is.EqualTo(a.id));
-			Expect(b.date_edited.HasValue, Is.EqualTo(false));
+			Assert.AreEqual(b.id, a.id);
+			Assert.AreEqual(b.date_edited.HasValue, false);
 
 			// Update it to NULL
 			b.date_edited = now;
 			db.Update(b);
 			var c = db.SingleOrDefault<deco>("WHERE id=@0", a.id);
-			Expect(c.id, Is.EqualTo(a.id));
-			Expect(c.date_edited.HasValue, Is.EqualTo(true));
+			Assert.AreEqual(c.id, a.id);
+			Assert.AreEqual(c.date_edited.HasValue, true);
 
 			// Update it to not NULL
 			c.date_edited = null;
 			db.Update(c);
 			var d = db.SingleOrDefault<deco>("WHERE id=@0", a.id);
-			Expect(d.id, Is.EqualTo(a.id));
-			Expect(d.date_edited.HasValue, Is.EqualTo(false));
+			Assert.AreEqual(d.id, a.id);
+			Assert.AreEqual(d.date_edited.HasValue, false);
 		}
 
 		[Test]
@@ -640,118 +640,129 @@ namespace PetaPoco.Tests
 							max_id = first + 6 
 						}
 					);
-			Expect(items.Count, Is.EqualTo(4));
+			Assert.AreEqual(items.Count, 4);
 		}
 
 		[Test]
 		public void SingleOrDefault_Empty()
 		{
-			Expect(db.SingleOrDefault<deco>("WHERE id=@0", 0), Is.Null);
+			Assert.IsNull(db.SingleOrDefault<deco>("WHERE id=@0", 0));
 		}
 
 		[Test]
 		public void SingleOrDefault_Single()
 		{
 			var id = InsertRecords(1);
-			Expect(db.SingleOrDefault<deco>("WHERE id=@0", id), Is.Not.Null);
+			Assert.IsNotNull(db.SingleOrDefault<deco>("WHERE id=@0", id));
 		}
 
 		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void SingleOrDefault_Multiple()
 		{
-			var id = InsertRecords(2);
-			db.SingleOrDefault<deco>("WHERE id>=@0", id);
+			Assert.Throws<InvalidOperationException>(() =>
+			{
+
+				var id = InsertRecords(2);
+				db.SingleOrDefault<deco>("WHERE id>=@0", id);
+			});
 		}
 
 		[Test]
 		public void FirstOrDefault_Empty()
 		{
-			Expect(db.FirstOrDefault<deco>("WHERE id=@0", 0), Is.Null);
+			Assert.IsNull(db.FirstOrDefault<deco>("WHERE id=@0", 0));
 		}
 
 		[Test]
 		public void FirstOrDefault_First()
 		{
 			var id = InsertRecords(1);
-			Expect(db.FirstOrDefault<deco>("WHERE id=@0", id), Is.Not.Null);
+			Assert.IsNotNull(db.FirstOrDefault<deco>("WHERE id=@0", id));
 		}
 
 		[Test]
 		public void FirstOrDefault_Multiple()
 		{
 			var id = InsertRecords(2);
-			Expect(db.FirstOrDefault<deco>("WHERE id>=@0", id), Is.Not.Null);
+			Assert.IsNotNull(db.FirstOrDefault<deco>("WHERE id>=@0", id));
 		}
 
 		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Single_Empty()
 		{
-			db.Single<deco>("WHERE id=@0", 0);
+			Assert.Throws<InvalidOperationException>(() =>
+			{
+				db.Single<deco>("WHERE id=@0", 0);
+			});
 		}
 
 		[Test]
 		public void Single_Single()
 		{
 			var id = InsertRecords(1);
-			Expect(db.Single<deco>("WHERE id=@0", id), Is.Not.Null);
+			Assert.IsNotNull(db.Single<deco>("WHERE id=@0", id));
 		}
 
 		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Single_Multiple()
 		{
-			var id = InsertRecords(2);
-			db.Single<deco>("WHERE id>=@0", id);
+			Assert.Throws<InvalidOperationException>(() =>
+			{
+				var id = InsertRecords(2);
+				db.Single<deco>("WHERE id>=@0", id);
+			});
 		}
 
 		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void First_Empty()
 		{
-			db.First<deco>("WHERE id=@0", 0);
+			Assert.Throws<InvalidOperationException>(() =>
+			{
+				db.First<deco>("WHERE id=@0", 0);
+			});
 		}
 
 		[Test]
 		public void First_First()
 		{
 			var id = InsertRecords(1);
-			Expect(db.First<deco>("WHERE id=@0", id), Is.Not.Null);
+			Assert.IsNotNull(db.First<deco>("WHERE id=@0", id));
 		}
 
 		[Test]
 		public void First_Multiple()
 		{
 			var id = InsertRecords(2);
-			Expect(db.First<deco>("WHERE id>=@0", id), Is.Not.Null);
+			Assert.IsNotNull(db.First<deco>("WHERE id>=@0", id));
 		}
 
 		[Test]
 		public void SingleOrDefault_PK_Empty()
 		{
-			Expect(db.SingleOrDefault<deco>(0), Is.Null);
+			Assert.IsNull(db.SingleOrDefault<deco>(0));
 		}
 
 		[Test]
 		public void SingleOrDefault_PK_Single()
 		{
 			var id = InsertRecords(1);
-			Expect(db.SingleOrDefault<deco>(id), Is.Not.Null);
+			Assert.IsNotNull(db.SingleOrDefault<deco>(id));
 		}
 
 		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
 		public void Single_PK_Empty()
 		{
-			db.Single<deco>(0);
+			Assert.Throws<InvalidOperationException>(() =>
+			{
+				db.Single<deco>(0);
+			});
 		}
 
 		[Test]
 		public void Single_PK_Single()
 		{
 			var id = InsertRecords(1);
-			Expect(db.Single<deco>(id), Is.Not.Null);
+			Assert.IsNotNull(db.Single<deco>(id));
 		}
 
 		[Test]
@@ -759,8 +770,8 @@ namespace PetaPoco.Tests
 		{
 			var id = InsertRecords(1);
 			var a = db.SingleOrDefault<deco>("SELECT * FROM petapoco WHERE id=@0", id);
-			Expect(a, Is.Not.Null);
-			Expect(a.id, Is.EqualTo(id));
+			Assert.IsNotNull(a);
+			Assert.AreEqual(a.id, id);
 		}
 
 		[Test]
@@ -768,8 +779,8 @@ namespace PetaPoco.Tests
 		{
 			var id = InsertRecords(1);
 			var a = db.SingleOrDefault<deco>("WHERE id=@0", id);
-			Expect(a, Is.Not.Null);
-			Expect(a.id, Is.EqualTo(id));
+			Assert.IsNotNull(a);
+			Assert.AreEqual(a.id, id);
 		}
 
 		[Test]
@@ -777,18 +788,18 @@ namespace PetaPoco.Tests
 		{
 			var id = InsertRecords(1);
 			var a = db.SingleOrDefault<deco>("FROM petapoco WHERE id=@0", id);
-			Expect(a, Is.Not.Null);
-			Expect(a.id, Is.EqualTo(id));
+			Assert.IsNotNull(a);
+			Assert.AreEqual(a.id, id);
 		}
 
 		void AssertDynamic(dynamic a, dynamic b)
 		{
-			Expect(a.id, Is.EqualTo(b.id));
-			Expect(a.title, Is.EqualTo(b.title));
-			Expect(a.draft, Is.EqualTo(b.draft));
-			Expect(a.content, Is.EqualTo(b.content));
-			Expect(a.date_created, Is.EqualTo(b.date_created));
-			Expect(a.state, Is.EqualTo(b.state));
+			Assert.AreEqual(a.id, b.id);
+			Assert.AreEqual(a.title, b.title);
+			Assert.AreEqual(a.draft, b.draft);
+			Assert.AreEqual(a.content, b.content);
+			Assert.AreEqual(a.date_created, b.date_created);
+			Assert.AreEqual(a.state, b.state);
 		}
 
 		dynamic CreateExpando()
@@ -814,18 +825,18 @@ namespace PetaPoco.Tests
 			// Create a random record
 			var o = CreateExpando();
 
-			Expect(db.IsNew("id", o), Is.True);
+			Assert.IsTrue(db.IsNew("id", o));
 
 			// Insert it
 			db.Insert("petapoco", "id", o);
-			Expect(o.id, Is.Not.EqualTo(0));
+			Assert.AreNotEqual(o.id, 0);
 
-			Expect(db.IsNew("id", o), Is.False);
+			Assert.IsFalse(db.IsNew("id", o));
 
 			// Retrieve it
 			var o2 = db.Single<dynamic>("SELECT * FROM petapoco WHERE id=@0", o.id);
 
-			Expect(db.IsNew("id", o2), Is.False);
+			Assert.IsFalse(db.IsNew("id", o2));
 
 			// Check it
 			AssertDynamic(o, o2);
@@ -845,7 +856,7 @@ namespace PetaPoco.Tests
 
 			// Should be gone!
 			var o4 = db.SingleOrDefault<dynamic>("SELECT * FROM petapoco WHERE id=@0", o.id);
-			Expect(o4==null, Is.True);
+			Assert.IsNull(o4);
 		}
 	
 		[Test]
@@ -857,7 +868,7 @@ namespace PetaPoco.Tests
 			db.Insert(o);
 
 			var o2 = db.SingleOrDefault<petapoco2>("WHERE email=@0", "blah@blah.com");
-			Expect(o2.name, Is.EqualTo("Mr Blah"));
+			Assert.AreEqual(o2.name, "Mr Blah");
 		}
 
 		[Test]
@@ -865,7 +876,7 @@ namespace PetaPoco.Tests
 		{
 			var id = InsertRecords(1);
 			var id2 = db.SingleOrDefault<long>("SELECT id from petapoco WHERE id=@0", id);
-			Expect(id, Is.EqualTo(id2));
+			Assert.AreEqual(id, id2);
 		}
 	}
 
