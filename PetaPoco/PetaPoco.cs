@@ -414,6 +414,10 @@ namespace PetaPoco
 				{
 					p.Value = (int)item;
 				}
+		                else if (t == typeof(uint) && _dbType == DBType.SQLite) // fix for SQLite uint storage
+		                {
+		                    p.Value = (long)((uint)item);
+		                }
 				else if (t == typeof(Guid))
 				{
 					p.Value = item.ToString();
