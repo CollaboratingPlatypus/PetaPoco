@@ -1,0 +1,44 @@
+<Configuration>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="F36DE5A6-A02E-43C8-8D06-EFBAC6FCCA70/f:PetaPoco.cs" caret="53562" fromTop="22" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="69484" fromTop="22" />
+      <File id="E6787C52-7549-44CD-AA6E-AB9D55946AB9/f:MultiPocoTests.cs" caret="0" fromTop="0" />
+      <File id="E6787C52-7549-44CD-AA6E-AB9D55946AB9/f:PetaTest.cs" caret="0" fromTop="0" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="18" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="18" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="18" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="1" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="1" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="1" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="1" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70845" fromTop="1" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="74769" fromTop="41" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="70847" fromTop="40" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="67434" fromTop="22" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="53555" fromTop="24" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="69253" fromTop="22" />
+      <File id="33699753-151D-4100-8F12-9AE1AEB5C5BD/f:PetaPoco.cs" caret="69484" fromTop="22" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir IsNull="False">
+    </NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+</Configuration>
