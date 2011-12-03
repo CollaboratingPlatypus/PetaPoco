@@ -1215,10 +1215,17 @@ namespace PetaPoco
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
 
-						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
+						string outputClause = String.Empty;
+						if (autoIncrement && DBType.SqlServer == _dbType)
+						{
+							outputClause = String.Format("OUTPUT INSERTED.[{0}]", primaryKeyName);
+						}
+
+						cmd.CommandText = String.Format("INSERT INTO {0} ({1}) {2} VALUES ({3})",
 								EscapeTableName(tableName),
-								string.Join(",", names.ToArray()),
-								string.Join(",", values.ToArray())
+								String.Join(",", names.ToArray()),
+								outputClause,
+								String.Join(",", values.ToArray())
 								);
 
 						if (!autoIncrement)
@@ -1228,7 +1235,6 @@ namespace PetaPoco
 							OnExecutedCommand(cmd);
 							return true;
 						}
-
 
 						object id;
 						switch (_dbType)
@@ -1240,7 +1246,6 @@ namespace PetaPoco
 								id = ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
-								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
 								DoPreExecute(cmd);
 								id = cmd.ExecuteScalar();
 								OnExecutedCommand(cmd);
