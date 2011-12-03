@@ -1554,13 +1554,15 @@ namespace PetaPoco
 			{
 				// Common primary key types
 				if (type == typeof(long))
-					return (long)pk == 0;
+					return (long)pk == default(long);
 				else if (type == typeof(ulong))
-					return (ulong)pk == 0;
+					return (ulong)pk == default(ulong);
 				else if (type == typeof(int))
-					return (int)pk == 0;
+					return (int)pk == default(int);
 				else if (type == typeof(uint))
-					return (uint)pk == 0;
+					return (uint)pk == default(uint);
+				else if (type == typeof(Guid))
+					return (Guid)pk == default(Guid);
 
 				// Create a default instance and compare
 				return pk == Activator.CreateInstance(pk.GetType());
