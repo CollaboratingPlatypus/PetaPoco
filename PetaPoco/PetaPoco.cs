@@ -1226,7 +1226,12 @@ namespace PetaPoco
 							DoPreExecute(cmd);
 							cmd.ExecuteNonQuery();
 							OnExecutedCommand(cmd);
-							return true;
+                            
+                            PocoColumn pkColumn;
+                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out pkColumn))
+                                return pkColumn.GetValue(poco);
+                            else
+                                return null;
 						}
 
 
