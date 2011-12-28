@@ -286,6 +286,35 @@ namespace PetaPoco.Tests
 		}
 
 		[Test]
+		public void PageRowNumber()
+		{
+			// In this test we're checking that the page query can handle a partition by
+			// select statement that will consolidate the test data down to a single row
+
+			// Create some records
+			const int count = 13;
+			long id = InsertRecords(count);
+
+			// Fetch em
+			var r = db.Page<poco>(1, 5, "SELECT ppoco.* FROM (SELECT ROW_NUMBER() OVER (PARTITION BY CAST(date_created AS DATE) ORDER by date_created desc) as pagern, petapoco.* from petapoco) ppoco WHERE pagern = 1 ORDER BY id");
+
+			// Check em
+			int i = 0;
+			foreach (var p in r.Items)
+			{
+				Assert.AreEqual(p.id, id + i);
+				i++;
+			}
+
+			// Check other stats
+			Assert.AreEqual(r.Items.Count, 1);
+			Assert.AreEqual(r.CurrentPage, 1);
+			Assert.AreEqual(r.ItemsPerPage, 5);
+			Assert.AreEqual(r.TotalItems, 1);
+			Assert.AreEqual(r.TotalPages, 1);
+		}
+
+		[Test]
 		public void Page_NoOrderBy()
 		{
 			// Unordered paging not supported by Compact Edition
