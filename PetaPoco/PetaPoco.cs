@@ -684,31 +684,39 @@ namespace PetaPoco
 
 		}
 
-		// Fetch a page	
-		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) 
+		// Fetch a page using using SQL provided to calculate count and return requested page data
+		public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
 		{
-			string sqlCount, sqlPage;
-			BuildPageQueries<T>((page-1)*itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
-
 			// Save the one-time command time out and use it for both queries
-			int saveTimeout = OneTimeCommandTimeout;
+			var saveTimeout = OneTimeCommandTimeout;
 
 			// Setup the paged result
-			var result = new Page<T>();
-			result.CurrentPage = page;
-			result.ItemsPerPage = itemsPerPage;
-			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
+			var result = new Page<T>
+			             	{
+			             		CurrentPage = page,
+			             		ItemsPerPage = itemsPerPage,
+			             		TotalItems = ExecuteScalar<long>(sqlCount.SQL, sqlCount.Arguments)
+			             	};
 			result.TotalPages = result.TotalItems / itemsPerPage;
+
 			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
 
 			OneTimeCommandTimeout = saveTimeout;
 
 			// Get the records
-			result.Items = Fetch<T>(sqlPage, args);
+			result.Items = Fetch<T>(sqlPage.SQL, sqlPage.Arguments);
 
 			// Done
 			return result;
+		}
+
+		public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args) 
+		{
+			string sqlCount, sqlPage;
+			BuildPageQueries<T>((page-1)*itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
+
+			return Page<T>(page, itemsPerPage, new Sql(sqlCount, args), new Sql(sqlPage, args));
 		}
 
 		public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) 
