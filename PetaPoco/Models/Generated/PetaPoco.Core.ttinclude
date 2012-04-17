@@ -1266,9 +1266,6 @@ and ucc.position = 1";
 			case "int":
 				sysType= "int";
 				break;
-			case "uniqueidentifier":
-				sysType=  "Guid";
-				 break;
 			case "smalldatetime":
 			case "datetime":
 			case "date":
@@ -1307,7 +1304,12 @@ and ucc.position = 1";
 
 
 
-	const string TABLE_SQL=@"select TABLE_NAME from USER_TABLES";
+	const string TABLE_SQL=@"select TABLE_NAME, 'Table' TABLE_TYPE, USER TABLE_SCHEMA
+from USER_TABLES
+union all
+select VIEW_NAME, 'View', USER
+from USER_VIEWS
+";
 
 	const string COLUMN_SQL=@"select table_name TableName, 
  column_name ColumnName, 
@@ -1315,7 +1317,7 @@ and ucc.position = 1";
  data_scale DataScale,
  nullable IsNullable
  from USER_TAB_COLS utc 
- where table_name = upper(:tableName)
+ where table_name = :tableName
  order by column_id";
 	  
 }
