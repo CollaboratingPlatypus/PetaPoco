@@ -202,11 +202,20 @@ namespace PetaPoco
 				_factory = DbProviderFactories.GetFactory(_providerName);
 
 			string dbtype = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
+
+			// Try using type name first (more reliable)
 			if (dbtype.StartsWith("MySql")) _dbType = DBType.MySql;
 			else if (dbtype.StartsWith("SqlCe")) _dbType = DBType.SqlServerCE;
 			else if (dbtype.StartsWith("Npgsql")) _dbType = DBType.PostgreSQL;
 			else if (dbtype.StartsWith("Oracle")) _dbType = DBType.Oracle;
-            else if (dbtype.StartsWith("SQLite")) _dbType = DBType.SQLite;
+			else if (dbtype.StartsWith("SQLite")) _dbType = DBType.SQLite;
+			else if (dbtype.StartsWith("System.Data.SqlClient.")) _dbType = DBType.SqlServer;
+			// else try with provider name
+			else if (_providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.MySql;
+			else if (_providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.SqlServerCE;
+			else if (_providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.PostgreSQL;
+			else if (_providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.Oracle;
+			else if (_providerName.IndexOf("SQLite", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.SQLite;
 
 			if (_dbType == DBType.MySql && _connectionString != null && _connectionString.IndexOf("Allow User Variables=true") >= 0)
 				_paramPrefix = "?";
