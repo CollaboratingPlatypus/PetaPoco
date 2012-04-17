@@ -616,7 +616,7 @@ namespace PetaPoco
 		}
 
 		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[][\w().])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[][\w().])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
@@ -1224,10 +1224,17 @@ namespace PetaPoco
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
 
-						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
+						string outputClause = String.Empty;
+						if (autoIncrement && DBType.SqlServer == _dbType)
+						{
+							outputClause = String.Format("OUTPUT INSERTED.[{0}]", primaryKeyName);
+						}
+
+						cmd.CommandText = String.Format("INSERT INTO {0} ({1}) {2} VALUES ({3})",
 								EscapeTableName(tableName),
-								string.Join(",", names.ToArray()),
-								string.Join(",", values.ToArray())
+								String.Join(",", names.ToArray()),
+								outputClause,
+								String.Join(",", values.ToArray())
 								);
 
 						if (!autoIncrement)
@@ -1237,7 +1244,6 @@ namespace PetaPoco
 							OnExecutedCommand(cmd);
 							return true;
 						}
-
 
 						object id;
 						switch (_dbType)
@@ -1249,7 +1255,6 @@ namespace PetaPoco
 								id = ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
 								break;
 							case DBType.SqlServer:
-								cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
 								DoPreExecute(cmd);
 								id = cmd.ExecuteScalar();
 								OnExecutedCommand(cmd);
@@ -1563,13 +1568,15 @@ namespace PetaPoco
 			{
 				// Common primary key types
 				if (type == typeof(long))
-					return (long)pk == 0;
+					return (long)pk == default(long);
 				else if (type == typeof(ulong))
-					return (ulong)pk == 0;
+					return (ulong)pk == default(ulong);
 				else if (type == typeof(int))
-					return (int)pk == 0;
+					return (int)pk == default(int);
 				else if (type == typeof(uint))
-					return (uint)pk == 0;
+					return (uint)pk == default(uint);
+				else if (type == typeof(Guid))
+					return (Guid)pk == default(Guid);
 
 				// Create a default instance and compare
 				return pk == Activator.CreateInstance(pk.GetType());
