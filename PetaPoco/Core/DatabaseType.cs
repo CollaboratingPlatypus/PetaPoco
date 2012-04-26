@@ -29,6 +29,11 @@ namespace PetaPoco
 			return sql;
 		}
 
+		public virtual string GetExistsSql()
+		{
+			return "SELECT COUNT(*) FROM {0} WHERE {1}";
+		}
+
 		public virtual string EscapeTableName(string str)
 		{
 			// Assume table names with "dot" are already escaped

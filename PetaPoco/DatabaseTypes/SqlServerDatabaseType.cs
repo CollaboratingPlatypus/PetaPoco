@@ -30,7 +30,10 @@ namespace PetaPoco
 			return db.ExecuteScalarHelper(cmd);
 		}
 
-
+		public override string GetExistsSql()
+		{
+			return "IF EXISTS (SELECT 1 FROM {0} WHERE {1}) SELECT 1 ELSE SELECT 0";
+		}
 	}
 
 }

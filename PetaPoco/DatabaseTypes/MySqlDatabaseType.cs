@@ -20,5 +20,10 @@ namespace PetaPoco
 		{
 			return string.Format("`{0}`", str);
 		}
+
+		public override string  GetExistsSql()
+		{
+ 			return "SELECT EXISTS (SELECT 1 FROM {0} WHERE {1})";
+		}
 	}
 }

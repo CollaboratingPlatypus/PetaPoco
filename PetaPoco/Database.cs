@@ -151,7 +151,7 @@ namespace PetaPoco
 
 		#region Transaction Management
 		// Helper to create a transaction scope
-		public Transaction GetTransaction()
+		public ITransaction GetTransaction()
 		{
 			return new Transaction(this);
 		}
@@ -553,11 +553,21 @@ namespace PetaPoco
 
 		#endregion
 
-		#region operation: linq style (Exists, Single, SingleOrDefault etc...)
-		public bool Exists<T>(object primaryKey) 
+		#region operation: Exists
+		public bool Exists<T>(string sql, params object[] args)
 		{
-			return FirstOrDefault<T>(string.Format("WHERE {0}=@0", _dbType.EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey) != null;
+			var poco = PocoData.ForType(typeof(T)).TableInfo;
+
+			return ExecuteScalar<int>(string.Format(_dbType.GetExistsSql(), poco.TableName, sql), args) != 0;
 		}
+
+		public bool Exists<T>(object primaryKey)
+		{
+			return Exists<T>(string.Format("{0}=@0", _dbType.EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
+		}
+		#endregion
+
+		#region operation: linq style (Exists, Single, SingleOrDefault etc...)
 		public T Single<T>(object primaryKey) 
 		{
 			return Single<T>(string.Format("WHERE {0}=@0", _dbType.EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);

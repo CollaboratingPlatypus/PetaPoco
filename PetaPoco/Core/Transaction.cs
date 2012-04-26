@@ -5,10 +5,15 @@ using System;
 
 namespace PetaPoco
 {
+	public interface ITransaction : IDisposable
+	{
+		void Complete();
+	}
+
 	/// <summary>
 	/// Transaction object helps maintain transaction depth counts
 	/// </summary>
-	public class Transaction : IDisposable
+	public class Transaction : ITransaction
 	{
 		public Transaction(Database db)
 		{
@@ -16,7 +21,7 @@ namespace PetaPoco
 			_db.BeginTransaction();
 		}
 
-		public virtual void Complete()
+		public void Complete()
 		{
 			_db.CompleteTransaction();
 			_db = null;
