@@ -14,15 +14,15 @@ namespace PetaPoco.Tests
 		[Test]
 		public void EscapeColumnName()
 		{
-			Assert.AreEqual(db.EscapeSqlIdentifier("column.name"), "[column.name]");
-			Assert.AreEqual(db.EscapeSqlIdentifier("column name"), "[column name]");
+			Assert.AreEqual(db._dbType.EscapeSqlIdentifier("column.name"), "[column.name]");
+			Assert.AreEqual(db._dbType.EscapeSqlIdentifier("column name"), "[column name]");
 		}
 
 		[Test]
 		public void EscapeTableName()
 		{
-			Assert.AreEqual(db.EscapeTableName("column.name"), "column.name");
-			Assert.AreEqual(db.EscapeTableName("column name"), "[column name]");
+			Assert.AreEqual(db._dbType.EscapeTableName("column.name"), "column.name");
+			Assert.AreEqual(db._dbType.EscapeTableName("column name"), "[column name]");
 		}
 	}
 }
