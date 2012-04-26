@@ -17,7 +17,7 @@ namespace PetaPoco
 			{
 				var pd = PocoData.ForType(typeof(T));
 				var tableName = DatabaseType.EscapeTableName(pd.TableInfo.TableName);
-				string cols = string.Join(", ", (from c in pd.QueryColumns select tableName + "." + DatabaseType.EscapeSqlIdentifier(c)).ToArray());
+				string cols = pd.Columns.Count != 0 ? string.Join(", ", (from c in pd.QueryColumns select tableName + "." + DatabaseType.EscapeSqlIdentifier(c)).ToArray()) : "NULL";
 				if (!rxFrom.IsMatch(sql))
 					sql = string.Format("SELECT {0} FROM {1} {2}", cols, tableName, sql);
 				else
