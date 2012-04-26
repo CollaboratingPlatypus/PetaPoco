@@ -116,7 +116,12 @@ namespace PetaPoco
 			{
 				_sharedConnection = _factory.CreateConnection();
 				_sharedConnection.ConnectionString = _connectionString;
-				_sharedConnection.Open();
+
+				if (_sharedConnection.State == ConnectionState.Broken)
+					_sharedConnection.Close();
+
+				if (_sharedConnection.State == ConnectionState.Closed)
+					_sharedConnection.Open();
 
 				_sharedConnection = OnConnectionOpened(_sharedConnection);
 
