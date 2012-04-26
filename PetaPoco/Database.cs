@@ -388,7 +388,13 @@ namespace PetaPoco
 					{
 						object val = cmd.ExecuteScalar();
 						OnExecutedCommand(cmd);
-						return (T)Convert.ChangeType(val, typeof(T));
+
+						// Handle nullable types
+						Type u = Nullable.GetUnderlyingType(typeof(T));
+						if (u != null && val == null) 
+							return default(T);
+
+						return (T)Convert.ChangeType(val, u);
 					}
 				}
 				finally
