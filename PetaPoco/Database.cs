@@ -398,7 +398,7 @@ namespace PetaPoco
 						if (u != null && val == null) 
 							return default(T);
 
-						return (T)Convert.ChangeType(val, u);
+						return (T)Convert.ChangeType(val, u==null ? typeof(T) : u);
 					}
 				}
 				finally
