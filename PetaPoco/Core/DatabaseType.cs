@@ -13,9 +13,16 @@ namespace PetaPoco
 			return "@";
 		}
 
-		public virtual bool MapBoolToInteger()
+		public virtual object MapParameterValue(object value)
 		{
-			return true;
+			// Cast bools to integer
+			if (value.GetType() == typeof(bool))
+			{
+				return ((bool)value) ? 1 : 0;
+			}
+	
+			// Leave it
+			return value;
 		}
 
 		public virtual void PreExecute(IDbCommand cmd)

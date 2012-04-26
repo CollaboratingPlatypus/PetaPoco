@@ -8,9 +8,13 @@ namespace PetaPoco
 {
 	class PostgreSQLDatabaseType : DatabaseType
 	{
-		public override bool MapBoolToInteger()
+		public override object MapParameterValue(object value)
 		{
-			return false;
+			// Don't map bools to ints in PostgreSQL
+			if (value.GetType() == typeof(bool))
+				return value;
+
+			return base.MapParameterValue(value);
 		}
 
 		public override string EscapeSqlIdentifier(string str)

@@ -245,6 +245,8 @@ namespace PetaPoco
 			}
 			else
 			{
+				value = _dbType.MapParameterValue(value);
+							   
 				var t = value.GetType();
 				if (t.IsEnum)		// PostgreSQL .NET driver wont cast enum to int
 				{
@@ -267,10 +269,6 @@ namespace PetaPoco
 					p.Size = Math.Max((value as AnsiString).Value.Length + 1, 4000);
 					p.Value = (value as AnsiString).Value;
 					p.DbType = DbType.AnsiString;
-				}
-				else if (t == typeof(bool) && _dbType.MapBoolToInteger())
-				{
-					p.Value = ((bool)value) ? 1 : 0;
 				}
 				else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
 				{
