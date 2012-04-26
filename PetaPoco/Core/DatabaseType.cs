@@ -41,10 +41,10 @@ namespace PetaPoco
 			return "SELECT COUNT(*) FROM {0} WHERE {1}";
 		}
 
-		public virtual string EscapeTableName(string str)
+		public virtual string EscapeTableName(string tableName)
 		{
 			// Assume table names with "dot" are already escaped
-			return str.IndexOf('.') >= 0 ? str : EscapeSqlIdentifier(str);
+			return tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
 		}
 
 		public virtual string EscapeSqlIdentifier(string str)
@@ -76,7 +76,7 @@ namespace PetaPoco
 				return Singleton<MySqlDatabaseType>.Instance;
 			if (TypeName.StartsWith("SqlCe")) 
 				return Singleton<SqlServerCEDatabaseType>.Instance;
-			if (TypeName.StartsWith("Npgsql")) 
+			if (TypeName.StartsWith("Npgsql") || TypeName.StartsWith("PgSql")) 
 				return Singleton<PostgreSQLDatabaseType>.Instance;
 			if (TypeName.StartsWith("Oracle")) 
 				return Singleton<OracleDatabaseType>.Instance;
@@ -90,7 +90,7 @@ namespace PetaPoco
 				return Singleton<MySqlDatabaseType>.Instance;
 			if (ProviderName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0) 
 				return Singleton<SqlServerCEDatabaseType>.Instance;
-			if (ProviderName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0) 
+			if (ProviderName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0) 
 				return Singleton<PostgreSQLDatabaseType>.Instance;
 			if (ProviderName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0) 
 				return Singleton<OracleDatabaseType>.Instance;
