@@ -55,7 +55,7 @@ namespace PetaPoco
 				if (_mappers.TryGetValue(t.Assembly, out val))
 					return val;
 
-				return null;
+				return Singleton<StandardMapper>.Instance;
 			}
 			finally
 			{

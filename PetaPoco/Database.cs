@@ -218,12 +218,9 @@ namespace PetaPoco
 			if (pi != null)
 			{
 				var mapper = Mappers.GetMapper(pi.DeclaringType);
-				if (mapper != null)
-				{
-					var fn = mapper.GetToDbConverter(pi);
-					if (fn != null)
-						value = fn(value);
-				}
+				var fn = mapper.GetToDbConverter(pi);
+				if (fn != null)
+					value = fn(value);
 			}
 
 			// Support passed in parameters

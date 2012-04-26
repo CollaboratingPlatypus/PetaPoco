@@ -57,19 +57,15 @@ namespace PetaPoco
 
 			// Get the mapper for this type
 			var mapper = Mappers.GetMapper(t);
-			if (mapper == null)
-			{
-				// Oops
-			}
 
 			// Get the table info
-			TableInfo = mapper == null ? TableInfo.FromPoco(t) : mapper.GetTableInfo(t);
+			TableInfo = mapper.GetTableInfo(t);
 
 			// Work out bound properties
 			Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
 			foreach (var pi in t.GetProperties())
 			{
-				ColumnInfo ci = mapper == null ? ColumnInfo.FromProperty(pi) : mapper.GetColumnInfo(pi);
+				ColumnInfo ci = mapper.GetColumnInfo(pi);
 				if (ci == null)
 					continue;
 
@@ -124,9 +120,7 @@ namespace PetaPoco
 						il.Emit(OpCodes.Ldstr, r.GetName(i));		// obj, obj, fieldname
 
 						// Get the converter
-						Func<object, object> converter = null;
-						if (mapper != null)
-							converter = mapper.GetFromDbConverter((PropertyInfo)null, srcType);
+						Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo)null, srcType);
 
 						/*
 						if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
@@ -312,7 +306,7 @@ namespace PetaPoco
 			Func<object, object> converter = null;
 
 			// Get converter from the mapper
-			if (mapper != null && pc != null)
+			if (pc != null)
 			{
 				converter = mapper.GetFromDbConverter(pc.PropertyInfo, srcType);
 				if (converter != null)
