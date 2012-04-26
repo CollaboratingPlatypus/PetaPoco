@@ -260,6 +260,10 @@ namespace PetaPoco
 				}
 				else if (t == typeof(string))
 				{
+					// out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
+					if ((value as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
+						p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null); 
+			   
 					p.Size = Math.Max((value as string).Length + 1, 4000);		// Help query plan caching by using common size
 					p.Value = value;
 				}
