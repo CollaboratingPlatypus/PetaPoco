@@ -12,7 +12,7 @@ namespace PetaPoco
 	{
 		public override string BuildPageQuery(long skip, long take, PagingHelper.SQLParts parts, ref object[] args)
 		{
-			parts.sqlSelectRemoved = PagingHelper.rxOrderBy.Replace(parts.sqlSelectRemoved, "");
+			parts.sqlSelectRemoved = PagingHelper.rxOrderBy.Replace(parts.sqlSelectRemoved, "", 1);
 			if (PagingHelper.rxDistinct.IsMatch(parts.sqlSelectRemoved))
 			{
 				parts.sqlSelectRemoved = "peta_inner.* FROM (SELECT " + parts.sqlSelectRemoved + ") peta_inner";
