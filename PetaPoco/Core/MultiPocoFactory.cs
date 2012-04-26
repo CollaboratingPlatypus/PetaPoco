@@ -21,13 +21,7 @@ namespace PetaPoco
 		public static object GetAutoMapper(Type[] types)
 		{
 			// Build a key
-			var kb = new StringBuilder();
-			foreach (var t in types)
-			{
-				kb.Append(t.ToString());
-				kb.Append(":");
-			}
-			var key = kb.ToString();
+			var key = new ArrayKey<Type>(types);
 
 			return AutoMappers.Get(key, () =>
 				{
@@ -133,8 +127,8 @@ namespace PetaPoco
 		}
 
 		// Various cached stuff
-		static Cache<string, object> MultiPocoFactories = new Cache<string, object>();
-		static Cache<string, object> AutoMappers = new Cache<string, object>();
+		static Cache<Tuple<Type, ArrayKey<Type>, string, string>, object> MultiPocoFactories = new Cache<Tuple<Type, ArrayKey<Type>, string, string>, object>();
+		static Cache<ArrayKey<Type>, object> AutoMappers = new Cache<ArrayKey<Type>, object>();
 
 		internal static void FlushCaches()
 		{
@@ -145,18 +139,7 @@ namespace PetaPoco
 		// Get (or create) the multi-poco factory for a query
 		public static Func<IDataReader, object, TRet> GetFactory<TRet>(Type[] types, string ConnectionString, string sql, IDataReader r)
 		{
-			// Build a key string  (this is crap, should address this at some point)
-			var kb = new StringBuilder();
-			kb.Append(typeof(TRet).ToString());
-			kb.Append(":");
-			foreach (var t in types)
-			{
-				kb.Append(":");
-				kb.Append(t.ToString());
-			}
-			kb.Append(":"); kb.Append(ConnectionString);
-			kb.Append(":"); kb.Append(sql);
-			string key = kb.ToString();
+			var key = Tuple.Create<Type, ArrayKey<Type>, string, string>(typeof(TRet), new ArrayKey<Type>(types), ConnectionString, sql);
 
 			return (Func<IDataReader, object, TRet>)MultiPocoFactories.Get(key, () =>
 				{

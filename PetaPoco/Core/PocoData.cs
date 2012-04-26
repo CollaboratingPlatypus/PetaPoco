@@ -94,7 +94,7 @@ namespace PetaPoco
 		public Delegate GetFactory(string sql, string connString, int firstColumn, int countColumns, IDataReader r)
 		{
 			// Check cache
-			var key = string.Format("{0}:{1}:{2}:{3}", sql, connString, firstColumn, countColumns);
+			var key = Tuple.Create<string, string, int, int>(sql, connString, firstColumn, countColumns);
 
 			return PocoFactories.Get(key, () =>
 				{
@@ -365,7 +365,7 @@ namespace PetaPoco
 		public string[] QueryColumns { get; private set; }
 		public TableInfo TableInfo { get; private set; }
 		public Dictionary<string, PocoColumn> Columns { get; private set; }
-		Cache<string, Delegate> PocoFactories = new Cache<string, Delegate>();
+		Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
 	}
 
 }
