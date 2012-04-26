@@ -480,6 +480,7 @@ namespace PetaPoco
 		{
 			return Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 		}
+
 		#endregion
 
 		#region operation: Fetch (page)
