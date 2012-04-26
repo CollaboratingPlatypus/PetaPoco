@@ -329,7 +329,14 @@ namespace PetaPoco
 			}
 			else if (!dstType.IsAssignableFrom(srcType))
 			{
-				return delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+				if (dstType.IsEnum && srcType == typeof(string))
+				{
+					return delegate(object src) { return EnumMapper.EnumFromString(dstType, (string)src); };
+				}
+				else
+				{
+					return delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+				}
 			}
 
 			return null;
