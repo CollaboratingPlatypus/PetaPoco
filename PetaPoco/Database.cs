@@ -677,9 +677,17 @@ namespace PetaPoco
 							AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
 						}
 
-						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
+						string outputClause = String.Empty;
+						if (autoIncrement)
+						{
+							outputClause = _dbType.GetInsertOutputClause(primaryKeyName);
+						}
+
+
+						cmd.CommandText = string.Format("INSERT INTO {0} ({1}){2} VALUES ({3})",
 								_dbType.EscapeTableName(tableName),
 								string.Join(",", names.ToArray()),
+								outputClause,
 								string.Join(",", values.ToArray())
 								);
 

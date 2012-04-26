@@ -26,13 +26,17 @@ namespace PetaPoco
 
 		public override object ExecuteInsert(Database db, System.Data.IDbCommand cmd, string PrimaryKeyName)
 		{
-			cmd.CommandText += ";\nSELECT SCOPE_IDENTITY() AS NewID;";
 			return db.ExecuteScalarHelper(cmd);
 		}
 
 		public override string GetExistsSql()
 		{
 			return "IF EXISTS (SELECT 1 FROM {0} WHERE {1}) SELECT 1 ELSE SELECT 0";
+		}
+
+		public override string GetInsertOutputClause(string primaryKeyName)
+		{
+			return String.Format(" OUTPUT INSERTED.[{0}]", primaryKeyName);
 		}
 	}
 

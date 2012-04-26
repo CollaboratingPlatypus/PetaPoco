@@ -50,6 +50,11 @@ namespace PetaPoco
 			return null;
 		}
 
+		public virtual string GetInsertOutputClause(string primaryKeyName)
+		{
+			return string.Empty;
+		}
+
 		public virtual object ExecuteInsert(Database db, IDbCommand cmd, string PrimaryKeyName)
 		{
 			cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
