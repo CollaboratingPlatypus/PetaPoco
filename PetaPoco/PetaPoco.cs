@@ -591,7 +591,7 @@ namespace PetaPoco
 			{
 				var pd = PocoData.ForType(typeof(T));
 				var tableName = EscapeTableName(pd.TableInfo.TableName);
-				string cols = string.Join(", ", (from c in pd.QueryColumns select tableName + "." + EscapeSqlIdentifier(c)).ToArray());
+				string cols = pd.QueryColumns.Length != 0 ? string.Join(", ", (from c in pd.QueryColumns select tableName + "." + EscapeSqlIdentifier(c)).ToArray()) : "null";
 				if (!rxFrom.IsMatch(sql))
 					sql = string.Format("SELECT {0} FROM {1} {2}", cols, tableName, sql);
 				else
@@ -2092,7 +2092,7 @@ namespace PetaPoco
 				}
 
 				// Forced type conversion including integral types -> enum
-				if (converter == null)
+			(string.Format(	if (converter == null)
 				{
 					if (dstType.IsEnum && IsIntegralType(srcType))
 					{
