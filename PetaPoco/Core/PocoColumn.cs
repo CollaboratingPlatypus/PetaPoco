@@ -4,7 +4,7 @@
 using System;
 using System.Reflection;
 
-namespace PetaPoco
+namespace PetaPoco.Internal
 {
 	internal class PocoColumn
 	{

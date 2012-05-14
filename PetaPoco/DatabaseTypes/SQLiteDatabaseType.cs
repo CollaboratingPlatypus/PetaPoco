@@ -2,9 +2,10 @@
 // Copyright © 2011-2012 Topten Software.  All Rights Reserved.
 
 using System;
+using PetaPoco.Internal;
 
 
-namespace PetaPoco
+namespace PetaPoco.DatabaseTypes
 {
 	class SQLiteDatabaseType : DatabaseType
 	{

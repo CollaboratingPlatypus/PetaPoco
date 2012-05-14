@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PetaPoco
+namespace PetaPoco.Internal
 {
 	internal class ExpandoColumn : PocoColumn
 	{

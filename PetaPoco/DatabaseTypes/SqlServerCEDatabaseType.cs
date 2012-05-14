@@ -3,9 +3,9 @@
 
 using System;
 using System.Linq;
+using PetaPoco.Internal;
 
-
-namespace PetaPoco
+namespace PetaPoco.DatabaseTypes
 {
 	class SqlServerCEDatabaseType : DatabaseType
 	{

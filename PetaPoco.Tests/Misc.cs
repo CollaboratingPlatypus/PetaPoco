@@ -41,13 +41,13 @@ namespace PetaPoco.Tests
 		[Test]
 		public void EnumMapper()
 		{
-			Assert.AreEqual(Fruits.Apples, PetaPoco.EnumMapper.EnumFromString(typeof(Fruits), "Apples"));
-			Assert.AreEqual(Fruits.Pears, PetaPoco.EnumMapper.EnumFromString(typeof(Fruits), "pears"));
-			Assert.AreEqual(Fruits.Bananas, PetaPoco.EnumMapper.EnumFromString(typeof(Fruits), "BANANAS"));
+			Assert.AreEqual(Fruits.Apples, PetaPoco.Internal.EnumMapper.EnumFromString(typeof(Fruits), "Apples"));
+			Assert.AreEqual(Fruits.Pears, PetaPoco.Internal.EnumMapper.EnumFromString(typeof(Fruits), "pears"));
+			Assert.AreEqual(Fruits.Bananas, PetaPoco.Internal.EnumMapper.EnumFromString(typeof(Fruits), "BANANAS"));
 
-			Assert.AreEqual(Fruits2.Oranges, PetaPoco.EnumMapper.EnumFromString(typeof(Fruits2), "Oranges"));
+			Assert.AreEqual(Fruits2.Oranges, PetaPoco.Internal.EnumMapper.EnumFromString(typeof(Fruits2), "Oranges"));
 
-			Assert.Throws(typeof(Exception), ()=>PetaPoco.EnumMapper.EnumFromString(typeof(Fruits2), "Apples"));
+			Assert.Throws(typeof(Exception), () => PetaPoco.Internal.EnumMapper.EnumFromString(typeof(Fruits2), "Apples"));
 		}
 	}
 }

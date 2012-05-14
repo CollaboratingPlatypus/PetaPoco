@@ -72,9 +72,9 @@
     <Compile Include="DatabaseTypes\SqlServerDatabaseType.cs" />
     <Compile Include="DatabaseTypes\SqlServerCEDatabaseType.cs" />
     <Compile Include="DatabaseTypes\MySqlDatabaseType.cs" />
-    <Compile Include="Helpers\AutoSelectHelper.cs" />
-    <Compile Include="Helpers\PagingHelper.cs" />
-    <Compile Include="Helpers\ParametersHelper.cs" />
+    <Compile Include="Utilities\AutoSelectHelper.cs" />
+    <Compile Include="Utilities\PagingHelper.cs" />
+    <Compile Include="Utilities\ParametersHelper.cs" />
     <Compile Include="Core\ExpandoColumn.cs" />
     <Compile Include="Core\PocoColumn.cs" />
     <Compile Include="Core\PocoData.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="Attributes\ExplicitColumnsAttribute.cs" />
     <Compile Include="OracleProvider.cs" />
     <Compile Include="Database.cs" />
+    <None Include="PetaPoco.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ArrayKey.cs" />
     <Compile Include="Utilities\Cache.cs" />
@@ -111,9 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="TextFile1.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

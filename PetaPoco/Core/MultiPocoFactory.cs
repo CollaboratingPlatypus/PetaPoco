@@ -9,7 +9,7 @@ using System.Reflection.Emit;
 using System.Linq.Expressions;
 using System.Data;
 
-namespace PetaPoco
+namespace PetaPoco.Internal
 {
 	class MultiPocoFactory
 	{

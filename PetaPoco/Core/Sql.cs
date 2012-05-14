@@ -5,6 +5,7 @@ using System;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using PetaPoco.Internal;
 
 namespace PetaPoco
 {

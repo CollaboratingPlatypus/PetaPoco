@@ -3,9 +3,10 @@
 
 using System;
 using System.Data;
+using PetaPoco.Internal;
 
 
-namespace PetaPoco
+namespace PetaPoco.DatabaseTypes
 {
 	class OracleDatabaseType : DatabaseType
 	{

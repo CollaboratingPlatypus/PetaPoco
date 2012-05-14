@@ -4,9 +4,9 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using PetaPoco.Internal;
 
-
-namespace PetaPoco
+namespace PetaPoco.DatabaseTypes
 {
 	class SqlServerDatabaseType : DatabaseType
 	{

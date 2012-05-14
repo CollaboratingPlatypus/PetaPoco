@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
+using PetaPoco.DatabaseTypes;
+using PetaPoco.Internal;
 
-namespace PetaPoco
+namespace PetaPoco.Internal
 {
 	abstract class DatabaseType
 	{

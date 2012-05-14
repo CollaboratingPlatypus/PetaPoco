@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Threading;
+using PetaPoco.Internal;
 
 namespace PetaPoco
 {

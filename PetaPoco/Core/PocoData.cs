@@ -8,8 +8,9 @@ using System.Data;
 using System.Reflection.Emit;
 using System.Linq;
 using System.Linq.Expressions;
+using PetaPoco.Internal;
 
-namespace PetaPoco
+namespace PetaPoco.Internal
 {
 	class PocoData
 	{
