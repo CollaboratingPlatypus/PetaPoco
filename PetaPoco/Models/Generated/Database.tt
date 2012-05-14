@@ -1,7 +1,9 @@
 <#@ include file="PetaPoco.Core.ttinclude" #>
 <#
 	// Settings
-    ConnectionStringName = "";			// Uses last connection string in config if not specified
+	ConnectionString = "";
+    ConnectionStringName = "";
+    ProviderName = "System.Data.SqlClient";
     Namespace = "";
     RepoName = "";
     GenerateOperations = true;

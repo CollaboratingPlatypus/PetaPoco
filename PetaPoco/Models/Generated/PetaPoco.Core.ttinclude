@@ -1,5 +1,4 @@
 <#@ template language="C#v3.5" hostspecific="True" #>
-<#@ assembly name="EnvDTE" #>
 <#@ assembly name="System.Core.dll" #>
 <#@ assembly name="System.Data" #>
 <#@ assembly name="System.Xml" #>
@@ -78,8 +77,11 @@
  implied. See the License for the specific language governing
  rights and limitations under the License.
 */
+a
+string ConnectionString="";
+string ConnectionStringName="";
+string ProviderName="";
 
-string ConnectionStringName = "";
 string Namespace = "";
 string RepoName = "";
 string ClassPrefix = "";
@@ -182,137 +184,6 @@ string CheckNullable(Column col)
     return result;
 }
 
-string GetConnectionString(ref string connectionStringName, out string providerName)
-{
-    var _CurrentProject = GetCurrentProject();
-
-	providerName=null;
-    
-    string result="";
-    ExeConfigurationFileMap configFile = new ExeConfigurationFileMap();
-    configFile.ExeConfigFilename = GetConfigPath();
-
-    if (string.IsNullOrEmpty(configFile.ExeConfigFilename))
-        throw new ArgumentNullException("The project does not contain App.config or Web.config file.");
-    
-    
-    var config = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(configFile, ConfigurationUserLevel.None);
-    var connSection=config.ConnectionStrings;
-
-    //if the connectionString is empty - which is the defauls
-    //look for count-1 - this is the last connection string
-    //and takes into account AppServices and LocalSqlServer
-    if(string.IsNullOrEmpty(connectionStringName))
-    {
-        if(connSection.ConnectionStrings.Count>1)
-        {
-			connectionStringName = connSection.ConnectionStrings[connSection.ConnectionStrings.Count-1].Name;
-            result=connSection.ConnectionStrings[connSection.ConnectionStrings.Count-1].ConnectionString;
-            providerName=connSection.ConnectionStrings[connSection.ConnectionStrings.Count-1].ProviderName;
-        }            
-    }
-    else
-    {
-        try
-        {
-            result=connSection.ConnectionStrings[connectionStringName].ConnectionString;
-            providerName=connSection.ConnectionStrings[connectionStringName].ProviderName;
-        }
-        catch
-        {
-            result="There is no connection string name called '"+connectionStringName+"'";
-        }
-    }
-
-//	if (String.IsNullOrEmpty(providerName))
-//		providerName="System.Data.SqlClient";
-    
-    return result;
-}
-
-string _connectionString="";
-string _providerName="";
-
-void InitConnectionString()
-{
-    if(String.IsNullOrEmpty(_connectionString))
-    {
-        _connectionString=GetConnectionString(ref ConnectionStringName, out _providerName);
-
-		if(_connectionString.Contains("|DataDirectory|"))
-		{
-			//have to replace it
-			string dataFilePath=GetDataDirectory();
-			_connectionString=_connectionString.Replace("|DataDirectory|",dataFilePath);
-		}    
-	}
-}
-
-public string ConnectionString
-{
-    get 
-    {
-		InitConnectionString();
-        return _connectionString;
-    }
-}
-
-public string ProviderName
-{
-    get 
-    {
-		InitConnectionString();
-        return _providerName;
-    }
-}
-
-public EnvDTE.Project GetCurrentProject()  {
-
-    IServiceProvider _ServiceProvider = (IServiceProvider)Host;
-    if (_ServiceProvider == null)
-        throw new Exception("Host property returned unexpected value (null)");
-	
-    EnvDTE.DTE dte = (EnvDTE.DTE)_ServiceProvider.GetService(typeof(EnvDTE.DTE));
-    if (dte == null)
-        throw new Exception("Unable to retrieve EnvDTE.DTE");
-	
-    Array activeSolutionProjects = (Array)dte.ActiveSolutionProjects;
-    if (activeSolutionProjects == null)
-        throw new Exception("DTE.ActiveSolutionProjects returned null");
-	
-    EnvDTE.Project dteProject = (EnvDTE.Project)activeSolutionProjects.GetValue(0);
-    if (dteProject == null)
-        throw new Exception("DTE.ActiveSolutionProjects[0] returned null");
-	
-    return dteProject;
-
-}
-
-private string GetProjectPath()
-{
-    EnvDTE.Project project = GetCurrentProject();
-    System.IO.FileInfo info = new System.IO.FileInfo(project.FullName);
-    return info.Directory.FullName;
-}
-
-private string GetConfigPath()
-{
-    EnvDTE.Project project = GetCurrentProject();
-    foreach (EnvDTE.ProjectItem item in project.ProjectItems)
-    {
-        // if it is the app.config file, then open it up
-        if (item.Name.Equals("App.config",StringComparison.InvariantCultureIgnoreCase) || item.Name.Equals("Web.config",StringComparison.InvariantCultureIgnoreCase))
-			return GetProjectPath() + "\\" + item.Name;
-    }
-    return String.Empty;
-}
-
-public string GetDataDirectory()
-{
-    EnvDTE.Project project=GetCurrentProject();
-    return System.IO.Path.GetDirectoryName(project.FileName)+"\\App_Data\\";
-}
-
 static string zap_password(string connectionString)
 {
 	var rx = new Regex("password=.*;", RegexOptions.Singleline | RegexOptions.Multiline | RegexOptions.IgnoreCase);
@@ -323,14 +194,11 @@ static string zap_password(string connectionString)
 
 Tables LoadTables()
 {
-	InitConnectionString();
-
 	WriteLine("// This file was automatically generated by the PetaPoco T4 Template");
 	WriteLine("// Do not make changes directly to this file - edit the template instead");
 	WriteLine("// ");
 	WriteLine("// The following connection settings were used to generate this file");
 	WriteLine("// ");
-	WriteLine("//     Connection String Name: `{0}`", ConnectionStringName);
 	WriteLine("//     Provider:               `{0}`", ProviderName);
 	WriteLine("//     Connection String:      `{0}`", zap_password(ConnectionString));
 	WriteLine("//     Schema:                 `{0}`", SchemaName);
@@ -390,7 +258,6 @@ Tables LoadTables()
 				reader=new SqlServerSchemaReader();
 			}
 
-			reader.outer=this;
 			result=reader.ReadSchema(conn, _factory);
 
 			// Remove unrequired tables/views
@@ -446,12 +313,6 @@ Tables LoadTables()
 abstract class SchemaReader
 {
 	public abstract Tables ReadSchema(DbConnection connection, DbProviderFactory factory);
-	public GeneratedTextTransformation outer;
-	public void WriteLine(string o)
-	{
-		outer.WriteLine(o);
-	}
-
 }
 
 class SqlServerSchemaReader : SchemaReader
