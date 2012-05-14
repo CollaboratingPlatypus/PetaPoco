@@ -46,6 +46,12 @@ namespace PetaPoco
 			set; 
 		}
 
+
+		/// <summary>
+		/// Creates and populates a TableInfo from the attributes of a POCO
+		/// </summary>
+		/// <param name="t">The POCO type</param>
+		/// <returns>A TableInfo instance</returns>
 		public static TableInfo FromPoco(Type t)
 		{
 			TableInfo ti = new TableInfo();

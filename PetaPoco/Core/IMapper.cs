@@ -6,7 +6,14 @@ using System.Reflection;
 
 namespace PetaPoco
 {
-	// Optionally provide an implementation of this to Database.Mapper
+	/// <summary>
+	/// IMapper provides a way to hook into PetaPoco's Database to POCO mapping mechanism to either
+	/// customize or completely replace it.
+	/// </summary>
+	/// <remarks>
+	/// To use this functionality, instantiate a class that implements IMapper and then pass it to
+	/// PetaPoco through the static method Mappers.Register()
+	/// </remarks>
 	public interface IMapper
 	{
 		/// <summary>
