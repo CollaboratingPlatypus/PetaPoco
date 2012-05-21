@@ -922,13 +922,26 @@ namespace PetaPoco
 
 		#region operation: Exists
 
-		public bool Exists<T>(string sql, params object[] args)
+		/// <summary>
+		/// Checks for the existance of a row matching the specified condition
+		/// </summary>
+		/// <typeparam name="T">The Type representing the table being queried</typeparam>
+		/// <param name="sqlCondition">The SQL expression to be tested for (ie: the WHERE expression)</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+		/// <returns>True if a record matching the condition is found.</returns>
+		public bool Exists<T>(string sqlCondition, params object[] args)
 		{
 			var poco = PocoData.ForType(typeof(T)).TableInfo;
 
-			return ExecuteScalar<int>(string.Format(_dbType.GetExistsSql(), poco.TableName, sql), args) != 0;
+			return ExecuteScalar<int>(string.Format(_dbType.GetExistsSql(), poco.TableName, sqlCondition), args) != 0;
 		}
 
+		/// <summary>
+		/// Checks for the existance of a row with the specified primary key value.
+		/// </summary>
+		/// <typeparam name="T">The Type representing the table being queried</typeparam>
+		/// <param name="primaryKey">The primary key value to look for</param>
+		/// <returns>True if a record with the specified primary key value exists.</returns>
 		public bool Exists<T>(object primaryKey)
 		{
 			return Exists<T>(string.Format("{0}=@0", _dbType.EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
@@ -938,43 +951,128 @@ namespace PetaPoco
 
 		#region operation: linq style (Exists, Single, SingleOrDefault etc...)
 
+		/// <summary>
+		/// Returns the record with the specified primary key value
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="primaryKey">The primary key value of the record to fetch</param>
+		/// <returns>The single record matching the specified primary key value</returns>
+		/// <remarks>
+		/// Throws an exception if there are zero or more than one record with the specified primary key value.
+		/// </remarks>
 		public T Single<T>(object primaryKey) 
 		{
 			return Single<T>(string.Format("WHERE {0}=@0", _dbType.EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
+
+		/// <summary>
+		/// Returns the record with the specified primary key value, or the default value if not found
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="primaryKey">The primary key value of the record to fetch</param>
+		/// <returns>The single record matching the specified primary key value</returns>
+		/// <remarks>
+		/// If there are no records with the specified primary key value, default(T) (typically null) is returned.
+		/// </remarks>
 		public T SingleOrDefault<T>(object primaryKey) 
 		{
 			return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _dbType.EscapeSqlIdentifier(PocoData.ForType(typeof(T)).TableInfo.PrimaryKey)), primaryKey);
 		}
+
+		/// <summary>
+		/// Runs a query that should always return a single row.
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">The SQL query</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+		/// <returns>The single record matching the specified primary key value</returns>
+		/// <remarks>
+		/// Throws an exception if there are zero or more than one matching record
+		/// </remarks>
 		public T Single<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).Single();
 		}
+
+		/// <summary>
+		/// Runs a query that should always return either a single row, or no rows
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">The SQL query</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+		/// <returns>The single record matching the specified primary key value, or default(T) if no matching rows</returns>
 		public T SingleOrDefault<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).SingleOrDefault();
 		}
+
+		/// <summary>
+		/// Runs a query that should always return at least one return
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">The SQL query</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+		/// <returns>The first record in the result set</returns>
 		public T First<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).First();
 		}
+
+		/// <summary>
+		/// Runs a query and returns the first record, or the default value if no matching records
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">The SQL query</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+		/// <returns>The first record in the result set, or default(T) if no matching rows</returns>
 		public T FirstOrDefault<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).FirstOrDefault();
 		}
 
+
+		/// <summary>
+		/// Runs a query that should always return a single row.
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>The single record matching the specified primary key value</returns>
+		/// <remarks>
+		/// Throws an exception if there are zero or more than one matching record
+		/// </remarks>
 		public T Single<T>(Sql sql) 
 		{
 			return Query<T>(sql).Single();
 		}
+
+		/// <summary>
+		/// Runs a query that should always return either a single row, or no rows
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>The single record matching the specified primary key value, or default(T) if no matching rows</returns>
 		public T SingleOrDefault<T>(Sql sql) 
 		{
 			return Query<T>(sql).SingleOrDefault();
 		}
+
+		/// <summary>
+		/// Runs a query that should always return at least one return
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>The first record in the result set</returns>
 		public T First<T>(Sql sql) 
 		{
 			return Query<T>(sql).First();
 		}
+
+		/// <summary>
+		/// Runs a query and returns the first record, or the default value if no matching records
+		/// </summary>
+		/// <typeparam name="T">The Type representing a row in the result set</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>The first record in the result set, or default(T) if no matching rows</returns>
 		public T FirstOrDefault<T>(Sql sql) 
 		{
 			return Query<T>(sql).FirstOrDefault();
@@ -982,14 +1080,32 @@ namespace PetaPoco
 		#endregion
 
 		#region operation: Insert
+
+		/// <summary>
+		/// Performs an SQL Insert
+		/// </summary>
+		/// <param name="tableName">The name of the table to insert into</param>
+		/// <param name="primaryKeyName">The name of the primary key column of the table</param>
+		/// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+		/// <returns>The auto allocated primary key of the new record</returns>
 		public object Insert(string tableName, string primaryKeyName, object poco)
 		{
 			return Insert(tableName, primaryKeyName, true, poco);
 		}
 
-		// Insert a poco into a table.  If the poco has a property with the same name 
-		// as the primary key the id of the new record is assigned to it.  Either way,
-		// the new id is returned.
+
+
+		/// <summary>
+		/// Performs an SQL Insert
+		/// </summary>
+		/// <param name="tableName">The name of the table to insert into</param>
+		/// <param name="primaryKeyName">The name of the primary key column of the table</param>
+		/// <param name="autoIncrement">True if the primary key is automatically allocated by the DB</param>
+		/// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+		/// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+		/// <remarks>Inserts a poco into a table.  If the poco has a property with the same name 
+		/// as the primary key the id of the new record is assigned to it.  Either way,
+		/// the new id is returned.</remarks>
 		public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
 		{
 			try
@@ -1084,7 +1200,13 @@ namespace PetaPoco
 			}
 		}
 
-		// Insert an annotated poco object
+		/// <summary>
+		/// Performs an SQL Insert
+		/// </summary>
+		/// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+		/// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+		/// <remarks>The name of the table, it's primary key and whether it's an auto-allocated primary key are retrieved
+		/// from the POCO's attributes</remarks>
 		public object Insert(object poco)
 		{
 			var pd = PocoData.ForType(poco.GetType());
@@ -1094,13 +1216,29 @@ namespace PetaPoco
 		#endregion
 
 		#region operation: Update
+
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="tableName">The name of the table to update</param>
+		/// <param name="primaryKeyName">The name of the primary key column of the table</param>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+		/// <returns>The number of affected records</returns>
 		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			return Update(tableName, primaryKeyName, poco, primaryKeyValue, null);
 		}
 
-
-		// Update a record with values from a poco.  primary key value can be either supplied or read from the poco
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="tableName">The name of the table to update</param>
+		/// <param name="primaryKeyName">The name of the primary key column of the table</param>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+		/// <param name="columns">The column names of the columns to be updated, or null for all</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
 		{
 			try
@@ -1194,42 +1332,95 @@ namespace PetaPoco
 			}
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="tableName">The name of the table to update</param>
+		/// <param name="primaryKeyName">The name of the primary key column of the table</param>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(string tableName, string primaryKeyName, object poco)
 		{
 			return Update(tableName, primaryKeyName, poco, null);
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="tableName">The name of the table to update</param>
+		/// <param name="primaryKeyName">The name of the primary key column of the table</param>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <param name="columns">The column names of the columns to be updated, or null for all</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
 		{
 			return Update(tableName, primaryKeyName, poco, null, columns);
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <param name="columns">The column names of the columns to be updated, or null for all</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(object poco, IEnumerable<string> columns)
 		{
 			return Update(poco, null, columns);
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(object poco)
 		{
 			return Update(poco, null, null);
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(object poco, object primaryKeyValue)
 		{
 			return Update(poco, primaryKeyValue, null);
 		}
+
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <param name="poco">The POCO object that specifies the column values to be updated</param>
+		/// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+		/// <param name="columns">The column names of the columns to be updated, or null for all</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
 		{
 			var pd = PocoData.ForType(poco.GetType());
 			return Update(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
+		/// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update<T>(string sql, params object[] args)
 		{
 			var pd = PocoData.ForType(typeof(T));
 			return Execute(string.Format("UPDATE {0} {1}", _dbType.EscapeTableName(pd.TableInfo.TableName), sql), args);
 		}
 
+		/// <summary>
+		/// Performs an SQL update
+		/// </summary>
+		/// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
+		/// <param name="sql">An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
+		/// <returns>The number of affected rows</returns>
 		public int Update<T>(Sql sql)
 		{
 			var pd = PocoData.ForType(typeof(T));
@@ -1238,11 +1429,27 @@ namespace PetaPoco
 		#endregion
 
 		#region operation: Delete
+
+		/// <summary>
+		/// Performs and SQL Delete
+		/// </summary>
+		/// <param name="tableName">The name of the table to delete from</param>
+		/// <param name="primaryKeyName">The name of the primary key column</param>
+		/// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
+		/// <returns>The number of rows affected</returns>
 		public int Delete(string tableName, string primaryKeyName, object poco)
 		{
 			return Delete(tableName, primaryKeyName, poco, null);
 		}
 
+		/// <summary>
+		/// Performs and SQL Delete
+		/// </summary>
+		/// <param name="tableName">The name of the table to delete from</param>
+		/// <param name="primaryKeyName">The name of the primary key column</param>
+		/// <param name="poco">The POCO object whose primary key value will be used to delete the row (or null to use the supplied primary key value)</param>
+		/// <param name="primaryKeyValue">The value of the primary key identifing the record to be deleted (or null, or get this value from the POCO instance)</param>
+		/// <returns>The number of rows affected</returns>
 		public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			// If primary key value not specified, pick it up from the object
@@ -1261,12 +1468,23 @@ namespace PetaPoco
 			return Execute(sql, primaryKeyValue);
 		}
 
+		/// <summary>
+		/// Performs an SQL Delete
+		/// </summary>
+		/// <param name="poco">The POCO object specifying the table name and primary key value of the row to be deleted</param>
+		/// <returns>The number of rows affected</returns>
 		public int Delete(object poco)
 		{
 			var pd = PocoData.ForType(poco.GetType());
 			return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
 		}
 
+		/// <summary>
+		/// Performs an SQL Delete
+		/// </summary>
+		/// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
+		/// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
+		/// <returns></returns>
 		public int Delete<T>(object pocoOrPrimaryKey)
 		{
 			if (pocoOrPrimaryKey.GetType() == typeof(T))
@@ -1275,12 +1493,25 @@ namespace PetaPoco
 			return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
 		}
 
+		/// <summary>
+		/// Performs an SQL Delete
+		/// </summary>
+		/// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
+		/// <param name="sql">The SQL condition clause identifying the row to delete (ie: everything after "DELETE FROM tablename"</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>The number of affected rows</returns>
 		public int Delete<T>(string sql, params object[] args)
 		{
 			var pd = PocoData.ForType(typeof(T));
 			return Execute(string.Format("DELETE FROM {0} {1}", _dbType.EscapeTableName(pd.TableInfo.TableName), sql), args);
 		}
 
+		/// <summary>
+		/// Performs an SQL Delete
+		/// </summary>
+		/// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
+		/// <param name="sql">An SQL builder object representing the SQL condition clause identifying the row to delete (ie: everything after "UPDATE tablename"</param>
+		/// <returns>The number of affected rows</returns>
 		public int Delete<T>(Sql sql)
 		{
 			var pd = PocoData.ForType(typeof(T));
@@ -1289,7 +1520,14 @@ namespace PetaPoco
 		#endregion
 
 		#region operation: IsNew
-		// Check if a poco represents a new record
+
+		/// <summary>
+		/// Check if a poco represents a new row
+		/// </summary>
+		/// <param name="primaryKeyName">The name of the primary key column</param>
+		/// <param name="poco">The object instance whose "newness" is to be tested</param>
+		/// <returns>True if the POCO represents a record already in the database</returns>
+		/// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
 		public bool IsNew(string primaryKeyName, object poco)
 		{
 			var pd = PocoData.ForObject(poco, primaryKeyName);
@@ -1341,6 +1579,12 @@ namespace PetaPoco
 			}
 		}
 
+		/// <summary>
+		/// Check if a poco represents a new row
+		/// </summary>
+		/// <param name="poco">The object instance whose "newness" is to be tested</param>
+		/// <returns>True if the POCO represents a record already in the database</returns>
+		/// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
 		public bool IsNew(object poco)
 		{
 			var pd = PocoData.ForType(poco.GetType());
@@ -1351,7 +1595,12 @@ namespace PetaPoco
 		#endregion
 
 		#region operation: Save
-		// Insert new record or Update existing record
+		/// <summary>
+		/// Saves a POCO by either performing either an SQL Insert or SQL Update
+		/// </summary>
+		/// <param name="tableName">The name of the table to be updated</param>
+		/// <param name="primaryKeyName">The name of the primary key column</param>
+		/// <param name="poco">The POCO object to be saved</param>
 		public void Save(string tableName, string primaryKeyName, object poco)
 		{
 			if (IsNew(primaryKeyName, poco))
@@ -1364,6 +1613,10 @@ namespace PetaPoco
 			}
 		}
 
+		/// <summary>
+		/// Saves a POCO by either performing either an SQL Insert or SQL Update
+		/// </summary>
+		/// <param name="poco">The POCO object to be saved</param>
 		public void Save(object poco)
 		{
 			var pd = PocoData.ForType(poco.GetType());
@@ -1372,47 +1625,291 @@ namespace PetaPoco
 		#endregion
 
 		#region operation: Multi-Poco Query/Fetch
-		// Multi Fetch
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="TRet">The returned list POCO type</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<TRet> Fetch<T1, T2, TRet>(Func<T1, T2, TRet> cb, string sql, params object[] args) { return Query<T1, T2, TRet>(cb, sql, args).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="TRet">The returned list POCO type</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<TRet> Fetch<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, string sql, params object[] args) { return Query<T1, T2, T3, TRet>(cb, sql, args).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <typeparam name="TRet">The returned list POCO type</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<TRet> Fetch<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, string sql, params object[] args) { return Query<T1, T2, T3, T4, TRet>(cb, sql, args).ToList(); }
 
-		// Multi Query
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<T1, T2, TRet>(Func<T1, T2, TRet> cb, string sql, params object[] args) { return Query<TRet>(new Type[] { typeof(T1), typeof(T2) }, cb, sql, args); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, string sql, params object[] args) { return Query<TRet>(new Type[] { typeof(T1), typeof(T2), typeof(T3) }, cb, sql, args); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, string sql, params object[] args) { return Query<TRet>(new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, cb, sql, args); }
 
-		// Multi Fetch (SQL builder)
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="TRet">The returned list POCO type</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<TRet> Fetch<T1, T2, TRet>(Func<T1, T2, TRet> cb, Sql sql) { return Query<T1, T2, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="TRet">The returned list POCO type</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<TRet> Fetch<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, Sql sql) { return Query<T1, T2, T3, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <typeparam name="TRet">The returned list POCO type</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<TRet> Fetch<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, Sql sql) { return Query<T1, T2, T3, T4, TRet>(cb, sql.SQL, sql.Arguments).ToList(); }
 
-		// Multi Query (SQL builder)
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<T1, T2, TRet>(Func<T1, T2, TRet> cb, Sql sql) { return Query<TRet>(new Type[] { typeof(T1), typeof(T2) }, cb, sql.SQL, sql.Arguments); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, Sql sql) { return Query<TRet>(new Type[] { typeof(T1), typeof(T2), typeof(T3) }, cb, sql.SQL, sql.Arguments); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, Sql sql) { return Query<TRet>(new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, cb, sql.SQL, sql.Arguments); }
 
-		// Multi Fetch (Simple)
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<T1> Fetch<T1, T2>(string sql, params object[] args) { return Query<T1, T2>(sql, args).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<T1> Fetch<T1, T2, T3>(string sql, params object[] args) { return Query<T1, T2, T3>(sql, args).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<T1> Fetch<T1, T2, T3, T4>(string sql, params object[] args) { return Query<T1, T2, T3, T4>(sql, args).ToList(); }
 
-		// Multi Query (Simple)
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<T1> Query<T1, T2>(string sql, params object[] args) { return Query<T1>(new Type[] { typeof(T1), typeof(T2) }, null, sql, args); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<T1> Query<T1, T2, T3>(string sql, params object[] args) { return Query<T1>(new Type[] { typeof(T1), typeof(T2), typeof(T3) }, null, sql, args); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<T1> Query<T1, T2, T3, T4>(string sql, params object[] args) { return Query<T1>(new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null, sql, args); }
 
-		// Multi Fetch (Simple) (SQL builder)
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<T1> Fetch<T1, T2>(Sql sql) { return Query<T1, T2>(sql.SQL, sql.Arguments).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<T1> Fetch<T1, T2, T3>(Sql sql) { return Query<T1, T2, T3>(sql.SQL, sql.Arguments).ToList(); }
+
+		/// <summary>
+		/// Perform a multi-poco fetch
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as a List</returns>
 		public List<T1> Fetch<T1, T2, T3, T4>(Sql sql) { return Query<T1, T2, T3, T4>(sql.SQL, sql.Arguments).ToList(); }
 
-		// Multi Query (Simple) (SQL builder)
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<T1> Query<T1, T2>(Sql sql) { return Query<T1>(new Type[] { typeof(T1), typeof(T2) }, null, sql.SQL, sql.Arguments); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<T1> Query<T1, T2, T3>(Sql sql) { return Query<T1>(new Type[] { typeof(T1), typeof(T2), typeof(T3) }, null, sql.SQL, sql.Arguments); }
+
+		/// <summary>
+		/// Perform a multi-poco query
+		/// </summary>
+		/// <typeparam name="T1">The first POCO type</typeparam>
+		/// <typeparam name="T2">The second POCO type</typeparam>
+		/// <typeparam name="T3">The third POCO type</typeparam>
+		/// <typeparam name="T4">The fourth POCO type</typeparam>
+		/// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<T1> Query<T1, T2, T3, T4>(Sql sql) { return Query<T1>(new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null, sql.SQL, sql.Arguments); }
 
-		// Actual implementation of the multi-poco query
+		/// <summary>
+		/// Performs a multi-poco query
+		/// </summary>
+		/// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
+		/// <param name="types">An array of Types representing the POCO types of the returned result set.</param>
+		/// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
+		/// <param name="sql">The SQL query to be executed</param>
+		/// <param name="args">Arguments to any embedded parameters in the SQL</param>
+		/// <returns>A collection of POCO's as an IEnumerable</returns>
 		public IEnumerable<TRet> Query<TRet>(Type[] types, object cb, string sql, params object[] args)
 		{
 			OpenSharedConnection();
@@ -1479,8 +1976,21 @@ namespace PetaPoco
 		#endregion
 
 		#region Last Command
+
+		/// <summary>
+		/// Retrieves the SQL of the last executed statement
+		/// </summary>
 		public string LastSQL { get { return _lastSql; } }
+
+		/// <summary>
+		/// Retrieves the arguments to the last execute statement
+		/// </summary>
 		public object[] LastArgs { get { return _lastArgs; } }
+
+
+		/// <summary>
+		/// Returns a formatted string describing the last executed SQL statement and it's argument values
+		/// </summary>
 		public string LastCommand
 		{
 			get { return FormatCommand(_lastSql, _lastArgs); }
@@ -1488,11 +1998,23 @@ namespace PetaPoco
 		#endregion
 
 		#region FormatCommand
+
+		/// <summary>
+		/// Formats the contents of a DB command for display
+		/// </summary>
+		/// <param name="cmd"></param>
+		/// <returns></returns>
 		public string FormatCommand(IDbCommand cmd)
 		{
 			return FormatCommand(cmd.CommandText, (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray());
 		}
 
+		/// <summary>
+		/// Formats an SQL query and it's arguments for display
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
 		public string FormatCommand(string sql, object[] args)
 		{
 			var sb = new StringBuilder();
@@ -1521,22 +2043,36 @@ namespace PetaPoco
 			set;
 		} */
 
+		/// <summary>
+		/// When set to true, PetaPoco will automatically create the "SELECT columns" part of any query that looks like it needs it
+		/// </summary>
 		public bool EnableAutoSelect 
 		{ 
 			get; 
 			set; 
 		}
 
+		/// <summary>
+		/// When set to true, parameters can be named ?myparam and populated from properties of the passed in argument values.
+		/// </summary>
 		public bool EnableNamedParams 
 		{ 
 			get; 
 			set; 
 		}
+
+		/// <summary>
+		/// Sets the timeout value for all SQL statements.
+		/// </summary>
 		public int CommandTimeout 
 		{ 
 			get; 
 			set; 
 		}
+
+		/// <summary>
+		/// Sets the timeout value for the next (and only next) SQL statement
+		/// </summary>
 		public int OneTimeCommandTimeout 
 		{ 
 			get; 
@@ -1836,15 +2372,22 @@ namespace PetaPoco
 
 
 	/// <summary>
-	/// Wrap strings in an instance of this class to for use of DBType.AnsiString
+	/// Wrap strings in an instance of this class to force use of DBType.AnsiString
 	/// </summary>
 	public class AnsiString
 	{
+		/// <summary>
+		/// Constructs an AnsiString
+		/// </summary>
+		/// <param name="str">The C# string to be converted to ANSI before being passed to the DB</param>
 		public AnsiString(string str)
 		{
 			Value = str;
 		}
 
+		/// <summary>
+		/// The string value
+		/// </summary>
 		public string Value 
 		{ 
 			get; 
@@ -1853,26 +2396,48 @@ namespace PetaPoco
 	}
 
 
+	/// <summary>
+	/// Hold information about a column in the database.
+	/// </summary>
+	/// <remarks>
+	/// Typically ColumnInfo is automatically populated from the attributes on a POCO object and it's properties. It can
+	/// however also be returned from the IMapper interface to provide your owning bindings between the DB and your POCOs.
+	/// </remarks>
 	public class ColumnInfo
 	{
+		/// <summary>
+		/// The SQL name of the column
+		/// </summary>
 		public string ColumnName
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// True if this column returns a calculated value from the database and shouldn't be used in Insert and Update operations.
+		/// </summary>
 		public bool ResultColumn
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// True if time and date values returned through this column should be forced to UTC DateTimeKind. (no conversion is applied - the Kind of the DateTime property
+		/// is simply set to DateTimeKind.Utc instead of DateTimeKind.Unknown.
+		/// </summary>
 		public bool ForceToUtc
 		{
 			get;
 			set;
 		}
 
+		/// <summary>
+		/// Creates and populates a ColumnInfo from the attributes of a POCO property.
+		/// </summary>
+		/// <param name="pi">The property whose column info is required</param>
+		/// <returns>A ColumnInfo instance</returns>
 		public static ColumnInfo FromProperty(PropertyInfo pi)
 		{
 			// Check if declaring poco has [Explicit] attribute
@@ -1918,7 +2483,14 @@ namespace PetaPoco
 		}
 	}
 
-	// Optionally provide an implementation of this to Database.Mapper
+	/// <summary>
+	/// IMapper provides a way to hook into PetaPoco's Database to POCO mapping mechanism to either
+	/// customize or completely replace it.
+	/// </summary>
+	/// <remarks>
+	/// To use this functionality, instantiate a class that implements IMapper and then pass it to
+	/// PetaPoco through the static method Mappers.Register()
+	/// </remarks>
 	public interface IMapper
 	{
 		/// <summary>
@@ -1964,28 +2536,53 @@ namespace PetaPoco
 	}
 
 
+	/// <summary>
+	/// This static manages registation of IMapper instances with PetaPoco
+	/// </summary>
 	public static class Mappers
 	{
+		/// <summary>
+		/// Registers a mapper for all types in a specific assembly
+		/// </summary>
+		/// <param name="assembly">The assembly whose types are to be managed by this mapper</param>
+		/// <param name="mapper">The IMapper implementation</param>
 		public static void Register(Assembly assembly, IMapper mapper)
 		{
 			RegisterInternal(assembly, mapper);
 		}
 
+		/// <summary>
+		/// Registers a mapper for a single POCO type
+		/// </summary>
+		/// <param name="type">The type to be managed by this mapper</param>
+		/// <param name="mapper">The IMapper implementation</param>
 		public static void Register(Type type, IMapper mapper)
 		{
 			RegisterInternal(type, mapper);
 		}
 
+		/// <summary>
+		/// Remove all mappers for all types in a specific assembly
+		/// </summary>
+		/// <param name="assembly">The assembly whose mappers are to be revoked</param>
 		public static void Revoke(Assembly assembly)
 		{
 			RevokeInternal(assembly);
 		}
 
+		/// <summary>
+		/// Remove the mapper for a specific type
+		/// </summary>
+		/// <param name="type">The type whose mapper is to be removed</param>
 		public static void Revoke(Type type)
 		{
 			RevokeInternal(type);
 		}
 
+		/// <summary>
+		/// Revoke an instance of a mapper
+		/// </summary>
+		/// <param name="mapper">The IMapper to be revkoed</param>
 		public static void Revoke(IMapper mapper)
 		{
 			_lock.EnterWriteLock();
@@ -2001,6 +2598,11 @@ namespace PetaPoco
 			}
 		}
 
+		/// <summary>
+		/// Retrieve the IMapper implementation to be used for a specified POCO type
+		/// </summary>
+		/// <param name="t"></param>
+		/// <returns></returns>
 		public static IMapper GetMapper(Type t)
 		{
 			_lock.EnterReadLock();
@@ -2019,6 +2621,7 @@ namespace PetaPoco
 				_lock.ExitReadLock();
 			}
 		}
+
 
 		static void RegisterInternal(object typeOrAssembly, IMapper mapper)
 		{
@@ -2050,6 +2653,8 @@ namespace PetaPoco
 
 		static void FlushCaches()
 		{
+			// Whenever a mapper is registered or revoked, we have to assume any generated code is no longer valid.
+			// Since this should be a rare occurance, the simplest approach is to simply dump everything and start over.
 			MultiPocoFactory.FlushCaches();
 			PocoData.FlushCaches();
 		}
@@ -2119,19 +2724,34 @@ namespace PetaPoco
 		}
 	}
 
-	// Simple helper class for building SQL statments
+	/// <summary>
+	/// A simple helper class for build SQL statements
+	/// </summary>
 	public class Sql
 	{
+		/// <summary>
+		/// Default, empty constructor
+		/// </summary>
 		public Sql()
 		{
 		}
 
+		/// <summary>
+		/// Construct an SQL statement with the supplied SQL and arguments
+		/// </summary>
+		/// <param name="sql">The SQL statement or fragment</param>
+		/// <param name="args">Arguments to any parameters embedded in the SQL</param>
 		public Sql(string sql, params object[] args)
 		{
 			_sql = sql;
 			_args = args;
 		}
 
+		/// <summary>
+		/// Instantiate a new SQL Builder object.  Weirdly implemented as a property but makes
+		/// for more elegantly readble fluent style construction of SQL Statements
+		/// eg: db.Query(Sql.Builder.Append(....))
+		/// </summary>
 		public static Sql Builder
 		{
 			get { return new Sql(); }
@@ -2157,6 +2777,9 @@ namespace PetaPoco
 			_argsFinal = args.ToArray();
 		}
 
+		/// <summary>
+		/// Returns the final SQL statement represented by this builder
+		/// </summary>
 		public string SQL
 		{
 			get
@@ -2166,6 +2789,9 @@ namespace PetaPoco
 			}
 		}
 
+		/// <summary>
+		/// Gets the complete, final set of arguments collected by this builder.
+		/// </summary>
 		public object[] Arguments
 		{
 			get
@@ -2175,6 +2801,11 @@ namespace PetaPoco
 			}
 		}
 
+		/// <summary>
+		/// Append another SQL builder instance to the right-hand-side of this SQL builder
+		/// </summary>
+		/// <param name="sql">A reference to another SQL builder instance</param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql Append(Sql sql)
 		{
 			if (_rhs != null)
@@ -2185,6 +2816,12 @@ namespace PetaPoco
 			return this;
 		}
 
+		/// <summary>
+		/// Append an SQL fragement to the right-hand-side of this SQL builder
+		/// </summary>
+		/// <param name="sql">The SQL statement or fragment</param>
+		/// <param name="args">Arguments to any parameters embedded in the SQL</param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql Append(string sql, params object[] args)
 		{
 			return Append(new Sql(sql, args));
@@ -2220,26 +2857,52 @@ namespace PetaPoco
 				_rhs.Build(sb, args, this);
 		}
 
+		/// <summary>
+		/// Appends an SQL WHERE clause to this SQL builder
+		/// </summary>
+		/// <param name="sql">The condition of the WHERE clause</param>
+		/// <param name="args">Arguments to any parameters embedded in the supplied SQL</param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql Where(string sql, params object[] args)
 		{
 			return Append(new Sql("WHERE (" + sql + ")", args));
 		}
 
+		/// <summary>
+		/// Appends an SQL ORDER BY clause to this SQL builder
+		/// </summary>
+		/// <param name="columns">A collection of SQL column names to order by</param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql OrderBy(params object[] columns)
 		{
 			return Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
 		}
 
+		/// <summary>
+		/// Appends an SQL SELECT clause to this SQL builder
+		/// </summary>
+		/// <param name="columns">A collection of SQL column names to select<param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql Select(params object[] columns)
 		{
 			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
 		}
 
+		/// <summary>
+		/// Appends an SQL FROM clause to this SQL builder
+		/// </summary>
+		/// <param name="tables">A collection of table names to be used in the FROM clause</param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql From(params object[] tables)
 		{
 			return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
 		}
 
+		/// <summary>
+		/// Appends an SQL GROUP BY clause to this SQL builder
+		/// </summary>
+		/// <param name="columns">A collection of column names to be grouped by</param>
+		/// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
 		public Sql GroupBy(params object[] columns)
 		{
 			return Append(new Sql("GROUP BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
@@ -2250,9 +2913,23 @@ namespace PetaPoco
 			return new SqlJoinClause(Append(new Sql(JoinType + table)));
 		}
 
+		/// <summary>
+		/// Appends an SQL INNER JOIN clause to this SQL builder
+		/// </summary>
+		/// <param name="table">The name of the table to join</param>
+		/// <returns>A reference an SqlJoinClause through which the join condition can be specified</returns>
 		public SqlJoinClause InnerJoin(string table) { return Join("INNER JOIN ", table); }
+
+		/// <summary>
+		/// Appends an SQL LEFT JOIN clause to this SQL builder
+		/// </summary>
+		/// <param name="table">The name of the table to join</param>
+		/// <returns>A reference an SqlJoinClause through which the join condition can be specified</returns>
 		public SqlJoinClause LeftJoin(string table) { return Join("LEFT JOIN ", table); }
 
+		/// <summary>
+		/// The SqlJoinClause is a simple helper class used in the construction of SQL JOIN statements with the SQL builder
+		/// </summary>
 		public class SqlJoinClause
 		{
 			private readonly Sql _sql;
@@ -2262,6 +2939,12 @@ namespace PetaPoco
 				_sql = sql;
 			}
 
+			/// <summary>
+			/// Appends a SQL ON clause after a JOIN statement
+			/// </summary>
+			/// <param name="onClause">The ON clause to be appended</param>
+			/// <param name="args">Arguments to any parameters embedded in the supplied SQL</param>
+			/// <returns>A reference to the parent SQL builder, allowing for fluent style concatenation</returns>
 			public Sql On(string onClause, params object[] args)
 			{
 				return _sql.Append("ON " + onClause, args);
@@ -2270,13 +2953,26 @@ namespace PetaPoco
 	}
 
 
+	/// <summary>
+	/// StandardMapper is the default implementation of IMapper used by PetaPoco
+	/// </summary>
 	public class StandardMapper : IMapper
 	{
+		/// <summary>
+		/// Constructs a TableInfo for a POCO by reading its attribute data
+		/// </summary>
+		/// <param name="pocoType">The POCO Type</param>
+		/// <returns></returns>
 		public TableInfo GetTableInfo(Type pocoType)
 		{
 			return TableInfo.FromPoco(pocoType);
 		}
 
+		/// <summary>
+		/// Constructs a ColumnInfo for a POCO property by reading its attribute data
+		/// </summary>
+		/// <param name="pocoProperty"></param>
+		/// <returns></returns>
 		public ColumnInfo GetColumnInfo(PropertyInfo pocoProperty)
 		{
 			return ColumnInfo.FromProperty(pocoProperty);
@@ -2334,6 +3030,12 @@ namespace PetaPoco
 			set; 
 		}
 
+
+		/// <summary>
+		/// Creates and populates a TableInfo from the attributes of a POCO
+		/// </summary>
+		/// <param name="t">The POCO type</param>
+		/// <returns>A TableInfo instance</returns>
 		public static TableInfo FromPoco(Type t)
 		{
 			TableInfo ti = new TableInfo();
@@ -2386,13 +3088,26 @@ namespace PetaPoco
 
 	namespace Internal
 	{
+		/// <summary>
+		/// Base class for DatabaseType handlers - provides default/common handling for different database engines
+		/// </summary>
 		abstract class DatabaseType
 		{
+			/// <summary>
+			/// Returns the prefix used to delimit parameters in SQL query strings.
+			/// </summary>
+			/// <param name="ConnectionString"></param>
+			/// <returns></returns>
 			public virtual string GetParameterPrefix(string ConnectionString)
 			{
 				return "@";
 			}
 
+			/// <summary>
+			/// Converts a supplied C# object value into a value suitable for passing to the database
+			/// </summary>
+			/// <param name="value">The value to convert</param>
+			/// <returns>The converted value</returns>
 			public virtual object MapParameterValue(object value)
 			{
 				// Cast bools to integer
@@ -2405,10 +3120,22 @@ namespace PetaPoco
 				return value;
 			}
 
+			/// <summary>
+			/// Called immediately before a command is executed, allowing for modification of the IDbCommand before it's passed to the database provider
+			/// </summary>
+			/// <param name="cmd"></param>
 			public virtual void PreExecute(IDbCommand cmd)
 			{
 			}
 
+			/// <summary>
+			/// Builds an SQL query suitable for performing page based queries to the database
+			/// </summary>
+			/// <param name="skip">The number of rows that should be skipped by the query</param>
+			/// <param name="take">The number of rows that should be retruend by the query</param>
+			/// <param name="parts">The original SQL query after being parsed into it's component parts</param>
+			/// <param name="args">Arguments to any embedded parameters in the SQL query</param>
+			/// <returns>The final SQL query that should be executed.</returns>
 			public virtual string BuildPageQuery(long skip, long take, PagingHelper.SQLParts parts, ref object[] args)
 			{
 				var sql = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", parts.sql, args.Length, args.Length + 1);
@@ -2416,32 +3143,65 @@ namespace PetaPoco
 				return sql;
 			}
 
+			/// <summary>
+			/// Returns an SQL Statement that can check for the existance of a row in the database.
+			/// </summary>
+			/// <returns></returns>
 			public virtual string GetExistsSql()
 			{
 				return "SELECT COUNT(*) FROM {0} WHERE {1}";
 			}
 
+			/// <summary>
+			/// Escape a tablename into a suitable format for the associated database provider.
+			/// </summary>
+			/// <param name="tableName">The name of the table (as specified by the client program, or as attributes on the associated POCO class.</param>
+			/// <returns>The escaped table name</returns>
 			public virtual string EscapeTableName(string tableName)
 			{
 				// Assume table names with "dot" are already escaped
 				return tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
 			}
 
+			/// <summary>
+			/// Escape and arbitary SQL identifier into a format suitable for the associated database provider
+			/// </summary>
+			/// <param name="str">The SQL identifier to be escaped</param>
+			/// <returns>The escaped identifier</returns>
 			public virtual string EscapeSqlIdentifier(string str)
 			{
 				return string.Format("[{0}]", str);
 			}
 
+			/// <summary>
+			/// Return an SQL expression that can be used to populate the primary key column of an auto-increment column.
+			/// </summary>
+			/// <param name="ti">Table info describing the table</param>
+			/// <returns>An SQL expressions</returns>
+			/// <remarks>See the Oracle database type for an example of how this method is used.</remarks>
 			public virtual string GetAutoIncrementExpression(TableInfo ti)
 			{
 				return null;
 			}
 
+			/// <summary>
+			/// Returns an SQL expression that can be used to specify the return value of auto incremented columns.
+			/// </summary>
+			/// <param name="primaryKeyName">The primary key of the row being inserted.</param>
+			/// <returns>An expression describing how to return the new primary key value</returns>
+			/// <remarks>See the SQLServer database provider for an example of how this method is used.</remarks>
 			public virtual string GetInsertOutputClause(string primaryKeyName)
 			{
 				return string.Empty;
 			}
 
+			/// <summary>
+			/// Performs an Insert operation
+			/// </summary>
+			/// <param name="db">The calling Database object</param>
+			/// <param name="cmd">The insert command to be executed</param>
+			/// <param name="PrimaryKeyName">The primary key of the table being inserted into</param>
+			/// <returns>The ID of the newly inserted record</returns>
 			public virtual object ExecuteInsert(Database db, IDbCommand cmd, string PrimaryKeyName)
 			{
 				cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
@@ -2449,6 +3209,12 @@ namespace PetaPoco
 			}
 
 
+			/// <summary>
+			/// Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
+			/// </summary>
+			/// <param name="TypeName"></param>
+			/// <param name="ProviderName"></param>
+			/// <returns></returns>
 			public static DatabaseType Resolve(string TypeName, string ProviderName)
 			{
 				// Try using type name first (more reliable)

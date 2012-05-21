@@ -101,6 +101,7 @@
     <None Include="NuGet\PetaPoco.Core.nuspec">
       <SubType>Designer</SubType>
     </None>
+    <None Include="PostBuild.bat" />
     <None Include="T4 Templates\PetaPoco.Core.ttinclude" />
     <None Include="T4 Templates\PetaPoco.Generator.ttinclude" />
     <None Include="T4 Templates\Database.tt">
@@ -115,8 +116,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release NuGet.exe pack "$(ProjectDir)PetaPoco.nuspec" -o "$(SolutionDir)Output"
-if $(ConfigurationName) == Release NuGet.exe pack "$(ProjectDir)PetaPoco.Core.nuspec" -o "$(SolutionDir)Output"</PostBuildEvent>
+    <PostBuildEvent>$(ProjectDir)\PostBuild.bat $(ConfigurationName)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
