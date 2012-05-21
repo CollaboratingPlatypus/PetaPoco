@@ -1,5 +1,6 @@
-bin
+﻿bin
 obj
 *.suo
 *.nupkg
+*.ncrunchsolution
 
