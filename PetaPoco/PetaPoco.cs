@@ -639,15 +639,15 @@ namespace PetaPoco
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
 
 
-			// Look for an "ORDER BY <whatever>" clause
-			m = rxOrderBy.Match(sqlCount);
-			if (!m.Success)
+			// Look for latest "ORDER BY <whatever>" clause
+			var orderMatch = rxOrderBy.Matches(sqlCount);
+			if (orderMatch.Count == 0 )
 			{
 				sqlOrderBy = null;
 			}
 			else
 			{
-				g = m.Groups[0];
+				g = orderMatch[orderMatch.Count - 1].Groups[0];
 				sqlOrderBy = g.ToString();
 				sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
 			}
