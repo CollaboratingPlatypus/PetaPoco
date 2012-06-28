@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-		<id>PetaPoco</id>
-		<title>PetaPoco - A tiny ORMish thing for your POCOs (Core + T4 Templates)</title>
-		<version>4.0.3</version>
+		<id>PetaPoco.Core</id>
+		<title>PetaPoco.Core - A tiny ORMish thing for your POCOs (Core Only)</title>
+		<version>5.0.1</version>
 		<authors>Topten Software</authors>
 		<owners>Topten Software</owners>
 		<licenseUrl>http://www.toptensoftware.com/petapoco/license</licenseUrl>
@@ -13,7 +13,8 @@
 		<description>
 PetaPoco is a tiny, single file .NET data access layer inspired by Massive that works with both non-dynamic POCO objects and dynamics.
 
-This package includes the core PetaPoco library + T4 templates to generate POCO classes from your database
+This package includes the just the core PetaPoco library (ie: no T4 templates)
+
 		</description>
 		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
 		<frameworkAssemblies>
@@ -23,7 +24,5 @@ This package includes the core PetaPoco library + T4 templates to generate POCO 
 	</metadata>
 	<files>
 		<file src="PetaPoco.cs" target="Content\Models" />
-		<file src="Models\Generated\*.tt" target="Content\Models\Generated" />
-		<file src="Models\Generated\PetaPoco*" target="Content\Models\Generated" />
 	</files>
 </package>

@@ -878,6 +878,21 @@ namespace PetaPoco.Tests
 			var id2 = db.SingleOrDefault<long>("SELECT id from petapoco WHERE id=@0", id);
 			Assert.AreEqual(id, id2);
 		}
+
+	    [Test]
+        public void Exists_Query_Does()
+        {
+            var id = InsertRecords(10);
+			Assert.IsTrue(db.Exists<deco>("id = @0", id));
+			Assert.IsTrue(db.Exists<deco>(id));
+		}
+        [Test]
+        public void Exists_Query_DoesNot()
+        {
+            var id = InsertRecords(10);
+			Assert.IsFalse(db.Exists<deco>("id = @0", id+100));
+			Assert.IsFalse(db.Exists<deco>(id + 100));
+        }
 	}
 
 }

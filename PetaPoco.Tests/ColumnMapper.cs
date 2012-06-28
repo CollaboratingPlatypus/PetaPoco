@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PetaTest;
+using System.Reflection;
 
 namespace PetaPoco.Tests
 {
@@ -16,42 +17,50 @@ namespace PetaPoco.Tests
 
 	public class MyColumnMapper : PetaPoco.IMapper
 	{
-		public void GetTableInfo(Type t, TableInfo ti)
+		public TableInfo GetTableInfo(Type t)
 		{
+			var ti = TableInfo.FromPoco(t);
+
 			if (t == typeof(Poco2))
 			{
 				ti.TableName = "petapoco";
 				ti.PrimaryKey = "id";
 			}
+
+			return ti;
 		}
-		public bool MapPropertyToColumn(System.Reflection.PropertyInfo pi, ref string columnName, ref bool resultColumn)
+		public ColumnInfo GetColumnInfo(System.Reflection.PropertyInfo pi)
 		{
+			var ci = ColumnInfo.FromProperty(pi);
+			if (ci == null)
+				return null;
+
 			if (pi.DeclaringType == typeof(Poco2))
 			{
 				switch (pi.Name)
 				{
 					case "prop1":
 						// Leave this property as is
-						return true;
+						break;
 
 					case "prop2":
 						// Rename this column
-						columnName = "remapped2";
-						return true;
+						ci.ColumnName = "remapped2";
+						break;
 
 					case "prop3":
 						// Mark this as a result column
-						resultColumn = true;
-						return true;
+						ci.ResultColumn = true;
+						break;
 
 					case "prop4":
 						// Ignore this property
-						return false;
+						return null;
 				}
 			}
 
 			// Do default property mapping
-			return true;
+			return ci;
 		}
 
 
@@ -60,7 +69,7 @@ namespace PetaPoco.Tests
 			return null;
 		}
 
-		public Func<object, object> GetToDbConverter(Type SourceType)
+		public Func<object, object> GetToDbConverter(PropertyInfo SourceProperty)
 		{
 			return null;
 		}
@@ -75,8 +84,8 @@ namespace PetaPoco.Tests
 		public void NoColumnMapper()
 		{
 
-			PetaPoco.Database.Mapper = new MyColumnMapper();
-			var pd=PetaPoco.Database.PocoData.ForType(typeof(Poco2));
+			PetaPoco.Mappers.Register(Assembly.GetExecutingAssembly(), new MyColumnMapper());
+			var pd=PetaPoco.Internal.PocoData.ForType(typeof(Poco2));
 
 			Assert.AreEqual(pd.Columns.Count, 3);
 			Assert.AreEqual(pd.Columns["prop1"].PropertyInfo.Name, "prop1");
@@ -85,6 +94,8 @@ namespace PetaPoco.Tests
 			Assert.AreEqual(string.Join(", ", pd.QueryColumns), "prop1, remapped2");
 			Assert.AreEqual(pd.TableInfo.PrimaryKey, "id");
 			Assert.AreEqual(pd.TableInfo.TableName, "petapoco");
+
+			PetaPoco.Mappers.Revoke(Assembly.GetExecutingAssembly());
 		}
 	}
 }
