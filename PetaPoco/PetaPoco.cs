@@ -18,6 +18,7 @@
 using PetaPoco.DatabaseTypes;
 using PetaPoco.Internal;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -3274,7 +3275,7 @@ namespace PetaPoco
 				// Build a key
 				var key = new ArrayKey<Type>(types);
 
-				return AutoMappers.Get(key, () =>
+				return AutoMappers.GetOrAdd(key, (_) =>
 					{
 						// Create a method
 						var m = new DynamicMethod("petapoco_automapper", types[0], types, true);
@@ -3378,13 +3379,13 @@ namespace PetaPoco
 			}
 
 			// Various cached stuff
-			static Cache<Tuple<Type, ArrayKey<Type>, string, string>, object> MultiPocoFactories = new Cache<Tuple<Type, ArrayKey<Type>, string, string>, object>();
-			static Cache<ArrayKey<Type>, object> AutoMappers = new Cache<ArrayKey<Type>, object>();
+			static ConcurrentDictionary<Tuple<Type, ArrayKey<Type>, string, string>, object> MultiPocoFactories = new ConcurrentDictionary<Tuple<Type, ArrayKey<Type>, string, string>, object>();
+			static ConcurrentDictionary<ArrayKey<Type>, object> AutoMappers = new ConcurrentDictionary<ArrayKey<Type>, object>();
 
 			internal static void FlushCaches()
 			{
-				MultiPocoFactories.Flush();
-				AutoMappers.Flush();
+				MultiPocoFactories.Clear();
+				AutoMappers.Clear();
 			}
 
 			// Get (or create) the multi-poco factory for a query
@@ -3392,7 +3393,7 @@ namespace PetaPoco
 			{
 				var key = Tuple.Create<Type, ArrayKey<Type>, string, string>(typeof(TRet), new ArrayKey<Type>(types), ConnectionString, sql);
 
-				return (Func<IDataReader, object, TRet>)MultiPocoFactories.Get(key, () =>
+				return (Func<IDataReader, object, TRet>)MultiPocoFactories.GetOrAdd(key, (_) =>
 					{
 						return CreateMultiPocoFactory<TRet>(types, ConnectionString, sql, r);
 					}
@@ -3446,7 +3447,7 @@ namespace PetaPoco
 					throw new InvalidOperationException("Can't use dynamic types with this method");
 #endif
 
-				return _pocoDatas.Get(t, () => new PocoData(t));
+				return _pocoDatas.GetOrAdd(t, (_) => new PocoData(t));
 			}
 
 			public PocoData()
@@ -3498,7 +3499,7 @@ namespace PetaPoco
 				// Check cache
 				var key = Tuple.Create<string, string, int, int>(sql, connString, firstColumn, countColumns);
 
-				return PocoFactories.Get(key, () =>
+				return PocoFactories.GetOrAdd(key, (_) =>
 					{
 					// Create the method
 					var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), type, new Type[] { typeof(IDataReader) }, true);
@@ -3760,10 +3761,10 @@ namespace PetaPoco
 
 			internal static void FlushCaches()
 			{
-				_pocoDatas.Flush();
+				_pocoDatas.Clear();
 			}
 
-			static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
+			static ConcurrentDictionary<Type, PocoData> _pocoDatas = new ConcurrentDictionary<Type, PocoData>();
 			static List<Func<object, object>> _converters = new List<Func<object, object>>();
 			static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) });
 			static MethodInfo fnIsDBNull = typeof(IDataRecord).GetMethod("IsDBNull");
@@ -3774,7 +3775,7 @@ namespace PetaPoco
 			public string[] QueryColumns { get; private set; }
 			public TableInfo TableInfo { get; private set; }
 			public Dictionary<string, PocoColumn> Columns { get; private set; }
-			Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
+			ConcurrentDictionary<Tuple<string, string, int, int>, Delegate> PocoFactories = new ConcurrentDictionary<Tuple<string, string, int, int>, Delegate>();
 		}
 
 
@@ -3852,79 +3853,11 @@ namespace PetaPoco
 			static Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		}
 
-		class Cache<TKey, TValue>
-		{
-			Dictionary<TKey, TValue> _map = new Dictionary<TKey, TValue>();
-			ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-
-			public int Count
-			{
-				get
-				{
-					return _map.Count;
-				}
-			}
-
-			public TValue Get(TKey key, Func<TValue> factory)
-			{
-				// Check cache
-				_lock.EnterReadLock();
-				TValue val;
-				try
-				{
-					if (_map.TryGetValue(key, out val))
-						return val;
-				}
-				finally
-				{
-					_lock.ExitReadLock();
-				}
-
-
-				// Cache it
-				_lock.EnterWriteLock();
-				try
-				{
-					// Check again
-					if (_map.TryGetValue(key, out val))
-						return val;
-
-					// Create it
-					val = factory();
-
-					// Store it
-					_map.Add(key, val);
-
-					// Done
-					return val;
-				}
-				finally
-				{
-					_lock.ExitWriteLock();
-				}
-			}
-
-			public void Flush()
-			{
-				// Cache it
-				_lock.EnterWriteLock();
-				try
-				{
-					_map.Clear();
-				}
-				finally
-				{
-					_lock.ExitWriteLock();
-				}
-
-			}
-		}
-
 		internal static class EnumMapper
 		{
 			public static object EnumFromString(Type enumType, string value)
 			{
-				Dictionary<string, object> map = _types.Get(enumType, () =>
+				Dictionary<string, object> map = _types.GetOrAdd(enumType, (_) =>
 				{
 					var values = Enum.GetValues(enumType);
 
@@ -3942,7 +3875,7 @@ namespace PetaPoco
 				return map[value];
 			}
 
-			static Cache<Type, Dictionary<string, object>> _types = new Cache<Type,Dictionary<string,object>>();
+			static ConcurrentDictionary<Type, Dictionary<string, object>> _types = new ConcurrentDictionary<Type,Dictionary<string,object>>();
 		}
 
 		internal static class PagingHelper

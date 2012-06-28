@@ -9,6 +9,7 @@ using System.Reflection.Emit;
 using System.Linq;
 using System.Linq.Expressions;
 using PetaPoco.Internal;
+using System.Collections.Concurrent;
 
 namespace PetaPoco.Internal
 {
@@ -45,7 +46,7 @@ namespace PetaPoco.Internal
 				throw new InvalidOperationException("Can't use dynamic types with this method");
 #endif
 
-			return _pocoDatas.Get(t, () => new PocoData(t));
+			return _pocoDatas.GetOrAdd(t, (_) => new PocoData(t));
 		}
 
 		public PocoData()
@@ -97,7 +98,7 @@ namespace PetaPoco.Internal
 			// Check cache
 			var key = Tuple.Create<string, string, int, int>(sql, connString, firstColumn, countColumns);
 
-			return PocoFactories.Get(key, () =>
+			return PocoFactories.GetOrAdd(key, (_) =>
 				{
 				// Create the method
 				var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), type, new Type[] { typeof(IDataReader) }, true);
@@ -359,10 +360,10 @@ namespace PetaPoco.Internal
 
 		internal static void FlushCaches()
 		{
-			_pocoDatas.Flush();
+			_pocoDatas.Clear();
 		}
 
-		static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
+		static ConcurrentDictionary<Type, PocoData> _pocoDatas = new ConcurrentDictionary<Type, PocoData>();
 		static List<Func<object, object>> _converters = new List<Func<object, object>>();
 		static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) });
 		static MethodInfo fnIsDBNull = typeof(IDataRecord).GetMethod("IsDBNull");
@@ -373,7 +374,7 @@ namespace PetaPoco.Internal
 		public string[] QueryColumns { get; private set; }
 		public TableInfo TableInfo { get; private set; }
 		public Dictionary<string, PocoColumn> Columns { get; private set; }
-		Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
+		ConcurrentDictionary<Tuple<string, string, int, int>, Delegate> PocoFactories = new ConcurrentDictionary<Tuple<string, string, int, int>, Delegate>();
 	}
 
 }

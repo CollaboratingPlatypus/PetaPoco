@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace PetaPoco.Internal
 	{
 		public static object EnumFromString(Type enumType, string value)
 		{
-			Dictionary<string, object> map = _types.Get(enumType, () =>
+			Dictionary<string, object> map = _types.GetOrAdd(enumType, (_) =>
 			{
 				var values = Enum.GetValues(enumType);
 
@@ -27,6 +28,6 @@ namespace PetaPoco.Internal
 			return map[value];
 		}
 
-		static Cache<Type, Dictionary<string, object>> _types = new Cache<Type,Dictionary<string,object>>();
+		static ConcurrentDictionary<Type, Dictionary<string, object>> _types = new ConcurrentDictionary<Type,Dictionary<string,object>>();
 	}
 }
