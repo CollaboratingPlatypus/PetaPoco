@@ -150,18 +150,21 @@ namespace PetaPoco.Internal
 				return Singleton<SQLiteDatabaseType>.Instance;
 			if (TypeName.StartsWith("System.Data.SqlClient.")) 
 				return Singleton<SqlServerDatabaseType>.Instance;
-			
-			// Try again with provider name
-			if (ProviderName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0) 
-				return Singleton<MySqlDatabaseType>.Instance;
-			if (ProviderName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0) 
-				return Singleton<SqlServerCEDatabaseType>.Instance;
-			if (ProviderName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0) 
-				return Singleton<PostgreSQLDatabaseType>.Instance;
-			if (ProviderName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0) 
-				return Singleton<OracleDatabaseType>.Instance;
-			if (ProviderName.IndexOf("SQLite", StringComparison.InvariantCultureIgnoreCase) >= 0) 
-				return Singleton<SQLiteDatabaseType>.Instance;
+
+			if (!string.IsNullOrEmpty(ProviderName))
+			{
+				// Try again with provider name
+				if (ProviderName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0)
+					return Singleton<MySqlDatabaseType>.Instance;
+				if (ProviderName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0)
+					return Singleton<SqlServerCEDatabaseType>.Instance;
+				if (ProviderName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
+					return Singleton<PostgreSQLDatabaseType>.Instance;
+				if (ProviderName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
+					return Singleton<OracleDatabaseType>.Instance;
+				if (ProviderName.IndexOf("SQLite", StringComparison.InvariantCultureIgnoreCase) >= 0)
+					return Singleton<SQLiteDatabaseType>.Instance;
+			}
 
 			// Assume SQL Server
 			return Singleton<SqlServerDatabaseType>.Instance;
