@@ -381,6 +381,12 @@ namespace PetaPoco
 					}
 					return sb.ToString();
 				}
+				else if (arg_val is IDataParameter)
+		                {
+		                    if (!args_dest.Contains(arg_val))
+		                        args_dest.Add(arg_val);
+		                    return ((IDataParameter) arg_val).ParameterName;
+		                }
 				else
 				{
 					args_dest.Add(arg_val);
@@ -405,7 +411,6 @@ namespace PetaPoco
 			var idbParam = item as IDbDataParameter;
 			if (idbParam != null)
 			{
-				idbParam.ParameterName = string.Format("{0}{1}", ParameterPrefix, cmd.Parameters.Count);
 				cmd.Parameters.Add(idbParam);
 				return;
 			}
