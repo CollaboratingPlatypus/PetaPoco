@@ -27,6 +27,12 @@ namespace <#=Namespace #>
 			CommonConstruct();
 		}
 		
+		public <#=RepoName#>(string connectionString, string providerName) 
+			: base(connectionString, providerName)
+		{
+			CommonConstruct();
+		}
+
 		partial void CommonConstruct();
 		
 		public interface IFactory
