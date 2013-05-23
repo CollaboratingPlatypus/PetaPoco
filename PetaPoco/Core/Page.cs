@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace PetaPoco
 {
-	/// <summary>
+    /// <summary>
 	/// Holds the results of a paged request.
 	/// </summary>
 	/// <typeparam name="T">The type of Poco in the returned result set</typeparam>
-	public class Page<T>
+	public class Page<T> : IPage
 	{
 		/// <summary>
 		/// The current page number contained in this page of result set 

@@ -52,6 +52,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -62,6 +63,7 @@
     <Compile Include="Attributes\ColumnAttribute.cs" />
     <Compile Include="Core\AnsiString.cs" />
     <Compile Include="Core\ColumnInfo.cs" />
+    <Compile Include="Core\IPage.cs" />
     <Compile Include="Core\Mappers.cs" />
     <Compile Include="Core\MultiPocoFactory.cs" />
     <Compile Include="Core\DatabaseType.cs" />
