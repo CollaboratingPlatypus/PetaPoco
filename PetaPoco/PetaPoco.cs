@@ -1570,7 +1570,9 @@ namespace PetaPoco
 					return (int)pk == 0;
 				else if (type == typeof(uint))
 					return (uint)pk == 0;
-
+				else if( type == typeof( decimal ) ) // adding a decimal type primary key
+					return (decimal)pk == 0;
+					
 				// Create a default instance and compare
 				return pk == Activator.CreateInstance(pk.GetType());
 			}
