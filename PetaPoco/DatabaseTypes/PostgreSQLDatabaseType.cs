@@ -19,6 +19,8 @@ namespace PetaPoco.DatabaseTypes
 
 		public override string EscapeSqlIdentifier(string str)
 		{
+			if(str[0] == '"' && str[str.Length - 1] == '"') return str;
+
 			return string.Format("\"{0}\"", str);
 		}
 
