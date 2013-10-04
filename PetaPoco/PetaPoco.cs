@@ -186,7 +186,8 @@ namespace PetaPoco
 			MySql,
 			PostgreSQL,
 			Oracle,
-            SQLite
+			SQLite,
+			ODBC
 		}
 		DBType _dbType = DBType.SqlServer;
 
@@ -210,6 +211,7 @@ namespace PetaPoco
 			else if (dbtype.StartsWith("Oracle")) _dbType = DBType.Oracle;
 			else if (dbtype.StartsWith("SQLite")) _dbType = DBType.SQLite;
 			else if (dbtype.StartsWith("System.Data.SqlClient.")) _dbType = DBType.SqlServer;
+			else if (dbtype.StartsWith("Odbc")) _dbType = DBType.Odbc;
 			// else try with provider name
 			else if (_providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.MySql;
 			else if (_providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0) _dbType = DBType.SqlServerCE;
@@ -221,6 +223,11 @@ namespace PetaPoco
 				_paramPrefix = "?";
 			if (_dbType == DBType.Oracle)
 				_paramPrefix = ":";
+			if (_dbType == DBType.Odbc)
+			{
+				_paramPrefix = "?";
+				EnableNamedParams = false;
+			}
 		}
 
 		// Automatically close one open shared connection
