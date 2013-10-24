@@ -62,6 +62,7 @@
     <Compile Include="Attributes\ColumnAttribute.cs" />
     <Compile Include="Core\AnsiString.cs" />
     <Compile Include="Core\ColumnInfo.cs" />
+    <Compile Include="Core\GridReader.cs" />
     <Compile Include="Core\Mappers.cs" />
     <Compile Include="Core\MultiPocoFactory.cs" />
     <Compile Include="Core\DatabaseType.cs" />
