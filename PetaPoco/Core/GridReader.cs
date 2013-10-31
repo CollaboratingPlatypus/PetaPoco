@@ -133,7 +133,7 @@ namespace PetaPoco
             var pd = PocoData.ForType(typeof (T));
             try
             {
-                while (index == _gridIndex && _reader.Read())
+                while (index == _gridIndex)
                 {
                     var factory =
                         pd.GetFactory(_command.CommandText, _command.Connection.ConnectionString, 0, _reader.FieldCount,
