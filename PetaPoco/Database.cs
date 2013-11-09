@@ -113,6 +113,7 @@ namespace PetaPoco
 			_transactionDepth = 0;
 			EnableAutoSelect = true;
 			EnableNamedParams = true;
+            DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
 			// If a provider name was supplied, get the IDbProviderFactory for it
 			if (_providerName != null)
