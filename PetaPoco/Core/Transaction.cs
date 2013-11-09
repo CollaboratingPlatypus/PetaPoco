@@ -2,6 +2,7 @@
 // Copyright © 2011-2012 Topten Software.  All Rights Reserved.
  
 using System;
+using System.Data;
 
 namespace PetaPoco
 {
@@ -18,8 +19,14 @@ namespace PetaPoco
 		public Transaction(Database db)
 		{
 			_db = db;
-			_db.BeginTransaction();
+			_db.BeginTransaction(db.DefaultIsolationLevel);
 		}
+
+        public Transaction(Database db, IsolationLevel isolationLevel)
+        {
+            _db = db;
+            _db.BeginTransaction(isolationLevel);
+        }
 
 		public void Complete()
 		{
