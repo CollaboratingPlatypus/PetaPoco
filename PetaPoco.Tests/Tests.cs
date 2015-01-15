@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using PetaTest;
-using PetaPoco;
 
 namespace PetaPoco.Tests
 {
@@ -25,6 +21,8 @@ namespace PetaPoco.Tests
 		[TestFixtureSetUp]
 		public void CreateDB()
 		{
+            Utils.SetDataDirectoryPath();
+
 			db = new Database(_connectionStringName);
 			db.OpenSharedConnection();		// <-- Wow, this is crucial to getting SqlCE to perform.
 			db.Execute(Utils.LoadTextResource(string.Format("PetaPoco.Tests.{0}_init.sql", _connectionStringName)));
@@ -348,6 +346,70 @@ namespace PetaPoco.Tests
 			Assert.AreEqual(r.TotalItems, 13);
 			Assert.AreEqual(r.TotalPages, 3);
 		}
+
+        [Test]
+        public void Page_DistinctWithManyColumns()
+        {
+            //// Unordered paging not supported by Compact Edition
+            if (_connectionStringName == "sqlserverce")
+                return;
+            // In this test we're checking that the query using distinct with many columns page correct when there are
+            // not-exactly pagesize*N records (ie: a partial page at the end)
+
+            // Create some records
+            const int count = 13;
+            long id = InsertRecords(count);
+
+            // Fetch em
+            var r = db.Page<poco>(2, 5, "SELECT DISTINCT id, title, content from petapoco ORDER BY id");
+
+            // Check em
+            int i = 0;
+            foreach (var p in r.Items)
+            {
+                Assert.AreEqual(p.id, id + i + 5);
+                i++;
+            }
+
+            // Check other stats
+            Assert.AreEqual(r.Items.Count, 5);
+            Assert.AreEqual(r.CurrentPage, 2);
+            Assert.AreEqual(r.ItemsPerPage, 5);
+            Assert.AreEqual(r.TotalItems, 13);
+            Assert.AreEqual(r.TotalPages, 3);
+        }
+
+        [Test]
+        public void Page_DistinctWithManyColumnsAndAnOrderByWithMultipleColumns()
+        {
+            //// Unordered paging not supported by Compact Edition
+            if (_connectionStringName == "sqlserverce")
+                return;
+            // In this test we're checking that the query using distinct with many columns page correct when there are
+            // not-exactly pagesize*N records (ie: a partial page at the end)
+
+            // Create some records
+            const int count = 13;
+            long id = InsertRecords(count);
+
+            // Fetch em
+            var r = db.Page<poco>(2, 5, "SELECT DISTINCT id, title, content FROM petapoco ORDER BY id asc, title desc");
+
+            // Check em
+            int i = 0;
+            foreach (var p in r.Items)
+            {
+                Assert.AreEqual(p.id, id + i + 5);
+                i++;
+            }
+
+            // Check other stats
+            Assert.AreEqual(r.Items.Count, 5);
+            Assert.AreEqual(r.CurrentPage, 2);
+            Assert.AreEqual(r.ItemsPerPage, 5);
+            Assert.AreEqual(r.TotalItems, 13);
+            Assert.AreEqual(r.TotalPages, 3);
+        }
 
 		[Test]
 		public void FetchPage()
@@ -794,7 +856,7 @@ namespace PetaPoco.Tests
 
 		void AssertDynamic(dynamic a, dynamic b)
 		{
-			Assert.AreEqual(a.id, b.id);
+            Assert.AreEqual((int)a.id, (int)b.id);
 			Assert.AreEqual(a.title, b.title);
 			Assert.AreEqual(a.draft, b.draft);
 			Assert.AreEqual(a.content, b.content);

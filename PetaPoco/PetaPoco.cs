@@ -616,7 +616,7 @@ namespace PetaPoco
 		}
 
 		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+        static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(:?(?<depth>(:?[\w\,\s\d])*(\s+(:?ASC|DESC))?)).*?", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
@@ -633,8 +633,9 @@ namespace PetaPoco
 			Group g = m.Groups[1];
 			sqlSelectRemoved = sql.Substring(g.Index);
 
-			if (rxDistinct.IsMatch(sqlSelectRemoved))
-				sqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
+			if (rxDistinct.IsMatch(sqlSelectRemoved)){
+                sqlCount = sql.Substring(0, g.Index) + "COUNT(*) FROM (" + sql.Substring(0, g.Index) + m.Groups[1].ToString().Trim() + " " + sql.Substring(g.Index + g.Length) + ") _count";
+            }
 			else
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
 
