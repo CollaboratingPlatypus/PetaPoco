@@ -18,5 +18,12 @@ namespace PetaPoco.Tests
 			return str;
 		}
 
+	    public static void SetDataDirectoryPath()
+	    {
+            var executable = Assembly.GetExecutingAssembly().Location;
+            var path = Path.GetDirectoryName(executable);
+
+            AppDomain.CurrentDomain.SetData("DataDirectory", path);
+	    }
 	}
 }
