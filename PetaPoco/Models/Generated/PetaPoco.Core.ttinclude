@@ -135,6 +135,7 @@ public class Column
     public bool IsNullable;
 	public bool IsAutoIncrement;
 	public bool Ignore;
+    public string DefaultSetting;
 }
 
 public class Tables : List<Table>
@@ -538,6 +539,15 @@ class SqlServerSchemaReader : SchemaReader
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
 					col.IsAutoIncrement=((int)rdr["IsIdentity"])==1;
+
+					//Stuart Pittaway added in DefaultSetting parameter for SQL Server type default values
+					col.DefaultSetting=rdr["DefaultSetting"].ToString();
+					while (col.DefaultSetting.StartsWith("(")) {col.DefaultSetting=col.DefaultSetting.Substring(1);}
+					while (col.DefaultSetting.EndsWith(")")) {col.DefaultSetting=col.DefaultSetting.Substring(0,col.DefaultSetting.Length-1);}
+					if (col.DefaultSetting.StartsWith("'")) col.DefaultSetting="\""+col.DefaultSetting.Substring(1);
+					if (col.DefaultSetting.EndsWith("'")) col.DefaultSetting=col.DefaultSetting.Substring(0,col.DefaultSetting.Length-1)+"\"";
+
+
 					result.Add(col);
 				}
 			}
@@ -730,6 +740,14 @@ class SqlServerCeSchemaReader : SchemaReader
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
 					col.IsAutoIncrement=rdr["AUTOINC_INCREMENT"]!=DBNull.Value;
+
+					//Stuart Pittaway added in DefaultSetting parameter for SQL Server type default values
+					col.DefaultSetting=rdr["DefaultSetting"].ToString();
+					while (col.DefaultSetting.StartsWith("(")) {col.DefaultSetting=col.DefaultSetting.Substring(1);}
+					while (col.DefaultSetting.EndsWith(")")) {col.DefaultSetting=col.DefaultSetting.Substring(0,col.DefaultSetting.Length-1);}
+					if (col.DefaultSetting.StartsWith("'")) col.DefaultSetting="\""+col.DefaultSetting.Substring(1);
+					if (col.DefaultSetting.EndsWith("'")) col.DefaultSetting=col.DefaultSetting.Substring(0,col.DefaultSetting.Length-1)+"\"";
+
 					result.Add(col);
 				}
 			}

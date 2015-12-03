@@ -10,7 +10,10 @@ using System.Linq;
 using System.Web;
 using PetaPoco;
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable CheckNamespace
 namespace <#=Namespace #>
+// ReSharper restore CheckNamespace
 {
 <# if (GenerateCommon) { #>
 	public partial class <#=RepoName#> : Database
@@ -151,6 +154,30 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 	[ExplicitColumns]
     public partial class <#=tbl.ClassName#> <# if (GenerateOperations) { #>: <#=RepoName#>.Record<<#=tbl.ClassName#>> <# } #> 
     {
+
+	public <#=tbl.ClassName#>(){
+//Stuarts Auto Generated Class Initaliser for Default values
+<#
+foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
+{
+// Columns for default values
+#>
+<# if ((col.DefaultSetting!=null) && (col.DefaultSetting.Length>0))  {#>
+<# if (col.PropertyType=="DateTime" && col.DefaultSetting=="0") {
+//Issues with ZERO being returned for default value for DateTime in SQL Server column, this
+//should be defaulted to 1900-01-01
+#>
+	//Default datetime (cast INT zero to SQL Server DATETIME datatype 1900-01-01 00:00:00.000)
+	this.<#=col.PropertyName #> = DateTime.FromBinary(599266080000000000L);
+<#} else {#>
+	this.<#=col.PropertyName #> = <#=col.DefaultSetting#>;
+<# } #>
+<# } #>
+<# } #>
+}
+
+<#
+
 <#
 foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 {
@@ -188,3 +215,4 @@ foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 <# } #>
 <# } #>
 }
+// ReSharper restore InconsistentNaming
