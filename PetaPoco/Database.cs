@@ -113,6 +113,7 @@ namespace PetaPoco
 			_transactionDepth = 0;
 			EnableAutoSelect = true;
 			EnableNamedParams = true;
+            DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
 			// If a provider name was supplied, get the IDbProviderFactory for it
 			if (_providerName != null)
@@ -233,6 +234,32 @@ namespace PetaPoco
 			return new Transaction(this);
 		}
 
+        /// <summary>
+        /// Starts or continues a transaction with a specific isolation level.
+        /// </summary>
+        /// <returns>An ITransaction reference that must be Completed or disposed</returns>
+        /// <remarks>
+        /// This method makes management of calls to Begin/End/CompleteTransaction easier.  
+        /// 
+        /// The usage pattern for this should be:
+        /// 
+        /// using (var tx = db.GetTransaction())
+        /// {
+        ///		// Do stuff
+        ///		db.Update(...);
+        ///		
+        ///     // Mark the transaction as complete
+        ///     tx.Complete();
+        /// }
+        /// 
+        /// Transactions can be nested but they must all be completed otherwise the entire
+        /// transaction is aborted.
+        /// </remarks>
+        public ITransaction GetTransaction(IsolationLevel isolationLevel)
+        {
+            return new Transaction(this, isolationLevel);
+        }
+
 		/// <summary>
 		/// Called when a transaction starts.  Overridden by the T4 template generated database
 		/// classes to ensure the same DB instance is used throughout the transaction.
@@ -251,14 +278,14 @@ namespace PetaPoco
 		/// <summary>
 		/// Starts a transaction scope, see GetTransaction() for recommended usage
 		/// </summary>
-		public void BeginTransaction()
+		public void BeginTransaction(IsolationLevel isolationLevel)
 		{
 			_transactionDepth++;
 
 			if (_transactionDepth == 1)
 			{
 				OpenSharedConnection();
-				_transaction = _sharedConnection.BeginTransaction();
+				_transaction = _sharedConnection.BeginTransaction(isolationLevel);
 				_transactionCancelled = false;
 				OnBeginTransaction();
 			}
@@ -2072,6 +2099,15 @@ namespace PetaPoco
 			get; 
 			set; 
 		}
+
+        /// <summary>
+        /// Sets the default isolation level for all transactions.
+        /// </summary>
+        public IsolationLevel DefaultIsolationLevel
+        {
+            get;
+            set;
+        }
 		#endregion
 
 		#region Member Fields
