@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PetaPoco")]
-[assembly: AssemblyDescription("A Tiny ORMish thing for your POCO's.")]
+[assembly: AssemblyTitle("csj")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Topten Software")]
-[assembly: AssemblyProduct("PetaPoco")]
-[assembly: AssemblyCopyright("Copyright © 2011-2012. Topten Software")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("csj")]
+[assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bdbdc77b-9138-4d46-b8bb-263449fec5cf")]
+[assembly: Guid("6d7a7154-7f3c-4335-941f-7840f96c8c46")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,6 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.0.1.*")]
-
-[assembly: InternalsVisibleTo("PetaPoco.Tests")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

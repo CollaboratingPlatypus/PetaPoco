@@ -40,13 +40,8 @@ namespace PetaPoco
 								type="PetaPoco.OracleProvider, ASSEMBLYNAME" />
 			</DbProviderFactories>
 		</system.data>
-	 
-	
 
 	 */
-
-
-
 
 	public class OracleProvider : DbProviderFactory
 	{
@@ -61,8 +56,8 @@ namespace PetaPoco
 
 		public OracleProvider()
 		{
-			_connectionType = ReflectHelper.TypeFromAssembly(_connectionTypeName, _assemblyName);
-			_commandType = ReflectHelper.TypeFromAssembly(_commandTypeName, _assemblyName);
+			_connectionType = TypeFromAssembly(_connectionTypeName, _assemblyName);
+			_commandType = TypeFromAssembly(_commandTypeName, _assemblyName);
 			if (_connectionType == null)
 				throw new InvalidOperationException("Can't find Connection type: " + _connectionTypeName);
 		}
@@ -81,52 +76,47 @@ namespace PetaPoco
 
 			return command;
 		}
+
+
+		public static Type TypeFromAssembly(string typeName, string assemblyName)
+		{
+			try
+			{
+				// Try to get the type from an already loaded assembly
+				Type type = Type.GetType(typeName);
+
+				if (type != null)
+				{
+					return type;
+				}
+
+				if (assemblyName == null)
+				{
+					// No assembly was specified for the type, so just fail
+					string message = "Could not load type " + typeName + ". Possible cause: no assembly name specified.";
+					throw new TypeLoadException(message);
+				}
+
+				Assembly assembly = Assembly.Load(assemblyName);
+
+				if (assembly == null)
+				{
+					throw new InvalidOperationException("Can't find assembly: " + assemblyName);
+				}
+
+				type = assembly.GetType(typeName);
+
+				if (type == null)
+				{
+					return null;
+				}
+
+				return type;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
 	}
-	
-	
-	public class ReflectHelper
-    {
-        public static Type TypeFromAssembly(string typeName, string assemblyName)
-        {
-            try
-            {
-                // Try to get the type from an already loaded assembly
-                Type type = Type.GetType(typeName);
-
-                if (type != null)
-                {
-                    return type;
-                }
-
-                if (assemblyName == null)
-                {
-                    // No assembly was specified for the type, so just fail
-                    string message = "Could not load type " + typeName + ". Possible cause: no assembly name specified.";
-                    throw new TypeLoadException(message);
-                }
-
-                Assembly assembly = Assembly.Load(assemblyName);
-
-                if (assembly == null)
-                {
-                    throw new InvalidOperationException("Can't find assembly: " + assemblyName);
-                }
-
-                type = assembly.GetType(typeName);
-
-                if (type == null)
-                {
-                    return null;
-                }
-
-                return type;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-    }
-
 }
