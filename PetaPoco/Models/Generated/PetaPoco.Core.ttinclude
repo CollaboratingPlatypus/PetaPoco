@@ -1213,8 +1213,8 @@ class OracleSchemaReader : SchemaReader
 					Column col=new Column();
 					col.Name=rdr["ColumnName"].ToString();
 					col.PropertyName=CleanUp(col.Name);
-					col.PropertyType=GetPropertyType(rdr["DataType"].ToString(), (rdr["DataType"] == DBNull.Value ? null : rdr["DataType"].ToString()));
-					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
+					col.PropertyType=GetPropertyType(rdr["DataType"].ToString(), (rdr["DataScale"] == DBNull.Value ? null : rdr["DataScale"].ToString()));
+					col.IsNullable = "YES".Equals(isnullable) || "Y".Equals(isnullable);
 					col.IsAutoIncrement=true;
 					result.Add(col);
 				}
@@ -1255,7 +1255,8 @@ and ucc.position = 1";
 	string GetPropertyType(string sqlType, string dataScale)
 	{
 		string sysType="string";
-		switch (sqlType.ToLower()) 
+		sqlType = sqlType.ToLower();
+		switch (sqlType) 
 		{
 			case "bigint":
 				sysType = "long";
