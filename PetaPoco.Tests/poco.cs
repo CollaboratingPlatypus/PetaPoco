@@ -38,8 +38,8 @@ namespace PetaPoco.Tests
 		[Column] public long id { get; set; }
 		[Column] public string title { get; set; }
 		[Column] public bool draft { get; set; }
-		[Column] public DateTime date_created { get; set; }
-		[Column] public DateTime? date_edited { get; set; }
+		[Column(ForceToUtc=true)] public DateTime date_created { get; set; }
+		[Column(ForceToUtc = true)]	public DateTime? date_edited { get; set; }
 		[Column] public string content { get; set; }
 		[Column] public State state { get; set; }
 		[Column("col w space")] public int col_w_space { get; set; }
