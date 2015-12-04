@@ -1,4 +1,4 @@
-Originally the brain child of [Brad Robinson],
+Originally the brainchild of [Brad Robinson],
 
 ## PetaPoco is a tiny, fast, single-file micro-ORM for .NET and Mono.
 
