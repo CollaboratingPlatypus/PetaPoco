@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+using System.Collections.Concurrent;
 
 namespace PetaPoco.Internal
 {
 	class Cache<TKey, TValue>
 	{
-		Dictionary<TKey, TValue> _map = new Dictionary<TKey, TValue>();
-		ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+		ConcurrentDictionary<TKey, Lazy<TValue>> _map = new ConcurrentDictionary<TKey, Lazy<TValue>>();
 
 		public int Count
 		{
@@ -21,56 +17,12 @@ namespace PetaPoco.Internal
 
 		public TValue Get(TKey key, Func<TValue> factory)
 		{
-			// Check cache
-			_lock.EnterReadLock();
-			TValue val;
-			try
-			{
-				if (_map.TryGetValue(key, out val))
-					return val;
-			}
-			finally
-			{
-				_lock.ExitReadLock();
-			}
-
-
-			// Cache it
-			_lock.EnterWriteLock();
-			try
-			{
-				// Check again
-				if (_map.TryGetValue(key, out val))
-					return val;
-
-				// Create it
-				val = factory();
-
-				// Store it
-				_map.Add(key, val);
-
-				// Done
-				return val;
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
-			}
+			return _map.GetOrAdd(key, new Lazy<TValue>(factory)).Value;
 		}
 
 		public void Flush()
 		{
-			// Cache it
-			_lock.EnterWriteLock();
-			try
-			{
-				_map.Clear();
-			}
-			finally
-			{
-				_lock.ExitWriteLock();
-			}
-
+			_map.Clear();
 		}
 	}
 }
