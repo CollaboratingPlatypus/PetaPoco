@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+		<id>PetaPoco.Core.Compiled</id>
+		<title>PetaPoco.Core.Compiled - A tiny ORMish thing for your POCOs (Core Only, Compiled)</title>
+		<version>5.0.1</version>
+    <authors>Collaborating Platypus</authors>
+    <owners>Collaborating Platypus</owners>
+		<licenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</licenseUrl>
+		<projectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</projectUrl>
+		<iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<description>
+PetaPoco is a tiny, single file .NET data access layer inspired by Massive that works with both non-dynamic POCO objects and dynamics.
+
+This package includes the just the core PetaPoco library (compiled) (ie: no T4 templates)
+
+		</description>
+		<tags>ORM MIRCO MIRCO-ORM PETA POCO MVC ASP.NET WebForms MSSQL SQLSERVER Postgres MySQL Database</tags>
+		<frameworkAssemblies>
+			<frameworkAssembly assemblyName="System.Data" />
+			<frameworkAssembly assemblyName="System.Configuration" />
+		</frameworkAssemblies>
+	</metadata>
+</package>
