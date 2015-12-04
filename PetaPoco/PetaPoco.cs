@@ -1828,12 +1828,29 @@ namespace PetaPoco
 				var tc = Type.GetTypeCode(t);
 				return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
 			}
-
-			// Create factory function that can convert a IDataReader record into a POCO
-			public Delegate GetFactory(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
-			{
-				// Check cache
-				var key = string.Format("{0}:{1}:{2}:{3}:{4}", sql, connString, ForceDateTimesToUtc, firstColumn, countColumns);
+            /// <summary>
+            /// GetFactoryKey for given parameters based on Fields and Types in IDataReader
+            /// </summary>
+            /// <param name="connString"></param>
+            /// <param name="forceDateTimeToUtc"></param>
+            /// <param name="firstColumn"></param>
+            /// <param name="countColumns"></param>
+            /// <param name="r"></param>
+            /// <returns></returns>
+            public string GetFactoryKey(string connString, bool forceDateTimeToUtc, int firstColumn, int countColumns, IDataReader r)
+            {
+                var fieldList = new List<string>();
+                for (int i = 0; i < r.FieldCount; i++)
+                {
+                    fieldList.Add(String.Format("f:{0}|t:{1}", r.GetName(i), r.GetFieldType(i)));
+                }
+                return string.Format("{0}:{1}:{2}:{3}:{4}", String.Join(",", fieldList), connString, forceDateTimeToUtc, firstColumn, countColumns);
+            }
+            // Create factory function that can convert a IDataReader record into a POCO
+            public Delegate GetFactory(string sql, string connString, bool ForceDateTimesToUtc, int firstColumn, int countColumns, IDataReader r)
+            {
+                // Check cache
+                var key = GetFactoryKey(connString, ForceDateTimesToUtc, firstColumn, countColumns, r);
 				RWLock.EnterReadLock();
 				try
 				{
