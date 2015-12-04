@@ -2094,11 +2094,19 @@ namespace PetaPoco
 				// Forced type conversion including integral types -> enum
 				if (converter == null)
 				{
+					var underlyingType = Nullable.GetUnderlyingType(dstType);
 					if (dstType.IsEnum && IsIntegralType(srcType))
 					{
 						if (srcType != typeof(int))
 						{
-							converter = delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
+							converter = delegate(object src) { return Enum.ToObject(dstType, src); };
+						}
+					}
+					else if (underlyingType != null && underlyingType.IsEnum && IsIntegralType(srcType))
+					{
+						if (srcType != typeof(int))
+						{
+							converter = delegate(object src) { return Enum.ToObject(underlyingType, src); };
 						}
 					}
 					else if (!dstType.IsAssignableFrom(srcType))
