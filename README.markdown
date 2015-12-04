@@ -1,22 +1,56 @@
-# PetaPoco #
+Originally the brain child of [Brad Robinson],
 
-<h2 class="tagline">A tiny ORM-ish thing for your POCOs</h2>
+## PetaPoco is a tiny, fast, single-file micro-ORM for .NET and Mono.
 
-PetaPoco is a tiny .NET data access layer inspired by Rob Conery's [Massive](https://github.com/robconery/massive) 
-project but for use with non-dynamic [POCO](http://en.wikipedia.org/wiki/Plain_Old_CLR_Object) objects.  It came about because I was finding
-many of my projects that used SubSonic/Linq were slow or becoming mixed bags of Linq and [CodingHorror](http://www.subsonicproject.com/docs/CodingHorror).
+* Like [Massive] it's a single file that you easily add to any project
+* Unlike [Massive] it works with strongly typed [POCO]'s
+* Like [Massive], it now also supports dynamic Expandos too - [read more](http://www.toptensoftware.com/blog/posts/104-PetaPoco-Not-So-Poco-or-adding-support-for-dynamic)
+* Like [ActiveRecord], it supports a close relationship between object and database table
+* Like [SubSonic], it supports generation of poco classes with T4 templates
+* Like [Dapper], it's fast because it uses dynamic method generation (MSIL) to assign column values to properties
 
-I needed a data acess layer that was:
+## Features at a Glance
 
-* tiny
-* fast
-* easy to use and similar to SubSonic
-* could run on .NET 3.5 and/or Mono 2.6 (ie: no support for dynamic).  
+* Tiny, no dependencies... a single C# file you can easily add to any project.
+* Works with strictly undecorated POCOs, or attributed almost-POCOs.
+* Helper methods for Insert/Delete/Update/Save and IsNew
+* Paged requests automatically work out total record count and fetch a specific page.
+* Easy transaction support.
+* Better parameter replacement support, including grabbing named parameters from object properties.
+* Great performance by eliminating Linq and fast property assignment with DynamicMethod generation.
+* Includes T4 templates to automatically generate POCO classes for you.
+* The query language is SQL... no weird fluent or Linq syntaxes (yes, matter of opinion)
+* Includes a low friction SQL builder class that makes writing inline SQL *much* easier.
+* Hooks for logging exceptions, installing value converters and mapping columns to properties without attributes.
+* Works with SQL Server, SQL Server CE, MySQL, PostgreSQL and Oracle.
+* Works under .NET 4.0/4.5/4.6 or Mono 2.8 and later.
+* Experimental support for `dynamic` under .NET 4.0 and Mono 2.8
+* [Xunit] unit tests.
+* OpenSource (Apache License)
+* All of this in about 1,500 lines of code
+ 
+## Documentation
 
-Rob's claim of Massive being only 400 lines of code intruiged me and I wondered if something similar could be done without dynamics.
+For configuration, code examples and other general information [See the docs]
 
-So, what's with the name?  Well if Massive is massive, this is "Peta" massive (at about 1,200 lines it's triple the size after all) and since it 
-works with "Poco"s ... "PetaPoco" seemed like a fun name!!
+## Contributing
 
+PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]
 
-See here - <http://www.toptensoftware.com/petapoco> - for full details.
+## Download
+
+PetaPoco is available from:
+
+* NuGet Peta - <https://www.nuget.org/packages/PetaPoco/>
+* NuGet Peta Core - <https://www.nuget.org/packages/PetaPoco.Core/>
+
+[Brad Robinson]:http://www.toptensoftware.com/
+[Massive]:https://github.com/FransBouma/Massive
+[Dapper]:https://github.com/StackExchange/dapper-dot-net
+[SubSonic]:http://subsonic.github.io/
+[ActiveRecord]:http://guides.rubyonrails.org/active_record_basics.html
+[POCO]:http://en.wikipedia.org/wiki/Plain_Old_CLR_Object
+[CodingHorror]:http://www.subsonicproject.com/docs/CodingHorror
+[XUnit]:https://github.com/xunit/xunit
+[See the docs]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki
+[the contribution guide]:./contributing.md
