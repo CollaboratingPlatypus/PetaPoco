@@ -64,6 +64,17 @@ namespace PetaPoco
 		public string Value { get; private set; }
 	}
 
+  // Specify the schema name of a poco
+  [AttributeUsage( AttributeTargets.Class )]
+  public class SchemaNameAttribute : Attribute
+  {
+    public SchemaNameAttribute( string schemaName )
+    {
+      Value = schemaName;
+    }
+    public string Value { get; private set; }
+  }
+
 	// Specific the primary key of a poco class (and optional sequence name for Oracle)
 	[AttributeUsage(AttributeTargets.Class)]
 	public class PrimaryKeyAttribute : Attribute
@@ -109,6 +120,7 @@ namespace PetaPoco
 	// Used by IMapper to override table bindings for an object
 	public class TableInfo
 	{
+	  public string SchemaName { get; set; }
 		public string TableName { get; set; }
 		public string PrimaryKey { get; set; }
 		public bool AutoIncrement { get; set; }
@@ -206,7 +218,7 @@ namespace PetaPoco
 			// Try using type name first (more reliable)
 			if (dbtype.StartsWith("MySql")) _dbType = DBType.MySql;
 			else if (dbtype.StartsWith("SqlCe")) _dbType = DBType.SqlServerCE;
-			else if (dbtype.StartsWith("Npgsql")) _dbType = DBType.PostgreSQL;
+			else if (dbtype.StartsWith("Npgsql") || dbtype.StartsWith("PgSql")) _dbType = DBType.PostgreSQL;
 			else if (dbtype.StartsWith("Oracle")) _dbType = DBType.Oracle;
 			else if (dbtype.StartsWith("SQLite")) _dbType = DBType.SQLite;
 			else if (dbtype.StartsWith("System.Data.SqlClient.")) _dbType = DBType.SqlServer;
@@ -593,7 +605,7 @@ namespace PetaPoco
 				var tableName = EscapeTableName(pd.TableInfo.TableName);
 				string cols = string.Join(", ", (from c in pd.QueryColumns select tableName + "." + EscapeSqlIdentifier(c)).ToArray());
 				if (!rxFrom.IsMatch(sql))
-					sql = string.Format("SELECT {0} FROM {1} {2}", cols, tableName, sql);
+          sql = string.Format( "SELECT {0} FROM {1} {2}", cols, GetTableTarget( pd.TableInfo.SchemaName, pd.TableInfo.TableName), sql );
 				else
 					sql = string.Format("SELECT {0} {1}", cols, sql);
 			}
@@ -1163,6 +1175,30 @@ namespace PetaPoco
 			// Assume table names with "dot" are already escaped
 			return str.IndexOf('.') >= 0 ? str : EscapeSqlIdentifier(str);
 		}
+    public string EscapeSchemaName( string str )
+    {
+      // Assume table names with "dot" are already escaped
+      if( str == null )
+        return null;
+      return str.IndexOf( '.' ) >= 0 ? str : EscapeSqlIdentifier( str );
+    }
+
+    private string GetTableTarget( PocoData pd )
+    {
+      var target = EscapeTableName( pd.TableInfo.TableName );
+      if ( pd.TableInfo.SchemaName != null )
+        target = string.Format( "{0}.{1}", EscapeSchemaName( pd.TableInfo.SchemaName ), target );
+      return target;
+    }
+
+    private string GetTableTarget( string schemaName, string tableName )
+    {
+      var target = EscapeTableName( tableName );
+      if ( schemaName != null )
+        target = string.Format( "{0}.{1}", EscapeSchemaName( schemaName ), target );
+      return target;
+    }
+
 		public string EscapeSqlIdentifier(string str)
 		{
 			switch (_dbType)
@@ -1189,7 +1225,12 @@ namespace PetaPoco
 		// Insert a poco into a table.  If the poco has a property with the same name 
 		// as the primary key the id of the new record is assigned to it.  Either way,
 		// the new id is returned.
-		public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
+    public object Insert( string tableName, string primaryKeyName, bool autoIncrement, object poco)
+    {
+      return Insert(null, tableName, primaryKeyName, autoIncrement, poco);
+    }
+
+		public object Insert(string schemaName, string tableName, string primaryKeyName, bool autoIncrement, object poco)
 		{
 			try
 			{
@@ -1223,9 +1264,9 @@ namespace PetaPoco
 							values.Add(string.Format("{0}{1}", _paramPrefix, index++));
 							AddParam(cmd, i.Value.GetValue(poco), _paramPrefix);
 						}
-
+            
 						cmd.CommandText = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
-								EscapeTableName(tableName),
+								GetTableTarget( schemaName, tableName ),
 								string.Join(",", names.ToArray()),
 								string.Join(",", values.ToArray())
 								);
@@ -1344,17 +1385,26 @@ namespace PetaPoco
 		public object Insert(object poco)
 		{
 			var pd = PocoData.ForType(poco.GetType());
-			return Insert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
+      return Insert( pd.TableInfo.SchemaName, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco );
 		}
 
 		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
-			return Update(tableName, primaryKeyName, poco, primaryKeyValue, null);
+			return Update( null, tableName, primaryKeyName, poco, primaryKeyValue, null);
 		}
 
+    public int Update( string schemaName, string tableName, string primaryKeyName, object poco, object primaryKeyValue )
+    {
+      return Update( schemaName, tableName, primaryKeyName, poco, primaryKeyValue, null );
+    }
 
 		// Update a record with values from a poco.  primary key value can be either supplied or read from the poco
 		public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+		{
+			return Update(null, tableName, primaryKeyName, poco, primaryKeyValue, columns);
+		}
+	
+    public int Update(string schemaName, string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
 		{
 			try
 			{
@@ -1414,10 +1464,11 @@ namespace PetaPoco
 							}
 
 						}
-
+            
 						cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
-											EscapeTableName(tableName), sb.ToString(), EscapeSqlIdentifier(primaryKeyName), _paramPrefix, index++);
-						AddParam(cmd, primaryKeyValue, _paramPrefix);
+                      GetTableTarget(schemaName, tableName), sb.ToString(), EscapeSqlIdentifier( primaryKeyName ), _paramPrefix, index++ );
+           
+           	AddParam(cmd, primaryKeyValue, _paramPrefix);
 
 						DoPreExecute(cmd);
 
@@ -1444,10 +1495,20 @@ namespace PetaPoco
 			return Update(tableName, primaryKeyName, poco, null);
 		}
 
+    public int Update( string schemaName, string tableName, string primaryKeyName, object poco )
+    {
+      return Update( schemaName, tableName, primaryKeyName, poco, null );
+    }
+
 		public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
 		{
-			return Update(tableName, primaryKeyName, poco, null, columns);
+			return Update(null, tableName, primaryKeyName, poco, null, columns);
 		}
+
+    public int Update( string schemaName, string tableName, string primaryKeyName, object poco, IEnumerable<string> columns )
+    {
+      return Update( schemaName, tableName, primaryKeyName, poco, null, columns );
+    }
 
 		public int Update(object poco, IEnumerable<string> columns)
 		{
@@ -1466,19 +1527,22 @@ namespace PetaPoco
 		public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
 		{
 			var pd = PocoData.ForType(poco.GetType());
-			return Update(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
+			return Update(pd.TableInfo.SchemaName, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
 		}
 
 		public int Update<T>(string sql, params object[] args)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(string.Format("UPDATE {0} {1}", EscapeTableName(pd.TableInfo.TableName), sql), args);
+      
+			return Execute(string.Format("UPDATE {0} {1}", GetTableTarget( pd ), sql), args);
 		}
 
-		public int Update<T>(Sql sql)
+
+
+	  public int Update<T>(Sql sql)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(new Sql(string.Format("UPDATE {0}", EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+			return Execute(new Sql(string.Format("UPDATE {0}", GetTableTarget(pd))).Append(sql));
 		}
 
 		public int Delete(string tableName, string primaryKeyName, object poco)
@@ -1486,7 +1550,17 @@ namespace PetaPoco
 			return Delete(tableName, primaryKeyName, poco, null);
 		}
 
-		public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+    public int Delete( string schemaName, string tableName, string primaryKeyName, object poco )
+    {
+      return Delete( schemaName, tableName, primaryKeyName, poco, null );
+    }
+
+    public int Delete( string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+    {
+      return Delete(null, tableName, primaryKeyName, poco, primaryKeyValue);
+    }
+
+		public int Delete( string schemaName, string tableName, string primaryKeyName, object poco, object primaryKeyValue)
 		{
 			// If primary key value not specified, pick it up from the object
 			if (primaryKeyValue == null)
@@ -1500,7 +1574,7 @@ namespace PetaPoco
 			}
 
 			// Do it
-			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", EscapeTableName(tableName), EscapeSqlIdentifier(primaryKeyName));
+			var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", GetTableTarget( schemaName, tableName ), EscapeSqlIdentifier(primaryKeyName));
 			return Execute(sql, primaryKeyValue);
 		}
 
@@ -1521,13 +1595,13 @@ namespace PetaPoco
 		public int Delete<T>(string sql, params object[] args)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(string.Format("DELETE FROM {0} {1}", EscapeTableName(pd.TableInfo.TableName), sql), args);
+			return Execute(string.Format("DELETE FROM {0} {1}", GetTableTarget( pd ), sql), args);
 		}
 
 		public int Delete<T>(Sql sql)
 		{
 			var pd = PocoData.ForType(typeof(T));
-			return Execute(new Sql(string.Format("DELETE FROM {0}", EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+			return Execute(new Sql(string.Format("DELETE FROM {0}", GetTableTarget( pd ))).Append(sql));
 		}
 
 		// Check if a poco represents a new record
@@ -1763,10 +1837,14 @@ namespace PetaPoco
 			{
 				type = t;
 				TableInfo=new TableInfo();
-
+        
 				// Get the table name
 				var a = t.GetCustomAttributes(typeof(TableNameAttribute), true);
 				TableInfo.TableName = a.Length == 0 ? t.Name : (a[0] as TableNameAttribute).Value;
+
+        // Get the schema name
+        a = t.GetCustomAttributes( typeof( SchemaNameAttribute ), true );
+        TableInfo.SchemaName = a.Length == 0 ? null : ( a[ 0 ] as SchemaNameAttribute ).Value;
 
 				// Get the primary key
 				a = t.GetCustomAttributes(typeof(PrimaryKeyAttribute), true);
