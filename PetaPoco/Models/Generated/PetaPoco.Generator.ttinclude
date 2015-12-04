@@ -170,8 +170,11 @@ foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 			}
 			set
 			{
-				_<#=col.PropertyName #> = value;
-				MarkColumnModified("<#=col.Name#>");
+				if (value != _<#=col.PropertyName #>)
+				{
+					_<#=col.PropertyName #> = value;
+					MarkColumnModified("<#=col.Name#>");
+				}
 			}
 		}
 		<#=col.PropertyType #><#=CheckNullable(col)#> _<#=col.PropertyName #>;
