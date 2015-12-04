@@ -28,8 +28,16 @@ Originally the brain child of [Brad Robinson],
 * [Xunit] unit tests.
 * OpenSource (Apache License)
 * All of this in about 1,500 lines of code
+ 
+## Documentation
 
-## Download ##
+For configuration, code examples and other general information [See the docs]
+
+## Contributing
+
+PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]
+
+## Download
 
 PetaPoco is available from:
 
@@ -44,3 +52,5 @@ PetaPoco is available from:
 [POCO]:http://en.wikipedia.org/wiki/Plain_Old_CLR_Object
 [CodingHorror]:http://www.subsonicproject.com/docs/CodingHorror
 [XUnit]:https://github.com/xunit/xunit
+[See the docs]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki
+[the contribution guide]:./contributing.md
