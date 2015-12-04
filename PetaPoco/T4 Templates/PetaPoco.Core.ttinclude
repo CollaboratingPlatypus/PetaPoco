@@ -161,10 +161,22 @@ public class Tables : List<Table>
 
 static Regex rxCleanUp = new Regex(@"[^\w\d_]", RegexOptions.Compiled);
 
+static string[] cs_keywords = { "abstract", "event", "new", "struct", "as", "explicit", "null", 
+	 "switch", "base", "extern", "object", "this", "bool", "false", "operator", "throw", 
+	 "break", "finally", "out", "true", "byte", "fixed", "override", "try", "case", "float", 
+	 "params", "typeof", "catch", "for", "private", "uint", "char", "foreach", "protected", 
+	 "ulong", "checked", "goto", "public", "unchecked", "class", "if", "readonly", "unsafe", 
+	 "const", "implicit", "ref", "ushort", "continue", "in", "return", "using", "decimal", 
+	 "int", "sbyte", "virtual", "default", "interface", "sealed", "volatile", "delegate", 
+	 "internal", "short", "void", "do", "is", "sizeof", "while", "double", "lock", 
+	 "stackalloc", "else", "long", "static", "enum", "namespace", "string" };
+
 static Func<string, string> CleanUp = (str) =>
 {
 	str = rxCleanUp.Replace(str, "_");
-	if (char.IsDigit(str[0])) str = "_" + str;
+
+	if (char.IsDigit(str[0]) || cs_keywords.Contains(str))
+		str = "@" + str;
 	
     return str;
 };
@@ -553,7 +565,7 @@ class SqlServerSchemaReader : SchemaReader
                 INNER JOIN sys.index_columns AS ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id 
                 INNER JOIN sys.objects AS o ON i.object_id = o.object_id 
                 LEFT OUTER JOIN sys.columns AS c ON ic.object_id = c.object_id AND c.column_id = ic.column_id
-                WHERE (i.type = 1) AND (o.name = @tableName)";
+                WHERE (i.is_primary_key = 1) AND (o.name = @tableName)";
 
 		using (var cmd=_factory.CreateCommand())
 		{
@@ -593,11 +605,15 @@ class SqlServerSchemaReader : SchemaReader
 				 break;
 			case "smalldatetime":
 			case "datetime":
+			case "datetime2":
 			case "date":
 			case "time":
 				sysType=  "DateTime";
 				  break;
-			case "float":
+			case "datetimeoffset":
+				sysType = "DateTimeOffset";
+				break;
+  			case "float":
 				sysType="double";
 				break;
 			case "real":
@@ -1308,7 +1324,12 @@ and ucc.position = 1";
 
 
 
-	const string TABLE_SQL=@"select TABLE_NAME from USER_TABLES";
+	const string TABLE_SQL=@"select TABLE_NAME, 'Table' TABLE_TYPE, USER TABLE_SCHEMA
+from USER_TABLES
+union all
+select VIEW_NAME, 'View', USER
+from USER_VIEWS";
+
 
 	const string COLUMN_SQL=@"select table_name TableName, 
  column_name ColumnName, 
@@ -1316,7 +1337,7 @@ and ucc.position = 1";
  data_scale DataScale,
  nullable IsNullable
  from USER_TAB_COLS utc 
- where table_name = upper(:tableName)
+ where table_name = :tableName
  order by column_id";
 	  
 }
