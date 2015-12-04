@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Linq.Expressions;
 using System.Data;
+using System.Collections.Concurrent;
 
 namespace PetaPoco.Internal
 {
@@ -23,7 +24,7 @@ namespace PetaPoco.Internal
 			// Build a key
 			var key = new ArrayKey<Type>(types);
 
-			return AutoMappers.Get(key, () =>
+			return AutoMappers.GetOrAdd(key, (_) =>
 				{
 					// Create a method
 					var m = new DynamicMethod("petapoco_automapper", types[0], types, true);
@@ -127,13 +128,13 @@ namespace PetaPoco.Internal
 		}
 
 		// Various cached stuff
-		static Cache<Tuple<Type, ArrayKey<Type>, string, string>, object> MultiPocoFactories = new Cache<Tuple<Type, ArrayKey<Type>, string, string>, object>();
-		static Cache<ArrayKey<Type>, object> AutoMappers = new Cache<ArrayKey<Type>, object>();
+		static ConcurrentDictionary<Tuple<Type, ArrayKey<Type>, string, string>, object> MultiPocoFactories = new ConcurrentDictionary<Tuple<Type, ArrayKey<Type>, string, string>, object>();
+		static ConcurrentDictionary<ArrayKey<Type>, object> AutoMappers = new ConcurrentDictionary<ArrayKey<Type>, object>();
 
 		internal static void FlushCaches()
 		{
-			MultiPocoFactories.Flush();
-			AutoMappers.Flush();
+			MultiPocoFactories.Clear();
+			AutoMappers.Clear();
 		}
 
 		// Get (or create) the multi-poco factory for a query
@@ -141,7 +142,7 @@ namespace PetaPoco.Internal
 		{
 			var key = Tuple.Create<Type, ArrayKey<Type>, string, string>(typeof(TRet), new ArrayKey<Type>(types), ConnectionString, sql);
 
-			return (Func<IDataReader, object, TRet>)MultiPocoFactories.Get(key, () =>
+			return (Func<IDataReader, object, TRet>)MultiPocoFactories.GetOrAdd(key, (_) =>
 				{
 					return CreateMultiPocoFactory<TRet>(types, ConnectionString, sql, r);
 				}

@@ -93,7 +93,6 @@
     <None Include="PetaPoco.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ArrayKey.cs" />
-    <Compile Include="Utilities\Cache.cs" />
     <Compile Include="Utilities\EnumMapper.cs" />
     <Compile Include="Utilities\Singleton.cs" />
   </ItemGroup>
