@@ -1,0 +1,33 @@
+postgres:
+  image: postgres:latest
+  container_name: postgres
+  volumes:
+    - Postgresql:/var/lib/postgresql
+  ports:
+    - "5001:5432"
+  environment:
+    - POSTGRES_PASSWORD=postgresp
+    - POSTGRES_USER=postgresu
+redis_cache:
+  image: redis:latest
+  container_name: redis_cache
+  ports:
+    - "5002:6379"
+  command: redis-server --save "" --maxmemory "256mb" --maxmemory-policy "allkeys-lru"
+#redis_persist:
+#  image: redis:latest
+#  container_name: redis_persist
+#  ports:
+#    - "5003:6379"
+#  volumes:
+#    - Redis:/data
+#  command: "redis-server --appendonly yes"
+#web:
+#  build: .
+#  command: python manage.py runserver 0.0.0.0:8000
+#  volumes:
+#    - .:/code
+#  ports:
+#    - "8000:8000"
+#  links:
+#    - db  
