@@ -22,9 +22,9 @@ build_script:
 after_build:
 - cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.5;DefineConstants=SKIP_POST_BUILD
 - cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0;DefineConstants=SKIP_POST_BUILD
-- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
-- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Core.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
-- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Compiled.nuspec -BasePath .\\PetaPoco\\bin\\Release\\ -OutputDirectory .\\PetaPacked\\ -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
+- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $env:APPVEYOR_BUILD_INFO_VERSION -Verbosity detailed"
+- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Core.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $env:APPVEYOR_BUILD_INFO_VERSION -Verbosity detailed"
+- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Compiled.nuspec -BasePath .\\PetaPoco\\bin\\Release\\ -OutputDirectory .\\PetaPacked\\ -Version $env:APPVEYOR_BUILD_INFO_VERSION -Verbosity detailed"
 #test_script:
 #- vstest.console /logger:Appveyor /TestAdapterPath:"%APPVEYOR_BUILD_FOLDER%\src\packages\Fixie.1.0.0.3\lib\net45" "%APPVEYOR_BUILD_FOLDER%\src\Portable.MediatR.Tests\bin\Release\Portable.MediatR.Tests.dll"
 artifacts:
