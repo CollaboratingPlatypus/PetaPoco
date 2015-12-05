@@ -17,6 +17,7 @@ assembly_info:
 cache: src\packages
 nuget:
   project_feed: true
+  disable_publish_on_pr: true
 build_script:
 - cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0
 after_build:
@@ -27,8 +28,6 @@ after_build:
 - ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Compiled.nuspec -BasePath .\\PetaPoco\\bin\\Release\\ -OutputDirectory .\\PetaPacked\\ -Version $env:APPVEYOR_BUILD_INFO_VERSION -Verbosity detailed"
 #test_script:
 #- vstest.console /logger:Appveyor /TestAdapterPath:"%APPVEYOR_BUILD_FOLDER%\src\packages\Fixie.1.0.0.3\lib\net45" "%APPVEYOR_BUILD_FOLDER%\src\Portable.MediatR.Tests\bin\Release\Portable.MediatR.Tests.dll"
-nuget:
-  disable_publish_on_pr: true
 artifacts:
 - path: PetaPacked\**\*.nupkg
 deploy:
