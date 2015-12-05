@@ -22,17 +22,19 @@ build:
   project: PetaPoco.sln
   verbosity: minimal
 after_build:
-- ps: ".\\Tools\\NuGet.exe pack \\Nuget\PetaPoco.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
-- ps: ".\\Tools\\NuGet.exe pack \\Nuget\PetaPoco.Core.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
-- ps: ".\\Tools\\NuGet.exe pack \\Nuget\PetaPoco.Compiled.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
+- msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:4.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0;DefineConstants='SKIP_POST_BUILD'
+- msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.5;DefineConstants='SKIP_POST_BUILD'
+- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
+- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Core.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
+- ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Compiled.nuspec -BasePath .\\PetaPoco\\bin\\Release\\ -OutputDirectory .\\PetaPacked\\ -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
 #test_script:
 #- vstest.console /logger:Appveyor /TestAdapterPath:"%APPVEYOR_BUILD_FOLDER%\src\packages\Fixie.1.0.0.3\lib\net45" "%APPVEYOR_BUILD_FOLDER%\src\Portable.MediatR.Tests\bin\Release\Portable.MediatR.Tests.dll"
 artifacts:
 - path: .\\PetaPacked\\Peta*.nupkg
-deploy:
-- provider: NuGet
-  api_key:
-    secure: YPGdPLnY9FEYDZz3zZFV/+BKreynP4W2/DoURr0XlBjS8eLkkSypvEkI0BQSfRur
-  artifact: /petapoco.*\.nupkg/
-  on:
-    branch: /master|Development/
+#deploy:
+#- provider: NuGet
+#  api_key:
+#    secure: YPGdPLnY9FEYDZz3zZFV/+BKreynP4W2/DoURr0XlBjS8eLkkSypvEkI0BQSfRur
+#  artifact: /petapoco.*\.nupkg/
+#  on:
+#    branch: /master|Development/

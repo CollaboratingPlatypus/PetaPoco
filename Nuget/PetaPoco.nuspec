@@ -23,7 +23,7 @@ This package includes the core PetaPoco library + T4 templates to generate POCO 
 	</metadata>
 	<files>
 		<file src="PetaPoco.cs" target="Content\Models" />
-		<file src="Models\Generated\*.tt" target="Content\Models\Generated" />
-		<file src="Models\Generated\PetaPoco*" target="Content\Models\Generated" />
+		<file src="*.tt" target="Content\Models\Generated" />
+		<file src="PetaPoco*.ttinclude" target="Content\Models\Generated" />
 	</files>
 </package>
