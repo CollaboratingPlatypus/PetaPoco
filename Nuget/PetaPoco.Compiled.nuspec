@@ -23,7 +23,9 @@ This package includes the just the core PetaPoco library (compiled) (ie: no T4 t
 		</frameworkAssemblies>
 	</metadata>
   <files>
-    <file src="Release\v4.0\SelfishHttp.dll" target="lib\net40" />
-    <file src="Release\v4.5\SelfishHttp.dll" target="lib\net45" />
+    <file src="Release\v4.0\PetaPoco.dll" target="lib\net40" />
+    <file src="Release\v4.0\PetaPoco.pdb" target="lib\net40" />
+    <file src="Release\v4.5\PetaPoco.dll" target="lib\net45" />
+    <file src="Release\v4.5\PetaPoco.pdb" target="lib\net45" />
   </files>
 </package>
