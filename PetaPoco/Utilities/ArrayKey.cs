@@ -1,57 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// <copyright file="ArrayKey.cs" company="PetaPoco - CollaboratingPlatypus">
+//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
+// </copyright>
+// <author>PetaPoco - CollaboratingPlatypus</author>
+// <date>2015/12/05</date>
 
 namespace PetaPoco.Internal
 {
-	class ArrayKey<T>
-	{
-		public ArrayKey(T[] keys)
-		{
-			// Store the keys
-			_keys = keys;
+    internal class ArrayKey<T>
+    {
+        private int _hashCode;
 
-			// Calculate the hashcode
-			_hashCode = 17;
-			foreach (var k in keys)
-			{
-				_hashCode = _hashCode * 23 + (k==null ? 0 : k.GetHashCode());
-			}
-		}
+        private T[] _keys;
 
-		T[] _keys;
-		int _hashCode;
+        public ArrayKey(T[] keys)
+        {
+            // Store the keys
+            _keys = keys;
 
-		bool Equals(ArrayKey<T> other)
-		{
-			if (other == null)
-				return false;
+            // Calculate the hashcode
+            _hashCode = 17;
+            foreach (var k in keys)
+            {
+                _hashCode = _hashCode*23 + (k == null ? 0 : k.GetHashCode());
+            }
+        }
 
-			if (other._hashCode != _hashCode)
-				return false;
+        private bool Equals(ArrayKey<T> other)
+        {
+            if (other == null)
+                return false;
 
-			if (other._keys.Length != _keys.Length)
-				return false;
+            if (other._hashCode != _hashCode)
+                return false;
 
-			for (int i = 0; i < _keys.Length; i++)
-			{
-				if (!object.Equals(_keys[i], other._keys[i]))
-					return false;
-			}
+            if (other._keys.Length != _keys.Length)
+                return false;
 
-			return true;
-		}
+            for (int i = 0; i < _keys.Length; i++)
+            {
+                if (!object.Equals(_keys[i], other._keys[i]))
+                    return false;
+            }
 
-		public override bool Equals(object obj)
-		{
-			return Equals(obj as ArrayKey<T>);
-		}
+            return true;
+        }
 
-		public override int GetHashCode()
-		{
-			return _hashCode;
-		}
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ArrayKey<T>);
+        }
 
-	}
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+    }
 }

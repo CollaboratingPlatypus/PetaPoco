@@ -47,6 +47,11 @@ For configuration, code examples and other general information [See the docs]
 PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]. We would also suggest you have a quick read of [Contributing to Open Source on GitHub].
 
 ---
+## Contributions Honour Roll
+
+A product like PetaPoco isn't the effort of one person, but rather a combined effort of many. For those individuals who rise above and beyond [we have a special place to honour them].
+
+---
 ## Download
 
 PetaPoco is available from:
@@ -66,3 +71,4 @@ PetaPoco is available from:
 [See the docs]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki
 [the contribution guide]:./contributing.md
 [Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
+[we have a special place to honour them]:./honourRoll.md

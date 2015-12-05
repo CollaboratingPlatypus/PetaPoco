@@ -1,39 +1,52 @@
-﻿// PetaPoco - A Tiny ORMish thing for your POCO's.
-// Copyright © 2011-2012 Topten Software.  All Rights Reserved.
- 
+﻿// <copyright file="ColumnAttribute.cs" company="PetaPoco - CollaboratingPlatypus">
+//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
+// </copyright>
+// <author>PetaPoco - CollaboratingPlatypus</author>
+// <date>2015/12/05</date>
+
 using System;
 
 namespace PetaPoco
 {
-	/// <summary>
-	/// For explicit poco properties, marks the property as a column and optionally 
-	/// supplies the DB column name.
-	/// </summary>
-	[AttributeUsage(AttributeTargets.Property)]
-	public class ColumnAttribute : Attribute
-	{
-		public ColumnAttribute() 
-		{
-			ForceToUtc = false;
-		}
-		
-		public ColumnAttribute(string Name) 
-		{ 
-			this.Name = Name;
-			ForceToUtc = false;
-		}
+    /// <summary>
+    ///     Represents the attribute which decorates a poco property and marks the property as a column and optionally supplies
+    ///     the DB column name.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class ColumnAttribute : Attribute
+    {
+        /// <summary>
+        ///     The column name.
+        /// </summary>
+        /// <returns>
+        ///     The column name.
+        /// </returns>
+        public string Name { get; set; }
 
-		public string Name 
-		{ 
-			get; 
-			set; 
-		}
+        /// <summary>
+        ///     The column name.
+        /// </summary>
+        /// <returns>
+        ///     The column name.
+        /// </returns>
+        public bool ForceToUtc { get; set; }
 
-		public bool ForceToUtc
-		{
-			get;
-			set;
-		}
-	}
+        /// <summary>
+        ///     Constructs a new instance of the <seealso cref="ColumnAttribute" />.
+        /// </summary>
+        public ColumnAttribute()
+        {
+            ForceToUtc = false;
+        }
 
+        /// <summary>
+        ///     Constructs a new instance of the <seealso cref="ColumnAttribute" />.
+        /// </summary>
+        /// <param name="primaryKey">The name of the column.</param>
+        public ColumnAttribute(string Name)
+        {
+            this.Name = Name;
+            ForceToUtc = false;
+        }
+    }
 }

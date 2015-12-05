@@ -1,38 +1,41 @@
-﻿// PetaPoco - A Tiny ORMish thing for your POCO's.
-// Copyright © 2011-2012 Topten Software.  All Rights Reserved.
- 
+﻿// <copyright file="Transaction.cs" company="PetaPoco - CollaboratingPlatypus">
+//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
+// </copyright>
+// <author>PetaPoco - CollaboratingPlatypus</author>
+// <date>2015/12/05</date>
+
 using System;
 
 namespace PetaPoco
 {
-	public interface ITransaction : IDisposable
-	{
-		void Complete();
-	}
+    public interface ITransaction : IDisposable
+    {
+        void Complete();
+    }
 
-	/// <summary>
-	/// Transaction object helps maintain transaction depth counts
-	/// </summary>
-	public class Transaction : ITransaction
-	{
-		public Transaction(Database db)
-		{
-			_db = db;
-			_db.BeginTransaction();
-		}
+    /// <summary>
+    ///     Transaction object helps maintain transaction depth counts
+    /// </summary>
+    public class Transaction : ITransaction
+    {
+        private Database _db;
 
-		public void Complete()
-		{
-			_db.CompleteTransaction();
-			_db = null;
-		}
+        public Transaction(Database db)
+        {
+            _db = db;
+            _db.BeginTransaction();
+        }
 
-		public void Dispose()
-		{
-			if (_db != null)
-				_db.AbortTransaction();
-		}
+        public void Complete()
+        {
+            _db.CompleteTransaction();
+            _db = null;
+        }
 
-		Database _db;
-	}
+        public void Dispose()
+        {
+            if (_db != null)
+                _db.AbortTransaction();
+        }
+    }
 }

@@ -138,7 +138,11 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 {
 #>
     
+<# if (string.IsNullOrEmpty(tbl.Schema)) { #>
 	[TableName("<#=tbl.Name#>")]
+<# } else { #>
+	[TableName("<#=tbl.Schema + "." + tbl.Name#>")]
+<# } #>
 <# if (tbl.PK!=null && tbl.PK.IsAutoIncrement) { #>
 <# if (tbl.SequenceName==null) { #>
 	[PrimaryKey("<#=tbl.PK.Name#>")]
