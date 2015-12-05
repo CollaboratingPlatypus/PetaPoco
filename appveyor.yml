@@ -8,7 +8,6 @@ branches:
   - development  
 skip_tags: true
 configuration: Release
-platform: AnyCPU
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
@@ -18,12 +17,11 @@ assembly_info:
 cache: src\packages
 nuget:
   project_feed: true
-build:
-  project: PetaPoco.sln
-  verbosity: minimal
+build_script:
+- cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0
 after_build:
-- msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.5;DefineConstants=SKIP_POST_BUILD
-- msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0;DefineConstants=SKIP_POST_BUILD
+- cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.5;DefineConstants=SKIP_POST_BUILD
+- cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0;DefineConstants=SKIP_POST_BUILD
 - ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
 - ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Core.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
 - ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.Compiled.nuspec -BasePath .\\PetaPoco\\bin\\Release\\ -OutputDirectory .\\PetaPacked\\ -Version $(APPVEYOR_BUILD_INFO_VERSION) -Verbosity detailed"
