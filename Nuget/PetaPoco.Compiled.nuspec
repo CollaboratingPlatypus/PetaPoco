@@ -4,8 +4,8 @@
 		<id>PetaPoco.Core.Compiled</id>
 		<title>PetaPoco.Core.Compiled - A tiny ORMish thing for your POCOs (Core Only, Compiled)</title>
 		<version>5.0.1</version>
-    <authors>Collaborating Platypus</authors>
-    <owners>Collaborating Platypus</owners>
+	    <authors>Collaborating Platypus</authors>
+	    <owners>Collaborating Platypus</owners>
 		<licenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</licenseUrl>
 		<projectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</projectUrl>
 		<iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
@@ -16,7 +16,7 @@ PetaPoco is a tiny, single file .NET data access layer inspired by Massive that 
 This package includes the just the core PetaPoco library (compiled) (ie: no T4 templates)
 
 		</description>
-		<tags>ORM MIRCO MIRCO-ORM PETA POCO MVC ASP.NET WebForms MSSQL SQLSERVER Postgres MySQL Database</tags>
+		<tags>Peta Poco Peta-Poco PetaPoco ORM-Micro Micro-ORM ORM ormmicro MVC MVC4 MVC5 MVC6 MySql Postgres MSSQL Database DAL SQL Easy</tags>
 		<frameworkAssemblies>
 			<frameworkAssembly assemblyName="System.Data" />
 			<frameworkAssembly assemblyName="System.Configuration" />

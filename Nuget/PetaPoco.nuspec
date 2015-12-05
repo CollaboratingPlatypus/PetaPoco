@@ -4,18 +4,18 @@
 		<id>PetaPoco</id>
 		<title>PetaPoco - A tiny ORMish thing for your POCOs (Core + T4 Templates)</title>
 		<version>5.0.1</version>
-    <authors>Collaborating Platypus</authors>
-    <owners>Collaborating Platypus</owners>
-    <licenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</licenseUrl>
-    <projectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</projectUrl>
-    <iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
+	    <authors>Collaborating Platypus</authors>
+	    <owners>Collaborating Platypus</owners>
+	    <licenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</licenseUrl>
+	    <projectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</projectUrl>
+	    <iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>
 PetaPoco is a tiny, single file .NET data access layer inspired by Massive that works with both non-dynamic POCO objects and dynamics.
 
 This package includes the core PetaPoco library + T4 templates to generate POCO classes from your database
 		</description>
-		<tags>ORM POCO MVC MVC2 MVC3 ASP.NET WebForms WebMatrix MySQL Database</tags>
+		<tags>Peta Poco Peta-Poco PetaPoco ORM-Micro Micro-ORM ORM ormmicro MVC MVC4 MVC5 MVC6 MySql Postgres MSSQL Database DAL SQL Easy</tags>
 		<frameworkAssemblies>
 			<frameworkAssembly assemblyName="System.Data" />
 			<frameworkAssembly assemblyName="System.Configuration" />
