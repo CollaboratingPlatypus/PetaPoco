@@ -35,7 +35,7 @@ For configuration, code examples and other general information [See the docs]
 
 ## Contributing
 
-PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]
+PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]. We would also suggest you have a quick read of [Contributing to Open Source on GitHub].
 
 ## Download
 
@@ -54,3 +54,4 @@ PetaPoco is available from:
 [XUnit]:https://github.com/xunit/xunit
 [See the docs]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki
 [the contribution guide]:./contributing.md
+[Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
