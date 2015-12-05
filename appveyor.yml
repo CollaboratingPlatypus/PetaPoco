@@ -28,7 +28,7 @@ after_build:
 #test_script:
 #- vstest.console /logger:Appveyor /TestAdapterPath:"%APPVEYOR_BUILD_FOLDER%\src\packages\Fixie.1.0.0.3\lib\net45" "%APPVEYOR_BUILD_FOLDER%\src\Portable.MediatR.Tests\bin\Release\Portable.MediatR.Tests.dll"
 artifacts:
-- path: .\\PetaPacked\\Peta*.nupkg
+- path: PetaPacked\**\*.nupkg
 #deploy:
 #- provider: NuGet
 #  api_key:
