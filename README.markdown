@@ -53,6 +53,7 @@ PetaPoco is available from:
 
 * NuGet Peta - <https://www.nuget.org/packages/PetaPoco/>
 * NuGet Peta Core - <https://www.nuget.org/packages/PetaPoco.Core/>
+* NuGet Peta Core Compiled - <https://www.nuget.org/packages/PetaPoco.Core.Compiled/>
 
 [Brad Robinson]:http://www.toptensoftware.com/
 [Massive]:https://github.com/FransBouma/Massive
