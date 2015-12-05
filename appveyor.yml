@@ -8,7 +8,7 @@ branches:
   - development  
 skip_tags: true
 configuration: Release
-platform: Any CPU
+platform: AnyCPU
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
