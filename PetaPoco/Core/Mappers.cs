@@ -1,8 +1,8 @@
-﻿// <copyright file="Mappers.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/06</date>
 
 using System;
 using System.Collections.Generic;
@@ -70,6 +70,23 @@ namespace PetaPoco
             {
                 foreach (var i in _mappers.Where(kvp => kvp.Value == mapper).ToList())
                     _mappers.Remove(i.Key);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+                FlushCaches();
+            }
+        }
+
+        /// <summary>
+        ///     Revokes all registered mappers.
+        /// </summary>
+        public static void RevokeAll()
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                _mappers.Clear();
             }
             finally
             {
