@@ -342,7 +342,7 @@ namespace PetaPoco
                 {
                     p.Value = (int) value;
                 }
-                else if (t == typeof(Guid))
+                else if (t == typeof(Guid) && !_dbType.HasNativeGuidSupport)
                 {
                     p.Value = value.ToString();
                     p.DbType = DbType.String;
