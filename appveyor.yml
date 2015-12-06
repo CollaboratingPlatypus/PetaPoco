@@ -18,6 +18,8 @@ cache: src\packages
 nuget:
   project_feed: true
   disable_publish_on_pr: true
+before_build:
+  - nuget restore
 build_script:
 - cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0
 after_build:
@@ -35,5 +37,5 @@ deploy:
   api_key:
     secure: YPGdPLnY9FEYDZz3zZFV/+BKreynP4W2/DoURr0XlBjS8eLkkSypvEkI0BQSfRur
   artifact: /.*\.nupkg/
-#  on:
-#    branch: /master|Development/
+  on:
+    branch: /master|Development/
