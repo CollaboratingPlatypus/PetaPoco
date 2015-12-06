@@ -17,6 +17,14 @@ namespace PetaPoco.Internal
     internal abstract class DatabaseType
     {
         /// <summary>
+        ///     Gets a flag for whether the DB has native support for GUID/UUID.
+        /// </summary>
+        public virtual bool HasNativeGuidSupport
+        {
+            get { return false; }
+        }
+
+        /// <summary>
         ///     Returns the prefix used to delimit parameters in SQL query strings.
         /// </summary>
         /// <param name="connectionString"></param>
