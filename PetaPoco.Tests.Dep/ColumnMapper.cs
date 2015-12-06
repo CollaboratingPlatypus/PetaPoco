@@ -64,12 +64,12 @@ namespace PetaPoco.Tests
 		}
 
 
-		public Func<object, object> GetFromDbConverter(System.Reflection.PropertyInfo pi, Type SourceType)
+		public Func<object, object> GetFromDbConverter(System.Reflection.PropertyInfo targetProperty, Type sourceType)
 		{
 			return null;
 		}
 
-		public Func<object, object> GetToDbConverter(PropertyInfo SourceProperty)
+		public Func<object, object> GetToDbConverter(PropertyInfo sourceProperty)
 		{
 			return null;
 		}
