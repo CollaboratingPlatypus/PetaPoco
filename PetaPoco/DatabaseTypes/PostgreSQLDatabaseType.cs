@@ -10,6 +10,11 @@ namespace PetaPoco.DatabaseTypes
 {
     internal class PostgreSQLDatabaseType : DatabaseType
     {
+        public override bool HasNativeGuidSupport
+        {
+            get { return true; }
+        }
+
         public override object MapParameterValue(object value)
         {
             // Don't map bools to ints in PostgreSQL
