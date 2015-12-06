@@ -19,7 +19,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="pocoType">The POCO Type</param>
         /// <returns></returns>
-        public TableInfo GetTableInfo(Type pocoType)
+        public virtual TableInfo GetTableInfo(Type pocoType)
         {
             return TableInfo.FromPoco(pocoType);
         }
@@ -29,17 +29,17 @@ namespace PetaPoco
         /// </summary>
         /// <param name="pocoProperty"></param>
         /// <returns></returns>
-        public ColumnInfo GetColumnInfo(PropertyInfo pocoProperty)
+        public virtual ColumnInfo GetColumnInfo(PropertyInfo pocoProperty)
         {
             return ColumnInfo.FromProperty(pocoProperty);
         }
 
-        public Func<object, object> GetFromDbConverter(PropertyInfo TargetProperty, Type SourceType)
+        public virtual Func<object, object> GetFromDbConverter(PropertyInfo targetProperty, Type sourceType)
         {
             return null;
         }
 
-        public Func<object, object> GetToDbConverter(PropertyInfo SourceProperty)
+        public virtual Func<object, object> GetToDbConverter(PropertyInfo sourceProperty)
         {
             return null;
         }
