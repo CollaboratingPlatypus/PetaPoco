@@ -19,7 +19,7 @@ nuget:
   project_feed: true
   disable_publish_on_pr: true
 before_build:
-  - nuget restore
+  - nuget restore -DisableParallelProcessing
 build_script:
 - cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0
 after_build:
