@@ -27,5 +27,7 @@ This package includes the just the core PetaPoco library (compiled) (ie: no T4 t
     <file src="v4.0\PetaPoco.pdb" target="lib\net40" />
     <file src="v4.5\PetaPoco.dll" target="lib\net45" />
     <file src="v4.5\PetaPoco.pdb" target="lib\net45" />
+    <file src="v4.6\PetaPoco.dll" target="lib\net46" />
+    <file src="v4.6\PetaPoco.pdb" target="lib\net46" />    
   </files>
 </package>

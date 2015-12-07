@@ -21,8 +21,9 @@ nuget:
 before_build:
   - nuget restore -DisableParallelProcessing
 build_script:
-- cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0
+- cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.6
 after_build:
+- cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.6;DefineConstants=SKIP_POST_BUILD
 - cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.5;DefineConstants=SKIP_POST_BUILD
 - cmd: msbuild PetaPoco/PetaPoco.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.0;DefineConstants=SKIP_POST_BUILD
 - ps: ".\\Tools\\NuGet.exe pack .\\Nuget\\PetaPoco.nuspec -BasePath .\\Output\\ -OutputDirectory .\\PetaPacked\\ -Exclude *.dll -Version $env:APPVEYOR_BUILD_INFO_VERSION -Verbosity detailed"
