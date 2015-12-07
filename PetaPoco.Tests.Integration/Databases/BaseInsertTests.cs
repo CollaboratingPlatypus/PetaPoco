@@ -47,7 +47,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPoco_IsValid()
+        public void Insert_GivenPoco_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -58,7 +58,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPoco_WhenInsertingRelatedPocosIsValid()
+        public void Insert_GivenPoco_WhenInsertingRelatedPocosShouldBeValid()
         {
             DB.Insert(_person);
             _order.PersonId = _person.Id;

@@ -65,11 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MultiPocoTests.cs" />
-    <Compile Include="Misc.cs" />
-    <Compile Include="ColumnMapper.cs" />
     <Compile Include="PetaTest.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="SqlBuilder.cs" />
     <Compile Include="poco.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
