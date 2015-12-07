@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/06</date>
+// <date>2015/12/07</date>
 
 using System;
 using System.Configuration;
@@ -35,7 +35,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 
         public override void ExecuteBuildScript(Database database, string script)
         {
-            script.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => database.Execute(s));
+            script.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => database.Execute(s));
         }
     }
 }

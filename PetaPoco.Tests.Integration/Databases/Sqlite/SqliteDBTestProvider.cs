@@ -2,17 +2,32 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/06</date>
+// <date>2015/12/07</date>
 
 using System;
 using System.Linq;
 using System.Reflection;
-using PetaPoco.Tests.Integration.Models;
 
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
 {
     public class SqliteDBTestProvider : DBTestProvider
     {
+        protected override Database Database => new Database("sqlite");
+
+        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqliteBuildDatabase.sql";
+
+        public override Database Execute()
+        {
+            Mappers.Register(GetType().Assembly, new SqliteMapper());
+            return base.Execute();
+        }
+
+        public override void Dispose()
+        {
+            Mappers.RevokeAll();
+            base.Dispose();
+        }
+
         public class SqliteMapper : StandardMapper
         {
             public override Func<object, object> GetFromDbConverter(PropertyInfo targetProperty, Type sourceType)
@@ -26,7 +41,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
                     switch (Type.GetTypeCode(type))
                     {
                         case TypeCode.DateTime:
-                            return o => new DateTime((long)o, DateTimeKind.Utc);
+                            return o => new DateTime((long) o, DateTimeKind.Utc);
                         default:
                             return o => Convert.ChangeType(o, Type.GetTypeCode(type));
                     }
@@ -49,22 +64,6 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
 
                 return base.GetToDbConverter(sourceProperty);
             }
-        }
-
-        protected override Database Database => new Database("sqlite");
-
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqliteBuildDatabase.sql";
-
-        public override Database Execute()
-        {
-            Mappers.Register(GetType().Assembly, new SqliteMapper());
-            return base.Execute();
-        }
-
-        public override void Dispose()
-        {
-            Mappers.RevokeAll();
-            base.Dispose();
         }
     }
 }

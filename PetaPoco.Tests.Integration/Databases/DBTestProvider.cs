@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/06</date>
+// <date>2015/12/07</date>
 
 using System;
 using System.IO;
@@ -15,6 +15,10 @@ namespace PetaPoco.Tests.Integration.Databases
         protected abstract Database Database { get; }
 
         protected abstract string ScriptResourceName { get; }
+
+        public virtual void Dispose()
+        {
+        }
 
         public virtual Database Execute()
         {
@@ -32,10 +36,6 @@ namespace PetaPoco.Tests.Integration.Databases
         public virtual void ExecuteBuildScript(Database database, string script)
         {
             database.Execute(script);
-        }
-
-        public virtual void Dispose()
-        {
         }
     }
 }

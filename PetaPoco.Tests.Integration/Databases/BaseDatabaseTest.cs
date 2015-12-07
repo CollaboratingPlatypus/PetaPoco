@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/06</date>
+// <date>2015/12/07</date>
 
 using System;
 
@@ -10,9 +10,8 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseDatabaseTest : IDisposable
     {
-        protected Database DB { get; set; }
-
         private DBTestProvider _provider;
+        protected Database DB { get; set; }
 
         protected BaseDatabaseTest(DBTestProvider provider)
         {
