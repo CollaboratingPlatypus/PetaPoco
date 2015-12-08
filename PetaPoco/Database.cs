@@ -1,8 +1,8 @@
-﻿// <copyright file="Database.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/06</date>
 
 using System;
 using System.Collections.Generic;
@@ -342,7 +342,7 @@ namespace PetaPoco
                 {
                     p.Value = (int) value;
                 }
-                else if (t == typeof(Guid))
+                else if (t == typeof(Guid) && !_dbType.HasNativeGuidSupport)
                 {
                     p.Value = value.ToString();
                     p.DbType = DbType.String;
@@ -1195,6 +1195,8 @@ namespace PetaPoco
         /// </remarks>
         public object Insert(object poco)
         {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
             var pd = PocoData.ForType(poco.GetType());
             return Insert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
         }

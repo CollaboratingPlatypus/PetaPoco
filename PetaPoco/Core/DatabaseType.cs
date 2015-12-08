@@ -1,8 +1,8 @@
-﻿// <copyright file="DatabaseType.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/06</date>
 
 using System;
 using System.Data;
@@ -16,6 +16,14 @@ namespace PetaPoco.Internal
     /// </summary>
     internal abstract class DatabaseType
     {
+        /// <summary>
+        ///     Gets a flag for whether the DB has native support for GUID/UUID.
+        /// </summary>
+        public virtual bool HasNativeGuidSupport
+        {
+            get { return false; }
+        }
+
         /// <summary>
         ///     Returns the prefix used to delimit parameters in SQL query strings.
         /// </summary>
@@ -66,7 +74,7 @@ namespace PetaPoco.Internal
         }
 
         /// <summary>
-        ///     Returns an SQL Statement that can check for the existance of a row in the database.
+        ///     Returns an SQL Statement that can check for the existence of a row in the database.
         /// </summary>
         /// <returns></returns>
         public virtual string GetExistsSql()
@@ -125,9 +133,9 @@ namespace PetaPoco.Internal
         /// </summary>
         /// <param name="db">The calling Database object</param>
         /// <param name="cmd">The insert command to be executed</param>
-        /// <param name="PrimaryKeyName">The primary key of the table being inserted into</param>
+        /// <param name="primaryKeyName">The primary key of the table being inserted into</param>
         /// <returns>The ID of the newly inserted record</returns>
-        public virtual object ExecuteInsert(Database db, IDbCommand cmd, string PrimaryKeyName)
+        public virtual object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
             return db.ExecuteScalarHelper(cmd);

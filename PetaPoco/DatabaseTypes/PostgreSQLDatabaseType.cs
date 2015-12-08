@@ -10,6 +10,11 @@ namespace PetaPoco.DatabaseTypes
 {
     internal class PostgreSQLDatabaseType : DatabaseType
     {
+        public override bool HasNativeGuidSupport
+        {
+            get { return true; }
+        }
+
         public override object MapParameterValue(object value)
         {
             // Don't map bools to ints in PostgreSQL
@@ -24,11 +29,11 @@ namespace PetaPoco.DatabaseTypes
             return string.Format("\"{0}\"", str);
         }
 
-        public override object ExecuteInsert(Database db, System.Data.IDbCommand cmd, string PrimaryKeyName)
+        public override object ExecuteInsert(Database db, System.Data.IDbCommand cmd, string primaryKeyName)
         {
-            if (PrimaryKeyName != null)
+            if (primaryKeyName != null)
             {
-                cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(PrimaryKeyName));
+                cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(primaryKeyName));
                 return db.ExecuteScalarHelper(cmd);
             }
             else

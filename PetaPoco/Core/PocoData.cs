@@ -350,6 +350,10 @@ namespace PetaPoco.Internal
                 {
                     return delegate(object src) { return EnumMapper.EnumFromString(dstType, (string) src); };
                 }
+                else if (dstType == typeof(Guid) && srcType == typeof(string))
+                {
+                    return delegate (object src) { return Guid.Parse((string)src); };
+                }
                 else
                 {
                     return delegate(object src) { return Convert.ChangeType(src, dstType, null); };
