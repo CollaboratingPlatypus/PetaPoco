@@ -6,8 +6,6 @@
 
 # Welcome to the official PetaPoco repository.
 
-----
-
 Originally the brainchild of [Brad Robinson],
 
 ## PetaPoco is a tiny, fast, single-file micro-ORM for .NET and Mono.
@@ -19,7 +17,6 @@ Originally the brainchild of [Brad Robinson],
 * Like [ActiveRecord], it supports a close relationship between object and database table
 * Like [SubSonic], it supports generation of poco classes with T4 templates
 
----
 ## Features at a Glance
 
 * Tiny, and absolutely no dependencies!
@@ -40,12 +37,10 @@ Originally the brainchild of [Brad Robinson],
 * OpenSource (Apache License)
 * All of this in about 1,500 lines of code
 
----
 ## Documentation
 
 For configuration, code examples and other general information [See the docs]
 
----
 ## Download
 
 PetaPoco is available from:
@@ -67,12 +62,10 @@ PetaPoco is available from:
 [Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
 [we have a special place to honour them]:./honourRoll.md
 
----
 ## Contributing
 
 PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]. We would also suggest you have a quick read of [Contributing to Open Source on GitHub].
 
----
 ## Contributions Honour Roll
 
 A product like PetaPoco isn't the effort of one person, but rather a combined effort of many. For those individuals who rise above and beyond [we have a special place to honour them].
