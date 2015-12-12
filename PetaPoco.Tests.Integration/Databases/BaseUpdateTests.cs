@@ -229,6 +229,28 @@ namespace PetaPoco.Tests.Integration.Databases
             rowEffected.ShouldBe(0);
         }
 
+        [Fact]
+        public void Update_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }).ShouldBe(1);
+            var personOther = DB.Single<Person>(_person.Id);
+
+            personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        public void Update_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id).ShouldBe(1);
+            var personOther = DB.Single<Person>(_person.Id);
+
+            personOther.ShouldNotBe(_person, true);
+        }
+
         private Person SinglePersonOther(Guid id)
         {
             return DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);

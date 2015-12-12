@@ -68,7 +68,6 @@ namespace PetaPoco.Internal
         public static PocoData ForObject(object o, string primaryKeyName)
         {
             var t = o.GetType();
-#if !PETAPOCO_NO_DYNAMIC
             if (t == typeof(System.Dynamic.ExpandoObject))
             {
                 var pd = new PocoData();
@@ -84,17 +83,13 @@ namespace PetaPoco.Internal
                 }
                 return pd;
             }
-            else
-#endif
-                return ForType(t);
+            return ForType(t);
         }
 
         public static PocoData ForType(Type t)
         {
-#if !PETAPOCO_NO_DYNAMIC
             if (t == typeof(System.Dynamic.ExpandoObject))
                 throw new InvalidOperationException("Can't use dynamic types with this method");
-#endif
 
             return _pocoDatas.Get(t, () => new PocoData(t));
         }

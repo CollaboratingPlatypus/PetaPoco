@@ -1454,7 +1454,8 @@ namespace PetaPoco
                         PropertyInfo pkpi = null;
                         if (primaryKeyName != null)
                         {
-                            pkpi = pd.Columns[primaryKeyName].PropertyInfo;
+                            PocoColumn col;
+                            pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
                         }
 
                         cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
