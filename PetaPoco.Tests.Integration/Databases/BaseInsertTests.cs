@@ -16,6 +16,7 @@ namespace PetaPoco.Tests.Integration.Databases
         private Order _order = new Order
         {
             PoNumber = "Peta's Order",
+            Status = OrderStatus.Accepted,
             CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc),
             CreatedBy = "Harry"
         };
@@ -41,12 +42,6 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenNull_ShouldThrow()
-        {
-            Should.Throw<ArgumentNullException>(() => DB.Insert(null));
-        }
-
-        [Fact]
         public void Insert_GivenPoco_ShouldBeValid()
         {
             DB.Insert(_person);
@@ -69,6 +64,47 @@ namespace PetaPoco.Tests.Integration.Databases
             var personOther = DB.Single<Person>(_person.Id);
             var orderOther = DB.Single<Order>(_order.Id);
             var orderLineOther = DB.Single<OrderLine>(_orderLine.Id);
+
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+            orderOther.ShouldNotBeNull();
+            orderOther.ShouldBe(_order);
+            orderLineOther.ShouldNotBeNull();
+            orderLineOther.ShouldBe(_orderLine);
+        }
+
+        [Fact]
+        public void Insert_GivenInvalidArguments_ShouldThrow()
+        {
+            Should.Throw<ArgumentNullException>(() => DB.Insert(null));
+            Should.Throw<ArgumentNullException>(() => DB.Insert(null, "SomeColumn", new Person()));
+            Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", null, new Person()));
+            Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", "SomeColumn", null));
+        }
+
+        [Fact]
+        public void Insert_GivenPocoTableNameAndColumnName_ShouldBeValid()
+        {
+            DB.Insert("SpecificPeople", "Id", false, _person);
+
+            var personOther = DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+        }
+
+        [Fact]
+        public void Insert_GivenPocoTableNameAndColumnName_WhenInsertingRelatedPocosShouldBeValid()
+        {
+            DB.Insert("SpecificPeople", "Id", false, _person);
+            _order.PersonId = _person.Id;
+            DB.Insert("SpecificOrders", "Id", _order);
+            _orderLine.OrderId = _order.Id;
+            DB.Insert("SpecificOrderLines", "Id", _orderLine);
+
+            var personOther = DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var orderOther = DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            var orderLineOther = DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);

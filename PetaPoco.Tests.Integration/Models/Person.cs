@@ -39,5 +39,21 @@ namespace PetaPoco.Tests.Integration.Models
             Height.ShouldBe(other.Height);
             Dob.ShouldBe(other.Dob);
         }
+
+        public void ShouldNotBe(Person other, bool sameId)
+        {
+            if (sameId)
+            {
+                Id.ShouldBe(other.Id);
+            }
+            else
+            {
+                Id.ShouldNotBe(other.Id);
+            }
+            Name.ShouldNotBe(other.Name);
+            Age.ShouldNotBe(other.Age);
+            Height.ShouldNotBe(other.Height);
+            Dob.ShouldNotBe(other.Dob);
+        }
     }
 }

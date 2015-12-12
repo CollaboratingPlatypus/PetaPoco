@@ -34,5 +34,21 @@ namespace PetaPoco.Tests.Integration.Models
             Quantity.ShouldBe(other.Quantity);
             SellPrice.ShouldBe(other.SellPrice);
         }
+
+        public void ShouldNotBe(OrderLine other, bool sameIds)
+        {
+            if (sameIds)
+            {
+                Id.ShouldBe(other.Id);
+                OrderId.ShouldBe(other.OrderId);
+            }
+            else
+            {
+                Id.ShouldNotBe(other.Id);
+                OrderId.ShouldNotBe(other.OrderId);
+            }
+            Quantity.ShouldNotBe(other.Quantity);
+            SellPrice.ShouldNotBe(other.SellPrice);
+        }
     }
 }
