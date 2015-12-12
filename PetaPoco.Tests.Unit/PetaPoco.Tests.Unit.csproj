@@ -72,6 +72,7 @@
     <Compile Include="Core\SqlBuilder.cs" />
     <Compile Include="DatabaseTests.cs" />
     <Compile Include="DatabaseTypes\SqlServerDatabaseTypeTests.cs" />
+    <Compile Include="DescriptionAttribute.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />
