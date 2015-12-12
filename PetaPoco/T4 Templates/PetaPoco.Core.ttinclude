@@ -1149,7 +1149,7 @@ class MySqlSchemaReader : SchemaReader
 	const string TABLE_SQL=@"
 			SELECT * 
 			FROM information_schema.tables 
-			WHERE (table_type='BASE TABLE' OR table_type='VIEW')
+			WHERE (table_type='BASE TABLE' OR table_type='VIEW') AND TABLE_SCHEMA=DATABASE()
 			";
 
 }
