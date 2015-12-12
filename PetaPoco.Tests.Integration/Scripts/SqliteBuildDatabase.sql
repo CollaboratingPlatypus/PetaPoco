@@ -1,6 +1,9 @@
 ﻿DROP TABLE IF EXISTS [OrderLines];
 DROP TABLE IF EXISTS [Orders];
 DROP TABLE IF EXISTS [People];
+DROP TABLE IF EXISTS [SpecificOrderLines];
+DROP TABLE IF EXISTS [SpecificOrders];
+DROP TABLE IF EXISTS [SpecificPeople];
 
 CREATE TABLE [People] (
 	[Id] TEXT NOT NULL PRIMARY KEY,
@@ -14,6 +17,7 @@ CREATE TABLE [Orders] (
 	[Id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	[PersonId] TEXT NOT NULL,
 	[PoNumber] TEXT NOT NULL,
+	[OrderStatus] INTEGER NOT NULL,
 	[CreatedOn] INTEGER NOT NULL,
 	[CreatedBy] TEXT NOT NULL,
 	CONSTRAINT [FK_Orders_People] FOREIGN KEY ([PersonId]) REFERENCES [People]([Id])
@@ -25,4 +29,30 @@ CREATE TABLE [OrderLines] (
 	[Qty] SMALLINT NOT NULL,
 	[SellPrice] NUMERIC(10, 4) NOT NULL,
   CONSTRAINT [FK_OrderLines_Orders] FOREIGN KEY ([OrderId]) REFERENCES [Orders]([Id])
+);
+
+CREATE TABLE [SpecificPeople] (
+	[Id] TEXT NOT NULL PRIMARY KEY,
+	[FullName] TEXT,
+	[Age] INTEGER NOT NULL,
+	[Height] INTEGER NOT NULL,
+	[Dob] INTEGER NULL
+);
+
+CREATE TABLE [SpecificOrders] (
+	[Id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	[PersonId] TEXT NOT NULL,
+	[PoNumber] TEXT NOT NULL,
+	[OrderStatus] INTEGER NOT NULL,
+	[CreatedOn] INTEGER NOT NULL,
+	[CreatedBy] TEXT NOT NULL,
+	CONSTRAINT [FK_SpecificOrders_SpecificPeople] FOREIGN KEY ([PersonId]) REFERENCES [SpecificPeople]([Id])
+);
+
+CREATE TABLE [SpecificOrderLines] (
+	[Id] INTEGER PRIMARY KEY NOT NULL,
+	[OrderId] INT NOT NULL,
+	[Qty] SMALLINT NOT NULL,
+	[SellPrice] NUMERIC(10, 4) NOT NULL,
+  CONSTRAINT [FK_SpecificOrderLines_SpecificOrders] FOREIGN KEY ([OrderId]) REFERENCES [SpecificOrders]([Id])
 );

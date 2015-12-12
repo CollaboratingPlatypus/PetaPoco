@@ -11,10 +11,30 @@ using PetaPoco.DatabaseTypes;
 
 namespace PetaPoco.Internal
 {
+    public interface IDatabaseType
+    {
+        /// <summary>
+        ///     Escape a tablename into a suitable format for the associated database provider.
+        /// </summary>
+        /// <param name="tableName">
+        ///     The name of the table (as specified by the client program, or as attributes on the associated
+        ///     POCO class.
+        /// </param>
+        /// <returns>The escaped table name</returns>
+        string EscapeTableName(string tableName);
+
+        /// <summary>
+        ///     Escape and arbitary SQL identifier into a format suitable for the associated database provider
+        /// </summary>
+        /// <param name="str">The SQL identifier to be escaped</param>
+        /// <returns>The escaped identifier</returns>
+        string EscapeSqlIdentifier(string str);
+    }
+
     /// <summary>
     ///     Base class for DatabaseType handlers - provides default/common handling for different database engines
     /// </summary>
-    internal abstract class DatabaseType
+    internal abstract class DatabaseType : IDatabaseType
     {
         /// <summary>
         ///     Gets a flag for whether the DB has native support for GUID/UUID.

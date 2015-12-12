@@ -101,17 +101,23 @@
   <ItemGroup>
     <Compile Include="Databases\BaseDatabaseTest.cs" />
     <Compile Include="Databases\BaseInsertTests.cs" />
+    <Compile Include="Databases\BaseUpdateTests.cs" />
     <Compile Include="Databases\DBTestProvider.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeDBTestProvider.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeInsertTests.cs" />
+    <Compile Include="Databases\MSSQLCe\MssqlCeUpdateTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlDBTestProvider.cs" />
     <Compile Include="Databases\MSSQL\MssqlInsertTests.cs" />
+    <Compile Include="Databases\MSSQL\MssqlUpdateTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDBTestProvider.cs" />
     <Compile Include="Databases\MySQL\MySqlInsertTests.cs" />
+    <Compile Include="Databases\MySQL\MySqlUpdateTests.cs" />
     <Compile Include="Databases\Postgres\PostgresDBTestProvider.cs" />
     <Compile Include="Databases\Postgres\PostgresInsertTests.cs" />
+    <Compile Include="Databases\Postgres\PostgresUpdateTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteDBTestProvider.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />
+    <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />

@@ -11,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases
     public abstract class BaseDatabaseTest : IDisposable
     {
         private DBTestProvider _provider;
-        protected Database DB { get; set; }
+        protected IDatabase DB { get; set; }
 
         protected BaseDatabaseTest(DBTestProvider provider)
         {

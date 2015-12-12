@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/06</date>
+// <date>2015/12/12</date>
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace PetaPoco
     /// <summary>
     ///     The main PetaPoco Database class.  You can either use this class directly, or derive from it.
     /// </summary>
-    public class Database : IDisposable
+    public class Database : IDisposable, IDatabase
     {
         #region IDisposable
 
@@ -126,7 +126,7 @@ namespace PetaPoco
 
             // Resolve the DB Type
             string DBTypeName = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
-            _dbType = DatabaseType.Resolve(DBTypeName, _providerName);
+            _dbType = Internal.DatabaseType.Resolve(DBTypeName, _providerName);
 
             // What character is used for delimiting parameters in SQL
             _paramPrefix = _dbType.GetParameterPrefix(_connectionString);
@@ -1095,6 +1095,15 @@ namespace PetaPoco
         /// </remarks>
         public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
+            if (tableName == null)
+                throw new ArgumentNullException("tableName");
+
+            if (primaryKeyName == null)
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
             try
             {
                 OpenSharedConnection();
@@ -2145,6 +2154,17 @@ namespace PetaPoco
         ///     Sets the timeout value for the next (and only next) SQL statement
         /// </summary>
         public int OneTimeCommandTimeout { get; set; }
+
+        /// <summary>
+        ///     Gets the loaded database type. <seealso cref="DatabaseType" />.
+        /// </summary>
+        /// <returns>
+        ///     The loaded database type.
+        /// </returns>
+        public IDatabaseType DatabaseType
+        {
+            get { return _dbType; }
+        }
 
         #endregion
 
