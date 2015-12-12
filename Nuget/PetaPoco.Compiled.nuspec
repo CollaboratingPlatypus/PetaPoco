@@ -8,7 +8,7 @@
 	    <owners>Collaborating Platypus</owners>
 		<licenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</licenseUrl>
 		<projectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</projectUrl>
-		<iconUrl>http://www.toptensoftware.com/petapoco/nuget_icon.png</iconUrl>
+		<iconUrl>https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2Nuget.png</iconUrl>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
 		<description>
 PetaPoco is a tiny, single file .NET data access layer inspired by Massive that works with both non-dynamic POCO objects and dynamics.
