@@ -20,7 +20,7 @@ nuget:
   disable_publish_on_pr: true
 before_build:
   - nuget restore -DisableParallelProcessing
-  - cmd: msbuild PetaPoco\PetaPoco.Cs.Joiner\PetaPoco.Cs.Joiner.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.6
+  - cmd: msbuild PetaPoco.Cs.Joiner\PetaPoco.Cs.Joiner.csproj /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.6
   - cmd: Tools\PetaPoco.Cs.Joiner.exe PetaPoco\
 build_script:
 - cmd: msbuild PetaPoco.sln /t:rebuild /tv:14.0 /p:Configuration=Release;TargetFrameworkVersion=v4.6
