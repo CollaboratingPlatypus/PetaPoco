@@ -1077,7 +1077,16 @@ namespace PetaPoco
         /// <returns>The auto allocated primary key of the new record</returns>
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
-            return Insert(tableName, primaryKeyName, true, poco);
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteInsert(tableName, primaryKeyName, true, poco);
         }
 
         /// <summary>
@@ -1095,15 +1104,38 @@ namespace PetaPoco
         /// </remarks>
         public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
-            if (tableName == null)
+            if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException("tableName");
 
-            if (primaryKeyName == null)
+            if (string.IsNullOrEmpty(primaryKeyName))
                 throw new ArgumentNullException("primaryKeyName");
 
             if (poco == null)
                 throw new ArgumentNullException("poco");
 
+            return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
+        }
+
+        /// <summary>
+        ///     Performs an SQL Insert
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        /// <remarks>
+        ///     The name of the table, it's primary key and whether it's an auto-allocated primary key are retrieved
+        ///     from the POCO's attributes
+        /// </remarks>
+        public object Insert(object poco)
+        {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            var pd = PocoData.ForType(poco.GetType());
+            return ExecuteInsert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
+        }
+
+        private object ExecuteInsert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
+        {
             try
             {
                 OpenSharedConnection();
@@ -1193,23 +1225,6 @@ namespace PetaPoco
             }
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
-        /// <remarks>
-        ///     The name of the table, it's primary key and whether it's an auto-allocated primary key are retrieved
-        ///     from the POCO's attributes
-        /// </remarks>
-        public object Insert(object poco)
-        {
-            if (poco == null)
-                throw new ArgumentNullException("poco");
-            var pd = PocoData.ForType(poco.GetType());
-            return Insert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
-        }
-
         #endregion
 
         #region operation: Update
@@ -1224,7 +1239,16 @@ namespace PetaPoco
         /// <returns>The number of affected records</returns>
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
-            return Update(tableName, primaryKeyName, poco, primaryKeyValue, null);
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
 
         /// <summary>
@@ -1237,6 +1261,136 @@ namespace PetaPoco
         /// <param name="columns">The column names of the columns to be updated, or null for all</param>
         /// <returns>The number of affected rows</returns>
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(string tableName, string primaryKeyName, object poco)
+        {
+            return Update(tableName, primaryKeyName, poco, null);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteUpdate(tableName, primaryKeyName, poco, null, columns);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(object poco, IEnumerable<string> columns)
+        {
+            return Update(poco, null, columns);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(object poco)
+        {
+            return Update(poco, null, null);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(object poco, object primaryKeyValue)
+        {
+            return Update(poco, primaryKeyValue, null);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
+        {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            var pd = PocoData.ForType(poco.GetType());
+            return ExecuteUpdate(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
+        /// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update<T>(string sql, params object[] args)
+        {
+            if (string.IsNullOrEmpty(sql))
+                throw new ArgumentNullException("sql");
+
+            var pd = PocoData.ForType(typeof(T));
+            return Execute(string.Format("UPDATE {0} {1}", _dbType.EscapeTableName(pd.TableInfo.TableName), sql), args);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
+        /// <param name="sql">
+        ///     An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE
+        ///     tablename"
+        /// </param>
+        /// <returns>The number of affected rows</returns>
+        public int Update<T>(Sql sql)
+        {
+            if (sql == null)
+                throw new ArgumentNullException("sql");
+
+            var pd = PocoData.ForType(typeof(T));
+            return Execute(new Sql(string.Format("UPDATE {0}", _dbType.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+        }
+
+        private int ExecuteUpdate(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             try
             {
@@ -1326,104 +1480,6 @@ namespace PetaPoco
                     throw;
                 return -1;
             }
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update(string tableName, string primaryKeyName, object poco)
-        {
-            return Update(tableName, primaryKeyName, poco, null);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
-        {
-            return Update(tableName, primaryKeyName, poco, null, columns);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update(object poco, IEnumerable<string> columns)
-        {
-            return Update(poco, null, columns);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update(object poco)
-        {
-            return Update(poco, null, null);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update(object poco, object primaryKeyValue)
-        {
-            return Update(poco, primaryKeyValue, null);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
-        {
-            var pd = PocoData.ForType(poco.GetType());
-            return Update(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
-        public int Update<T>(string sql, params object[] args)
-        {
-            var pd = PocoData.ForType(typeof(T));
-            return Execute(string.Format("UPDATE {0} {1}", _dbType.EscapeTableName(pd.TableInfo.TableName), sql), args);
-        }
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE
-        ///     tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
-        public int Update<T>(Sql sql)
-        {
-            var pd = PocoData.ForType(typeof(T));
-            return Execute(new Sql(string.Format("UPDATE {0}", _dbType.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
         }
 
         #endregion

@@ -73,14 +73,7 @@ namespace PetaPoco.Tests.Integration.Databases
             orderLineOther.ShouldBe(_orderLine);
         }
 
-        [Fact]
-        public void Insert_GivenInvalidArguments_ShouldThrow()
-        {
-            Should.Throw<ArgumentNullException>(() => DB.Insert(null));
-            Should.Throw<ArgumentNullException>(() => DB.Insert(null, "SomeColumn", new Person()));
-            Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", null, new Person()));
-            Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", "SomeColumn", null));
-        }
+
 
         [Fact]
         public void Insert_GivenPocoTableNameAndColumnName_ShouldBeValid()

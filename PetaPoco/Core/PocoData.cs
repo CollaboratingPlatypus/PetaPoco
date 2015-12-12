@@ -118,7 +118,6 @@ namespace PetaPoco.Internal
                 var il = m.GetILGenerator();
                 var mapper = Mappers.GetMapper(type);
 
-#if !PETAPOCO_NO_DYNAMIC
                 if (type == typeof(object))
                 {
                     // var poco=new T()
@@ -176,7 +175,6 @@ namespace PetaPoco.Internal
                     }
                 }
                 else
-#endif
                     if (type.IsValueType || type == typeof(string) || type == typeof(byte[]))
                     {
                         // Do we need to install a converter?
