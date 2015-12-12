@@ -41,7 +41,7 @@ Originally the brainchild of [Brad Robinson],
 
 Save an entity
 ```c#
-    db.save(new Article { Title = "Super easy to use PetaPoco" });
+    db.Save(new Article { Title = "Super easy to use PetaPoco" });
 ```
 
 Get an entity
