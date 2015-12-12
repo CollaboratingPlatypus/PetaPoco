@@ -105,8 +105,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
-      "$(SolutionDir)Tools\PetaPoco.Cs.Joiner.exe" $(ProjectDir) 
-      COPY "$(ProjectDir)T4 Templates\*" "$(SolutionDir)Output\"
+      "$(ProjectDir)..\Tools\PetaPoco.Cs.Joiner.exe" $(ProjectDir) 
+      COPY "$(ProjectDir)T4 Templates\*" "$(ProjectDir)..\Output\"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
