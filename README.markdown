@@ -64,9 +64,9 @@ For configuration, code examples and other general information [See the docs]
 
 PetaPoco is available from:
 
-* NuGet Peta - <https://www.nuget.org/packages/PetaPoco/>
-* NuGet Peta Core - <https://www.nuget.org/packages/PetaPoco.Core/>
-* NuGet Peta Core Compiled - <https://www.nuget.org/packages/PetaPoco.Core.Compiled/>
+* NuGet Peta - <https://www.nuget.org/packages/PetaPoco/> - A single file include with [T4 text templates](https://msdn.microsoft.com/en-us/library/bb126445.aspx) to automatically build your pocos for you.
+* NuGet Peta Core - <https://www.nuget.org/packages/PetaPoco.Core/> - A single file include.
+* NuGet Peta Core Compiled - <https://www.nuget.org/packages/PetaPoco.Core.Compiled/> - A compiled version which your project references.
 
 [Brad Robinson]:http://www.toptensoftware.com/
 [Massive]:https://github.com/FransBouma/Massive
