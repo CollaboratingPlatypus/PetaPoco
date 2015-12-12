@@ -37,6 +37,25 @@ Originally the brainchild of [Brad Robinson],
 * OpenSource (Apache License)
 * All of this in about 1,500 lines of code
 
+## Super easy use and configuration
+
+Save an entity
+```c#
+    db.save(new Article { Title = "Super easy to use PetaPoco" });
+```
+
+Get an entity
+```c#
+    var article = db.Single<Article>("WHERE Id = @0", 123);
+```
+
+Delete an entity
+```c#
+    db.Delete(article);
+```
+
+Plus much much more.
+
 ## Documentation
 
 For configuration, code examples and other general information [See the docs]
