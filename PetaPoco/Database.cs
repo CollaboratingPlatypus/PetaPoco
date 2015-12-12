@@ -126,7 +126,7 @@ namespace PetaPoco
 
             // Resolve the DB Type
             string DBTypeName = (_factory == null ? _sharedConnection.GetType() : _factory.GetType()).Name;
-            _dbType = Internal.DatabaseType.Resolve(DBTypeName, _providerName);
+            _dbType = DatabaseType.Resolve(DBTypeName, _providerName);
 
             // What character is used for delimiting parameters in SQL
             _paramPrefix = _dbType.GetParameterPrefix(_connectionString);
@@ -2156,12 +2156,12 @@ namespace PetaPoco
         public int OneTimeCommandTimeout { get; set; }
 
         /// <summary>
-        ///     Gets the loaded database type. <seealso cref="DatabaseType" />.
+        ///     Gets the loaded database provider. <seealso cref="Provider" />.
         /// </summary>
         /// <returns>
         ///     The loaded database type.
         /// </returns>
-        public IDatabaseType DatabaseType
+        public IProvider Provider
         {
             get { return _dbType; }
         }

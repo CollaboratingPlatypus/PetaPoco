@@ -48,11 +48,11 @@ namespace PetaPoco
         int OneTimeCommandTimeout { get; set; }
 
         /// <summary>
-        ///     Gets the loaded database type. <seealso cref="DatabaseType" />.
+        ///     Gets the loaded database type. <seealso cref="Provider" />.
         /// </summary>
         /// <returns>
         ///     The loaded database type.
         /// </returns>
-        IDatabaseType DatabaseType { get; }
+        IProvider Provider { get; }
     }
 }

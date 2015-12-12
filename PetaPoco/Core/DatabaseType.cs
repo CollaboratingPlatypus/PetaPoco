@@ -11,7 +11,7 @@ using PetaPoco.DatabaseTypes;
 
 namespace PetaPoco.Internal
 {
-    public interface IDatabaseType
+    public interface IProvider
     {
         /// <summary>
         ///     Escape a tablename into a suitable format for the associated database provider.
@@ -34,7 +34,7 @@ namespace PetaPoco.Internal
     /// <summary>
     ///     Base class for DatabaseType handlers - provides default/common handling for different database engines
     /// </summary>
-    internal abstract class DatabaseType : IDatabaseType
+    internal abstract class DatabaseType : IProvider
     {
         /// <summary>
         ///     Gets a flag for whether the DB has native support for GUID/UUID.

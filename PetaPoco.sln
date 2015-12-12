@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Unit", "PetaPoco.Tests.Unit\PetaPoco.Tests.Unit.csproj", "{80586BD7-13C7-4EF7-918D-D1F048672CC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.SingleFile", "PetaPoco.Tests.Integration.SingleFile\PetaPoco.Tests.Integration.SingleFile.csproj", "{9B2D7B13-A47D-497C-9E46-85B78C2D074E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
