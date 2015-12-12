@@ -45,3 +45,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("5.0.1.*")]
 [assembly: InternalsVisibleTo("PetaPoco.Tests")]
 [assembly: InternalsVisibleTo("PetaPoco.Tests.Unit")]
+[assembly: InternalsVisibleTo("PetaPoco.Tests.Integration")]
