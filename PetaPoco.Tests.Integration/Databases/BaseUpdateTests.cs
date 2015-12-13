@@ -2,11 +2,11 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/12</date>
+// <date>2015/12/13</date>
 
 using System;
 using System.Linq;
-using PetaPoco.Internal;
+using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -95,7 +95,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var personOther = DB.Single<Person>(_person.Id);
             UpdateProperties(personOther);
-            DB.Update(personOther, new[] {"FullName", "Height"}).ShouldBe(1);
+            DB.Update(personOther, new[] { "FullName", "Height" }).ShouldBe(1);
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.Id.ShouldBe(_person.Id);
@@ -138,7 +138,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var personOther = DB.Single<Person>(_person.Id);
             UpdateProperties(personOther);
-            DB.Update(personOther, _person.Id, new[] {"FullName", "Height"}).ShouldBe(1);
+            DB.Update(personOther, _person.Id, new[] { "FullName", "Height" }).ShouldBe(1);
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.Id.ShouldBe(_person.Id);
@@ -181,7 +181,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var personOther = SinglePersonOther(_person.Id);
             UpdateProperties(personOther);
-            DB.Update("SpecificPeople", "Id", personOther, _person.Id, new[] {"FullName", "Height"}).ShouldBe(1);
+            DB.Update("SpecificPeople", "Id", personOther, _person.Id, new[] { "FullName", "Height" }).ShouldBe(1);
             personOther = SinglePersonOther(_person.Id);
 
             personOther.Id.ShouldBe(_person.Id);
@@ -227,6 +227,30 @@ namespace PetaPoco.Tests.Integration.Databases
             var rowEffected = DB.Update(_person);
 
             rowEffected.ShouldBe(0);
+        }
+
+        [Fact]
+        public void Update_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })
+                .ShouldBe(1);
+            var personOther = DB.Single<Person>(_person.Id);
+
+            personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        public void Update_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id)
+                .ShouldBe(1);
+            var personOther = DB.Single<Person>(_person.Id);
+
+            personOther.ShouldNotBe(_person, true);
         }
 
         private Person SinglePersonOther(Guid id)

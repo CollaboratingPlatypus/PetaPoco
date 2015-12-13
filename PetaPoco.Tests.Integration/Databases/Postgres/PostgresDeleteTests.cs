@@ -6,13 +6,13 @@
 
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.Sqlite
+namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
-    [Collection("SqliteTests")]
-    public class SqliteUpdateTests : BaseUpdateTests
+    [Collection("PostgresTests")]
+    public class PostgresDeleteTests : BaseDeleteTests
     {
-        public SqliteUpdateTests()
-            : base(new SqliteDBTestProvider())
+        public PostgresDeleteTests()
+            : base(new PostgresDBTestProvider())
         {
         }
     }

@@ -6,11 +6,13 @@
 
 using System;
 using System.Data;
+using PetaPoco.Core;
 using PetaPoco.Internal;
+using PetaPoco.Utilities;
 
 namespace PetaPoco.DatabaseTypes
 {
-    internal class OracleDatabaseType : DatabaseType
+    public class OracleDatabaseType : DatabaseType
     {
         public override string GetParameterPrefix(string connectionString)
         {
@@ -22,9 +24,9 @@ namespace PetaPoco.DatabaseTypes
             cmd.GetType().GetProperty("BindByName").SetValue(cmd, true, null);
         }
 
-        public override string BuildPageQuery(long skip, long take, PagingHelper.SQLParts parts, ref object[] args)
+        public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
-            if (parts.sqlSelectRemoved.StartsWith("*"))
+            if (parts.SqlSelectRemoved.StartsWith("*"))
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
 
             // Same deal as SQL Server

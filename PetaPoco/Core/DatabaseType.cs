@@ -2,17 +2,38 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/06</date>
+// <date>2015/12/13</date>
 
 using System;
 using System.Data;
 using System.Linq;
 using PetaPoco.DatabaseTypes;
+using PetaPoco.Internal;
+using PetaPoco.Utilities;
 
-namespace PetaPoco.Internal
+namespace PetaPoco.Core
 {
-    public interface IProvider
+    /// <summary>
+    ///     Base class for DatabaseType handlers - provides default/common handling for different database engines
+    /// </summary>
+    public abstract class DatabaseType : IProvider
     {
+        /// <summary>
+        ///     Gets a flag for whether the DB has native support for GUID/UUID.
+        /// </summary>
+        public virtual bool HasNativeGuidSupport
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        ///     Gets the <seealso cref="IPagingHelper" /> this provider supplies.
+        /// </summary>
+        public virtual IPagingHelper PagingUtility
+        {
+            get { return PagingHelper.Instance; }
+        }
+
         /// <summary>
         ///     Escape a tablename into a suitable format for the associated database provider.
         /// </summary>
@@ -21,27 +42,20 @@ namespace PetaPoco.Internal
         ///     POCO class.
         /// </param>
         /// <returns>The escaped table name</returns>
-        string EscapeTableName(string tableName);
+        public virtual string EscapeTableName(string tableName)
+        {
+            // Assume table names with "dot" are already escaped
+            return tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
+        }
 
         /// <summary>
         ///     Escape and arbitary SQL identifier into a format suitable for the associated database provider
         /// </summary>
         /// <param name="str">The SQL identifier to be escaped</param>
         /// <returns>The escaped identifier</returns>
-        string EscapeSqlIdentifier(string str);
-    }
-
-    /// <summary>
-    ///     Base class for DatabaseType handlers - provides default/common handling for different database engines
-    /// </summary>
-    internal abstract class DatabaseType : IProvider
-    {
-        /// <summary>
-        ///     Gets a flag for whether the DB has native support for GUID/UUID.
-        /// </summary>
-        public virtual bool HasNativeGuidSupport
+        public virtual string EscapeSqlIdentifier(string str)
         {
-            get { return false; }
+            return string.Format("[{0}]", str);
         }
 
         /// <summary>
@@ -86,10 +100,10 @@ namespace PetaPoco.Internal
         /// <param name="parts">The original SQL query after being parsed into it's component parts</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL query</param>
         /// <returns>The final SQL query that should be executed.</returns>
-        public virtual string BuildPageQuery(long skip, long take, PagingHelper.SQLParts parts, ref object[] args)
+        public virtual string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
-            var sql = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", parts.sql, args.Length, args.Length + 1);
-            args = args.Concat(new object[] {take, skip}).ToArray();
+            var sql = string.Format("{0}\nLIMIT @{1} OFFSET @{2}", parts.Sql, args.Length, args.Length + 1);
+            args = args.Concat(new object[] { take, skip }).ToArray();
             return sql;
         }
 
@@ -100,30 +114,6 @@ namespace PetaPoco.Internal
         public virtual string GetExistsSql()
         {
             return "SELECT COUNT(*) FROM {0} WHERE {1}";
-        }
-
-        /// <summary>
-        ///     Escape a tablename into a suitable format for the associated database provider.
-        /// </summary>
-        /// <param name="tableName">
-        ///     The name of the table (as specified by the client program, or as attributes on the associated
-        ///     POCO class.
-        /// </param>
-        /// <returns>The escaped table name</returns>
-        public virtual string EscapeTableName(string tableName)
-        {
-            // Assume table names with "dot" are already escaped
-            return tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
-        }
-
-        /// <summary>
-        ///     Escape and arbitary SQL identifier into a format suitable for the associated database provider
-        /// </summary>
-        /// <param name="str">The SQL identifier to be escaped</param>
-        /// <returns>The escaped identifier</returns>
-        public virtual string EscapeSqlIdentifier(string str)
-        {
-            return string.Format("[{0}]", str);
         }
 
         /// <summary>

@@ -5,15 +5,17 @@
 // <date>2015/12/05</date>
 
 using System.Linq;
+using PetaPoco.Core;
 using PetaPoco.Internal;
+using PetaPoco.Utilities;
 
 namespace PetaPoco.DatabaseTypes
 {
-    internal class SqlServerCEDatabaseType : DatabaseType
+    public class SqlServerCEDatabaseType : DatabaseType
     {
-        public override string BuildPageQuery(long skip, long take, PagingHelper.SQLParts parts, ref object[] args)
+        public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
-            var sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", parts.sql, args.Length, args.Length + 1);
+            var sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", parts.Sql, args.Length, args.Length + 1);
             args = args.Concat(new object[] {skip, take}).ToArray();
             return sqlPage;
         }

@@ -9,11 +9,14 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using PetaPoco.Core;
 using PetaPoco.Internal;
+using PetaPoco.Utilities;
 
 namespace PetaPoco
 {
@@ -632,12 +635,12 @@ namespace PetaPoco
                 sql = AutoSelectHelper.AddSelectClause<T>(_dbType, sql);
 
             // Split the SQL
-            PagingHelper.SQLParts parts;
-            if (!PagingHelper.SplitSQL(sql, out parts))
+            SQLParts parts;
+            if (!Provider.PagingUtility.SplitSQL(sql, out parts))
                 throw new Exception("Unable to parse SQL statement for paged query");
 
             sqlPage = _dbType.BuildPageQuery(skip, take, parts, ref args);
-            sqlCount = parts.sqlCount;
+            sqlCount = parts.SqlCount;
         }
 
         /// <summary>
@@ -1072,9 +1075,26 @@ namespace PetaPoco
         ///     Performs an SQL Insert
         /// </summary>
         /// <param name="tableName">The name of the table to insert into</param>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        public object Insert(string tableName, object poco)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteInsert(tableName, null, false, poco);
+        }
+
+        /// <summary>
+        ///     Performs an SQL Insert
+        /// </summary>
+        /// <param name="tableName">The name of the table to insert into</param>
         /// <param name="primaryKeyName">The name of the primary key column of the table</param>
         /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record</returns>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1454,7 +1474,8 @@ namespace PetaPoco
                         PropertyInfo pkpi = null;
                         if (primaryKeyName != null)
                         {
-                            pkpi = pd.Columns[primaryKeyName].PropertyInfo;
+                            PocoColumn col;
+                            pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
                         }
 
                         cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
@@ -1551,7 +1572,19 @@ namespace PetaPoco
         {
             if (pocoOrPrimaryKey.GetType() == typeof(T))
                 return Delete(pocoOrPrimaryKey);
+
             var pd = PocoData.ForType(typeof(T));
+
+            if (pocoOrPrimaryKey.GetType().Name.Contains("AnonymousType"))
+            {
+                var pi = pocoOrPrimaryKey.GetType().GetProperty(pd.TableInfo.PrimaryKey);
+
+                if (pi == null)
+                    throw new InvalidOperationException(string.Format("Anonymous type does not contain an id for PK column `{0}`.", pd.TableInfo.PrimaryKey));
+
+                pocoOrPrimaryKey = pi.GetValue(pocoOrPrimaryKey, new object[0]);
+            }
+
             return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
         }
 
@@ -1596,51 +1629,62 @@ namespace PetaPoco
         /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
         public bool IsNew(string primaryKeyName, object poco)
         {
-            var pd = PocoData.ForObject(poco, primaryKeyName);
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentException("primaryKeyName");
+
+            return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName), poco);
+        }
+
+        protected virtual bool IsNew(string primaryKeyName, PocoData pd, object poco)
+        {
+            if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
+                throw new InvalidOperationException("IsNew() and Save() are only supported on tables with identity (inc auto-increment) primary key columns");
+
             object pk;
             PocoColumn pc;
+            PropertyInfo pi;
             if (pd.Columns.TryGetValue(primaryKeyName, out pc))
             {
                 pk = pc.GetValue(poco);
-            }
-            else if (poco.GetType() == typeof(System.Dynamic.ExpandoObject))
-            {
-                return true;
+                pi = pc.PropertyInfo;
             }
             else
             {
-                var pi = poco.GetType().GetProperty(primaryKeyName);
+                pi = poco.GetType().GetProperty(primaryKeyName);
                 if (pi == null)
                     throw new ArgumentException(string.Format("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName));
                 pk = pi.GetValue(poco, null);
             }
 
-            if (pk == null)
-                return true;
+            var type = pk != null ? pk.GetType() : pi.PropertyType;
 
-            var type = pk.GetType();
-
-            if (type.IsValueType)
-            {
-                // Common primary key types
-                if (type == typeof(long))
-                    return (long) pk == default(long);
-                else if (type == typeof(ulong))
-                    return (ulong) pk == default(ulong);
-                else if (type == typeof(int))
-                    return (int) pk == default(int);
-                else if (type == typeof(uint))
-                    return (uint) pk == default(uint);
-                else if (type == typeof(Guid))
-                    return (Guid) pk == default(Guid);
-
-                // Create a default instance and compare
-                return pk == Activator.CreateInstance(pk.GetType());
-            }
-            else
-            {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) || !type.IsValueType)
                 return pk == null;
-            }
+
+            if (type == typeof(string))
+                return string.IsNullOrEmpty((string)pk);
+            if (!pi.PropertyType.IsValueType)
+                return pk == null;
+            if (type == typeof(long))
+                return (long)pk == default(long);
+            if (type == typeof(int))
+                return (int)pk == default(int);
+            if (type == typeof(Guid))
+                return (Guid)pk == default(Guid);
+            if (type == typeof(ulong))
+                return (ulong)pk == default(ulong);
+            if (type == typeof(uint))
+                return (uint)pk == default(uint);
+            if (type == typeof(short))
+                return (short)pk == default(short);
+            if (type == typeof(ushort))
+                return (ushort)pk == default(ushort);
+
+            // Create a default instance and compare
+            return pk == Activator.CreateInstance(pk.GetType());
         }
 
         /// <summary>
@@ -1651,10 +1695,11 @@ namespace PetaPoco
         /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
         public bool IsNew(object poco)
         {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
             var pd = PocoData.ForType(poco.GetType());
-            if (!pd.TableInfo.AutoIncrement)
-                throw new InvalidOperationException("IsNew() and Save() are only supported on tables with auto-increment/identity primary key columns");
-            return IsNew(pd.TableInfo.PrimaryKey, poco);
+            return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
         }
 
         #endregion

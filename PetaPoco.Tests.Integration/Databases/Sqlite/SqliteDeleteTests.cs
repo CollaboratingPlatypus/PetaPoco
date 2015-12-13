@@ -9,9 +9,9 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
 {
     [Collection("SqliteTests")]
-    public class SqliteUpdateTests : BaseUpdateTests
+    public class SqliteDeleteTests : BaseDeleteTests
     {
-        public SqliteUpdateTests()
+        public SqliteDeleteTests()
             : base(new SqliteDBTestProvider())
         {
         }

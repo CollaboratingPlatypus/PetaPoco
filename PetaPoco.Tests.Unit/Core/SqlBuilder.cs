@@ -2,15 +2,16 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/07</date>
+// <date>2015/12/13</date>
 
 using System;
+using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
 
 namespace PetaPoco.Tests.Unit.Core
 {
-    [RequiresCleanUpAttribute]
+    [RequiresCleanUp]
     public class SqlTests
     {
         [Fact]
@@ -282,6 +283,52 @@ namespace PetaPoco.Tests.Unit.Core
                 .LeftJoin("comments").On("articles.article_id=comments.article_id");
 
             sql.SQL.ShouldBe("SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id");
+        }
+
+        [Fact]
+        [Description("Investigation of reported bug #123")]
+        public void Append_GivenMultipleAppends_IsValid()
+        {
+            var sql = new Sql();
+            var resource = new
+            {
+                ResourceName = "p1",
+                ResourceDescription = "p2",
+                ResourceContent = "p3",
+                ResourceData = "p4",
+                ResourceGUID = Guid.Parse("C32B630F-FCFE-49FF-A27C-2E4105D4003E"),
+                LaunchPath = "p5",
+                ResourceType = OrderStatus.Deleted,
+                ContentType = "p5",
+                SchoolID = "p5",
+                DistrictID = "p5",
+                UpdatedBy = 87,
+                UpdatedDate = new DateTime(2000, 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                IsActive = true,
+                Extension = "p9",
+                ResourceID = 99,
+            };
+
+            sql.Append("UPDATE [Resource] SET ")
+                .Append("[ResourceName] = @0", resource.ResourceName)
+                .Append(",[ResourceDescription] = @0", resource.ResourceDescription)
+                .Append(",[ResourceContent] = @0", resource.ResourceContent)
+                .Append(",[ResourceData] = @0", resource.ResourceData)
+                .Append(",[ResourceGUID] = @0", resource.ResourceGUID)
+                .Append(",[LaunchPath] = @0", resource.LaunchPath)
+                .Append(",[ResourceType] = @0", (int) resource.ResourceType)
+                .Append(",[ContentType] = @0", resource.ContentType)
+                .Append(",[SchoolID] = @0", resource.SchoolID)
+                .Append(",[DistrictID] = @0", resource.DistrictID)
+                .Append(",[IsActive] = @0", resource.IsActive)
+                .Append(",[UpdatedBy] = @0", resource.UpdatedBy)
+                .Append(",[UpdatedDate] = @0", resource.UpdatedDate)
+                .Append(",[Extension] = @0", resource.Extension).Append(" WHERE ResourceID=@0", resource.ResourceID);
+
+            sql.SQL.Replace("\n", "")
+                .Replace("\r", "")
+                .ShouldBe(
+                    @"UPDATE [Resource] SET [ResourceName] = @0,[ResourceDescription] = @1,[ResourceContent] = @2,[ResourceData] = @3,[ResourceGUID] = @4,[LaunchPath] = @5,[ResourceType] = @6,[ContentType] = @7,[SchoolID] = @8,[DistrictID] = @9,[IsActive] = @10,[UpdatedBy] = @11,[UpdatedDate] = @12,[Extension] = @13 WHERE ResourceID=@14");
         }
     }
 }

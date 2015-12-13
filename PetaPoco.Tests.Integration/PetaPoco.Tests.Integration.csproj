@@ -100,28 +100,36 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Databases\BaseDatabaseTest.cs" />
+    <Compile Include="Databases\BaseDeleteTests.cs" />
     <Compile Include="Databases\BaseInsertTests.cs" />
     <Compile Include="Databases\BaseUpdateTests.cs" />
     <Compile Include="Databases\DBTestProvider.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeDBTestProvider.cs" />
+    <Compile Include="Databases\MSSQLCe\MssqlCeDeleteTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeInsertTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeUpdateTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlDBTestProvider.cs" />
+    <Compile Include="Databases\MSSQL\MssqlDeleteTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlInsertTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlUpdateTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDBTestProvider.cs" />
+    <Compile Include="Databases\MySQL\MySqlDeleteTests.cs" />
     <Compile Include="Databases\MySQL\MySqlInsertTests.cs" />
     <Compile Include="Databases\MySQL\MySqlUpdateTests.cs" />
     <Compile Include="Databases\Postgres\PostgresDBTestProvider.cs" />
+    <Compile Include="Databases\Postgres\PostgresDeleteTests.cs" />
     <Compile Include="Databases\Postgres\PostgresInsertTests.cs" />
     <Compile Include="Databases\Postgres\PostgresUpdateTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteDBTestProvider.cs" />
+    <Compile Include="Databases\Sqlite\SqliteDeleteTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
+    <Compile Include="Models\Note.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\TransactionLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>

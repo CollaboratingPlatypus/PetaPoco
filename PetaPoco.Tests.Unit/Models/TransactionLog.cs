@@ -4,16 +4,15 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/13</date>
 
-using Xunit;
+using System;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
+namespace PetaPoco.Tests.Unit.Models
 {
-    [Collection("MssqlCeTests")]
-    public class MssqlCeInsertTests : BaseInsertTests
+    [TableName("TransactionLogs")]
+    public class TransactionLog
     {
-        public MssqlCeInsertTests()
-            : base(new MssqlCeDBTestProvider())
-        {
-        }
+        public string Description { get; set; }
+
+        public DateTime CreatedOn { get; set; }
     }
 }

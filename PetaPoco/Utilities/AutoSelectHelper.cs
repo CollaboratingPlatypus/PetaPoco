@@ -6,6 +6,7 @@
 
 using System.Linq;
 using System.Text.RegularExpressions;
+using PetaPoco.Core;
 
 namespace PetaPoco.Internal
 {

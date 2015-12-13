@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using PetaPoco.Core;
 using PetaPoco.Internal;
 
 namespace PetaPoco
