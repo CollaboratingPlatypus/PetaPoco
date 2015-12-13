@@ -1,8 +1,8 @@
-﻿// <copyright file="Sql.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/13</date>
 
 using System;
 using System.Collections.Generic;
@@ -222,6 +222,17 @@ namespace PetaPoco
         public SqlJoinClause LeftJoin(string table)
         {
             return Join("LEFT JOIN ", table);
+        }
+
+        /// <summary>
+        ///     Returns the SQL statement.
+        /// </summary>
+        /// <summary>
+        ///     Returns the final SQL statement represented by this builder
+        /// </summary>
+        public override string ToString()
+        {
+            return SQL;
         }
 
         /// <summary>
