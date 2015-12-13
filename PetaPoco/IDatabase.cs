@@ -5,6 +5,7 @@
 // <date>2015/12/12</date>
 
 using System;
+using PetaPoco.Core;
 using PetaPoco.Internal;
 
 namespace PetaPoco

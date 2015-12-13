@@ -4,11 +4,12 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/05</date>
 
+using PetaPoco.Core;
 using PetaPoco.Internal;
 
 namespace PetaPoco.DatabaseTypes
 {
-    internal class MySqlDatabaseType : DatabaseType
+    public class MySqlDatabaseType : DatabaseType
     {
         public override string GetParameterPrefix(string connectionString)
         {

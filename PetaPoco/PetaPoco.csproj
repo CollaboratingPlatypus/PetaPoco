@@ -48,6 +48,7 @@
     <Compile Include="Attributes\ColumnAttribute.cs" />
     <Compile Include="Core\AnsiString.cs" />
     <Compile Include="Core\ColumnInfo.cs" />
+    <Compile Include="Core\IProvider.cs" />
     <Compile Include="Core\Mappers.cs" />
     <Compile Include="Core\MultiPocoFactory.cs" />
     <Compile Include="Core\DatabaseType.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="IExecute.cs" />
     <Compile Include="IQuery.cs" />
     <Compile Include="Utilities\AutoSelectHelper.cs" />
+    <Compile Include="Utilities\IPagingHelper.cs" />
     <Compile Include="Utilities\PagingHelper.cs" />
     <Compile Include="Utilities\ParametersHelper.cs" />
     <Compile Include="Core\ExpandoColumn.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Utilities\Cache.cs" />
     <Compile Include="Utilities\EnumMapper.cs" />
     <Compile Include="Utilities\Singleton.cs" />
+    <Compile Include="Utilities\SQLParts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="T4 Templates\PetaPoco.Core.ttinclude" />

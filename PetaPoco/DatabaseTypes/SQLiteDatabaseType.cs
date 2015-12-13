@@ -4,11 +4,12 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/05</date>
 
+using PetaPoco.Core;
 using PetaPoco.Internal;
 
 namespace PetaPoco.DatabaseTypes
 {
-    internal class SQLiteDatabaseType : DatabaseType
+    public class SQLiteDatabaseType : DatabaseType
     {
         public override object MapParameterValue(object value)
         {

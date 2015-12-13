@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using PetaPoco.Core;
 using PetaPoco.Internal;
+using PetaPoco.Utilities;
 
 namespace PetaPoco
 {
@@ -634,12 +635,12 @@ namespace PetaPoco
                 sql = AutoSelectHelper.AddSelectClause<T>(_dbType, sql);
 
             // Split the SQL
-            PagingHelper.SQLParts parts;
-            if (!PagingHelper.SplitSQL(sql, out parts))
+            SQLParts parts;
+            if (!Provider.PagingHelper.SplitSQL(sql, out parts))
                 throw new Exception("Unable to parse SQL statement for paged query");
 
             sqlPage = _dbType.BuildPageQuery(skip, take, parts, ref args);
-            sqlCount = parts.sqlCount;
+            sqlCount = parts.SqlCount;
         }
 
         /// <summary>

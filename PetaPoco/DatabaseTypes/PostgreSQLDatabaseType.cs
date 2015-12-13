@@ -4,11 +4,12 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/05</date>
 
+using PetaPoco.Core;
 using PetaPoco.Internal;
 
 namespace PetaPoco.DatabaseTypes
 {
-    internal class PostgreSQLDatabaseType : DatabaseType
+    public class PostgreSQLDatabaseType : DatabaseType
     {
         public override bool HasNativeGuidSupport
         {
