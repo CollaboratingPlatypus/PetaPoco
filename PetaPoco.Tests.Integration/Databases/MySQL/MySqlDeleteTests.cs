@@ -6,13 +6,13 @@
 
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.Sqlite
+namespace PetaPoco.Tests.Integration.Databases.MySQL
 {
-    [Collection("SqliteTests")]
-    public class SqliteUpdateTests : BaseUpdateTests
+    [Collection("MySqlTests")]
+    public class MySqlDeleteTests : BaseDeleteTests
     {
-        public SqliteUpdateTests()
-            : base(new SqliteDBTestProvider())
+        public MySqlDeleteTests()
+            : base(new MySqlDBTestProvider())
         {
         }
     }
