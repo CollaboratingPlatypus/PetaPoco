@@ -5,6 +5,7 @@
 // <date>2015/12/05</date>
 
 using System;
+using System.Linq;
 
 namespace PetaPoco
 {
@@ -51,6 +52,26 @@ namespace PetaPoco
             ti.PrimaryKey = a.Length == 0 ? null : (a[0] as PrimaryKeyAttribute).Value;
             ti.SequenceName = a.Length == 0 ? null : (a[0] as PrimaryKeyAttribute).SequenceName;
             ti.AutoIncrement = a.Length == 0 ? false : (a[0] as PrimaryKeyAttribute).AutoIncrement;
+
+            if (string.IsNullOrEmpty(ti.PrimaryKey))
+            {
+                var prop = t.GetProperties().FirstOrDefault(p =>
+                {
+                    if (p.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                    if (p.Name.Equals(t.Name + "id", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                    if (p.Name.Equals(t.Name + "_id", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                    return false;
+                });
+
+                if (prop != null)
+                {
+                    ti.PrimaryKey = prop.Name;
+                    ti.AutoIncrement = prop.PropertyType.IsValueType;
+                }
+            }
 
             return ti;
         }

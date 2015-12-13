@@ -1074,9 +1074,26 @@ namespace PetaPoco
         ///     Performs an SQL Insert
         /// </summary>
         /// <param name="tableName">The name of the table to insert into</param>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        public object Insert(string tableName, object poco)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteInsert(tableName, null, false, poco);
+        }
+
+        /// <summary>
+        ///     Performs an SQL Insert
+        /// </summary>
+        /// <param name="tableName">The name of the table to insert into</param>
         /// <param name="primaryKeyName">The name of the primary key column of the table</param>
         /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record</returns>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))

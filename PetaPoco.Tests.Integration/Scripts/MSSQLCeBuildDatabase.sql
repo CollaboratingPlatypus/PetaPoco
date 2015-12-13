@@ -45,3 +45,14 @@ CREATE TABLE [SpecificOrderLines] (
 	[Qty] SMALLINT NOT NULL,
 	[SellPrice] NUMERIC(10, 4) NOT NULL
 );
+
+CREATE TABLE [TransactionLogs] (
+	[Description] NTEXT NOT NULL,
+	[CreatedOn] DATETIME NOT NULL
+);
+
+CREATE TABLE [Note] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[Text] NTEXT NOT NULL,
+	[CreatedOn] DATETIME NOT NULL
+);

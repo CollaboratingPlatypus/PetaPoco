@@ -57,6 +57,7 @@ namespace PetaPoco.Tests.Unit
         public void Insert_GivenInvalidArguments_ShouldThrow()
         {
             Should.Throw<ArgumentNullException>(() => DB.Insert(null));
+            Should.Throw<ArgumentNullException>(() => DB.Insert(null, null));
             Should.Throw<ArgumentNullException>(() => DB.Insert(null, "SomeColumn", new Person()));
             Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", null, new Person()));
             Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", "SomeColumn", null));
@@ -71,7 +72,7 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentException>(() => DB.IsNew("MissingId", new { }));
 
             Should.Throw<InvalidOperationException>(() => DB.IsNew(new TransactionLog()));
-            Should.Throw<InvalidOperationException>(() => DB.IsNew(new Note()));
+            Should.Throw<InvalidOperationException>(() => DB.IsNew(new EntityWithoutConventionId()));
             Should.Throw<InvalidOperationException>(() => DB.IsNew(new ExpandoObject()));
         }
 
@@ -240,6 +241,15 @@ namespace PetaPoco.Tests.Unit
         public class ComplexPrimaryKey
         {
              
+        }
+
+        public class EntityWithoutConventionId
+        {
+            public int SomeOtherId { get; set; }
+
+            public DateTime CreatedOn { get; set; }
+
+            public string Text { get; set; }
         }
     }
 }

@@ -2,9 +2,10 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/07</date>
+// <date>2015/12/13</date>
 
 using System;
+using System.CodeDom;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -73,14 +74,14 @@ namespace PetaPoco.Tests.Integration.Databases
             orderLineOther.ShouldBe(_orderLine);
         }
 
-
-
         [Fact]
         public void Insert_GivenPocoTableNameAndColumnName_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
-            var personOther = DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var personOther =
+                DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _person.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -95,9 +96,14 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             DB.Insert("SpecificOrderLines", "Id", _orderLine);
 
-            var personOther = DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
-            var orderOther = DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
-            var orderLineOther = DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
+            var personOther =
+                DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _person.Id);
+            var orderOther =
+                DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            var orderLineOther =
+                DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -105,6 +111,32 @@ namespace PetaPoco.Tests.Integration.Databases
             orderOther.ShouldBe(_order);
             orderLineOther.ShouldNotBeNull();
             orderLineOther.ShouldBe(_orderLine);
+        }
+
+        [Fact]
+        public void Insert_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        {
+            var note = new { Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+
+            var key = DB.Insert("Note", "Id", note);
+            var otherNote = DB.Single<Note>(key);
+
+            key.ShouldNotBeNull();
+            otherNote.Text.ShouldBe(note.Text);
+            otherNote.CreatedOn.ShouldBe(note.CreatedOn);
+        }
+
+        [Fact]
+        public void Insert_GivenTableNameAndAnonymousType_ShouldBeValid()
+        {
+            var log = new { Description = "Test log", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+
+            var logKey = DB.Insert("TransactionLogs", log);
+            var otherLog = DB.Single<TransactionLog>($"SELECT * FROM {DB.Provider.EscapeTableName("TransactionLogs")}");
+
+            logKey.ShouldBeNull();
+            otherLog.Description.ShouldBe(log.Description);
+            otherLog.CreatedOn.ShouldBe(log.CreatedOn);
         }
     }
 }

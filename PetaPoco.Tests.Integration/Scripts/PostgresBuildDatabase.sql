@@ -4,6 +4,8 @@ DROP TABLE IF EXISTS "People";
 DROP TABLE IF EXISTS "SpecificOrderLines";
 DROP TABLE IF EXISTS "SpecificOrders";
 DROP TABLE IF EXISTS "SpecificPeople";
+DROP TABLE IF EXISTS "TransactionLogs";
+DROP TABLE IF EXISTS "Note";
 
 CREATE TABLE "People" (
 	"Id" UUID NOT NULL PRIMARY KEY,
@@ -28,7 +30,7 @@ CREATE TABLE "OrderLines" (
 	"OrderId" INT NOT NULL,
 	"Qty" SMALLINT NOT NULL,
 	"SellPrice" NUMERIC(10, 4) NOT NULL,
-  CONSTRAINT "FK_OrderLines_Orders" FOREIGN KEY ("OrderId") REFERENCES "Orders"("Id")
+	CONSTRAINT "FK_OrderLines_Orders" FOREIGN KEY ("OrderId") REFERENCES "Orders"("Id")
 );
 
 CREATE TABLE "SpecificPeople" (
@@ -54,5 +56,16 @@ CREATE TABLE "SpecificOrderLines" (
 	"OrderId" INT NOT NULL,
 	"Qty" SMALLINT NOT NULL,
 	"SellPrice" NUMERIC(10, 4) NOT NULL,
-  CONSTRAINT "FK_SpecificOrderLines_SpecificOrders" FOREIGN KEY ("OrderId") REFERENCES "SpecificOrders"("Id")
+	CONSTRAINT "FK_SpecificOrderLines_SpecificOrders" FOREIGN KEY ("OrderId") REFERENCES "SpecificOrders"("Id")
+);
+
+CREATE TABLE "TransactionLogs" (
+	"Description" VARCHAR(5000) NOT NULL,
+	"CreatedOn" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE "Note" (
+	"Id" SERIAL PRIMARY KEY NOT NULL,
+	"Text" VARCHAR(5000) NOT NULL,
+	"CreatedOn" TIMESTAMP NOT NULL
 );
