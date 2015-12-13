@@ -29,9 +29,9 @@ namespace PetaPoco.Core
         /// <summary>
         ///     Gets the <seealso cref="IPagingHelper" /> this provider supplies.
         /// </summary>
-        public virtual IPagingHelper PagingHelper
+        public virtual IPagingHelper PagingUtility
         {
-            get { return Utilities.PagingHelper.Instance; }
+            get { return PagingHelper.Instance; }
         }
 
         /// <summary>

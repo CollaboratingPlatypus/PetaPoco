@@ -636,7 +636,7 @@ namespace PetaPoco
 
             // Split the SQL
             SQLParts parts;
-            if (!Provider.PagingHelper.SplitSQL(sql, out parts))
+            if (!Provider.PagingUtility.SplitSQL(sql, out parts))
                 throw new Exception("Unable to parse SQL statement for paged query");
 
             sqlPage = _dbType.BuildPageQuery(skip, take, parts, ref args);

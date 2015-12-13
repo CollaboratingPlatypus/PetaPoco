@@ -16,7 +16,7 @@ namespace PetaPoco.Core
         /// <summary>
         ///     Gets the <seealso cref="IPagingHelper" /> this provider supplies.
         /// </summary>
-        IPagingHelper PagingHelper { get; }
+        IPagingHelper PagingUtility { get; }
 
         /// <summary>
         ///     Escape a tablename into a suitable format for the associated database provider.

@@ -16,7 +16,7 @@ namespace PetaPoco.DatabaseTypes
     {
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
-            var helper = (PagingHelper) PagingHelper;
+            var helper = (PagingHelper) PagingUtility;
             parts.SqlSelectRemoved = helper.RegexOrderBy.Replace(parts.SqlSelectRemoved, "", 1);
             if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
             {
