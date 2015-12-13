@@ -1,8 +1,8 @@
-﻿// <copyright file="PocoData.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/13</date>
 
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using PetaPoco.Internal;
 
-namespace PetaPoco.Internal
+namespace PetaPoco.Core
 {
-    internal class PocoData
+    public class PocoData
     {
         private static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
         private static List<Func<object, object>> _converters = new List<Func<object, object>>();
@@ -24,7 +25,7 @@ namespace PetaPoco.Internal
         private static MethodInfo fnListGetItem = typeof(List<Func<object, object>>).GetProperty("Item").GetGetMethod();
         private static MethodInfo fnInvoke = typeof(Func<object, object>).GetMethod("Invoke");
         private Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
-        public Type type;
+        public Type Type;
         public string[] QueryColumns { get; private set; }
         public TableInfo TableInfo { get; private set; }
         public Dictionary<string, PocoColumn> Columns { get; private set; }
@@ -33,19 +34,19 @@ namespace PetaPoco.Internal
         {
         }
 
-        public PocoData(Type t)
+        public PocoData(Type type)
         {
-            type = t;
+            Type = type;
 
             // Get the mapper for this type
-            var mapper = Mappers.GetMapper(t);
+            var mapper = Mappers.GetMapper(type);
 
             // Get the table info
-            TableInfo = mapper.GetTableInfo(t);
+            TableInfo = mapper.GetTableInfo(type);
 
             // Work out bound properties
             Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
-            foreach (var pi in t.GetProperties())
+            foreach (var pi in type.GetProperties())
             {
                 ColumnInfo ci = mapper.GetColumnInfo(pi);
                 if (ci == null)
@@ -65,9 +66,9 @@ namespace PetaPoco.Internal
             QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
         }
 
-        public static PocoData ForObject(object o, string primaryKeyName)
+        public static PocoData ForObject(object obj, string primaryKeyName)
         {
-            var t = o.GetType();
+            var t = obj.GetType();
             if (t == typeof(System.Dynamic.ExpandoObject))
             {
                 var pd = new PocoData();
@@ -76,7 +77,7 @@ namespace PetaPoco.Internal
                 pd.Columns.Add(primaryKeyName, new ExpandoColumn() {ColumnName = primaryKeyName});
                 pd.TableInfo.PrimaryKey = primaryKeyName;
                 pd.TableInfo.AutoIncrement = true;
-                foreach (var col in (o as IDictionary<string, object>).Keys)
+                foreach (var col in (obj as IDictionary<string, object>).Keys)
                 {
                     if (col != primaryKeyName)
                         pd.Columns.Add(col, new ExpandoColumn() {ColumnName = col});
@@ -86,34 +87,34 @@ namespace PetaPoco.Internal
             return ForType(t);
         }
 
-        public static PocoData ForType(Type t)
+        public static PocoData ForType(Type type)
         {
-            if (t == typeof(System.Dynamic.ExpandoObject))
+            if (type == typeof(System.Dynamic.ExpandoObject))
                 throw new InvalidOperationException("Can't use dynamic types with this method");
 
-            return _pocoDatas.Get(t, () => new PocoData(t));
+            return _pocoDatas.Get(type, () => new PocoData(type));
         }
 
-        private static bool IsIntegralType(Type t)
+        private static bool IsIntegralType(Type type)
         {
-            var tc = Type.GetTypeCode(t);
+            var tc = Type.GetTypeCode(type);
             return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
         }
 
         // Create factory function that can convert a IDataReader record into a POCO
-        public Delegate GetFactory(string sql, string connString, int firstColumn, int countColumns, IDataReader r)
+        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int countColumns, IDataReader reader)
         {
             // Check cache
-            var key = Tuple.Create<string, string, int, int>(sql, connString, firstColumn, countColumns);
+            var key = Tuple.Create<string, string, int, int>(sql, connectionString, firstColumn, countColumns);
 
             return PocoFactories.Get(key, () =>
             {
                 // Create the method
-                var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), type, new Type[] {typeof(IDataReader)}, true);
+                var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), Type, new Type[] {typeof(IDataReader)}, true);
                 var il = m.GetILGenerator();
-                var mapper = Mappers.GetMapper(type);
+                var mapper = Mappers.GetMapper(Type);
 
-                if (type == typeof(object))
+                if (Type == typeof(object))
                 {
                     // var poco=new T()
                     il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes)); // obj
@@ -123,10 +124,10 @@ namespace PetaPoco.Internal
                     // Enumerate all fields generating a set assignment for the column
                     for (int i = firstColumn; i < firstColumn + countColumns; i++)
                     {
-                        var srcType = r.GetFieldType(i);
+                        var srcType = reader.GetFieldType(i);
 
                         il.Emit(OpCodes.Dup); // obj, obj
-                        il.Emit(OpCodes.Ldstr, r.GetName(i)); // obj, obj, fieldname
+                        il.Emit(OpCodes.Ldstr, reader.GetName(i)); // obj, obj, fieldname
 
                         // Get the converter
                         Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo) null, srcType);
@@ -169,129 +170,128 @@ namespace PetaPoco.Internal
                         il.Emit(OpCodes.Callvirt, fnAdd);
                     }
                 }
+                else if (Type.IsValueType || Type == typeof(string) || Type == typeof(byte[]))
+                {
+                    // Do we need to install a converter?
+                    var srcType = reader.GetFieldType(0);
+                    var converter = GetConverter(mapper, null, srcType, Type);
+
+                    // "if (!rdr.IsDBNull(i))"
+                    il.Emit(OpCodes.Ldarg_0); // rdr
+                    il.Emit(OpCodes.Ldc_I4_0); // rdr,0
+                    il.Emit(OpCodes.Callvirt, fnIsDBNull); // bool
+                    var lblCont = il.DefineLabel();
+                    il.Emit(OpCodes.Brfalse_S, lblCont);
+                    il.Emit(OpCodes.Ldnull); // null
+                    var lblFin = il.DefineLabel();
+                    il.Emit(OpCodes.Br_S, lblFin);
+
+                    il.MarkLabel(lblCont);
+
+                    // Setup stack for call to converter
+                    AddConverterToStack(il, converter);
+
+                    il.Emit(OpCodes.Ldarg_0); // rdr
+                    il.Emit(OpCodes.Ldc_I4_0); // rdr,0
+                    il.Emit(OpCodes.Callvirt, fnGetValue); // value
+
+                    // Call the converter
+                    if (converter != null)
+                        il.Emit(OpCodes.Callvirt, fnInvoke);
+
+                    il.MarkLabel(lblFin);
+                    il.Emit(OpCodes.Unbox_Any, Type); // value converted
+                }
                 else
-                    if (type.IsValueType || type == typeof(string) || type == typeof(byte[]))
+                {
+                    // var poco=new T()
+                    il.Emit(OpCodes.Newobj,
+                        Type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
+
+                    // Enumerate all fields generating a set assignment for the column
+                    for (int i = firstColumn; i < firstColumn + countColumns; i++)
                     {
-                        // Do we need to install a converter?
-                        var srcType = r.GetFieldType(0);
-                        var converter = GetConverter(mapper, null, srcType, type);
+                        // Get the PocoColumn for this db column, ignore if not known
+                        PocoColumn pc;
+                        if (!Columns.TryGetValue(reader.GetName(i), out pc))
+                            continue;
+
+                        // Get the source type for this column
+                        var srcType = reader.GetFieldType(i);
+                        var dstType = pc.PropertyInfo.PropertyType;
 
                         // "if (!rdr.IsDBNull(i))"
-                        il.Emit(OpCodes.Ldarg_0); // rdr
-                        il.Emit(OpCodes.Ldc_I4_0); // rdr,0
-                        il.Emit(OpCodes.Callvirt, fnIsDBNull); // bool
-                        var lblCont = il.DefineLabel();
-                        il.Emit(OpCodes.Brfalse_S, lblCont);
-                        il.Emit(OpCodes.Ldnull); // null
-                        var lblFin = il.DefineLabel();
-                        il.Emit(OpCodes.Br_S, lblFin);
+                        il.Emit(OpCodes.Ldarg_0); // poco,rdr
+                        il.Emit(OpCodes.Ldc_I4, i); // poco,rdr,i
+                        il.Emit(OpCodes.Callvirt, fnIsDBNull); // poco,bool
+                        var lblNext = il.DefineLabel();
+                        il.Emit(OpCodes.Brtrue_S, lblNext); // poco
 
-                        il.MarkLabel(lblCont);
+                        il.Emit(OpCodes.Dup); // poco,poco
 
-                        // Setup stack for call to converter
-                        AddConverterToStack(il, converter);
+                        // Do we need to install a converter?
+                        var converter = GetConverter(mapper, pc, srcType, dstType);
 
-                        il.Emit(OpCodes.Ldarg_0); // rdr
-                        il.Emit(OpCodes.Ldc_I4_0); // rdr,0
-                        il.Emit(OpCodes.Callvirt, fnGetValue); // value
-
-                        // Call the converter
-                        if (converter != null)
-                            il.Emit(OpCodes.Callvirt, fnInvoke);
-
-                        il.MarkLabel(lblFin);
-                        il.Emit(OpCodes.Unbox_Any, type); // value converted
-                    }
-                    else
-                    {
-                        // var poco=new T()
-                        il.Emit(OpCodes.Newobj,
-                            type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
-
-                        // Enumerate all fields generating a set assignment for the column
-                        for (int i = firstColumn; i < firstColumn + countColumns; i++)
+                        // Fast
+                        bool Handled = false;
+                        if (converter == null)
                         {
-                            // Get the PocoColumn for this db column, ignore if not known
-                            PocoColumn pc;
-                            if (!Columns.TryGetValue(r.GetName(i), out pc))
-                                continue;
-
-                            // Get the source type for this column
-                            var srcType = r.GetFieldType(i);
-                            var dstType = pc.PropertyInfo.PropertyType;
-
-                            // "if (!rdr.IsDBNull(i))"
-                            il.Emit(OpCodes.Ldarg_0); // poco,rdr
-                            il.Emit(OpCodes.Ldc_I4, i); // poco,rdr,i
-                            il.Emit(OpCodes.Callvirt, fnIsDBNull); // poco,bool
-                            var lblNext = il.DefineLabel();
-                            il.Emit(OpCodes.Brtrue_S, lblNext); // poco
-
-                            il.Emit(OpCodes.Dup); // poco,poco
-
-                            // Do we need to install a converter?
-                            var converter = GetConverter(mapper, pc, srcType, dstType);
-
-                            // Fast
-                            bool Handled = false;
-                            if (converter == null)
+                            var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] {typeof(int)});
+                            if (valuegetter != null
+                                && valuegetter.ReturnType == srcType
+                                && (valuegetter.ReturnType == dstType || valuegetter.ReturnType == Nullable.GetUnderlyingType(dstType)))
                             {
-                                var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] {typeof(int)});
-                                if (valuegetter != null
-                                    && valuegetter.ReturnType == srcType
-                                    && (valuegetter.ReturnType == dstType || valuegetter.ReturnType == Nullable.GetUnderlyingType(dstType)))
-                                {
-                                    il.Emit(OpCodes.Ldarg_0); // *,rdr
-                                    il.Emit(OpCodes.Ldc_I4, i); // *,rdr,i
-                                    il.Emit(OpCodes.Callvirt, valuegetter); // *,value
-
-                                    // Convert to Nullable
-                                    if (Nullable.GetUnderlyingType(dstType) != null)
-                                    {
-                                        il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] {Nullable.GetUnderlyingType(dstType)}));
-                                    }
-
-                                    il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true)); // poco
-                                    Handled = true;
-                                }
-                            }
-
-                            // Not so fast
-                            if (!Handled)
-                            {
-                                // Setup stack for call to converter
-                                AddConverterToStack(il, converter);
-
-                                // "value = rdr.GetValue(i)"
                                 il.Emit(OpCodes.Ldarg_0); // *,rdr
                                 il.Emit(OpCodes.Ldc_I4, i); // *,rdr,i
-                                il.Emit(OpCodes.Callvirt, fnGetValue); // *,value
+                                il.Emit(OpCodes.Callvirt, valuegetter); // *,value
 
-                                // Call the converter
-                                if (converter != null)
-                                    il.Emit(OpCodes.Callvirt, fnInvoke);
+                                // Convert to Nullable
+                                if (Nullable.GetUnderlyingType(dstType) != null)
+                                {
+                                    il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] {Nullable.GetUnderlyingType(dstType)}));
+                                }
 
-                                // Assign it
-                                il.Emit(OpCodes.Unbox_Any, pc.PropertyInfo.PropertyType); // poco,poco,value
                                 il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true)); // poco
+                                Handled = true;
                             }
-
-                            il.MarkLabel(lblNext);
                         }
 
-                        var fnOnLoaded = RecurseInheritedTypes<MethodInfo>(type,
-                            (x) => x.GetMethod("OnLoaded", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
-                        if (fnOnLoaded != null)
+                        // Not so fast
+                        if (!Handled)
                         {
-                            il.Emit(OpCodes.Dup);
-                            il.Emit(OpCodes.Callvirt, fnOnLoaded);
+                            // Setup stack for call to converter
+                            AddConverterToStack(il, converter);
+
+                            // "value = rdr.GetValue(i)"
+                            il.Emit(OpCodes.Ldarg_0); // *,rdr
+                            il.Emit(OpCodes.Ldc_I4, i); // *,rdr,i
+                            il.Emit(OpCodes.Callvirt, fnGetValue); // *,value
+
+                            // Call the converter
+                            if (converter != null)
+                                il.Emit(OpCodes.Callvirt, fnInvoke);
+
+                            // Assign it
+                            il.Emit(OpCodes.Unbox_Any, pc.PropertyInfo.PropertyType); // poco,poco,value
+                            il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true)); // poco
                         }
+
+                        il.MarkLabel(lblNext);
                     }
+
+                    var fnOnLoaded = RecurseInheritedTypes<MethodInfo>(Type,
+                        (x) => x.GetMethod("OnLoaded", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
+                    if (fnOnLoaded != null)
+                    {
+                        il.Emit(OpCodes.Dup);
+                        il.Emit(OpCodes.Callvirt, fnOnLoaded);
+                    }
+                }
 
                 il.Emit(OpCodes.Ret);
 
                 // Cache it, return it
-                return m.CreateDelegate(Expression.GetFuncType(typeof(IDataReader), type));
+                return m.CreateDelegate(Expression.GetFuncType(typeof(IDataReader), Type));
             }
                 );
         }
@@ -345,7 +345,7 @@ namespace PetaPoco.Internal
                 }
                 else if (dstType == typeof(Guid) && srcType == typeof(string))
                 {
-                    return delegate (object src) { return Guid.Parse((string)src); };
+                    return delegate(object src) { return Guid.Parse((string) src); };
                 }
                 else
                 {

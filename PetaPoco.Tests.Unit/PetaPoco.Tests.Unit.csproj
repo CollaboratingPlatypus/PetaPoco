@@ -73,10 +73,12 @@
     <Compile Include="DatabaseTests.cs" />
     <Compile Include="DatabaseTypes\SqlServerDatabaseTypeTests.cs" />
     <Compile Include="DescriptionAttribute.cs" />
+    <Compile Include="Models\Note.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\TransactionLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequiresCleanUp.cs" />
   </ItemGroup>

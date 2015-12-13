@@ -6,6 +6,7 @@
 
 using System;
 using System.Reflection;
+using PetaPoco.Core;
 using Shouldly;
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace PetaPoco.Tests.Unit.Core
         public void NoColumnMapper()
         {
             Mappers.Register(Assembly.GetExecutingAssembly(), new MyColumnMapper());
-            var pd = Internal.PocoData.ForType(typeof(Poco2));
+            var pd = PocoData.ForType(typeof(Poco2));
 
             pd.Columns.Count.ShouldBe(3);
             pd.Columns["prop1"].PropertyInfo.Name.ShouldBe("prop1");

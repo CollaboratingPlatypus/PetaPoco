@@ -7,9 +7,9 @@
 using System;
 using System.Reflection;
 
-namespace PetaPoco.Internal
+namespace PetaPoco.Core
 {
-    internal class PocoColumn
+    public class PocoColumn
     {
         public string ColumnName;
         public bool ForceToUtc;

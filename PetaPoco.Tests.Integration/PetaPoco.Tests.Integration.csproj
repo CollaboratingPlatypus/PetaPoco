@@ -118,10 +118,12 @@
     <Compile Include="Databases\Sqlite\SqliteDBTestProvider.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
+    <Compile Include="Models\Note.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\TransactionLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>

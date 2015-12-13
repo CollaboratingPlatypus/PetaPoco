@@ -9,10 +9,12 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using PetaPoco.Core;
 using PetaPoco.Internal;
 
 namespace PetaPoco
@@ -1597,51 +1599,62 @@ namespace PetaPoco
         /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
         public bool IsNew(string primaryKeyName, object poco)
         {
-            var pd = PocoData.ForObject(poco, primaryKeyName);
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentException("primaryKeyName");
+
+            return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName), poco);
+        }
+
+        protected virtual bool IsNew(string primaryKeyName, PocoData pd, object poco)
+        {
+            if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
+                throw new InvalidOperationException("IsNew() and Save() are only supported on tables with identity (inc auto-increment) primary key columns");
+
             object pk;
             PocoColumn pc;
+            PropertyInfo pi;
             if (pd.Columns.TryGetValue(primaryKeyName, out pc))
             {
                 pk = pc.GetValue(poco);
-            }
-            else if (poco.GetType() == typeof(System.Dynamic.ExpandoObject))
-            {
-                return true;
+                pi = pc.PropertyInfo;
             }
             else
             {
-                var pi = poco.GetType().GetProperty(primaryKeyName);
+                pi = poco.GetType().GetProperty(primaryKeyName);
                 if (pi == null)
                     throw new ArgumentException(string.Format("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName));
                 pk = pi.GetValue(poco, null);
             }
 
-            if (pk == null)
-                return true;
+            var type = pk != null ? pk.GetType() : pi.PropertyType;
 
-            var type = pk.GetType();
-
-            if (type.IsValueType)
-            {
-                // Common primary key types
-                if (type == typeof(long))
-                    return (long) pk == default(long);
-                else if (type == typeof(ulong))
-                    return (ulong) pk == default(ulong);
-                else if (type == typeof(int))
-                    return (int) pk == default(int);
-                else if (type == typeof(uint))
-                    return (uint) pk == default(uint);
-                else if (type == typeof(Guid))
-                    return (Guid) pk == default(Guid);
-
-                // Create a default instance and compare
-                return pk == Activator.CreateInstance(pk.GetType());
-            }
-            else
-            {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) || !type.IsValueType)
                 return pk == null;
-            }
+
+            if (type == typeof(string))
+                return string.IsNullOrEmpty((string)pk);
+            if (!pi.PropertyType.IsValueType)
+                return pk == null;
+            if (type == typeof(long))
+                return (long)pk == default(long);
+            if (type == typeof(int))
+                return (int)pk == default(int);
+            if (type == typeof(Guid))
+                return (Guid)pk == default(Guid);
+            if (type == typeof(ulong))
+                return (ulong)pk == default(ulong);
+            if (type == typeof(uint))
+                return (uint)pk == default(uint);
+            if (type == typeof(short))
+                return (short)pk == default(short);
+            if (type == typeof(ushort))
+                return (ushort)pk == default(ushort);
+
+            // Create a default instance and compare
+            return pk == Activator.CreateInstance(pk.GetType());
         }
 
         /// <summary>
@@ -1652,10 +1665,11 @@ namespace PetaPoco
         /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
         public bool IsNew(object poco)
         {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
             var pd = PocoData.ForType(poco.GetType());
-            if (!pd.TableInfo.AutoIncrement)
-                throw new InvalidOperationException("IsNew() and Save() are only supported on tables with auto-increment/identity primary key columns");
-            return IsNew(pd.TableInfo.PrimaryKey, poco);
+            return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
         }
 
         #endregion
