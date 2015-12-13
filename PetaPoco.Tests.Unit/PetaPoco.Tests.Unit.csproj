@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\MapperTests.cs" />
+    <Compile Include="Core\PocoDataTests.cs" />
     <Compile Include="Core\SqlBuilder.cs" />
     <Compile Include="DatabaseTests.cs" />
     <Compile Include="DatabaseTypes\SqlServerDatabaseTypeTests.cs" />

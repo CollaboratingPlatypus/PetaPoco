@@ -117,7 +117,11 @@ namespace PetaPoco.Core
                 if (Type == typeof(object))
                 {
                     // var poco=new T()
-                    il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes)); // obj
+                    var ctor = Type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
+                    if (ctor == null)
+                        throw new InvalidOperationException("Type [" + Type.FullName + "] should have default public or non-public constructor");
+
+                    il.Emit(OpCodes.Newobj, ctor);
 
                     MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
 
@@ -205,8 +209,11 @@ namespace PetaPoco.Core
                 else
                 {
                     // var poco=new T()
-                    il.Emit(OpCodes.Newobj,
-                        Type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null));
+                    var ctor = Type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
+                    if (ctor == null)
+                        throw new InvalidOperationException("Type [" + Type.FullName + "] should have default public or non-public constructor");
+
+                    il.Emit(OpCodes.Newobj, ctor);
 
                     // Enumerate all fields generating a set assignment for the column
                     for (int i = firstColumn; i < firstColumn + countColumns; i++)
