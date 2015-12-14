@@ -1,16 +1,21 @@
-﻿// <copyright file="MySqlDatabaseType.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/14</date>
 
+using System.Data.Common;
 using PetaPoco.Core;
-using PetaPoco.Internal;
 
-namespace PetaPoco.DatabaseTypes
+namespace PetaPoco.Providers
 {
-    public class MySqlDatabaseType : DatabaseType
+    public class MySqlDatabaseProvider : DatabaseProvider
     {
+        public override DbProviderFactory GetFactory()
+        {
+            return GetFactory("MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Culture=neutral, PublicKeyToken=c5687fc88969c44d");
+        }
+
         public override string GetParameterPrefix(string connectionString)
         {
             if (connectionString != null && connectionString.IndexOf("Allow User Variables=true") >= 0)
@@ -19,9 +24,9 @@ namespace PetaPoco.DatabaseTypes
                 return "@";
         }
 
-        public override string EscapeSqlIdentifier(string str)
+        public override string EscapeSqlIdentifier(string sqlIdentifier)
         {
-            return string.Format("`{0}`", str);
+            return string.Format("`{0}`", sqlIdentifier);
         }
 
         public override string GetExistsSql()

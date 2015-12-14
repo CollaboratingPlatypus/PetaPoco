@@ -4,22 +4,22 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/07</date>
 
-using PetaPoco.DatabaseTypes;
+using PetaPoco.Providers;
 using Shouldly;
 using Xunit;
 
 namespace PetaPoco.Tests.Unit.DatabaseTypes
 {
-    public class SqlServerDatabaseTypeTests
+    public class SqlServerDatabaseProviderTests
     {
-        private readonly SqlServerDatabaseType _type = new SqlServerDatabaseType();
+        private readonly SqlServerDatabaseProvider _provider = new SqlServerDatabaseProvider();
 
         [Theory]
         [InlineData("column.name", "[column.name]")]
         [InlineData("column name", "[column name]")]
         public void EscapeSqlIdentifier_GivenInput_ShouldBeValid(string input, string expected)
         {
-            _type.EscapeSqlIdentifier(input).ShouldBe(expected);
+            _provider.EscapeSqlIdentifier(input).ShouldBe(expected);
         }
 
         [Theory]
@@ -27,7 +27,7 @@ namespace PetaPoco.Tests.Unit.DatabaseTypes
         [InlineData("column name", "[column name]")]
         public void EscapeTableName_GivenInput_ShouldBeValid(string input, string expected)
         {
-            _type.EscapeTableName(input).ShouldBe(expected);
+            _provider.EscapeTableName(input).ShouldBe(expected);
         }
     }
 }

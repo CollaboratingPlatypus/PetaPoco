@@ -8,12 +8,12 @@ using System;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-    public abstract class BaseDatabaseTest : IDisposable
+    public abstract class BaseDatabase : IDisposable
     {
         private DBTestProvider _provider;
         protected IDatabase DB { get; set; }
 
-        protected BaseDatabaseTest(DBTestProvider provider)
+        protected BaseDatabase(DBTestProvider provider)
         {
             _provider = provider;
             DB = _provider.Execute();

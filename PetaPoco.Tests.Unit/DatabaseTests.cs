@@ -5,7 +5,12 @@
 // <date>2015/12/13</date>
 
 using System;
+using System.Data;
+using System.Data.Common;
 using System.Dynamic;
+using Moq;
+using PetaPoco.Core;
+using PetaPoco.Providers;
 using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
@@ -16,9 +21,30 @@ namespace PetaPoco.Tests.Unit
     {
         private IDatabase DB { get; set; }
 
+        private DbProviderFactory _dbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Strict).Object;
+
+        private IProvider _provider = new Mock<IProvider>(MockBehavior.Loose).Object; 
+
         public DatabaseTests()
         {
-            DB = new Database("mssql");
+            DB = new Database("cs", _provider);
+        }
+
+        [Fact]
+        public void Construct_GivenInvalidArguments_ShouldThrow()
+        {
+            Should.Throw<InvalidOperationException>(() => new Database());
+
+            Should.Throw<ArgumentNullException>(() => new Database((IDbConnection)null));
+
+            Should.Throw<ArgumentNullException>(() => new Database("some connection string", (IProvider)null));
+            Should.Throw<ArgumentException>(() => new Database(null, _provider));
+
+            Should.Throw<ArgumentException>(() => new Database((string)null));
+            Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
+
+            Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
+            Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory)null));
         }
 
         [Fact]

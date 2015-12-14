@@ -72,7 +72,7 @@
     <Compile Include="Core\PocoDataTests.cs" />
     <Compile Include="Core\SqlBuilder.cs" />
     <Compile Include="DatabaseTests.cs" />
-    <Compile Include="DatabaseTypes\SqlServerDatabaseTypeTests.cs" />
+    <Compile Include="Providers\SqlServerDatabaseProviderTests.cs" />
     <Compile Include="DescriptionAttribute.cs" />
     <Compile Include="Models\Note.cs" />
     <Compile Include="Models\Order.cs" />

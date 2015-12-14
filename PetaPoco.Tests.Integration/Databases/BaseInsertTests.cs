@@ -11,7 +11,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-    public abstract class BaseInsertTests : BaseDatabaseTest
+    public abstract class BaseInsertTests : BaseDatabase
     {
         private Order _order = new Order
         {

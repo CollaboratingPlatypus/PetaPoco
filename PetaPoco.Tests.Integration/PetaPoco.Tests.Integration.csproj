@@ -61,6 +61,10 @@
       <HintPath>..\packages\Npgsql.3.0.3\lib\net45\Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.12.1.2400\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Shouldly, Version=2.6.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
       <HintPath>..\packages\Shouldly.2.6.0\lib\net40\Shouldly.dll</HintPath>
       <Private>True</Private>
@@ -99,27 +103,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Databases\BaseDatabaseTest.cs" />
+    <Compile Include="Databases\BaseDatabase.cs" />
+    <Compile Include="Databases\BaseDatabaseTests.cs" />
     <Compile Include="Databases\BaseDeleteTests.cs" />
     <Compile Include="Databases\BaseInsertTests.cs" />
     <Compile Include="Databases\BaseUpdateTests.cs" />
     <Compile Include="Databases\DBTestProvider.cs" />
+    <Compile Include="Databases\MSSQLCe\MssqlCeDatabaseTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeDBTestProvider.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeDeleteTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeInsertTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeUpdateTests.cs" />
+    <Compile Include="Databases\MSSQL\MssqlDatabaseTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlDBTestProvider.cs" />
     <Compile Include="Databases\MSSQL\MssqlDeleteTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlInsertTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlUpdateTests.cs" />
+    <Compile Include="Databases\MySQL\MySqlDatabaseTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDBTestProvider.cs" />
     <Compile Include="Databases\MySQL\MySqlDeleteTests.cs" />
     <Compile Include="Databases\MySQL\MySqlInsertTests.cs" />
     <Compile Include="Databases\MySQL\MySqlUpdateTests.cs" />
+    <Compile Include="Databases\Postgres\PostgresDatabaseTests.cs" />
     <Compile Include="Databases\Postgres\PostgresDBTestProvider.cs" />
     <Compile Include="Databases\Postgres\PostgresDeleteTests.cs" />
     <Compile Include="Databases\Postgres\PostgresInsertTests.cs" />
     <Compile Include="Databases\Postgres\PostgresUpdateTests.cs" />
+    <Compile Include="Databases\Sqlite\SqliteDatabaseTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteDBTestProvider.cs" />
     <Compile Include="Databases\Sqlite\SqliteDeleteTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />

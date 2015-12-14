@@ -4,15 +4,20 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/05</date>
 
+using System.Data.Common;
 using System.Linq;
 using PetaPoco.Core;
-using PetaPoco.Internal;
 using PetaPoco.Utilities;
 
-namespace PetaPoco.DatabaseTypes
+namespace PetaPoco.Providers
 {
-    public class SqlServerCEDatabaseType : DatabaseType
+    public class SqlServerCEDatabaseProviders : DatabaseProvider
     {
+        public override DbProviderFactory GetFactory()
+        {
+            return GetFactory("System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Culture=neutral, PublicKeyToken=89845dcd8080cc91");
+        }
+
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", parts.Sql, args.Length, args.Length + 1);

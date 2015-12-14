@@ -1,40 +1,34 @@
-﻿// <copyright file="PostgreSQLDatabaseType.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/14</date>
 
+using System.Data.Common;
 using PetaPoco.Core;
-using PetaPoco.Internal;
 
-namespace PetaPoco.DatabaseTypes
+namespace PetaPoco.Providers
 {
-    public class PostgreSQLDatabaseType : DatabaseType
+    public class SQLiteDatabaseProvider : DatabaseProvider
     {
-        public override bool HasNativeGuidSupport
+        public override DbProviderFactory GetFactory()
         {
-            get { return true; }
+            return GetFactory("System.Data.SQLite.SQLiteFactory, System.Data.SQLite, Culture=neutral, PublicKeyToken=db937bc2d44ff139");
         }
 
         public override object MapParameterValue(object value)
         {
-            // Don't map bools to ints in PostgreSQL
-            if (value.GetType() == typeof(bool))
-                return value;
+            if (value.GetType() == typeof(uint))
+                return (long) ((uint) value);
 
             return base.MapParameterValue(value);
-        }
-
-        public override string EscapeSqlIdentifier(string str)
-        {
-            return string.Format("\"{0}\"", str);
         }
 
         public override object ExecuteInsert(Database db, System.Data.IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
             {
-                cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(primaryKeyName));
+                cmd.CommandText += ";\nSELECT last_insert_rowid();";
                 return db.ExecuteScalarHelper(cmd);
             }
             else
@@ -42,6 +36,11 @@ namespace PetaPoco.DatabaseTypes
                 db.ExecuteNonQueryHelper(cmd);
                 return -1;
             }
+        }
+
+        public override string GetExistsSql()
+        {
+            return "SELECT EXISTS (SELECT 1 FROM {0} WHERE {1})";
         }
     }
 }
