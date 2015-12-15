@@ -13,7 +13,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-    public abstract class BaseUpdateTests : BaseDatabaseTest
+    public abstract class BaseUpdateTests : BaseDatabase
     {
         private Order _order = new Order
         {

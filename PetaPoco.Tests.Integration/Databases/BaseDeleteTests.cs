@@ -11,7 +11,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-    public abstract class BaseDeleteTests : BaseDatabaseTest
+    public abstract class BaseDeleteTests : BaseDatabase
     {
         private TransactionLog _log = new TransactionLog
         {

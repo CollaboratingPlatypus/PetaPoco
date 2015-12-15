@@ -5,15 +5,20 @@
 // <date>2015/12/05</date>
 
 using System;
+using System.Data.Common;
 using System.Linq;
 using PetaPoco.Core;
-using PetaPoco.Internal;
 using PetaPoco.Utilities;
 
-namespace PetaPoco.DatabaseTypes
+namespace PetaPoco.Providers
 {
-    public class SqlServerDatabaseType : DatabaseType
+    public class SqlServerDatabaseProvider : DatabaseProvider
     {
+        public override DbProviderFactory GetFactory()
+        {
+            return GetFactory("System.Data.SqlClient.SqlClientFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+        }
+
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var helper = (PagingHelper) PagingUtility;

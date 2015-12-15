@@ -6,13 +6,13 @@
 
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQL
+namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
-    [Collection("MssqlTests")]
-    public class MssqlUpdateTests : BaseUpdateTests
+    [Collection("PostgresTests")]
+    public class PostgresDatabaseTests : BaseDatabaseTests
     {
-        public MssqlUpdateTests()
-            : base(new MssqlDBTestProvider())
+        public PostgresDatabaseTests()
+            : base(new PostgresDBTestProvider())
         {
         }
     }

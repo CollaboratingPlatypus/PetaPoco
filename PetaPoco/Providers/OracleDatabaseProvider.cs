@@ -6,13 +6,14 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
 
-namespace PetaPoco.DatabaseTypes
+namespace PetaPoco.Providers
 {
-    public class OracleDatabaseType : DatabaseType
+    public class OracleDatabaseProvider : DatabaseProvider
     {
         public override string GetParameterPrefix(string connectionString)
         {
@@ -30,12 +31,17 @@ namespace PetaPoco.DatabaseTypes
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
 
             // Same deal as SQL Server
-            return Singleton<SqlServerDatabaseType>.Instance.BuildPageQuery(skip, take, parts, ref args);
+            return Singleton<SqlServerDatabaseProvider>.Instance.BuildPageQuery(skip, take, parts, ref args);
         }
 
-        public override string EscapeSqlIdentifier(string str)
+        public override DbProviderFactory GetFactory()
         {
-            return string.Format("\"{0}\"", str.ToUpperInvariant());
+            return GetFactory("Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess, Culture=neutral, PublicKeyToken=89b483f429c47342");
+        }
+
+        public override string EscapeSqlIdentifier(string sqlIdentifier)
+        {
+            return string.Format("\"{0}\"", sqlIdentifier.ToUpperInvariant());
         }
 
         public override string GetAutoIncrementExpression(TableInfo ti)

@@ -2,13 +2,13 @@
 |:-----|:----------|:----|:---------|:------------------|
 |[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development)|[![Nuget Downloads](https://img.shields.io/nuget/dt/PetaPoco.svg)](https://img.shields.io/nuget/dt/PetaPoco.svg)|[![Nuget Downloads core](https://img.shields.io/nuget/dt/PetaPoco.Core.svg)](https://img.shields.io/nuget/dt/PetaPoco.Core.svg)|[![Nuget Downloads core](https://img.shields.io/nuget/dt/PetaPoco.Core.Compiled.svg)](https://img.shields.io/nuget/dt/PetaPoco.Core.Compiled.svg)
 
-<img align="right" alt="PetaPoco Logo" src="https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2_256.png">
+<img align="right" alt="PetaPoco Logo" width="128" src="https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2_256.png">
 
-# Welcome to the official PetaPoco repository.
+# Welcome to the official PetaPoco repository
 
 Originally the brainchild of [Brad Robinson],
 
-## PetaPoco is a tiny, fast, single-file micro-ORM for .NET and Mono.
+## PetaPoco is a tiny, fast, single-file micro-ORM for .NET and Mono
 
 * Like [Dapper], it's fast because it uses dynamic method generation (MSIL) to assign column values to properties
 * Like [Massive] it's available as single file that you easily add to any project or complied.
@@ -41,20 +41,26 @@ Originally the brainchild of [Brad Robinson],
 
 Save an entity
 ```c#
+    db.Save(article);
     db.Save(new Article { Title = "Super easy to use PetaPoco" });
+    db.Save("Articles", "Id", { Title = "Super easy to use PetaPoco", Id = Guid.New() });
 ```
 
 Get an entity
 ```c#
-    var article = db.Single<Article>("WHERE Id = @0", 123);
+    var article = db.Single<Article>(123);
+    var article = db.Single<Article>("WHERE ArticleKey = @0", "ART-123");
 ```
 
 Delete an entity
 ```c#
     db.Delete(article);
+    db.Delete<Article>(123);
+    db.Delete("Articles", "Id", 123);
+    db.Delete("Articles", "ArticleKey", "ART-123");
 ```
 
-Plus much much more.
+Plus much much [more](https://github.com/CollaboratingPlatypus/PetaPoco/wiki).
 
 ## Documentation
 

@@ -55,5 +55,13 @@ namespace PetaPoco
         ///     The loaded database type.
         /// </returns>
         IProvider Provider { get; }
+
+        /// <summary>
+        ///     Gets the connection string.
+        /// </summary>
+        /// <returns>
+        ///     The connection string.
+        /// </returns>
+        string ConnectionString { get; }
     }
 }

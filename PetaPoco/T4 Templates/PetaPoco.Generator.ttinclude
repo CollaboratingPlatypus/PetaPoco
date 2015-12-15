@@ -151,7 +151,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 <# } #>
 <# } #>
 <# if (tbl.PK!=null && !tbl.PK.IsAutoIncrement) { #>
-	[PrimaryKey("<#=tbl.PK.Name#>", autoIncrement=false)]
+	[PrimaryKey("<#=tbl.PK.Name#>", AutoIncrement=false)]
 <# } #>
 	[ExplicitColumns]
     public partial class <#=tbl.ClassName#> <# if (GenerateOperations) { #>: <#=RepoName#>.Record<<#=tbl.ClassName#>> <# } #> 

@@ -9,9 +9,9 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     [Collection("MssqlTests")]
-    public class MssqlUpdateTests : BaseUpdateTests
+    public class MssqlDatabaseTests : BaseDatabaseTests
     {
-        public MssqlUpdateTests()
+        public MssqlDatabaseTests()
             : base(new MssqlDBTestProvider())
         {
         }
