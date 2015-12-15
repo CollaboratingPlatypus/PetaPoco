@@ -1230,7 +1230,7 @@ class OracleSchemaReader : SchemaReader
 					col.Name=rdr["ColumnName"].ToString();
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString(), (rdr["DataScale"] == DBNull.Value ? null : rdr["DataScale"].ToString()));
-					col.IsNullable = "YES".Equals(isnullable) || "Y".Equals(isnullable);
+					col.IsNullable = "YES".Equals(rdr["isnullable"].ToString()) || "Y".Equals(rdr["isnullable"].ToString());
 					col.IsAutoIncrement=true;
 					result.Add(col);
 				}
