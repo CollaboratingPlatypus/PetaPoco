@@ -1,10 +1,10 @@
 ### **General house keeping**
 
-PetaPoco has a coding standards and guidelines. 
+PetaPoco has coding standards and guidelines. 
 - We use the [Framework Design Guidelines] and all code should try and follow these guidelines. 
 - All public APIs should include XML doc comments. See [XML Documentation Comments (C# Programming Guide)]
 - All bug fixes should include a unit test(s). 
-- All features **must** include unit test(s) and integration test(s).
+- All features **must** include a unit test(s) and an integration test(s).
 
 Contributing to PetaPoco
 =========================
