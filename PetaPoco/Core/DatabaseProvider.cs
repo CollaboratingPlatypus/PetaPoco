@@ -218,7 +218,8 @@ namespace PetaPoco.Core
             if (providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0 || 
                 providerName.IndexOf("SqlCeConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerCEDatabaseProviders>.Instance;
-            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
+            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0 
+                || providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<OracleDatabaseProvider>.Instance;
