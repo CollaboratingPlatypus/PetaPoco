@@ -23,6 +23,7 @@ namespace PetaPoco.Providers
         public override void PreExecute(IDbCommand cmd)
         {
             cmd.GetType().GetProperty("BindByName").SetValue(cmd, true, null);
+            cmd.GetType().GetProperty("InitialLONGFetchSize").SetValue(cmd, -1, null);
         }
 
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)

@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/12</date>
+// <date>2015/12/15</date>
 
 using System;
 using System.Collections.Generic;
@@ -328,6 +328,14 @@ namespace PetaPoco
         List<T> SkipTake<T>(long skip, long take, Sql sql);
 
         /// <summary>
+        ///     Checks for the existance of a row with the specified primary key value.
+        /// </summary>
+        /// <typeparam name="T">The Type representing the table being queried</typeparam>
+        /// <param name="primaryKey">The primary key value to look for</param>
+        /// <returns>True if a record with the specified primary key value exists.</returns>
+        bool Exists<T>(object primaryKey);
+
+        /// <summary>
         ///     Checks for the existance of a row matching the specified condition
         /// </summary>
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
@@ -335,14 +343,6 @@ namespace PetaPoco
         /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
         /// <returns>True if a record matching the condition is found.</returns>
         bool Exists<T>(string sqlCondition, params object[] args);
-
-        /// <summary>
-        ///     Checks for the existance of a row with the specified primary key value.
-        /// </summary>
-        /// <typeparam name="T">The Type representing the table being queried</typeparam>
-        /// <param name="primaryKey">The primary key value to look for</param>
-        /// <returns>True if a record with the specified primary key value exists.</returns>
-        bool Exists<T>(object primaryKey);
 
         /// <summary>
         ///     Returns the record with the specified primary key value
@@ -356,17 +356,6 @@ namespace PetaPoco
         T Single<T>(object primaryKey);
 
         /// <summary>
-        ///     Returns the record with the specified primary key value, or the default value if not found
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="primaryKey">The primary key value of the record to fetch</param>
-        /// <returns>The single record matching the specified primary key value</returns>
-        /// <remarks>
-        ///     If there are no records with the specified primary key value, default(T) (typically null) is returned.
-        /// </remarks>
-        T SingleOrDefault<T>(object primaryKey);
-
-        /// <summary>
         ///     Runs a query that should always return a single row.
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
@@ -377,33 +366,6 @@ namespace PetaPoco
         ///     Throws an exception if there are zero or more than one matching record
         /// </remarks>
         T Single<T>(string sql, params object[] args);
-
-        /// <summary>
-        ///     Runs a query that should always return either a single row, or no rows
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The single record matching the specified primary key value, or default(T) if no matching rows</returns>
-        T SingleOrDefault<T>(string sql, params object[] args);
-
-        /// <summary>
-        ///     Runs a query that should always return at least one return
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The first record in the result set</returns>
-        T First<T>(string sql, params object[] args);
-
-        /// <summary>
-        ///     Runs a query and returns the first record, or the default value if no matching records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The first record in the result set, or default(T) if no matching rows</returns>
-        T FirstOrDefault<T>(string sql, params object[] args);
 
         /// <summary>
         ///     Runs a query that should always return a single row.
@@ -425,12 +387,50 @@ namespace PetaPoco
         T SingleOrDefault<T>(Sql sql);
 
         /// <summary>
+        ///     Returns the record with the specified primary key value, or the default value if not found
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="primaryKey">The primary key value of the record to fetch</param>
+        /// <returns>The single record matching the specified primary key value</returns>
+        /// <remarks>
+        ///     If there are no records with the specified primary key value, default(T) (typically null) is returned.
+        /// </remarks>
+        T SingleOrDefault<T>(object primaryKey);
+
+        /// <summary>
+        ///     Runs a query that should always return either a single row, or no rows
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="sql">The SQL query</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+        /// <returns>The single record matching the specified primary key value, or default(T) if no matching rows</returns>
+        T SingleOrDefault<T>(string sql, params object[] args);
+
+        /// <summary>
+        ///     Runs a query that should always return at least one return
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="sql">The SQL query</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+        /// <returns>The first record in the result set</returns>
+        T First<T>(string sql, params object[] args);
+
+        /// <summary>
         ///     Runs a query that should always return at least one return
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
         /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
         /// <returns>The first record in the result set</returns>
         T First<T>(Sql sql);
+
+        /// <summary>
+        ///     Runs a query and returns the first record, or the default value if no matching records
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="sql">The SQL query</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+        /// <returns>The first record in the result set, or default(T) if no matching rows</returns>
+        T FirstOrDefault<T>(string sql, params object[] args);
 
         /// <summary>
         ///     Runs a query and returns the first record, or the default value if no matching records

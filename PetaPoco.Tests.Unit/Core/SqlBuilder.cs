@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2015/12/17</date>
 
 using System;
 using PetaPoco.Tests.Unit.Models;
@@ -14,282 +14,264 @@ namespace PetaPoco.Tests.Unit.Core
     [RequiresCleanUp]
     public class SqlTests
     {
-        [Fact]
-        public void simple_append()
+        private Sql _sql;
+
+        public SqlTests()
         {
-            var sql = new Sql();
-
-            sql.Append("LINE 1");
-            sql.Append("LINE 2");
-            sql.Append("LINE 3");
-
-            sql.SQL.ShouldBe("LINE 1\nLINE 2\nLINE 3");
-            sql.Arguments.Length.ShouldBe(0);
+            _sql = new Sql();
         }
 
         [Fact]
-        public void single_arg()
+        public void Append_GivenSimpleStrings_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("LINE 1");
+            _sql.Append("LINE 2");
+            _sql.Append("LINE 3");
 
-            sql.Append("arg @0", "a1");
-
-            sql.SQL.ShouldBe("arg @0");
-            sql.Arguments.Length.ShouldBe(1);
-            sql.Arguments[0].ShouldBe("a1");
+            _sql.SQL.ShouldBe("LINE 1\nLINE 2\nLINE 3");
+            _sql.Arguments.Length.ShouldBe(0);
         }
 
         [Fact]
-        public void multiple_args()
+        public void Append_GivenSignleArgument_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @0", "a1");
 
-            sql.Append("arg @0 @1", "a1", "a2");
-
-            sql.SQL.ShouldBe("arg @0 @1");
-            sql.Arguments.Length.ShouldBe(2);
-            sql.Arguments[0].ShouldBe("a1");
-            sql.Arguments[1].ShouldBe("a2");
+            _sql.SQL.ShouldBe("arg @0");
+            _sql.Arguments.Length.ShouldBe(1);
+            _sql.Arguments[0].ShouldBe("a1");
         }
 
         [Fact]
-        public void unused_args()
+        public void Append_GivenMultipleArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @0 @1", "a1", "a2");
 
-            sql.Append("arg @0 @2", "a1", "a2", "a3");
-
-            sql.SQL.ShouldBe("arg @0 @1");
-            sql.Arguments.Length.ShouldBe(2);
-            sql.Arguments[0].ShouldBe("a1");
-            sql.Arguments[1].ShouldBe("a3");
+            _sql.SQL.ShouldBe("arg @0 @1");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe("a1");
+            _sql.Arguments[1].ShouldBe("a2");
         }
 
         [Fact]
-        public void unordered_args()
+        [Description("Question: should this not throw?")]
+        public void Append_GivenUnusedArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @0 @2", "a1", "a2", "a3");
 
-            sql.Append("arg @2 @1", "a1", "a2", "a3");
-
-            sql.SQL.ShouldBe("arg @0 @1");
-            sql.Arguments.Length.ShouldBe(2);
-            sql.Arguments[0].ShouldBe("a3");
-            sql.Arguments[1].ShouldBe("a2");
+            _sql.SQL.ShouldBe("arg @0 @1");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe("a1");
+            _sql.Arguments[1].ShouldBe("a3");
         }
 
         [Fact]
-        public void repeated_args()
+        public void Append_GivenUnorderedArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @2 @1", "a1", "a2", "a3");
 
-            sql.Append("arg @0 @1 @0 @1", "a1", "a2");
-
-            sql.SQL.ShouldBe("arg @0 @1 @2 @3");
-            sql.Arguments.Length.ShouldBe(4);
-            sql.Arguments[0].ShouldBe("a1");
-            sql.Arguments[1].ShouldBe("a2");
-            sql.Arguments[2].ShouldBe("a1");
-            sql.Arguments[3].ShouldBe("a2");
+            _sql.SQL.ShouldBe("arg @0 @1");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe("a3");
+            _sql.Arguments[1].ShouldBe("a2");
         }
 
         [Fact]
-        public void mysql_user_vars()
+        public void Append_GivenRepeatedArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @0 @1 @0 @1", "a1", "a2");
 
-            sql.Append("arg @@user1 @2 @1 @@@system1", "a1", "a2", "a3");
-
-            sql.SQL.ShouldBe("arg @@user1 @0 @1 @@@system1");
-            sql.Arguments.Length.ShouldBe(2);
-            sql.Arguments[0].ShouldBe("a3");
-            sql.Arguments[1].ShouldBe("a2");
+            _sql.SQL.ShouldBe("arg @0 @1 @2 @3");
+            _sql.Arguments.Length.ShouldBe(4);
+            _sql.Arguments[0].ShouldBe("a1");
+            _sql.Arguments[1].ShouldBe("a2");
+            _sql.Arguments[2].ShouldBe("a1");
+            _sql.Arguments[3].ShouldBe("a2");
         }
 
         [Fact]
-        public void named_args()
+        public void Append_GivenMySqlUserVariables_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @@user1 @2 @1 @@@system1", "a1", "a2", "a3");
 
-            sql.Append("arg @name @password", new {name = "n", password = "p"});
-
-            sql.SQL.ShouldBe("arg @0 @1");
-            sql.Arguments.Length.ShouldBe(2);
-            sql.Arguments[0].ShouldBe("n");
-            sql.Arguments[1].ShouldBe("p");
+            _sql.SQL.ShouldBe("arg @@user1 @0 @1 @@@system1");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe("a3");
+            _sql.Arguments[1].ShouldBe("a2");
         }
 
         [Fact]
-        public void mixed_named_and_numbered_args()
+        public void Append_GivenNameArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @name @password", new { name = "n", password = "p" });
 
-            sql.Append("arg @0 @name @1 @password @2", "a1", "a2", "a3", new {name = "n", password = "p"});
-
-            sql.SQL.ShouldBe("arg @0 @1 @2 @3 @4");
-            sql.Arguments.Length.ShouldBe(5);
-            sql.Arguments[0].ShouldBe("a1");
-            sql.Arguments[1].ShouldBe("n");
-            sql.Arguments[2].ShouldBe("a2");
-            sql.Arguments[3].ShouldBe("p");
-            sql.Arguments[4].ShouldBe("a3");
+            _sql.SQL.ShouldBe("arg @0 @1");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe("n");
+            _sql.Arguments[1].ShouldBe("p");
         }
 
         [Fact]
-        public void append_with_args()
+        public void Append_GivenMixedNameAndNumberArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("arg @0 @name @1 @password @2", "a1", "a2", "a3", new { name = "n", password = "p" });
 
-            sql.Append("l1 @0", "a0");
-            sql.Append("l2 @0", "a1");
-            sql.Append("l3 @0", "a2");
-
-            sql.SQL.ShouldBe("l1 @0\nl2 @1\nl3 @2");
-            sql.Arguments.Length.ShouldBe(3);
-            sql.Arguments[0].ShouldBe("a0");
-            sql.Arguments[1].ShouldBe("a1");
-            sql.Arguments[2].ShouldBe("a2");
+            _sql.SQL.ShouldBe("arg @0 @1 @2 @3 @4");
+            _sql.Arguments.Length.ShouldBe(5);
+            _sql.Arguments[0].ShouldBe("a1");
+            _sql.Arguments[1].ShouldBe("n");
+            _sql.Arguments[2].ShouldBe("a2");
+            _sql.Arguments[3].ShouldBe("p");
+            _sql.Arguments[4].ShouldBe("a3");
         }
 
         [Fact]
-        public void append_with_args2()
+        public void Append_GivenConsecutiveArguments_ShouldBeValid()
         {
-            var sql = new Sql();
+            _sql.Append("l1 @0", "a0");
+            _sql.Append("l2 @0", "a1");
+            _sql.Append("l3 @0", "a2");
 
-            sql.Append("l1");
-            sql.Append("l2 @0 @1", "a1", "a2");
-            sql.Append("l3 @0", "a3");
-
-            sql.SQL.ShouldBe("l1\nl2 @0 @1\nl3 @2");
-            sql.Arguments.Length.ShouldBe(3);
-            sql.Arguments[0].ShouldBe("a1");
-            sql.Arguments[1].ShouldBe("a2");
-            sql.Arguments[2].ShouldBe("a3");
+            _sql.SQL.ShouldBe("l1 @0\nl2 @1\nl3 @2");
+            _sql.Arguments.Length.ShouldBe(3);
+            _sql.Arguments[0].ShouldBe("a0");
+            _sql.Arguments[1].ShouldBe("a1");
+            _sql.Arguments[2].ShouldBe("a2");
         }
 
         [Fact]
-        public void invalid_arg_index()
+        public void Append_GivenConsecutiveComplexArguments_ShouldBeValid()
+        {
+            _sql.Append("l1");
+            _sql.Append("l2 @0 @1", "a1", "a2");
+            _sql.Append("l3 @0", "a3");
+
+            _sql.SQL.ShouldBe("l1\nl2 @0 @1\nl3 @2");
+            _sql.Arguments.Length.ShouldBe(3);
+            _sql.Arguments[0].ShouldBe("a1");
+            _sql.Arguments[1].ShouldBe("a2");
+            _sql.Arguments[2].ShouldBe("a3");
+        }
+
+        [Fact]
+        public void Append_GivenInvalidNumberOfArguments_ShouldThrow()
         {
             Should.Throw<ArgumentOutOfRangeException>(() =>
             {
-                var sql = new Sql();
-                sql.Append("arg @0 @1", "a0");
-                sql.SQL.ShouldBe("arg @0 @1");
+                _sql.Append("arg @0 @1", "a0");
+                _sql.SQL.ShouldBe("arg @0 @1");
             });
         }
 
         [Fact]
-        public void invalid_arg_name()
+        public void Append_GivenInvalidArgumentNames_ShouldThrow()
         {
             Should.Throw<ArgumentException>(() =>
             {
-                var sql = new Sql();
-                sql.Append("arg @name1 @name2", new {x = 1, y = 2});
-                sql.SQL.ShouldBe("arg @0 @1");
+                _sql.Append("arg @name1 @name2", new { x = 1, y = 2 });
+                _sql.SQL.ShouldBe("arg @0 @1");
             });
         }
 
         [Fact]
-        public void append_instances()
+        public void Append_GivenSqLInstance_ShouldBeValid()
         {
-            var sql = new Sql("l0 @0", "a0");
+            _sql = new Sql("l0 @0", "a0");
             var sql1 = new Sql("l1 @0", "a1");
             var sql2 = new Sql("l2 @0", "a2");
 
-            sql.Append(sql1).ShouldBe(sql);
-            sql.Append(sql2).ShouldBe(sql);
+            _sql.Append(sql1).ShouldBe(_sql);
+            _sql.Append(sql2).ShouldBe(_sql);
 
-            sql.SQL.ShouldBe("l0 @0\nl1 @1\nl2 @2");
-            sql.Arguments.Length.ShouldBe(3);
-            sql.Arguments[0].ShouldBe("a0");
-            sql.Arguments[1].ShouldBe("a1");
-            sql.Arguments[2].ShouldBe("a2");
+            _sql.SQL.ShouldBe("l0 @0\nl1 @1\nl2 @2");
+            _sql.Arguments.Length.ShouldBe(3);
+            _sql.Arguments[0].ShouldBe("a0");
+            _sql.Arguments[1].ShouldBe("a1");
+            _sql.Arguments[2].ShouldBe("a2");
         }
 
         [Fact]
-        public void ConsecutiveWhere()
+        public void Append_GivenConsecutiveWheres_ShouldBeValid()
         {
-            var sql = new Sql()
+            _sql = new Sql()
                 .Append("SELECT * FROM blah");
 
-            sql.Append("WHERE x");
-            sql.Append("WHERE y");
+            _sql.Append("WHERE x");
+            _sql.Append("WHERE y");
 
-            sql.SQL.ShouldBe("SELECT * FROM blah\nWHERE x\nAND y");
+            _sql.SQL.ShouldBe("SELECT * FROM blah\nWHERE x\nAND y");
         }
 
         [Fact]
-        public void ConsecutiveOrderBy()
+        public void Append_GivenConsecutiveOrderBys_ShouldBeValid()
         {
-            var sql = new Sql()
+            _sql = new Sql()
                 .Append("SELECT * FROM blah");
 
-            sql.Append("ORDER BY x");
-            sql.Append("ORDER BY y");
+            _sql.Append("ORDER BY x");
+            _sql.Append("ORDER BY y");
 
-            sql.SQL.ShouldBe("SELECT * FROM blah\nORDER BY x\n, y");
+            _sql.SQL.ShouldBe("SELECT * FROM blah\nORDER BY x\n, y");
         }
 
         [Fact]
-        public void param_expansion_1()
+        public void Append_GivenArrayAndValue_ShouldBeValid()
         {
             // Simple collection parameter expansion
-            var sql = Sql.Builder.Append("@0 IN (@1) @2", 20, new int[] {1, 2, 3}, 30);
+            _sql = Sql.Builder.Append("@0 IN (@1) @2", 20, new int[] { 1, 2, 3 }, 30);
 
-            sql.SQL.ShouldBe("@0 IN (@1,@2,@3) @4");
-            sql.Arguments.Length.ShouldBe(5);
-            sql.Arguments[0].ShouldBe(20);
-            sql.Arguments[1].ShouldBe(1);
-            sql.Arguments[2].ShouldBe(2);
-            sql.Arguments[3].ShouldBe(3);
-            sql.Arguments[4].ShouldBe(30);
+            _sql.SQL.ShouldBe("@0 IN (@1,@2,@3) @4");
+            _sql.Arguments.Length.ShouldBe(5);
+            _sql.Arguments[0].ShouldBe(20);
+            _sql.Arguments[1].ShouldBe(1);
+            _sql.Arguments[2].ShouldBe(2);
+            _sql.Arguments[3].ShouldBe(3);
+            _sql.Arguments[4].ShouldBe(30);
         }
 
         [Fact]
-        public void param_expansion_2()
+        public void Append_GivenTwoArrays_ShouldBeValid()
         {
             // Out of order expansion
-            var sql = Sql.Builder.Append("IN (@3) (@1)", null, new int[] {1, 2, 3}, null, new int[] {4, 5, 6});
+            _sql = Sql.Builder.Append("IN (@3) (@1)", null, new[] { 1, 2, 3 }, null, new[] { 4, 5, 6 });
 
-            sql.SQL.ShouldBe("IN (@0,@1,@2) (@3,@4,@5)");
-            sql.Arguments.Length.ShouldBe(6);
-            sql.Arguments[0].ShouldBe(4);
-            sql.Arguments[1].ShouldBe(5);
-            sql.Arguments[2].ShouldBe(6);
-            sql.Arguments[3].ShouldBe(1);
-            sql.Arguments[4].ShouldBe(2);
-            sql.Arguments[5].ShouldBe(3);
+            _sql.SQL.ShouldBe("IN (@0,@1,@2) (@3,@4,@5)");
+            _sql.Arguments.Length.ShouldBe(6);
+            _sql.Arguments[0].ShouldBe(4);
+            _sql.Arguments[1].ShouldBe(5);
+            _sql.Arguments[2].ShouldBe(6);
+            _sql.Arguments[3].ShouldBe(1);
+            _sql.Arguments[4].ShouldBe(2);
+            _sql.Arguments[5].ShouldBe(3);
         }
 
         [Fact]
-        public void param_expansion_named()
+        public void Append_GivenArray_ShouldBeValid()
         {
-            // Expand a named parameter
-            var sql = Sql.Builder.Append("IN (@numbers)", new {numbers = (new int[] {1, 2, 3})});
+            _sql = Sql.Builder.Append("IN (@numbers)", new { numbers = (new[] { 1, 2, 3 }) });
 
-            sql.SQL.ShouldBe("IN (@0,@1,@2)");
-            sql.Arguments.Length.ShouldBe(3);
-            sql.Arguments[0].ShouldBe(1);
-            sql.Arguments[1].ShouldBe(2);
-            sql.Arguments[2].ShouldBe(3);
+            _sql.SQL.ShouldBe("IN (@0,@1,@2)");
+            _sql.Arguments.Length.ShouldBe(3);
+            _sql.Arguments[0].ShouldBe(1);
+            _sql.Arguments[1].ShouldBe(2);
+            _sql.Arguments[2].ShouldBe(3);
         }
 
         [Fact]
-        public void join()
+        public void Join_GivenTable_ShouldBeValid()
         {
-            var sql = Sql.Builder
+            _sql = Sql.Builder
                 .Select("*")
                 .From("articles")
                 .LeftJoin("comments").On("articles.article_id=comments.article_id");
 
-            sql.SQL.ShouldBe("SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id");
+            _sql.SQL.ShouldBe("SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id");
         }
 
         [Fact]
         [Description("Investigation of reported bug #123")]
-        public void Append_GivenMultipleAppends_IsValid()
+        public void Append_GivenMultipleAppends_ShouldBeValid()
         {
-            var sql = new Sql();
             var resource = new
             {
                 ResourceName = "p1",
@@ -309,7 +291,7 @@ namespace PetaPoco.Tests.Unit.Core
                 ResourceID = 99,
             };
 
-            sql.Append("UPDATE [Resource] SET ")
+            _sql.Append("UPDATE [Resource] SET ")
                 .Append("[ResourceName] = @0", resource.ResourceName)
                 .Append(",[ResourceDescription] = @0", resource.ResourceDescription)
                 .Append(",[ResourceContent] = @0", resource.ResourceContent)
@@ -325,7 +307,7 @@ namespace PetaPoco.Tests.Unit.Core
                 .Append(",[UpdatedDate] = @0", resource.UpdatedDate)
                 .Append(",[Extension] = @0", resource.Extension).Append(" WHERE ResourceID=@0", resource.ResourceID);
 
-            sql.SQL.Replace("\n", "")
+            _sql.SQL.Replace("\n", "")
                 .Replace("\r", "")
                 .ShouldBe(
                     @"UPDATE [Resource] SET [ResourceName] = @0,[ResourceDescription] = @1,[ResourceContent] = @2,[ResourceData] = @3,[ResourceGUID] = @4,[LaunchPath] = @5,[ResourceType] = @6,[ContentType] = @7,[SchoolID] = @8,[DistrictID] = @9,[IsActive] = @10,[UpdatedBy] = @11,[UpdatedDate] = @12,[Extension] = @13 WHERE ResourceID=@14");

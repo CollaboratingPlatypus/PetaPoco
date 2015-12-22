@@ -89,7 +89,7 @@ PetaPoco is available from:
 
 ## Contributing
 
-PetaPoco welcomes input form the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]. We would also suggest you have a quick read of [Contributing to Open Source on GitHub].
+PetaPoco welcomes input from the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]. We would also suggest you have a quick read of [Contributing to Open Source on GitHub].
 
 ## Contributions Honour Roll
 

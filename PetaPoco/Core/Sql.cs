@@ -102,6 +102,7 @@ namespace PetaPoco
             else
                 _rhs = sql;
 
+            _sqlFinal = null;
             return this;
         }
 
