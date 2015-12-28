@@ -16,9 +16,9 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void GetFactory_GivenTypeWithNotPublicConstructor_ShouldBeValid()
         {
-            var pd = PocoData.ForObject(TestEntity.Instance, "Id");
+            var pd = PocoData.ForObject(TestEntity.Instance, "Id", new ConventionMapper());
 
-            Should.Throw<InvalidOperationException>(() => pd.GetFactory("", "", 1, 1, null));
+            Should.Throw<InvalidOperationException>(() => pd.GetFactory("", "", 1, 1, null, null));
         }
 
         public class TestEntity

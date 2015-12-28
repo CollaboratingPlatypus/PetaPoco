@@ -7,6 +7,7 @@
 using System;
 using System.Linq;
 using PetaPoco.Core;
+using PetaPoco.Internal;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -195,7 +196,7 @@ namespace PetaPoco.Tests.Integration.Databases
         public void Update_GivenSqlAndParameters_ShouldBeValid()
         {
             DB.Insert(_person);
-            var pd = PocoData.ForType(_person.GetType());
+            var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
             var sql = $"SET {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} = @1 " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey)} = @0";
 
@@ -210,7 +211,7 @@ namespace PetaPoco.Tests.Integration.Databases
         public void Update_GivenSql_ShouldBeValid()
         {
             DB.Insert(_person);
-            var pd = PocoData.ForType(_person.GetType());
+            var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
             var sql = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} = @1 " +
                               $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey)} = @0", _person.Id, "Feta's Order");
 

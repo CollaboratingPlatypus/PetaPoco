@@ -34,12 +34,12 @@ namespace PetaPoco.Core
         {
         }
 
-        public PocoData(Type type)
+        public PocoData(Type type, IMapper defaultMapper)
         {
             Type = type;
 
             // Get the mapper for this type
-            var mapper = Mappers.GetMapper(type);
+            var mapper = Mappers.GetMapper(type, defaultMapper);
 
             // Get the table info
             TableInfo = mapper.GetTableInfo(type);
@@ -66,7 +66,7 @@ namespace PetaPoco.Core
             QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
         }
 
-        public static PocoData ForObject(object obj, string primaryKeyName)
+        public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
         {
             var t = obj.GetType();
             if (t == typeof(System.Dynamic.ExpandoObject))
@@ -84,15 +84,15 @@ namespace PetaPoco.Core
                 }
                 return pd;
             }
-            return ForType(t);
+            return ForType(t, defaultMapper);
         }
 
-        public static PocoData ForType(Type type)
+        public static PocoData ForType(Type type, IMapper defaultMapper)
         {
             if (type == typeof(System.Dynamic.ExpandoObject))
                 throw new InvalidOperationException("Can't use dynamic types with this method");
 
-            return _pocoDatas.Get(type, () => new PocoData(type));
+            return _pocoDatas.Get(type, () => new PocoData(type, defaultMapper));
         }
 
         private static bool IsIntegralType(Type type)
@@ -102,7 +102,7 @@ namespace PetaPoco.Core
         }
 
         // Create factory function that can convert a IDataReader record into a POCO
-        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int countColumns, IDataReader reader)
+        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int countColumns, IDataReader reader, IMapper defaultMapper)
         {
             // Check cache
             var key = Tuple.Create<string, string, int, int>(sql, connectionString, firstColumn, countColumns);
@@ -112,7 +112,7 @@ namespace PetaPoco.Core
                 // Create the method
                 var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), Type, new Type[] {typeof(IDataReader)}, true);
                 var il = m.GetILGenerator();
-                var mapper = Mappers.GetMapper(Type);
+                var mapper = Mappers.GetMapper(Type, defaultMapper);
 
                 if (Type == typeof(object))
                 {

@@ -42,10 +42,10 @@ namespace PetaPoco
         /// <summary>
         ///     Constructs a new instance of the <seealso cref="ColumnAttribute" />.
         /// </summary>
-        /// <param name="primaryKey">The name of the column.</param>
-        public ColumnAttribute(string Name)
+        /// <param name="name">The name of the column.</param>
+        public ColumnAttribute(string name)
         {
-            this.Name = Name;
+            Name = name;
             ForceToUtc = false;
         }
     }
