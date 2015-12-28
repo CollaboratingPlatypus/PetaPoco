@@ -166,7 +166,7 @@ namespace PetaPoco
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration" /> is null.</exception>
         /// <exception cref="InvalidOperationException">Thrown when no configuration string is configured and app/web config does any connection string registered.</exception>
         /// <exception cref="InvalidOperationException">Thrown when a connection string configured and no provider is configured.</exception>
-        public Database(IBuildConfiguration configuration)
+        public Database(IDatabaseBuildConfiguration configuration)
         {
             if (configuration == null)
                 throw new ArgumentNullException("configuration");

@@ -44,7 +44,7 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
 
-            Should.Throw<ArgumentNullException>(() => new Database((IBuildConfiguration) null));
+            Should.Throw<ArgumentNullException>(() => new Database((IDatabaseBuildConfiguration) null));
             Should.Throw<InvalidOperationException>(() =>
             {
                 try

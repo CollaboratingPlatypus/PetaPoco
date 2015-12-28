@@ -12,7 +12,7 @@ namespace PetaPoco
     /// <summary>
     ///     A helper class which enables fluent configuration.
     /// </summary>
-    public class DatabaseConfiguration : IBuildConfiguration, DatabaseConfiguration.IBuildConfigurationSettings, IHideObjectMethods
+    public class DatabaseConfiguration : IDatabaseBuildConfiguration, DatabaseConfiguration.IBuildConfigurationSettings, IHideObjectMethods
     {
         private readonly IDictionary<string, object> _settings = new Dictionary<string, object>();
 
@@ -45,8 +45,8 @@ namespace PetaPoco
         /// <summary>
         ///     Starts a new PetaPoco build configuration.
         /// </summary>
-        /// <returns>An instance of <see cref="IBuildConfiguration" /> to form a fluent interface.</returns>
-        public static IBuildConfiguration Build()
+        /// <returns>An instance of <see cref="IDatabaseBuildConfiguration" /> to form a fluent interface.</returns>
+        public static IDatabaseBuildConfiguration Build()
         {
             return new DatabaseConfiguration();
         }
