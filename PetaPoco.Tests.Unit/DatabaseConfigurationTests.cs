@@ -184,8 +184,8 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingConnectionStringName_GivenInvalidArguments_Throws()
         {
-            Should.Throw<ArgumentException>(() => config.UsingConnectionName(null));
-            Should.Throw<ArgumentException>(() => config.UsingConnectionName(string.Empty));
+            Should.Throw<ArgumentException>(() => config.UsingConnectionStringName(null));
+            Should.Throw<ArgumentException>(() => config.UsingConnectionStringName(string.Empty));
         }
 
         [Fact(Skip = "Can't be tested as testing would require connection strings in the app/web config.")]

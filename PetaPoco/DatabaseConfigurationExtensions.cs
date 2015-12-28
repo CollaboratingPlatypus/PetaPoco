@@ -182,7 +182,7 @@ namespace PetaPoco
         /// <param name="connectionStringName">The connection string name.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IBuildConfiguration UsingConnectionName(this IBuildConfiguration source, string connectionStringName)
+        public static IBuildConfiguration UsingConnectionStringName(this IBuildConfiguration source, string connectionStringName)
         {
             if (string.IsNullOrEmpty(connectionStringName))
                 throw new ArgumentException("Argument is null or empty", "connectionStringName");
