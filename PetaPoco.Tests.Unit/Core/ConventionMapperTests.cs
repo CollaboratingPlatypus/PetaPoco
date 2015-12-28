@@ -34,6 +34,36 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
+        public void GetFromDbConverter_GivenPropertyTypeAndInterceptSet_ShouldCallback()
+        {
+            var wasCalled = false;
+            _mapper.FromDbConverter = (info, type) =>
+            {
+                wasCalled = true;
+                return null;
+            };
+            
+             _mapper.GetFromDbConverter(typeof(Order).GetProperty(nameof(Order.OrderId)), typeof(int));
+            
+            wasCalled.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void GetToDbConverter_GivenPropertyAndInterceptSet_ShouldCallback()
+        {
+            var wasCalled = false;
+            _mapper.ToDbConverter = (info) =>
+            {
+                wasCalled = true;
+                return null;
+            };
+
+            _mapper.GetToDbConverter(typeof(Order).GetProperty(nameof(Order.OrderId)));
+
+            wasCalled.ShouldBeTrue();
+        }
+
+        [Fact]
         public void GetTableInfo_UsingDefaults_ShouldBeValid()
         {
             var ti1 = _mapper.GetTableInfo(typeof(Order));

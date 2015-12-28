@@ -56,14 +56,14 @@ namespace PetaPoco
         public Func<TableInfo, Type, bool> MapTable { get; set; }
 
         /// <summary>
-        ///     Gets or sets the to db converter logic.
-        /// </summary>
-        public Func<object, object> ToDbConverter { get; set; }
-
-        /// <summary>
         ///     Gets or sets the from db convert logic.
         /// </summary>
-        public Func<object, object> FromDbConverter { get; set; }
+        public Func<PropertyInfo, Type, Func<object, object>> FromDbConverter { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the to db converter logic.
+        /// </summary>
+        public Func<PropertyInfo, Func<object, object>> ToDbConverter { get; set; }
 
         /// <summary>
         ///     Constructs a new instance of convention mapper.
@@ -189,7 +189,7 @@ namespace PetaPoco
         /// <returns>A Func that can do the conversion, or null for no conversion</returns>
         public Func<object, object> GetFromDbConverter(PropertyInfo targetProperty, Type sourceType)
         {
-            return FromDbConverter;
+            return FromDbConverter != null ? FromDbConverter(targetProperty, sourceType) : null;
         }
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace PetaPoco
         /// </remarks>
         public Func<object, object> GetToDbConverter(PropertyInfo sourceProperty)
         {
-            return ToDbConverter;
+            return ToDbConverter != null ? ToDbConverter(sourceProperty) : null;
         }
     }
 }
