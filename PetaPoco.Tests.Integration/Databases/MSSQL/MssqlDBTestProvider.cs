@@ -8,7 +8,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     public class MssqlDBTestProvider : DBTestProvider
     {
-        protected override Database Database => new Database("mssql");
+        protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("mssql").Create();
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
     }

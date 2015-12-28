@@ -14,11 +14,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     public class MssqlCeDBTestProvider : DBTestProvider
     {
-        protected override Database Database => new Database("mssqlce");
+        protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("mssqlce").Create();
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLCeBuildDatabase.sql";
 
-        public override Database Execute()
+        public override IDatabase Execute()
         {
             if (File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
             {
@@ -33,7 +33,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
             return base.Execute();
         }
 
-        public override void ExecuteBuildScript(Database database, string script)
+        public override void ExecuteBuildScript(IDatabase database, string script)
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => database.Execute(s));
         }
