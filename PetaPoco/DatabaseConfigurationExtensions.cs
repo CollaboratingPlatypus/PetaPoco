@@ -24,6 +24,8 @@ namespace PetaPoco
 
         internal const string ConnectionString = "ConnectionString";
 
+        internal const string ConnectionStringName = "ConnectionStringName";
+
         internal const string DefaultMapper = "DefaultMapper";
 
         private static void SetSetting(this IBuildConfiguration source, string key, object value)
@@ -170,6 +172,21 @@ namespace PetaPoco
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException("Argument is null or empty", "connectionString");
             source.SetSetting(ConnectionString, connectionString);
+            return source;
+        }
+
+        /// <summary>
+        ///     Adds a connection string name.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="connectionStringName">The connection string name.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
+        /// <returns>The configuration source to form a fluent interface.</returns>
+        public static IBuildConfiguration UsingConnectionName(this IBuildConfiguration source, string connectionStringName)
+        {
+            if (string.IsNullOrEmpty(connectionStringName))
+                throw new ArgumentException("Argument is null or empty", "connectionStringName");
+            source.SetSetting(ConnectionStringName, connectionStringName);
             return source;
         }
 

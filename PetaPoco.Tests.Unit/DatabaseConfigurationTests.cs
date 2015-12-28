@@ -182,6 +182,18 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
+        public void UsingConnectionStringName_GivenInvalidArguments_Throws()
+        {
+            Should.Throw<ArgumentException>(() => config.UsingConnectionName(null));
+            Should.Throw<ArgumentException>(() => config.UsingConnectionName(string.Empty));
+        }
+
+        [Fact(Skip = "Can't be tested as testing would require connection strings in the app/web config.")]
+        public void UsingConnectionStringName_GivenTimeoutAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
+        {
+        }
+
+        [Fact]
         public void UsingDefaultMapper_GivenInvalidArguments_Throws()
         {
             Should.Throw<ArgumentNullException>(() => config.UsingDefaultMapper((StandardMapper) null));

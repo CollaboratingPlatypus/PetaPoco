@@ -132,7 +132,7 @@ namespace PetaPoco
             var entry = ConfigurationManager.ConnectionStrings[connectionStringName];
 
             if (entry == null)
-                throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+                throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
@@ -179,10 +179,21 @@ namespace PetaPoco
             ConnectionStringSettings entry = null;
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
             {
-                if (ConfigurationManager.ConnectionStrings.Count == 0)
-                    throw new InvalidOperationException("One or more connection strings must be registered to not configure the connection string");
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, cn =>
+                {
+                    entry = ConfigurationManager.ConnectionStrings[cn];
 
-                 entry = ConfigurationManager.ConnectionStrings[0];
+                    if (entry == null)
+                        throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", cn));
+                }, () =>
+                {
+                    if (ConfigurationManager.ConnectionStrings.Count == 0)
+                        throw new InvalidOperationException("One or more connection strings must be registered to not configure the connection string");
+
+                    entry = ConfigurationManager.ConnectionStrings[0];
+                });
+
+                // ReSharper disable once PossibleNullReferenceException
                 _connectionString = entry.ConnectionString;
             });
 
