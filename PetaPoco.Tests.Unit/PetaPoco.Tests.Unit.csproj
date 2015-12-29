@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>PetaPoco.Tests.Unit.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>PetaPoco.Tests.Unit.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
@@ -68,9 +70,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\MapperTests.cs" />
+    <Compile Include="Core\ConventionMapperRegressionTests.cs" />
+    <Compile Include="Core\ConventionMapperTests.cs" />
+    <Compile Include="Core\Inflection\EnglishInflectorTests.cs" />
+    <Compile Include="Core\Inflection\InflectorTests.cs" />
+    <Compile Include="Core\StandardMapperTests.cs" />
     <Compile Include="Core\PocoDataTests.cs" />
-    <Compile Include="Core\SqlBuilder.cs" />
+    <Compile Include="Core\SqlTests.cs" />
+    <Compile Include="DatabaseConfigurationTests.cs" />
     <Compile Include="DatabaseTests.cs" />
     <Compile Include="Providers\SqlServerDatabaseProviderTests.cs" />
     <Compile Include="DescriptionAttribute.cs" />
@@ -81,11 +88,12 @@
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\TransactionLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequiresCleanUp.cs" />
+    <Compile Include="RequiresCleanUpAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="PetaPoco.Tests.Unit.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PetaPoco\PetaPoco.csproj">

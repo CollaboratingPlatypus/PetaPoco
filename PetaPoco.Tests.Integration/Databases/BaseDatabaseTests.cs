@@ -25,6 +25,11 @@ namespace PetaPoco.Tests.Integration.Databases
         {
         }
 
+        protected virtual void AfterDbCreate(Database db)
+        {
+            
+        }
+
         [Fact]
         public void Construct_GivenConnection_ShouldBeValid()
         {
@@ -36,6 +41,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
                 using (var db = new Database(connection))
                 {
+                    AfterDbCreate(db);
                     var key = db.Insert(_note);
                     var otherNote = db.SingleOrDefault<Note>(key);
 
@@ -52,6 +58,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             using (var db = new Database(connectionString, providerName))
             {
+                AfterDbCreate(db);
                 var key = db.Insert(_note);
                 var otherNote = db.SingleOrDefault<Note>(key);
 
@@ -67,6 +74,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             using (var db = new Database(connectionString, factory))
             {
+                AfterDbCreate(db);
                 var key = db.Insert(_note);
                 var otherNote = db.SingleOrDefault<Note>(key);
 
@@ -83,6 +91,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             using (var db = new Database(entry.Name))
             {
+                AfterDbCreate(db);
                 var key = db.Insert(_note);
                 var otherNote = db.SingleOrDefault<Note>(key);
                 _note.ShouldBe(otherNote);
@@ -97,6 +106,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             using (var db = new Database(connectionString, provider))
             {
+                AfterDbCreate(db);
                 var key = db.Insert(_note);
                 var otherNote = db.SingleOrDefault<Note>(key);
 

@@ -22,7 +22,7 @@ namespace PetaPoco
         /// <summary>
         ///     Get information about the table associated with a POCO class
         /// </summary>
-        /// <param name="pocoType"></param>
+        /// <param name="pocoType">The poco type.</param>
         /// <returns>A TableInfo instance</returns>
         /// <remarks>
         ///     This method must return a valid TableInfo.

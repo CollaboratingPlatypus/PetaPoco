@@ -18,14 +18,14 @@ namespace PetaPoco.Internal
         private static Regex rxFrom = new Regex(@"\A\s*FROM\s",
             RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
-        public static string AddSelectClause<T>(IProvider provider, string sql)
+        public static string AddSelectClause<T>(IProvider provider, string sql, IMapper defaultMapper)
         {
             if (sql.StartsWith(";"))
                 return sql.Substring(1);
 
             if (!rxSelect.IsMatch(sql))
             {
-                var pd = PocoData.ForType(typeof(T));
+                var pd = PocoData.ForType(typeof(T), defaultMapper);
                 var tableName = provider.EscapeTableName(pd.TableInfo.TableName);
                 string cols = pd.Columns.Count != 0
                     ? string.Join(", ", (from c in pd.QueryColumns select tableName + "." + provider.EscapeSqlIdentifier(c)).ToArray())

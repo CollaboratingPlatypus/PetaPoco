@@ -12,7 +12,7 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class DBTestProvider : IDisposable
     {
-        protected abstract Database Database { get; }
+        protected abstract IDatabase Database { get; }
 
         protected abstract string ScriptResourceName { get; }
 
@@ -20,7 +20,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
         }
 
-        public virtual Database Execute()
+        public virtual IDatabase Execute()
         {
             var db = Database;
             using (var s = this.GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
@@ -33,7 +33,7 @@ namespace PetaPoco.Tests.Integration.Databases
             return db;
         }
 
-        public virtual void ExecuteBuildScript(Database database, string script)
+        public virtual void ExecuteBuildScript(IDatabase database, string script)
         {
             database.Execute(script);
         }

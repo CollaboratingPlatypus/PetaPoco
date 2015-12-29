@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2015/12/28</date>
 
 using System;
 using System.Data;
@@ -10,7 +10,6 @@ using System.Data.Common;
 using System.Dynamic;
 using Moq;
 using PetaPoco.Core;
-using PetaPoco.Providers;
 using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
@@ -19,11 +18,10 @@ namespace PetaPoco.Tests.Unit
 {
     public class DatabaseTests
     {
-        private IDatabase DB { get; set; }
-
         private DbProviderFactory _dbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Strict).Object;
 
-        private IProvider _provider = new Mock<IProvider>(MockBehavior.Loose).Object; 
+        private IProvider _provider = new Mock<IProvider>(MockBehavior.Loose).Object;
+        private IDatabase DB { get; set; }
 
         public DatabaseTests()
         {
@@ -35,16 +33,42 @@ namespace PetaPoco.Tests.Unit
         {
             Should.Throw<InvalidOperationException>(() => new Database());
 
-            Should.Throw<ArgumentNullException>(() => new Database((IDbConnection)null));
+            Should.Throw<ArgumentNullException>(() => new Database((IDbConnection) null));
 
-            Should.Throw<ArgumentNullException>(() => new Database("some connection string", (IProvider)null));
+            Should.Throw<ArgumentNullException>(() => new Database("some connection string", (IProvider) null));
             Should.Throw<ArgumentException>(() => new Database(null, _provider));
 
-            Should.Throw<ArgumentException>(() => new Database((string)null));
+            Should.Throw<ArgumentException>(() => new Database((string) null));
             Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
 
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
-            Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory)null));
+            Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
+
+            Should.Throw<ArgumentNullException>(() => new Database((IDatabaseBuildConfiguration) null));
+            Should.Throw<InvalidOperationException>(() =>
+            {
+                try
+                {
+                    DatabaseConfiguration.Build().Create();
+                }
+                catch (Exception e)
+                {
+                    e.Message.ShouldContain("One or more connection strings");
+                    throw;
+                }
+            });
+            Should.Throw<InvalidOperationException>(() =>
+            {
+                try
+                {
+                    DatabaseConfiguration.Build().UsingConnectionString("cs").Create();
+                }
+                catch (Exception e)
+                {
+                    e.Message.ShouldContain("Both a connection string and provider are required");
+                    throw;
+                }
+            });
         }
 
         [Fact]
@@ -142,16 +166,16 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void IsNew_GivenNonTransientEntity_ShouldBeValid()
         {
-            var guidEntity = new GenericIdEntity<Guid> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841")};
+            var guidEntity = new GenericIdEntity<Guid> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") };
             var guidNullableEntity = new GenericIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") };
-            var intEntity = new GenericIdEntity<int> {Id = 1};
+            var intEntity = new GenericIdEntity<int> { Id = 1 };
             var unsignedIntEntity = new GenericIdEntity<uint> { Id = 1 };
             var shortEntity = new GenericIdEntity<short>() { Id = 1 };
             var unsignedShortEntity = new GenericIdEntity<ushort>() { Id = 1 };
             var longEntity = new GenericIdEntity<long>() { Id = 1 };
             var unsignedLongEntity = new GenericIdEntity<ulong>() { Id = 1 };
             var stringEntity = new GenericIdEntity<string>() { Id = "ID-1" };
-            var referenceEntity = new GenericIdEntity<ComplexPrimaryKey> {Id = new ComplexPrimaryKey()};
+            var referenceEntity = new GenericIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() };
 
             var guidResult = DB.IsNew(guidEntity);
             var guidNullableResult = DB.IsNew(guidNullableEntity);
@@ -266,7 +290,6 @@ namespace PetaPoco.Tests.Unit
 
         public class ComplexPrimaryKey
         {
-             
         }
 
         public class EntityWithoutConventionId

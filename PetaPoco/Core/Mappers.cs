@@ -97,22 +97,23 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Retrieve the IMapper implementation to be used for a specified POCO type
+        ///     Retrieve the IMapper implementation to be used for a specified POCO type.
         /// </summary>
-        /// <param name="t"></param>
-        /// <returns></returns>
-        public static IMapper GetMapper(Type t)
+        /// <param name="entityType">The entity type to get the mapper for.</param>
+        /// <param name="defaultMapper">The default mapper to use when non is registered for the type.</param>
+        /// <returns>The mapper for the given type.</returns>
+        public static IMapper GetMapper(Type entityType, IMapper defaultMapper)
         {
             _lock.EnterReadLock();
             try
             {
                 IMapper val;
-                if (_mappers.TryGetValue(t, out val))
+                if (_mappers.TryGetValue(entityType, out val))
                     return val;
-                if (_mappers.TryGetValue(t.Assembly, out val))
+                if (_mappers.TryGetValue(entityType.Assembly, out val))
                     return val;
 
-                return Singleton<StandardMapper>.Instance;
+                return defaultMapper;
             }
             finally
             {
@@ -151,7 +152,7 @@ namespace PetaPoco
         private static void FlushCaches()
         {
             // Whenever a mapper is registered or revoked, we have to assume any generated code is no longer valid.
-            // Since this should be a rare occurance, the simplest approach is to simply dump everything and start over.
+            // Since this should be a rare occurrence, the simplest approach is to simply dump everything and start over.
             MultiPocoFactory.FlushCaches();
             PocoData.FlushCaches();
         }
