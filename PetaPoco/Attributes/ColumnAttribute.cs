@@ -1,16 +1,16 @@
-﻿// <copyright file="ColumnAttribute.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2015/12/30</date>
 
 using System;
 
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents the attribute which decorates a poco property and marks the property as a column and optionally supplies
-    ///     the DB column name.
+    ///     Represents an attribute which can decorate a Poco property to mark the property as a column. It may also optionally
+    ///     supply the DB column name.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute
