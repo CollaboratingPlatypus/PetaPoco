@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/28</date>
+// <date>2016/01/06</date>
 
 using System;
 using System.Data;
@@ -18,10 +18,11 @@ namespace PetaPoco.Tests.Unit
 {
     public class DatabaseTests
     {
-        private DbProviderFactory _dbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Strict).Object;
+        private readonly DbProviderFactory _dbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Strict).Object;
 
-        private IProvider _provider = new Mock<IProvider>(MockBehavior.Loose).Object;
-        private IDatabase DB { get; set; }
+        private readonly IProvider _provider = new Mock<IProvider>(MockBehavior.Loose).Object;
+
+        private IDatabase DB { get; }
 
         public DatabaseTests()
         {
@@ -127,151 +128,63 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
-        public void IsNew_GivenTransientEntity_ShouldBeValid()
+        public void IsNew_GivenTransientEntity_ShoudlBeTrue()
         {
-            var guidEntity = new GenericIdEntity<Guid>();
-            var guidNullableEntity = new GenericIdEntity<Guid?>();
-            var intEntity = new GenericIdEntity<int>();
-            var unsignedIntEntity = new GenericIdEntity<uint>();
-            var shortEntity = new GenericIdEntity<short>();
-            var unsignedShortEntity = new GenericIdEntity<ushort>();
-            var longEntity = new GenericIdEntity<long>();
-            var unsignedLongEntity = new GenericIdEntity<ulong>();
-            var stringEntity = new GenericIdEntity<string>();
-            var referenceEntity = new GenericIdEntity<ComplexPrimaryKey>();
-
-            var guidResult = DB.IsNew(guidEntity);
-            var guidNullableResult = DB.IsNew(guidNullableEntity);
-            var intResult = DB.IsNew(intEntity);
-            var unsignedIntResult = DB.IsNew(unsignedIntEntity);
-            var shortResult = DB.IsNew(shortEntity);
-            var unsignedShortResult = DB.IsNew(unsignedShortEntity);
-            var longResult = DB.IsNew(longEntity);
-            var unsignedLongResult = DB.IsNew(unsignedLongEntity);
-            var stringResult = DB.IsNew(stringEntity);
-            var referenceResult = DB.IsNew(referenceEntity);
-
-            guidResult.ShouldBeTrue();
-            guidNullableResult.ShouldBeTrue();
-            intResult.ShouldBeTrue();
-            unsignedIntResult.ShouldBeTrue();
-            shortResult.ShouldBeTrue();
-            unsignedShortResult.ShouldBeTrue();
-            longResult.ShouldBeTrue();
-            unsignedLongResult.ShouldBeTrue();
-            stringResult.ShouldBeTrue();
-            referenceResult.ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<Guid>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<Guid?>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<int>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<uint>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<short>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<ushort>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<long>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<ulong>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<string>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<ComplexPrimaryKey>()).ShouldBeTrue();
         }
 
         [Fact]
-        public void IsNew_GivenNonTransientEntity_ShouldBeValid()
+        public void IsNew_GivenNonTransientEntity_ShouldBeFalse()
         {
-            var guidEntity = new GenericIdEntity<Guid> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") };
-            var guidNullableEntity = new GenericIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") };
-            var intEntity = new GenericIdEntity<int> { Id = 1 };
-            var unsignedIntEntity = new GenericIdEntity<uint> { Id = 1 };
-            var shortEntity = new GenericIdEntity<short>() { Id = 1 };
-            var unsignedShortEntity = new GenericIdEntity<ushort>() { Id = 1 };
-            var longEntity = new GenericIdEntity<long>() { Id = 1 };
-            var unsignedLongEntity = new GenericIdEntity<ulong>() { Id = 1 };
-            var stringEntity = new GenericIdEntity<string>() { Id = "ID-1" };
-            var referenceEntity = new GenericIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() };
-
-            var guidResult = DB.IsNew(guidEntity);
-            var guidNullableResult = DB.IsNew(guidNullableEntity);
-            var intResult = DB.IsNew(intEntity);
-            var unsignedIntResult = DB.IsNew(unsignedIntEntity);
-            var shortResult = DB.IsNew(shortEntity);
-            var unsignedShortResult = DB.IsNew(unsignedShortEntity);
-            var longResult = DB.IsNew(longEntity);
-            var unsignedLongResult = DB.IsNew(unsignedLongEntity);
-            var stringResult = DB.IsNew(stringEntity);
-            var referenceResult = DB.IsNew(referenceEntity);
-
-            guidResult.ShouldBeFalse();
-            guidNullableResult.ShouldBeFalse();
-            intResult.ShouldBeFalse();
-            unsignedIntResult.ShouldBeFalse();
-            shortResult.ShouldBeFalse();
-            unsignedShortResult.ShouldBeFalse();
-            longResult.ShouldBeFalse();
-            unsignedLongResult.ShouldBeFalse();
-            stringResult.ShouldBeFalse();
-            referenceResult.ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<Guid> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<int> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<uint> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<short>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<ushort>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<long>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<ulong>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<string>() { Id = "ID-1" }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() }).ShouldBeFalse();
         }
 
         [Fact]
-        public void IsNew_GivenTransientEntityAndPrimaryKeyName_ShouldBeValid()
+        public void IsNew_GivenTransientEntityAndPrimaryKeyName_ShouldBeTrue()
         {
-            var guidEntity = new GenericNoMapsIdEntity<Guid>();
-            var guidNullableEntity = new GenericNoMapsIdEntity<Guid?>();
-            var intEntity = new GenericNoMapsIdEntity<int>();
-            var unsignedIntEntity = new GenericNoMapsIdEntity<uint>();
-            var shortEntity = new GenericNoMapsIdEntity<short>();
-            var unsignedShortEntity = new GenericNoMapsIdEntity<ushort>();
-            var longEntity = new GenericNoMapsIdEntity<long>();
-            var unsignedLongEntity = new GenericNoMapsIdEntity<ulong>();
-            var stringEntity = new GenericNoMapsIdEntity<string>();
-            var referenceEntity = new GenericNoMapsIdEntity<ComplexPrimaryKey>();
-
-            var guidResult = DB.IsNew("Id", guidEntity);
-            var guidNullableResult = DB.IsNew("Id", guidNullableEntity);
-            var intResult = DB.IsNew("Id", intEntity);
-            var unsignedIntResult = DB.IsNew("Id", unsignedIntEntity);
-            var shortResult = DB.IsNew("Id", shortEntity);
-            var unsignedShortResult = DB.IsNew("Id", unsignedShortEntity);
-            var longResult = DB.IsNew("Id", longEntity);
-            var unsignedLongResult = DB.IsNew("Id", unsignedLongEntity);
-            var stringResult = DB.IsNew("Id", stringEntity);
-            var referenceResult = DB.IsNew("Id", referenceEntity);
-
-            guidResult.ShouldBeTrue();
-            guidNullableResult.ShouldBeTrue();
-            intResult.ShouldBeTrue();
-            unsignedIntResult.ShouldBeTrue();
-            shortResult.ShouldBeTrue();
-            unsignedShortResult.ShouldBeTrue();
-            longResult.ShouldBeTrue();
-            unsignedLongResult.ShouldBeTrue();
-            stringResult.ShouldBeTrue();
-            referenceResult.ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<Guid>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<Guid?>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<int>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<uint>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<short>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<ushort>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<long>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<ulong>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<string>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<ComplexPrimaryKey>()).ShouldBeTrue();
         }
 
         [Fact]
-        public void IsNew_GivenNonTransientEntityAndPrimaryKeyName_ShouldBeValid()
+        public void IsNew_GivenNonTransientEntityAndPrimaryKeyName_ShouldBeFalse()
         {
-            var guidEntity = new GenericNoMapsIdEntity<Guid> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") };
-            var guidNullableEntity = new GenericNoMapsIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") };
-            var intEntity = new GenericNoMapsIdEntity<int> { Id = 1 };
-            var unsignedIntEntity = new GenericNoMapsIdEntity<uint> { Id = 1 };
-            var shortEntity = new GenericNoMapsIdEntity<short>() { Id = 1 };
-            var unsignedShortEntity = new GenericNoMapsIdEntity<ushort>() { Id = 1 };
-            var longEntity = new GenericNoMapsIdEntity<long>() { Id = 1 };
-            var unsignedLongEntity = new GenericNoMapsIdEntity<ulong>() { Id = 1 };
-            var stringEntity = new GenericNoMapsIdEntity<string>() { Id = "ID-1" };
-            var referenceEntity = new GenericNoMapsIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() };
-
-            var guidResult = DB.IsNew("id", guidEntity);
-            var guidNullableResult = DB.IsNew("id", guidNullableEntity);
-            var intResult = DB.IsNew("id", intEntity);
-            var unsignedIntResult = DB.IsNew("id", unsignedIntEntity);
-            var shortResult = DB.IsNew("id", shortEntity);
-            var unsignedShortResult = DB.IsNew("id", unsignedShortEntity);
-            var longResult = DB.IsNew("id", longEntity);
-            var unsignedLongResult = DB.IsNew("id", unsignedLongEntity);
-            var stringResult = DB.IsNew("id", stringEntity);
-            var referenceResult = DB.IsNew("id", referenceEntity);
-
-            guidResult.ShouldBeFalse();
-            guidNullableResult.ShouldBeFalse();
-            intResult.ShouldBeFalse();
-            unsignedIntResult.ShouldBeFalse();
-            shortResult.ShouldBeFalse();
-            unsignedShortResult.ShouldBeFalse();
-            longResult.ShouldBeFalse();
-            unsignedLongResult.ShouldBeFalse();
-            stringResult.ShouldBeFalse();
-            referenceResult.ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<Guid> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<int> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<uint> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<short>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<ushort>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<long>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<ulong>() { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<string>() { Id = "ID-1" }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() }).ShouldBeFalse();
         }
 
         [ExplicitColumns]

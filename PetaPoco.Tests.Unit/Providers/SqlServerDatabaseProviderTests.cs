@@ -2,13 +2,13 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/07</date>
+// <date>2016/01/06</date>
 
 using PetaPoco.Providers;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Unit.DatabaseTypes
+namespace PetaPoco.Tests.Unit.Providers
 {
     public class SqlServerDatabaseProviderTests
     {
@@ -17,7 +17,7 @@ namespace PetaPoco.Tests.Unit.DatabaseTypes
         [Theory]
         [InlineData("column.name", "[column.name]")]
         [InlineData("column name", "[column name]")]
-        public void EscapeSqlIdentifier_GivenInput_ShouldBeValid(string input, string expected)
+        public void EscapeSqlIdentifier_GivenInput_ShouldBeExpected(string input, string expected)
         {
             _provider.EscapeSqlIdentifier(input).ShouldBe(expected);
         }
@@ -25,7 +25,7 @@ namespace PetaPoco.Tests.Unit.DatabaseTypes
         [Theory]
         [InlineData("column.name", "column.name")]
         [InlineData("column name", "[column name]")]
-        public void EscapeTableName_GivenInput_ShouldBeValid(string input, string expected)
+        public void EscapeTableName_GivenInput_ShouldBeExpected(string input, string expected)
         {
             _provider.EscapeTableName(input).ShouldBe(expected);
         }

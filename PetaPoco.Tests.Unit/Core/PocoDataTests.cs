@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2016/01/06</date>
 
 using System;
 using PetaPoco.Core;
@@ -14,7 +14,7 @@ namespace PetaPoco.Tests.Unit.Core
     public class PocoDataTests
     {
         [Fact]
-        public void GetFactory_GivenTypeWithNotPublicConstructor_ShouldBeValid()
+        public void GetFactory_GivenTypeWithNotPublicConstructor_ShouldThrow()
         {
             var pd = PocoData.ForObject(TestEntity.Instance, "Id", new ConventionMapper());
 
@@ -23,12 +23,11 @@ namespace PetaPoco.Tests.Unit.Core
 
         public class TestEntity
         {
+            public static TestEntity Instance => new TestEntity("");
+
             private TestEntity(string arg1)
             {
-                
             }
-
-            public static TestEntity Instance => new TestEntity("");
         }
     }
 }

@@ -208,7 +208,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenSql_ShouldBeValid()
+        public void Update_GivenPocoUpdateSql_ShouldUpdateThePoco()
         {
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());

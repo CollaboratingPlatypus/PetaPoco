@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/14</date>
+// <date>2016/01/06</date>
 
 using System;
 using System.Configuration;
@@ -14,7 +14,7 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseDatabaseTests : BaseDatabase
     {
-        private Note _note = new Note
+        private readonly Note _note = new Note
         {
             Text = "A test note",
             CreatedOn = new DateTime(1955, 1, 11, 4, 2, 4, DateTimeKind.Utc)
@@ -27,7 +27,6 @@ namespace PetaPoco.Tests.Integration.Databases
 
         protected virtual void AfterDbCreate(Database db)
         {
-            
         }
 
         [Fact]

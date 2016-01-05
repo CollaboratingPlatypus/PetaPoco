@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Unit
 {
     public class DatabaseConfigurationTests
     {
-        private IDatabaseBuildConfiguration config;
+        private readonly IDatabaseBuildConfiguration config;
 
         public DatabaseConfigurationTests()
         {

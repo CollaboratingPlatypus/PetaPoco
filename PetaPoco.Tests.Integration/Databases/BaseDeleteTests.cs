@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2016/01/06</date>
 
 using System;
 using PetaPoco.Tests.Integration.Models;
@@ -13,12 +13,6 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseDeleteTests : BaseDatabase
     {
-        private TransactionLog _log = new TransactionLog
-        {
-            Description = "A test log",
-            CreatedOn = new DateTime(1957, 1, 11, 4, 2, 4, DateTimeKind.Utc)
-        };
-
         private Note _note = new Note
         {
             Text = "A test note",
@@ -60,7 +54,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenPoco_ShouldBeValid()
+        public void Delete_GivenPoco_ShouldDeletePoco()
         {
             // Arrange
             DB.Insert(_person);
@@ -89,7 +83,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenPocoOrPrimaryKey_IsValid()
+        public void Delete_GivenPocoOrPrimaryKey_ShouldDeletePoco()
         {
             DB.Insert(_note);
             DB.Insert(_note2);
@@ -109,7 +103,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenTableNamePrimaryKeyNameAndPoco_IsValid()
+        public void Delete_GivenTableNamePrimaryKeyNameAndPoco_ShouldDeletePoco()
         {
             DB.Insert(_person);
             DB.Insert(_note);
@@ -125,7 +119,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_IsValid()
+        public void Delete_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldDeletePoco()
         {
             DB.Insert(_person);
             DB.Insert(_note);
@@ -141,7 +135,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenSqlAndArgs_IsValid()
+        public void Delete_GivenSqlAndArgs_ShouldDeletePoco()
         {
             DB.Insert(_note);
             DB.Insert(_person);
@@ -157,7 +151,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenSql_IsValid()
+        public void Delete_GivenSql_ShouldDeletePoco()
         {
             DB.Insert(_note);
             DB.Insert(_person);
