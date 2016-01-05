@@ -9,8 +9,8 @@ using System;
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents an attribute which can decorate a poco property as the primary key column. Additionally, specifies
-    ///     whether the column is auto incrementing and the optional sequence name for Oracle sequence columns.
+    ///     Is an attribute, which when applied to a Poco class, specifies primary key column. Additionally, specifies whether
+    ///     the column is auto incrementing and the optional sequence name for Oracle sequence columns.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class PrimaryKeyAttribute : Attribute
