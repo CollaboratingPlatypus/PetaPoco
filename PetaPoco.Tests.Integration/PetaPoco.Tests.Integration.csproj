@@ -124,6 +124,12 @@
     <Compile Include="Databases\MSSQL\MssqlExecuteTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlInsertTests.cs" />
     <Compile Include="Databases\MSSQL\MssqlUpdateTests.cs" />
+    <Compile Include="Databases\MariaDb\MariaDbDatabaseTests.cs" />
+    <Compile Include="Databases\MariaDb\MariaDbDBTestProvider.cs" />
+    <Compile Include="Databases\MariaDb\MariaDbDeleteTests.cs" />
+    <Compile Include="Databases\MariaDb\MariaDbExecuteTests.cs" />
+    <Compile Include="Databases\MariaDb\MariaDbInsertTests.cs" />
+    <Compile Include="Databases\MariaDb\MariaDbUpdateTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDatabaseTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDBTestProvider.cs" />
     <Compile Include="Databases\MySQL\MySqlDeleteTests.cs" />
@@ -185,6 +191,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>petapoco.mdf</DependentUpon>
     </Content>
+    <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSSQLCeBuildDatabase.sql" />
   </ItemGroup>
   <ItemGroup>

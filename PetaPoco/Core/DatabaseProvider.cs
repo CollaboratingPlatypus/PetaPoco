@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/14</date>
+// <date>2016/01/11</date>
 
 using System;
 using System.Data;
@@ -185,6 +185,8 @@ namespace PetaPoco.Core
             // Try using type name first (more reliable)
             if (typeName.StartsWith("MySql"))
                 return Singleton<MySqlDatabaseProvider>.Instance;
+            if (typeName.StartsWith("MariaDb"))
+                return Singleton<MariaDbDatabaseProvider>.Instance;
             if (typeName.StartsWith("SqlCe"))
                 return Singleton<SqlServerCEDatabaseProviders>.Instance;
             if (typeName.StartsWith("Npgsql") || typeName.StartsWith("PgSql"))
@@ -215,10 +217,12 @@ namespace PetaPoco.Core
             // Try again with provider name
             if (providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<MySqlDatabaseProvider>.Instance;
-            if (providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0 || 
+            if (providerName.IndexOf("MariaDb", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                return Singleton<MariaDbDatabaseProvider>.Instance;
+            if (providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("SqlCeConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerCEDatabaseProviders>.Instance;
-            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0 
+            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0
                 || providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
