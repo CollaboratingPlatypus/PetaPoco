@@ -62,6 +62,7 @@
     <Compile Include="Core\StandardMapper.cs" />
     <Compile Include="DatabaseConfiguration.cs" />
     <Compile Include="DatabaseConfigurationExtensions.cs" />
+    <Compile Include="IBuildConfigurationSettings.cs" />
     <Compile Include="IDatabaseBuildConfiguration.cs" />
     <Compile Include="IHideObjectMethods.cs" />
     <Compile Include="Providers\SQLiteDatabaseProvider.cs" />

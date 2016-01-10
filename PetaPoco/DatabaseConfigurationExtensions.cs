@@ -30,7 +30,7 @@ namespace PetaPoco
 
         private static void SetSetting(this IDatabaseBuildConfiguration source, string key, object value)
         {
-            ((DatabaseConfiguration.IBuildConfigurationSettings) source).SetSetting(key, value);
+            ((IBuildConfigurationSettings) source).SetSetting(key, value);
         }
 
         /// <summary>

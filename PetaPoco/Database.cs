@@ -171,7 +171,7 @@ namespace PetaPoco
             if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
-            var settings = (DatabaseConfiguration.IBuildConfigurationSettings) configuration;
+            var settings = (IBuildConfigurationSettings) configuration;
 
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
