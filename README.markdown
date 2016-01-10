@@ -21,6 +21,7 @@ Originally the brainchild of [Brad Robinson],
 
 * Tiny, and absolutely no dependencies!
 * Works with strictly undecorated POCOs, or attributed almost-POCOs.
+* Easy to configure and includes [fluent configuration] out of the box.
 * Helper methods for Insert/Delete/Update/Save and IsNew
 * Paged requests automatically work out total record count and fetch a specific page.
 * Easy transaction support.
@@ -86,6 +87,7 @@ PetaPoco is available from:
 [the contribution guide]:./contributing.md
 [Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
 [we have a special place to honour them]:./honourRoll.md
+[fluent configuration]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki/Fluent-Configuration
 
 ## Contributing
 
