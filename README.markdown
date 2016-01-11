@@ -21,6 +21,7 @@ Originally the brainchild of [Brad Robinson],
 
 * Tiny, and absolutely no dependencies!
 * Works with strictly undecorated POCOs, or attributed almost-POCOs.
+* Easy to configure and includes [fluent configuration] out of the box.
 * Helper methods for Insert/Delete/Update/Save and IsNew
 * Paged requests automatically work out total record count and fetch a specific page.
 * Easy transaction support.
@@ -30,7 +31,7 @@ Originally the brainchild of [Brad Robinson],
 * Includes a low friction SQL builder class that makes writing inline SQL *much* easier.
 * Includes T4 templates to automatically generate POCO classes for you.
 * Hooks for logging exceptions, installing value converters and mapping columns to properties without attributes.
-* Works with SQL Server, SQL Server CE, SQLite, MySQL, and PostgreSQL. (Oracle supported but has no integration tests).
+* Works with SQL Server, SQL Server CE, SQLite, MySQL, MariaDB, and PostgreSQL. (Oracle supported but does not have integration tests).
 * Works under .NET 4.0/4.5/4.6 or Mono 2.8 and later.
 * Has [Xunit] unit tests.
 * Has supported DBs integration tests.
@@ -86,6 +87,7 @@ PetaPoco is available from:
 [the contribution guide]:./contributing.md
 [Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
 [we have a special place to honour them]:./honourRoll.md
+[fluent configuration]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki/Fluent-Configuration
 
 ## Contributing
 

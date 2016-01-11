@@ -76,14 +76,14 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
-        public void GetColumnInfo_GivenPropertyWithoutColumnAttributeAndEntityWithExplicitAttribute_ShouldBeValid()
+        public void GetColumnInfo_GivenPropertyWithoutColumnAttributeAndEntityWithExplicitAttribute_ShouldBeNull()
         {
             var columnInfo = _mapper.GetColumnInfo(typeof(TeraEntity).GetProperty(nameof(TeraEntity.NotAColumn)));
             columnInfo.ShouldBeNull();
         }
 
         [Fact]
-        public void GetColumnInfo_GivenPropertyWithIgnoreColumnAttributeAndEntityWithoutExplicitAttribute_ShouldBeValid()
+        public void GetColumnInfo_GivenPropertyWithIgnoreColumnAttributeAndEntityWithoutExplicitAttribute_ShouldBeNull()
         {
             var columnInfo = _mapper.GetColumnInfo(typeof(YottaEntity).GetProperty(nameof(YottaEntity.NotAColumn)));
             columnInfo.ShouldBeNull();

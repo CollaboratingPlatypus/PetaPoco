@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Unit
 {
     public class DatabaseConfigurationTests
     {
-        private IDatabaseBuildConfiguration config;
+        private readonly IDatabaseBuildConfiguration config;
 
         public DatabaseConfigurationTests()
         {
@@ -23,10 +23,10 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void SetSetting_GivenKeyAndValue_ShouldSetSetting()
         {
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).SetSetting("key", "value");
+            ((IBuildConfigurationSettings) config).SetSetting("key", "value");
 
             string value = null;
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => value = v);
+            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => value = v);
             value.ShouldNotBeNull();
             value.ShouldBe("value");
         }
@@ -34,21 +34,21 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void SetSetting_GivenKeyAndNull_ShouldRemoveSetting()
         {
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).SetSetting("key", "value");
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).SetSetting("key", null);
+            ((IBuildConfigurationSettings) config).SetSetting("key", "value");
+            ((IBuildConfigurationSettings) config).SetSetting("key", null);
 
             var getCalled = false;
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => { getCalled = true; });
+            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => { getCalled = true; });
             getCalled.ShouldBeFalse();
         }
 
         [Fact]
         public void TryGetSetting_GivenKeyAndValue_ShouldGetSetting()
         {
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).SetSetting("key", "value");
+            ((IBuildConfigurationSettings) config).SetSetting("key", "value");
 
             string value = null;
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => value = v);
+            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => value = v);
             value.ShouldNotBeNull();
             value.ShouldBe("value");
         }
@@ -57,27 +57,27 @@ namespace PetaPoco.Tests.Unit
         public void TryGetSetting_GivenKeyThatDoesNotMatchValue_ShouldNotCallback()
         {
             var getCalled = false;
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => { getCalled = true; });
+            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => { getCalled = true; });
             getCalled.ShouldBeFalse();
         }
 
         [Fact]
         public void TrySetSetting_GivenNullKey_Throws()
         {
-            Should.Throw<ArgumentNullException>(() => ((DatabaseConfiguration.IBuildConfigurationSettings) config).SetSetting(null, "value"));
+            Should.Throw<ArgumentNullException>(() => ((IBuildConfigurationSettings) config).SetSetting(null, "value"));
         }
 
         [Fact]
         public void TryGetSetting_GivenNullKey_Throws()
         {
-            Should.Throw<ArgumentNullException>(() => ((DatabaseConfiguration.IBuildConfigurationSettings) config).TryGetSetting<string>(null, v => { }));
+            Should.Throw<ArgumentNullException>(() => ((IBuildConfigurationSettings) config).TryGetSetting<string>(null, v => { }));
         }
 
         [Fact]
         public void TryGetSetting_GivenNullCallback_Throws()
         {
-            ((DatabaseConfiguration.IBuildConfigurationSettings) config).SetSetting("key", "value");
-            Should.Throw<NullReferenceException>(() => ((DatabaseConfiguration.IBuildConfigurationSettings) config).TryGetSetting<string>("key", null));
+            ((IBuildConfigurationSettings) config).SetSetting("key", "value");
+            Should.Throw<NullReferenceException>(() => ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", null));
         }
 
         [Fact]

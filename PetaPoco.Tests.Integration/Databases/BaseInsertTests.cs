@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2016/01/06</date>
 
 using System;
 using PetaPoco.Tests.Integration.Models;
@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseInsertTests : BaseDatabase
     {
-        private Order _order = new Order
+        private readonly Order _order = new Order
         {
             PoNumber = "Peta's Order",
             Status = OrderStatus.Accepted,
@@ -21,13 +21,13 @@ namespace PetaPoco.Tests.Integration.Databases
             CreatedBy = "Harry"
         };
 
-        private OrderLine _orderLine = new OrderLine
+        private readonly OrderLine _orderLine = new OrderLine
         {
             Quantity = 5,
             SellPrice = 4.99m,
         };
 
-        private Person _person = new Person
+        private readonly Person _person = new Person
         {
             Id = Guid.NewGuid(),
             Age = 18,
@@ -53,7 +53,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPoco_WhenInsertingRelatedPocosShouldBeValid()
+        public void Insert_WhenInsertingRelatedPocosAndGivenPoco_ShouldInsertPocos()
         {
             DB.Insert(_person);
             _order.PersonId = _person.Id;
@@ -74,7 +74,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPocoTableNameAndColumnName_ShouldBeValid()
+        public void Insert_GivenPocoTableNameAndColumnName_ShouldInsertPoco()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -87,7 +87,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPocoTableNameAndColumnName_WhenInsertingRelatedPocosShouldBeValid()
+        public void Insert_WhenInsertingRelatedPocosGivenPocoTableNameAndColumnName_ShouldInsertPocos()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
             _order.PersonId = _person.Id;
@@ -113,7 +113,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        public void Insert_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldInsertPoco()
         {
             var note = new { Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
@@ -126,7 +126,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenTableNameAndAnonymousType_ShouldBeValid()
+        public void Insert_GivenTableNameAndAnonymousType_ShouldInsertPoco()
         {
             var log = new { Description = "Test log", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
