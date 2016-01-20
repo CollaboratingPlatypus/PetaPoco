@@ -328,7 +328,7 @@ namespace PetaPoco
         List<T> SkipTake<T>(long skip, long take, Sql sql);
 
         /// <summary>
-        ///     Checks for the existance of a row with the specified primary key value.
+        ///     Checks for the existence of a row with the specified primary key value.
         /// </summary>
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
         /// <param name="primaryKey">The primary key value to look for</param>
@@ -336,7 +336,7 @@ namespace PetaPoco
         bool Exists<T>(object primaryKey);
 
         /// <summary>
-        ///     Checks for the existance of a row matching the specified condition
+        ///     Checks for the existence of a row matching the specified condition
         /// </summary>
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
         /// <param name="sqlCondition">The SQL expression to be tested for (ie: the WHERE expression)</param>

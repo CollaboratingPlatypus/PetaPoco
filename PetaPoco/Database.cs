@@ -1007,7 +1007,7 @@ namespace PetaPoco
         #region operation: Exists
 
         /// <summary>
-        ///     Checks for the existance of a row matching the specified condition
+        ///     Checks for the existence of a row matching the specified condition
         /// </summary>
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
         /// <param name="sqlCondition">The SQL expression to be tested for (ie: the WHERE expression)</param>
@@ -1017,11 +1017,14 @@ namespace PetaPoco
         {
             var poco = PocoData.ForType(typeof(T), _defaultMapper).TableInfo;
 
-            return ExecuteScalar<int>(string.Format(_provider.GetExistsSql(), poco.TableName, sqlCondition), args) != 0;
+            if (sqlCondition.TrimStart().StartsWith("where", StringComparison.OrdinalIgnoreCase))
+                sqlCondition = sqlCondition.TrimStart().Substring(5);
+
+            return ExecuteScalar<int>(string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args) != 0;
         }
 
         /// <summary>
-        ///     Checks for the existance of a row with the specified primary key value.
+        ///     Checks for the existence of a row with the specified primary key value.
         /// </summary>
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
         /// <param name="primaryKey">The primary key value to look for</param>
