@@ -5,6 +5,7 @@
 // <date>2015/12/28</date>
 
 using System;
+using System.Data;
 using PetaPoco.Core;
 
 namespace PetaPoco
@@ -27,6 +28,8 @@ namespace PetaPoco
         internal const string ConnectionStringName = "ConnectionStringName";
 
         internal const string DefaultMapper = "DefaultMapper";
+
+        internal const string IsolationLevel = "IsolationLevel";
 
         private static void SetSetting(this IDatabaseBuildConfiguration source, string key, object value)
         {
@@ -257,6 +260,18 @@ namespace PetaPoco
             var mapper = new T();
             configure(mapper);
             source.SetSetting(DefaultMapper, mapper);
+            return source;
+        }
+
+        /// <summary>
+        ///     Specifies the transaction isolation level to use.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="isolationLevel"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
+        public static IDatabaseBuildConfiguration UsingIsolationLevel(this IDatabaseBuildConfiguration source, IsolationLevel isolationLevel)
+        {
+            source.SetSetting(IsolationLevel, isolationLevel);
             return source;
         }
 

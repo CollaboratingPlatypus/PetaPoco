@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/27</date>
+// <date>2016/01/21</date>
 
 using System;
 using System.Data;
@@ -71,13 +71,15 @@ namespace PetaPoco
         bool EnableNamedParams { get; set; }
 
         /// <summary>
-        ///     Sets the timeout value, in seconds, which PetaPoco applies to all <see cref="IDbCommand.CommandTimeout" />. (Default is 0)
+        ///     Sets the timeout value, in seconds, which PetaPoco applies to all <see cref="IDbCommand.CommandTimeout" />.
+        ///     (Default is 0)
         /// </summary>
         /// <remarks>
-        ///     If the current value is zero PetaPoco will not set the command timeout, and therefor, the .net default (30 seconds) will be in affect.
+        ///     If the current value is zero PetaPoco will not set the command timeout, and therefor, the .net default (30 seconds)
+        ///     will be in affect.
         /// </remarks>
         /// <returns>
-        ///     The current command timeout. 
+        ///     The current command timeout.
         /// </returns>
         int CommandTimeout { get; set; }
 
@@ -85,7 +87,7 @@ namespace PetaPoco
         ///     Sets the timeout value for the next (and only next) SQL statement.
         /// </summary>
         /// <remarks>
-        ///     This is a one-time settings, which after use, will return the <see cref="CommandTimeout"/> setting.
+        ///     This is a one-time settings, which after use, will return the <see cref="CommandTimeout" /> setting.
         /// </remarks>
         /// <returns>
         ///     The one time command timeout.
@@ -107,5 +109,51 @@ namespace PetaPoco
         ///     The connection string.
         /// </returns>
         string ConnectionString { get; }
+
+        /// <summary>
+        ///     Gets or sets the transaction isolation level.
+        /// </summary>
+        /// <remarks>
+        ///     When value is null, the underlying providers default isolation level is used.
+        /// </remarks>
+        IsolationLevel? IsolationLevel { get; set; }
+
+        /// <summary>
+        ///     Starts or continues a transaction.
+        /// </summary>
+        /// <returns>An ITransaction reference that must be Completed or disposed</returns>
+        /// <remarks>
+        ///     This method makes management of calls to Begin/End/CompleteTransaction easier.
+        ///     The usage pattern for this should be:
+        ///     using (var tx = db.GetTransaction())
+        ///     {
+        ///     // Do stuff
+        ///     db.Update(...);
+        ///     // Mark the transaction as complete
+        ///     tx.Complete();
+        ///     }
+        ///     Transactions can be nested but they must all be completed otherwise the entire
+        ///     transaction is aborted.
+        /// </remarks>
+        ITransaction GetTransaction();
+
+        /// <summary>
+        ///     Starts a transaction scope, see GetTransaction() for recommended usage
+        /// </summary>
+        void BeginTransaction();
+
+        /// <summary>
+        ///     Aborts the entire outer most transaction scope
+        /// </summary>
+        /// <remarks>
+        ///     Called automatically by Transaction.Dispose()
+        ///     if the transaction wasn't completed.
+        /// </remarks>
+        void AbortTransaction();
+
+        /// <summary>
+        ///     Marks the current transaction scope as complete.
+        /// </summary>
+        void CompleteTransaction();
     }
 }

@@ -209,6 +209,7 @@ namespace PetaPoco
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
+            settings.TryGetSetting<IsolationLevel>(DatabaseConfigurationExtensions.IsolationLevel, v => IsolationLevel = v);
         }
 
         /// <summary>
@@ -343,7 +344,7 @@ namespace PetaPoco
             if (_transactionDepth == 1)
             {
                 OpenSharedConnection();
-                _transaction = _sharedConnection.BeginTransaction();
+                _transaction = !_isolationLevel.HasValue ? _sharedConnection.BeginTransaction() : _sharedConnection.BeginTransaction(_isolationLevel.Value);
                 _transactionCancelled = false;
                 OnBeginTransaction();
             }
@@ -2378,6 +2379,24 @@ namespace PetaPoco
             get { return _connectionString; }
         }
 
+        /// <summary>
+        ///     Gets or sets the transaction isolation level.
+        /// </summary>
+        /// <remarks>
+        ///     When value is null, the underlying providers default isolation level is used.
+        /// </remarks>
+        public IsolationLevel? IsolationLevel
+        {
+            get { return _isolationLevel; }
+            set
+            {
+                if (_transaction != null)
+                    throw new InvalidOperationException("Isolation level can't be changed during a transaction.");
+
+                _isolationLevel = value;
+            }
+        }
+
         #endregion
 
         #region Member Fields
@@ -2395,6 +2414,7 @@ namespace PetaPoco
         private object[] _lastArgs;
         private string _paramPrefix;
         private DbProviderFactory _factory;
+        private IsolationLevel? _isolationLevel;
 
         #endregion
 
