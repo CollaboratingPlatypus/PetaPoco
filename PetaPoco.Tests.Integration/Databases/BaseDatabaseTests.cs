@@ -6,8 +6,11 @@
 
 using System;
 using System.Configuration;
+using System.Data;
 using System.Linq;
+using System.Reflection;
 using PetaPoco.Tests.Integration.Models;
+using Shouldly;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
@@ -110,6 +113,26 @@ namespace PetaPoco.Tests.Integration.Databases
                 var otherNote = db.SingleOrDefault<Note>(key);
 
                 _note.ShouldBe(otherNote);
+            }
+        }
+
+        [Fact]
+        public void IsolationLevel_WhenChangedDuringTransaction_ShouldThrow()
+        {
+            using (DB.GetTransaction())
+            {
+                Should.Throw<InvalidOperationException>(() => DB.IsolationLevel = IsolationLevel.Chaos);
+            }
+        }
+
+        [Fact]
+        public void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
+        {
+            DB.IsolationLevel = IsolationLevel.RepeatableRead;
+            using (var t = DB.GetTransaction())
+            {
+                var transaction = (IDbTransaction) DB.GetType().GetField("_transaction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(DB);
+                transaction.IsolationLevel.ShouldBe(DB.IsolationLevel.Value);
             }
         }
     }

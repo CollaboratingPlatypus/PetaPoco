@@ -5,6 +5,7 @@
 // <date>2015/12/28</date>
 
 using System;
+using System.Data;
 using PetaPoco.Providers;
 using Shouldly;
 using Xunit;
@@ -242,6 +243,29 @@ namespace PetaPoco.Tests.Unit
             db.DefaultMapper.ShouldBeOfType<StandardMapper>();
             db1Called.ShouldBeTrue();
             db1.DefaultMapper.ShouldBeOfType<StandardMapper>();
+        }
+
+        [Fact]
+        public void UsingIsolationLevel_GivenIsolationLevelAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
+        {
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingIsolationLevel(IsolationLevel.Chaos)
+                .Create();
+
+            db.IsolationLevel.ShouldBe(IsolationLevel.Chaos);
+        }
+
+        [Fact]
+        public void NotUsingIsolationLevel_AfterCreate_PetaPocoInstanceShouldBeNull()
+        {
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .Create();
+
+            db.IsolationLevel.ShouldBeNull();
         }
     }
 }
