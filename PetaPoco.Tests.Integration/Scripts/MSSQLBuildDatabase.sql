@@ -73,3 +73,14 @@ CREATE TABLE dbo.[Note] (
 	[Text] NTEXT NOT NULL,
 	[CreatedOn] DATETIME NOT NULL
 )
+
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'store')
+BEGIN
+	EXEC('CREATE SCHEMA store')
+END
+
+CREATE TABLE [store].[People] (
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[FullName] NVARCHAR(255),
+	[Age] BIGINT NOT NULL
+)
