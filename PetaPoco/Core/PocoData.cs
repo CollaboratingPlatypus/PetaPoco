@@ -117,11 +117,7 @@ namespace PetaPoco.Core
                 if (Type == typeof(object))
                 {
                     // var poco=new T()
-                    var ctor = Type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
-                    if (ctor == null)
-                        throw new InvalidOperationException("Type [" + Type.FullName + "] should have default public or non-public constructor");
-
-                    il.Emit(OpCodes.Newobj, ctor);
+                    il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes));          // obj
 
                     MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
 

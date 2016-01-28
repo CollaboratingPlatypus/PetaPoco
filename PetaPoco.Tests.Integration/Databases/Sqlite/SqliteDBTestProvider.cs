@@ -20,7 +20,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
         {
             m.FromDbConverter = (targetProperty, sourceType) =>
             {
-                if (sourceType == typeof(long))
+                if (targetProperty != null && sourceType == typeof(long))
                 {
                     var type = !targetProperty.PropertyType.IsNullableType()
                         ? targetProperty.PropertyType

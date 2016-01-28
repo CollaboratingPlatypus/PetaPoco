@@ -128,7 +128,7 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
         {
-            DB.IsolationLevel = IsolationLevel.RepeatableRead;
+            DB.IsolationLevel = IsolationLevel.Serializable;
             using (var t = DB.GetTransaction())
             {
                 var transaction = (IDbTransaction) DB.GetType().GetField("_transaction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(DB);
