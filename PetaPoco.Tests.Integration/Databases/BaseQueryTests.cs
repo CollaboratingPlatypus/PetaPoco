@@ -22,7 +22,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnCollection()
+        public void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -30,8 +30,14 @@ namespace PetaPoco.Tests.Integration.Databases
                 $"SELECT * FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = DB.Query<dynamic>(sql, OrderStatus.Pending);
-
             results.Count().ShouldBe(3);
+
+            var order = (IDictionary<string, object>) results.First();
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName]).ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
+            order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
+            ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName]).ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         private void AddOrders(int ordersToAdd)
@@ -56,9 +62,9 @@ namespace PetaPoco.Tests.Integration.Databases
                 var order = new Order
                 {
                     PoNumber = "PO" + i,
-                    Status = (OrderStatus) orderStatuses.GetValue(i%orderStatuses.Length),
-                    PersonId = people.Skip(i%4).Take(1).Single().Id,
-                    CreatedOn = new DateTime(1990 - (i%4), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                    Status = (OrderStatus) orderStatuses.GetValue(i % orderStatuses.Length),
+                    PersonId = people.Skip(i % 4).Take(1).Single().Id,
+                    CreatedOn = new DateTime(1990 - (i % 4), 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     CreatedBy = "Harry" + i
                 };
                 DB.Insert(order);
@@ -69,11 +75,16 @@ namespace PetaPoco.Tests.Integration.Databases
                     {
                         OrderId = order.Id,
                         Quantity = (short) j,
-                        SellPrice = 9.99m*j,
-                        Total = 9.99m*j*j
+                        SellPrice = 9.99m * j,
+                        Total = 9.99m * j * j
                     });
                 }
             }
+        }
+
+        private static DateTime ConvertToDateTime(object value)
+        {
+            return value as DateTime? ?? new DateTime((long)value, DateTimeKind.Utc);
         }
     }
 }
