@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [People] (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-	[FullName] NTEXT,
+	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
 	[Dob] DATETIME NOT NULL
@@ -9,10 +9,10 @@
 CREATE TABLE [Orders] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[PersonId] UNIQUEIDENTIFIER REFERENCES [People](Id),
-	[PoNumber] NTEXT NOT NULL,
+	[PoNumber] NVARCHAR(15) NOT NULL,
 	[OrderStatus] INT NOT NULL,
 	[CreatedOn] DATETIME NOT NULL,
-	[CreatedBy] NTEXT NOT NULL
+	[CreatedBy] NVARCHAR(255) NOT NULL
 );
 
 CREATE TABLE [OrderLines] (
@@ -24,7 +24,7 @@ CREATE TABLE [OrderLines] (
 
 CREATE TABLE [SpecificPeople] (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-	[FullName] NTEXT,
+	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
 	[Dob] DATETIME NOT NULL
@@ -33,10 +33,10 @@ CREATE TABLE [SpecificPeople] (
 CREATE TABLE [SpecificOrders] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[PersonId] UNIQUEIDENTIFIER REFERENCES [SpecificPeople](Id),
-	[PoNumber] NTEXT NOT NULL,
+	[PoNumber] NVARCHAR(15) NOT NULL,
 	[OrderStatus] INT NOT NULL,
 	[CreatedOn] DATETIME NOT NULL,
-	[CreatedBy] NTEXT NOT NULL
+	[CreatedBy] NVARCHAR(255) NOT NULL
 );
 
 CREATE TABLE [SpecificOrderLines] (
