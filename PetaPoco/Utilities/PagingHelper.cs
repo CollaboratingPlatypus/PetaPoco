@@ -18,7 +18,7 @@ namespace PetaPoco.Utilities
 
         public Regex RegexOrderBy =
             new Regex(
-                @"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
+                @"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
                 RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
         public static IPagingHelper Instance { get; private set; }
@@ -47,7 +47,7 @@ namespace PetaPoco.Utilities
                 return false;
 
             // Save column list and replace with COUNT(*)
-            Group g = m.Groups[1];
+            var g = m.Groups[1];
             parts.SqlSelectRemoved = sql.Substring(g.Index);
 
             if (RegexDistinct.IsMatch(parts.SqlSelectRemoved))
@@ -57,11 +57,7 @@ namespace PetaPoco.Utilities
 
             // Look for the last "ORDER BY <whatever>" clause not part of a ROW_NUMBER expression
             m = RegexOrderBy.Match(parts.SqlCount);
-            if (!m.Success)
-            {
-                parts.SqlOrderBy = null;
-            }
-            else
+            if (m.Success)
             {
                 g = m.Groups[0];
                 parts.SqlOrderBy = g.ToString();
