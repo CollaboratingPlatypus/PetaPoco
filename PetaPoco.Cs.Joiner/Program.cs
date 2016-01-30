@@ -65,10 +65,12 @@ namespace PetaPoco.Cs.Joiner
 
 	        builder.AppendLine(@"
 namespace PetaPoco
-{");
+{
+#pragma warning disable 1066,1570,1573,1591");
 
             parsedFiles.ForEach(p => builder.AppendLine(p.CodeBlock));
-            builder.Append(@"}");
+            builder.Append(@"#pragma warning restore 1066,1570,1573,1591
+}");
 
             File.WriteAllText(Path.Combine(filePath, "..\\", "Output", "PetaPoco.cs"), builder.ToString());
 
