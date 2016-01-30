@@ -4,6 +4,7 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2016/01/29</date>
 
+using System;
 using System.Linq;
 using PetaPoco.Tests.Integration.Databases;
 
@@ -17,8 +18,11 @@ namespace PetaPoco.Tests.Integration.x86.Databases.MSAccess
 
         public override void ExecuteBuildScript(IDatabase database, string script)
         {
-            script.Split(';').Select(s => s.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).ToList().ForEach(s =>
+            script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {
+                if (s.StartsWith("--"))
+                    return;
+
                 if (s.StartsWith("DROP"))
                 {
                     try
@@ -28,11 +32,10 @@ namespace PetaPoco.Tests.Integration.x86.Databases.MSAccess
                     catch
                     {
                     }
+                    return;
                 }
-                else
-                {
-                    base.ExecuteBuildScript(database, s);
-                }
+                
+                base.ExecuteBuildScript(database, s);
             });
         }
     }

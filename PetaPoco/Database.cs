@@ -429,6 +429,11 @@ namespace PetaPoco
             if (value == null)
             {
                 p.Value = DBNull.Value;
+
+                if (pi.PropertyType.Name == "Byte[]")
+                {
+                    p.DbType = DbType.Binary;
+                }
             }
             else
             {
@@ -467,7 +472,6 @@ namespace PetaPoco
                     p.GetType().GetProperty("UdtTypeName").SetValue(p, "geography", null); //geography is the equivalent SQL Server Type
                     p.Value = value;
                 }
-
                 else if (value.GetType().Name == "SqlGeometry") //SqlGeometry is a CLR Type
                 {
                     p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type

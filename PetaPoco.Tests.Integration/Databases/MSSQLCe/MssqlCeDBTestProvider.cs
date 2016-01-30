@@ -20,14 +20,13 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 
         public override IDatabase Execute()
         {
-            if (File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
+            if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
             {
-                File.Delete(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf"));
-            }
-
-            using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
-            {
-                engine.CreateDatabase();
+                using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
+                {
+                    engine.CreateDatabase();
+                }
+                //File.Delete(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf"));
             }
 
             return base.Execute();
@@ -35,7 +34,25 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 
         public override void ExecuteBuildScript(IDatabase database, string script)
         {
-            script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => database.Execute(s));
+            script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
+            {
+                if (s.StartsWith("--"))
+                    return;
+
+                if (s.StartsWith("DROP"))
+                {
+                    try
+                    {
+                        base.ExecuteBuildScript(database, s);
+                    }
+                    catch
+                    {
+                    }
+                    return;
+                }
+
+                base.ExecuteBuildScript(database, s);
+            });
         }
     }
 }

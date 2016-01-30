@@ -137,5 +137,19 @@ namespace PetaPoco.Tests.Integration.Databases
             otherLog.Description.ShouldBe(log.Description);
             otherLog.CreatedOn.ShouldBe(log.CreatedOn);
         }
+
+        [Fact]
+        public void Insert_GivenNullByteArray_ShouldNotThrow()
+        {
+            DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[])null });
+            DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
+        }
+
+        [Fact]
+        public void Insert_GivenNonNullByteArray_ShouldNotThrow()
+        {
+            DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
+            DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
+        }
     }
 }

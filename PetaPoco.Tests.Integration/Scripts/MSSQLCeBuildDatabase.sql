@@ -1,4 +1,13 @@
-﻿CREATE TABLE [People] (
+﻿DROP TABLE [OrderLines];
+DROP TABLE [Orders];
+DROP TABLE [People];
+DROP TABLE [SpecificOrderLines];
+DROP TABLE [SpecificOrders];
+DROP TABLE [SpecificPeople];
+DROP TABLE [TransactionLogs];
+DROP TABLE [Note];
+
+CREATE TABLE [People] (
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
@@ -56,3 +65,12 @@ CREATE TABLE [Note] (
 	[Text] NTEXT NOT NULL,
 	[CreatedOn] DATETIME NOT NULL
 );
+
+-- Investigation Tables;
+
+DROP TABLE [BugInvestigation_10R9LZYK];
+
+CREATE TABLE [BugInvestigation_10R9LZYK] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TestColumn1] BINARY(32)
+)

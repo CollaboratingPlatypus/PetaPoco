@@ -65,3 +65,12 @@ CREATE TABLE [Note] (
 	[Text] MEMO NOT NULL,
 	[CreatedOn] Datetime NOT NULL
 );
+
+-- Investigation Tables;
+
+DROP TABLE [BugInvestigation_10R9LZYK];
+
+CREATE TABLE [BugInvestigation_10R9LZYK] (
+	[Id] AUTOINCREMENT PRIMARY KEY,
+	[TestColumn1] BINARY
+);

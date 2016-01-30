@@ -69,3 +69,12 @@ CREATE TABLE [Note] (
 	[Text] TEXT NOT NULL,
 	[CreatedOn] INTEGER NOT NULL
 );
+
+-- Investigation Tables
+
+DROP TABLE IF EXISTS [BugInvestigation_10R9LZYK];
+
+CREATE TABLE [BugInvestigation_10R9LZYK] (
+	[Id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	[TestColumn1] BLOG(32)
+);
