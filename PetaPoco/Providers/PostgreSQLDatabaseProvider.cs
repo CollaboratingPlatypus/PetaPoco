@@ -21,6 +21,11 @@ namespace PetaPoco.Providers
             return GetFactory("Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7");
         }
 
+        public override string GetExistsSql()
+        {
+            return "SELECT CASE WHEN EXISTS(SELECT 1 FROM {0} WHERE {1}) THEN 1 ELSE 0 END";
+        }
+
         public override object MapParameterValue(object value)
         {
             // Don't map bools to ints in PostgreSQL

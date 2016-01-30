@@ -67,6 +67,7 @@
     <Compile Include="IDatabaseBuildConfiguration.cs" />
     <Compile Include="IHideObjectMethods.cs" />
     <Compile Include="Providers\MariaDbDatabaseProvider.cs" />
+    <Compile Include="Providers\MsAccessDbDatabaseProvider.cs" />
     <Compile Include="Providers\SQLiteDatabaseProvider.cs" />
     <Compile Include="Providers\OracleDatabaseProvider.cs" />
     <Compile Include="Providers\PostgreSQLDatabaseProvider.cs" />

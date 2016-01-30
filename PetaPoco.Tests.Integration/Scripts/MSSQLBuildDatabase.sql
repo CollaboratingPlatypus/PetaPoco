@@ -87,3 +87,13 @@ CREATE TABLE [store].[People] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL
 )
+
+-- Investigation Tables
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_10R9LZYK')
+	DROP TABLE dbo.[BugInvestigation_10R9LZYK]
+
+CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TestColumn1] VARBINARY(32)
+)

@@ -31,7 +31,7 @@ Originally the brainchild of [Brad Robinson],
 * Includes a low friction SQL builder class that makes writing inline SQL *much* easier.
 * Includes T4 templates to automatically generate POCO classes for you.
 * Hooks for logging exceptions, installing value converters and mapping columns to properties without attributes.
-* Works with SQL Server, SQL Server CE, SQLite, MySQL, MariaDB, and PostgreSQL. (Oracle supported but does not have integration tests).
+* Works with SQL Server, SQL Server CE, MS Access, SQLite, MySQL, MariaDB, and PostgreSQL. (Oracle supported but does not have integration tests).
 * Works under .NET 4.0/4.5/4.6 or Mono 2.8 and later.
 * Has [Xunit] unit tests.
 * Has supported DBs integration tests.

@@ -176,9 +176,10 @@ namespace PetaPoco.Core
         ///     Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
         /// </summary>
         /// <param name="type">The type name.</param>
-        /// <param name="allowDefault">A flag to specify whether a default provider is allowed to be chosen if none is matched.</param>
+        /// <param name="allowDefault">A flag that when set allows the default <see cref="SqlServerDatabaseProvider"/> to be returned if not match is found.</param>
+        /// <param name="connectionString">The connection string.</param>
         /// <returns>The database provider.</returns>
-        internal static IProvider Resolve(Type type, bool allowDefault)
+        internal static IProvider Resolve(Type type, bool allowDefault, string connectionString)
         {
             var typeName = type.Name;
 
@@ -199,7 +200,11 @@ namespace PetaPoco.Core
                 return Singleton<OracleDatabaseProvider>.Instance;
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
                 return Singleton<SqlServerDatabaseProvider>.Instance;
-
+            if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
+                && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
+            {
+                return Singleton<MsAccessDbDatabaseProvider>.Instance;
+            }
             if (!allowDefault)
                 throw new ArgumentException("Could not match `" + type.FullName + "` to a provider.", "type");
 
@@ -211,8 +216,10 @@ namespace PetaPoco.Core
         ///     Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
         /// </summary>
         /// <param name="providerName">The provider name.</param>
+        /// <param name="allowDefault">A flag that when set allows the default <see cref="SqlServerDatabaseProvider"/> to be returned if not match is found.</param>
+        /// <param name="connectionString">The connection string.</param>
         /// <returns>The database type.</returns>
-        internal static IProvider Resolve(string providerName, bool allowDefault)
+        internal static IProvider Resolve(string providerName, bool allowDefault, string connectionString)
         {
             // Try again with provider name
             if (providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -231,6 +238,11 @@ namespace PetaPoco.Core
                 return Singleton<SQLiteDatabaseProvider>.Instance;
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<OracleDatabaseProvider>.Instance;
+            if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
+                && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
+            {
+                return Singleton<MsAccessDbDatabaseProvider>.Instance;
+            }
             if (providerName.IndexOf("SqlServer", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerDatabaseProvider>.Instance;

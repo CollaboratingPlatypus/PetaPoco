@@ -69,3 +69,12 @@ CREATE TABLE "Note" (
 	"Text" VARCHAR(5000) NOT NULL,
 	"CreatedOn" TIMESTAMP NOT NULL
 );
+
+-- Investigation Tables
+
+DROP TABLE IF EXISTS "BugInvestigation_10R9LZYK";
+
+CREATE TABLE "BugInvestigation_10R9LZYK" (
+	"Id" SERIAL PRIMARY KEY NOT NULL,
+	"TestColumn1" BYTEA
+);

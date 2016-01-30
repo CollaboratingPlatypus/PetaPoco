@@ -54,7 +54,7 @@ namespace PetaPoco
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false), null);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace PetaPoco
             // Prevent closing external connection
             _sharedConnectionDepth = 2;
 
-            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false), null);
+            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), null);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace PetaPoco
                 throw new ArgumentException("Connection string cannot be null or empty", "connectionString");
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(providerName, true), null);
+            Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), null);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace PetaPoco
                 throw new ArgumentNullException("factory");
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(factory.GetType(), false), null);
+            Initialise(DatabaseProvider.Resolve(factory.GetType(), false, _connectionString), null);
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace PetaPoco
 
             _connectionString = entry.ConnectionString;
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false), null);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace PetaPoco
                     throw new InvalidOperationException("Both a connection string and provider are required or neither.");
 
                 var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-                Initialise(DatabaseProvider.Resolve(providerName, false), defaultMapper);
+                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
             });
 
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
@@ -429,6 +429,11 @@ namespace PetaPoco
             if (value == null)
             {
                 p.Value = DBNull.Value;
+
+                if (pi.PropertyType.Name == "Byte[]")
+                {
+                    p.DbType = DbType.Binary;
+                }
             }
             else
             {
@@ -467,7 +472,6 @@ namespace PetaPoco
                     p.GetType().GetProperty("UdtTypeName").SetValue(p, "geography", null); //geography is the equivalent SQL Server Type
                     p.Value = value;
                 }
-
                 else if (value.GetType().Name == "SqlGeometry") //SqlGeometry is a CLR Type
                 {
                     p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
