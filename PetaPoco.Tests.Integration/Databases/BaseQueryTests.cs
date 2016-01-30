@@ -22,6 +22,39 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        public virtual void Page_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        {
+            AddPeople(15, 5);
+            var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+            var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} LIKE @0";
+
+            var page = DB.Page<Person>(2, 3, sql, "Peta%");
+            page.CurrentPage.ShouldBe(2);
+            page.TotalPages.ShouldBe(5);
+            page.TotalItems.ShouldBe(15);
+            page.ItemsPerPage.ShouldBe(3);
+            page.Items.Count.ShouldBe(3);
+            page.Items.All(p => p.Name.StartsWith("Peta")).ShouldBeTrue();
+        }
+
+        [Fact]
+        public virtual void Page_ForPocoSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        {
+            AddPeople(15, 5);
+            var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+            var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} LIKE @0 " +
+                      $"ORDER BY {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)}";
+
+            var page = DB.Page<Person>(2, 3, sql, "Peta%");
+            page.CurrentPage.ShouldBe(2);
+            page.TotalPages.ShouldBe(5);
+            page.TotalItems.ShouldBe(15);
+            page.ItemsPerPage.ShouldBe(3);
+            page.Items.Count.ShouldBe(3);
+            page.Items.All(p => p.Name.StartsWith("Peta")).ShouldBeTrue();
+        }
+
+        [Fact]
         public void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -253,6 +286,34 @@ namespace PetaPoco.Tests.Integration.Databases
             results.ForEach(po => po.ShouldStartWith("PO"));
         }
 
+        private void AddPeople(int petasToAdd, int sallysToAdd)
+        {
+            var c = petasToAdd > sallysToAdd ? petasToAdd : sallysToAdd;
+            for (var i = 0; i < c; i++)
+            {
+                if (petasToAdd > i)
+                {
+                    DB.Insert(new Person
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Peta" + i,
+                        Age = 18 + i,
+                        Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                    });
+                }
+                if (sallysToAdd > i)
+                {
+                    DB.Insert(new Person
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Sally" + i,
+                        Age = 18 + i,
+                        Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                    });
+                }
+            }
+        }
+
         private void AddOrders(int ordersToAdd)
         {
             var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
@@ -263,6 +324,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 var p = new Person
                 {
                     Id = Guid.NewGuid(),
+                    Name = "Peta" + i,
                     Age = 18 + i,
                     Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
                 };

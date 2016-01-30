@@ -126,7 +126,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
+        public virtual void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
         {
             DB.IsolationLevel = IsolationLevel.Serializable;
             using (var t = DB.GetTransaction())
