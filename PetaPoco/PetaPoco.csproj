@@ -66,6 +66,7 @@
     <Compile Include="IBuildConfigurationSettings.cs" />
     <Compile Include="IDatabaseBuildConfiguration.cs" />
     <Compile Include="IHideObjectMethods.cs" />
+    <Compile Include="Providers\FirebirdDbDatabaseProvider.cs" />
     <Compile Include="Providers\MariaDbDatabaseProvider.cs" />
     <Compile Include="Providers\MsAccessDbDatabaseProvider.cs" />
     <Compile Include="Providers\SQLiteDatabaseProvider.cs" />
