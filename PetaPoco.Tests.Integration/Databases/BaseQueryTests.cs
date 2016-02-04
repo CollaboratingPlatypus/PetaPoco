@@ -2,12 +2,13 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/28</date>
+// <date>2016/02/04</date>
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using PetaPoco.Core;
+using PetaPoco.Providers;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -121,6 +122,37 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        public void Query_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+
+            var sql =
+                $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @Status AND @NullableProperty IS NULL";
+
+            if (DB.Provider.GetType() == typeof(PostgreSQLDatabaseProvider))
+            {
+                sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS CHAR)");
+            }
+            else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
+            {
+                sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
+            }
+
+            var results = DB.Query<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null }).ToList();
+            results.Count.ShouldBe(3);
+
+            results.ForEach(o =>
+            {
+                o.PoNumber.ShouldStartWith("PO");
+                o.Status.ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>().ToArray());
+                o.PersonId.ShouldNotBe(Guid.Empty);
+                o.CreatedOn.ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+                o.CreatedBy.ShouldStartWith("Harry");
+            });
+        }
+
+        [Fact]
         public void Query_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -182,14 +214,14 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Fetch<dynamic>(sql, OrderStatus.Pending);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>)results.First();
-            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>) results.First();
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
@@ -206,18 +238,47 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Fetch<dynamic>(sql);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>)results.First();
-            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>) results.First();
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
         public void Fetch_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql =$"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @Status AND @NullableProperty IS NULL";
+
+            if (DB.Provider.GetType() == typeof(PostgreSQLDatabaseProvider))
+            {
+                sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS CHAR)");
+            }
+            else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
+            {
+                sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
+            }
+
+            var results = DB.Fetch<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
+            results.Count.ShouldBe(3);
+
+            results.ForEach(o =>
+            {
+                o.PoNumber.ShouldStartWith("PO");
+                o.Status.ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>().ToArray());
+                o.PersonId.ShouldNotBe(Guid.Empty);
+                o.CreatedOn.ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+                o.CreatedBy.ShouldStartWith("Harry");
+            });
+        }
+
+        [Fact]
+        public void Fetch_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
