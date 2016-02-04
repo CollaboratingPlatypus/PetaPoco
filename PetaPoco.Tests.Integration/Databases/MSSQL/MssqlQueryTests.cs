@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/28</date>
+// <date>2016/02/04</date>
 
 using System;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
-        public void Query_ForPocoGivenSql_GivenSqlStartingWithSet__ShouldReturnValidPocoCollection()
+        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithSet__ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -43,7 +43,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
-        public void Query_GivenSqlStartingWithDeclare_ShouldExecute()
+        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithDeclare__ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -65,7 +65,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
-        public void Query_GivenSqlStartingWithWith_ShouldExecute()
+        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithWith__ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -77,7 +77,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
                                       )
                                       SELECT *
                                       FROM [{0}_CTE]
-                                      WHERE [{2}] = @0;", pd.TableInfo.TableName, columns, pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName);
+                                      WHERE [{2}] = @0;", pd.TableInfo.TableName, columns,
+                pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName);
 
             var results = DB.Query<Order>(sql, OrderStatus.Pending).ToList();
             results.Count.ShouldBe(3);
