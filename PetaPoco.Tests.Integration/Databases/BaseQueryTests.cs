@@ -286,7 +286,7 @@ namespace PetaPoco.Tests.Integration.Databases
             results.ForEach(po => po.ShouldStartWith("PO"));
         }
 
-        private void AddPeople(int petasToAdd, int sallysToAdd)
+        protected void AddPeople(int petasToAdd, int sallysToAdd)
         {
             var c = petasToAdd > sallysToAdd ? petasToAdd : sallysToAdd;
             for (var i = 0; i < c; i++)
@@ -314,7 +314,7 @@ namespace PetaPoco.Tests.Integration.Databases
             }
         }
 
-        private void AddOrders(int ordersToAdd)
+        protected void AddOrders(int ordersToAdd)
         {
             var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
             var people = new List<Person>(4);
@@ -357,7 +357,7 @@ namespace PetaPoco.Tests.Integration.Databases
             }
         }
 
-        private static DateTime ConvertToDateTime(object value)
+        protected static DateTime ConvertToDateTime(object value)
         {
             return value as DateTime? ?? new DateTime((long) value, DateTimeKind.Utc);
         }
