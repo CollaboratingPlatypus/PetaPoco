@@ -97,3 +97,19 @@ CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[TestColumn1] VARBINARY(32)
 )
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_10R9LZYK')
+	DROP TABLE dbo.[BugInvestigation_10R9LZYK]
+
+CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
+	[ColumnA] VARCHAR(20),
+	[Column2] VARCHAR(20),
+)
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_5TN5C4U4')
+	DROP TABLE dbo.[BugInvestigation_5TN5C4U4]
+
+CREATE TABLE dbo.[BugInvestigation_5TN5C4U4] (
+	[ColumnA] VARCHAR(20),
+	[Column2] VARCHAR(20),
+)
