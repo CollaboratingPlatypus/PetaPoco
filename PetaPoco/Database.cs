@@ -430,7 +430,7 @@ namespace PetaPoco
             {
                 p.Value = DBNull.Value;
 
-                if (pi.PropertyType.Name == "Byte[]")
+                if (pi != null && pi.PropertyType.Name == "Byte[]")
                 {
                     p.DbType = DbType.Binary;
                 }
