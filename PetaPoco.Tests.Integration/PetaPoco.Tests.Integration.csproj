@@ -51,6 +51,10 @@
     <CodeAnalysisRuleSet>PetaPoco.Tests.Integration.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FirebirdSql.Data.FirebirdClient, Version=4.10.0.0, Culture=neutral, PublicKeyToken=3750abcc3150b00c, processorArchitecture=MSIL">
+      <HintPath>..\packages\FirebirdSql.Data.FirebirdClient.4.10.0.0\lib\net45\FirebirdSql.Data.FirebirdClient.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
@@ -114,6 +118,14 @@
     <Compile Include="Databases\BaseQueryTests.cs" />
     <Compile Include="Databases\BaseUpdateTests.cs" />
     <Compile Include="Databases\DBTestProvider.cs" />
+    <Compile Include="Databases\Firebird\FirebirdDBTestProvider.cs" />
+    <Compile Include="Databases\Firebird\FirebirdInsertTests.cs" />
+    <Compile Include="Databases\Firebird\FirebirdDatabaseTests.cs" />
+    <Compile Include="Databases\Firebird\FirebirdDeleteTests.cs" />
+    <Compile Include="Databases\Firebird\FirebirdExecuteTests.cs" />
+    <Compile Include="Databases\Firebird\FirebirdQueryLinqTests.cs" />
+    <Compile Include="Databases\Firebird\FirebirdQueryTests.cs" />
+    <Compile Include="Databases\Firebird\FirebirdUpdateTests.cs" />
     <Compile Include="Databases\MariaDb\MariaDbQueryLinqTests.cs" />
     <Compile Include="Databases\MariaDb\MariaQueryTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeDatabaseTests.cs" />
@@ -205,6 +217,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>petapoco.mdf</DependentUpon>
     </Content>
+    <EmbeddedResource Include="Scripts\FirebirdDbBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSSQLCeBuildDatabase.sql" />
   </ItemGroup>
@@ -220,6 +233,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

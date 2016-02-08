@@ -200,6 +200,8 @@ namespace PetaPoco.Core
                 return Singleton<OracleDatabaseProvider>.Instance;
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
                 return Singleton<SqlServerDatabaseProvider>.Instance;
+            if (typeName.StartsWith("FbConnection") || typeName.EndsWith("FirebirdClientFactory"))
+                return Singleton<FirebirdDbDatabaseProvider>.Instance;
             if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
                 && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
@@ -238,6 +240,9 @@ namespace PetaPoco.Core
                 return Singleton<SQLiteDatabaseProvider>.Instance;
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<OracleDatabaseProvider>.Instance;
+            if (providerName.IndexOf("Firebird", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
+                providerName.IndexOf("FbConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                return Singleton<FirebirdDbDatabaseProvider>.Instance;
             if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
                 && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
