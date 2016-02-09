@@ -12,7 +12,7 @@ CREATE TABLE [People] (
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
-	[Dob] Datetime NOT NULL
+	[Dob] Datetime NULL
 );
 
 CREATE TABLE [Orders] (
@@ -36,7 +36,7 @@ CREATE TABLE [SpecificPeople] (
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
-	[Dob] Datetime NOT NULL
+	[Dob] Datetime NULL
 );
 
 CREATE TABLE [SpecificOrders] (

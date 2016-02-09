@@ -20,7 +20,7 @@ CREATE TABLE dbo.[People] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
-	[Dob] DATETIME NOT NULL
+	[Dob] DATETIME NULL
 )
 
 CREATE TABLE dbo.[Orders] (
@@ -44,7 +44,7 @@ CREATE TABLE dbo.[SpecificPeople] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
-	[Dob] DATETIME NOT NULL
+	[Dob] DATETIME NULL
 )
 
 CREATE TABLE dbo.[SpecificOrders] (
@@ -98,10 +98,10 @@ CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
 	[TestColumn1] VARBINARY(32)
 )
 
-IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_10R9LZYK')
-	DROP TABLE dbo.[BugInvestigation_10R9LZYK]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_64O6LT8U')
+	DROP TABLE dbo.[BugInvestigation_64O6LT8U]
 
-CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
+CREATE TABLE dbo.[BugInvestigation_64O6LT8U] (
 	[ColumnA] VARCHAR(20),
 	[Column2] VARCHAR(20),
 )
