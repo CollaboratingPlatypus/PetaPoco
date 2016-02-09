@@ -46,7 +46,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
                 switch (Type.GetTypeCode(type))
                 {
                     case TypeCode.DateTime:
-                        return o => ((DateTime) o).Ticks;
+                        return o => ((DateTime?) o)?.Ticks;
                 }
 
                 return null;

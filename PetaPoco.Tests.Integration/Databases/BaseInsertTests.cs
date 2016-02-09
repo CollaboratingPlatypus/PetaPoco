@@ -151,5 +151,17 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
             DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
         }
+
+        [Fact]
+        public void Insert_GivenPocoWithNullDateTime_ShouldNotThrow()
+        {
+            _person.Dob = null;
+            DB.Insert(_person);
+
+            var personOther = DB.Single<Person>(_person.Id);
+
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+        }
     }
 }
