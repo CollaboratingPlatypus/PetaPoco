@@ -174,6 +174,7 @@
     <Compile Include="Databases\Sqlite\SqliteExecuteTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
+    <Compile Include="Documentation\Inserts.cs" />
     <Compile Include="Models\Note.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
