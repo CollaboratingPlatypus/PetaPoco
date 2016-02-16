@@ -1187,7 +1187,9 @@ namespace PetaPoco
             if (poco == null)
                 throw new ArgumentNullException("poco");
 
-            return ExecuteInsert(tableName, null, false, poco);
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+
+            return ExecuteInsert(tableName, pd == null ? null : pd.TableInfo.PrimaryKey, pd != null && pd.TableInfo.AutoIncrement, poco);
         }
 
         /// <summary>
@@ -1208,7 +1210,13 @@ namespace PetaPoco
             if (poco == null)
                 throw new ArgumentNullException("poco");
 
-            return ExecuteInsert(tableName, primaryKeyName, true, poco);
+            var t = poco.GetType();
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement ||
+                                t.Name.Contains("AnonymousType") &&
+                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+
+            return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
 
         /// <summary>
@@ -1322,7 +1330,7 @@ namespace PetaPoco
                         object id = _provider.ExecuteInsert(this, cmd, primaryKeyName);
 
                         // Assign the ID back to the primary key property
-                        if (primaryKeyName != null)
+                        if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
                         {
                             PocoColumn pc;
                             if (pd.Columns.TryGetValue(primaryKeyName, out pc))
