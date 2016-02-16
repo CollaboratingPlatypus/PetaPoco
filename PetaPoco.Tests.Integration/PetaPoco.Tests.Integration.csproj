@@ -176,6 +176,7 @@
     <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
     <Compile Include="Documentation\Inserts.cs" />
     <Compile Include="Models\Note.cs" />
+    <Compile Include="Models\NoteNullablePrimary.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />
