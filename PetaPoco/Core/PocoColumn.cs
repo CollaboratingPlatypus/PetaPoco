@@ -28,7 +28,11 @@ namespace PetaPoco.Core
 
         public virtual object ChangeType(object val)
         {
-            return Convert.ChangeType(val, PropertyInfo.PropertyType);
+            var t = PropertyInfo.PropertyType;
+            if (val.GetType().IsValueType && PropertyInfo.PropertyType.IsGenericType && PropertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                t = t.GetGenericArguments()[0];
+
+            return Convert.ChangeType(val, t);
         }
     }
 }

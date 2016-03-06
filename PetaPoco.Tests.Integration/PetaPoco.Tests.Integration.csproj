@@ -153,6 +153,7 @@
     <Compile Include="Databases\MySQL\MySqlDatabaseTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDBTestProvider.cs" />
     <Compile Include="Databases\MySQL\MySqlDeleteTests.cs" />
+    <Compile Include="Databases\MySQL\MySqlMiscellaneousTests.cs" />
     <Compile Include="Databases\MySQL\MySqlQueryLinqTests.cs" />
     <Compile Include="Databases\MySQL\MySqlInsertTests.cs" />
     <Compile Include="Databases\MySQL\MySqlExecuteTests.cs" />
@@ -174,7 +175,9 @@
     <Compile Include="Databases\Sqlite\SqliteExecuteTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
+    <Compile Include="Documentation\Inserts.cs" />
     <Compile Include="Models\Note.cs" />
+    <Compile Include="Models\NoteNullablePrimary.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
     <Compile Include="Models\OrderStatus.cs" />

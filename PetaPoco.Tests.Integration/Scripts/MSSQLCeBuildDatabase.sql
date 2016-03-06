@@ -12,7 +12,7 @@ CREATE TABLE [People] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
-	[Dob] DATETIME NOT NULL
+	[Dob] DATETIME NULL
 );
 
 CREATE TABLE [Orders] (
@@ -36,7 +36,7 @@ CREATE TABLE [SpecificPeople] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
-	[Dob] DATETIME NOT NULL
+	[Dob] DATETIME NULL
 );
 
 CREATE TABLE [SpecificOrders] (

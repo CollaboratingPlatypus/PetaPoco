@@ -113,6 +113,9 @@ namespace PetaPoco
             };
             IsPrimaryKeyAutoIncrement = t =>
             {
+                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    t = t.GetGenericArguments()[0];
+
                 if (t == typeof(long) || t == typeof(ulong))
                     return true;
                 if (t == typeof(int) || t == typeof(uint))
