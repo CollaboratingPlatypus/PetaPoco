@@ -153,6 +153,7 @@
     <Compile Include="Databases\MySQL\MySqlDatabaseTests.cs" />
     <Compile Include="Databases\MySQL\MySqlDBTestProvider.cs" />
     <Compile Include="Databases\MySQL\MySqlDeleteTests.cs" />
+    <Compile Include="Databases\MySQL\MySqlMiscellaneousTests.cs" />
     <Compile Include="Databases\MySQL\MySqlQueryLinqTests.cs" />
     <Compile Include="Databases\MySQL\MySqlInsertTests.cs" />
     <Compile Include="Databases\MySQL\MySqlExecuteTests.cs" />
