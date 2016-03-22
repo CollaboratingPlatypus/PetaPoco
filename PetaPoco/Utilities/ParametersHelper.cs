@@ -68,7 +68,12 @@ namespace PetaPoco.Internal
                 }
                 else
                 {
-                    args_dest.Add(arg_val);
+                    var argValCopy = arg_val;
+                    if (argValCopy is ICloneable)
+                    {   // Using a clone prevents the error "The SqlParameter is already contained by another SqlParameterCollection" if the parameter is a SqlParameter, rather than a value type.
+                        argValCopy = ((ICloneable)argValCopy).Clone();
+                    }
+                    args_dest.Add(argValCopy);
                     return "@" + (args_dest.Count - 1).ToString();
                 }
             }
