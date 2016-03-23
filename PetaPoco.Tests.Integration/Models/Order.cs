@@ -5,6 +5,7 @@
 // <date>2015/12/07</date>
 
 using System;
+using System.Collections.Generic;
 using Shouldly;
 
 namespace PetaPoco.Tests.Integration.Models
@@ -31,6 +32,10 @@ namespace PetaPoco.Tests.Integration.Models
 
         [Column("OrderStatus")]
         public OrderStatus Status { get; set; }
+
+        public Person Person { get; set; }
+
+        public List<OrderLine> OrderLines { get; set; }
 
         public void ShouldBe(Order other)
         {
