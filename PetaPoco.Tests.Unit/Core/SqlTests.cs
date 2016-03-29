@@ -191,6 +191,44 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
+        public void Append_GivenConsecutiveSets_ShouldBeValid()
+        {
+            _sql = new Sql()
+                .Append("UPDATE blah");
+
+            _sql.Append("SET a = 1");
+            _sql.Append("SET b = 2");
+
+            _sql.SQL.ShouldBe("UPDATE blah\nSET a = 1\n, b = 2");
+        }
+
+        [Fact]
+        public void Set_GivenConsecutiveSets_ShouldBeValid()
+        {
+            _sql = new Sql()
+                .Append("UPDATE blah");
+
+            _sql.Set("a = 1");
+            _sql.Set("b = 2");
+
+            _sql.SQL.ShouldBe("UPDATE blah\nSET a = 1\n, b = 2");
+        }
+
+        [Fact]
+        public void Append_GivenConsecutiveSetsAndWheres_ShouldBeValid()
+        {
+            _sql = new Sql()
+                .Append("UPDATE blah");
+
+            _sql.Append("SET a = 1");
+            _sql.Append("SET b = 2");
+            _sql.Append("WHERE x");
+            _sql.Append("WHERE y");
+
+            _sql.SQL.ShouldBe("UPDATE blah\nSET a = 1\n, b = 2\nWHERE x\nAND y");
+        }
+
+        [Fact]
         public void Append_GivenConsecutiveWheres_ShouldBeValid()
         {
             _sql = new Sql()
