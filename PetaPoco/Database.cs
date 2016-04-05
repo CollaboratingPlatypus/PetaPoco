@@ -466,6 +466,11 @@ namespace PetaPoco
                     p.Size = Math.Max((value as AnsiString).Value.Length + 1, 4000);
                     p.Value = (value as AnsiString).Value;
                     p.DbType = DbType.AnsiString;
+                    if(p is System.Data.SqlClient.SqlParameter)
+                    {
+                        var cast = p as System.Data.SqlClient.SqlParameter;
+                        cast.SqlDbType = SqlDbType.VarChar;
+                    }
                 }
                 else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
                 {
