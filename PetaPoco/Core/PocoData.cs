@@ -335,9 +335,10 @@ namespace PetaPoco.Core
             // Forced type conversion including integral types -> enum
             if (dstType.IsEnum && IsIntegralType(srcType))
             {
-                if (srcType != typeof(int))
+                var baseType = Enum.GetUnderlyingType(dstType);
+                if (srcType != baseType)
                 {
-                    return delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
+                    return delegate (object src) { return Convert.ChangeType(src, baseType, null); };
                 }
             }
             else if (!dstType.IsAssignableFrom(srcType))
