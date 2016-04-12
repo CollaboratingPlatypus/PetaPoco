@@ -133,7 +133,6 @@
     <Compile Include="Databases\MSSQLCe\MssqlCeDeleteTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeExecuteTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeInsertTests.cs" />
-    <Compile Include="Databases\MSSQLCe\MssqlCeQueryTests2.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeUpdateTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeQueryLinqTests.cs" />
     <Compile Include="Databases\MSSQLCe\MssqlCeQueryTests.cs" />
