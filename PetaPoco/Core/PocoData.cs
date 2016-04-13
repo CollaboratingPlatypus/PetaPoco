@@ -332,12 +332,25 @@ namespace PetaPoco.Core
                 return delegate(object src) { return new DateTime(((DateTime) src).Ticks, DateTimeKind.Utc); };
             }
 
+            // unwrap nullable types
+            Type underlyingDstType = Nullable.GetUnderlyingType(dstType);
+            if (underlyingDstType != null)
+            {
+                dstType = underlyingDstType;
+            }
+
             // Forced type conversion including integral types -> enum
             if (dstType.IsEnum && IsIntegralType(srcType))
             {
-                if (srcType != typeof(int))
+                var backingDstType = Enum.GetUnderlyingType(dstType);
+                if (underlyingDstType != null)
                 {
-                    return delegate(object src) { return Convert.ChangeType(src, typeof(int), null); };
+                    // if dstType is Nullable<Enum>, convert to enum value
+                    return delegate (object src) { return Enum.ToObject(dstType, src); };
+                }
+                else if (srcType != backingDstType)
+                {
+                    return delegate (object src) { return Convert.ChangeType(src, backingDstType, null); };
                 }
             }
             else if (!dstType.IsAssignableFrom(srcType))
