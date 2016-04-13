@@ -138,6 +138,9 @@ namespace PetaPoco
                     sql = "AND " + sql.Substring(6);
                 if (Is(lhs, "ORDER BY ") && Is(this, "ORDER BY "))
                     sql = ", " + sql.Substring(9);
+                // add set clause
+                if (Is(lhs, "SET ") && Is(this, "SET "))
+                    sql = ", " + sql.Substring(4);
 
                 sb.Append(sql);
             }
@@ -145,6 +148,17 @@ namespace PetaPoco
             // Now do rhs
             if (_rhs != null)
                 _rhs.Build(sb, args, this);
+        }
+
+        /// <summary>
+        ///     Appends an SQL SET clause to this SQL builder
+        /// </summary>
+        /// <param name="sql">The SET clause like "{field} = {value}"</param>
+        /// <param name="args">Arguments to any parameters embedded in the supplied SQL</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        public Sql Set(string sql, params object[] args)
+        {
+            return Append(new Sql("SET " + sql, args));
         }
 
         /// <summary>
