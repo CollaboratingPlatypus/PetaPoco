@@ -138,7 +138,6 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             });
         }
         
-        #region Multi-result set Tests
         [Fact]
         public void Query_MultiResultsSet_SingleResultsSetSinglePoco__ShouldReturnValidPocoCollection()
         {
@@ -267,8 +266,5 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
                 secondOrderLine.SellPrice.ShouldBe(19.98m);
             });
         }
-
-        #endregion
-
     }
 }
