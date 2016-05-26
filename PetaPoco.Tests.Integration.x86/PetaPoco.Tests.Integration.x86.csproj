@@ -43,6 +43,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -68,6 +69,54 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseDatabase.cs">
+      <Link>Databases\BaseDatabase.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseDatabaseTests.cs">
+      <Link>Databases\BaseDatabaseTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseDeleteTests.cs">
+      <Link>Databases\BaseDeleteTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseExecuteTests.cs">
+      <Link>Databases\BaseExecuteTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseInsertTests.cs">
+      <Link>Databases\BaseInsertTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseQueryLinqTests.cs">
+      <Link>Databases\BaseQueryLinqTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseQueryTests.cs">
+      <Link>Databases\BaseQueryTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseUpdateTests.cs">
+      <Link>Databases\BaseUpdateTests.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\DBTestProvider.cs">
+      <Link>Databases\DBTestProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Note.cs">
+      <Link>Models\Note.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\NoteNullablePrimary.cs">
+      <Link>Models\NoteNullablePrimary.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Order.cs">
+      <Link>Models\Order.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderLine.cs">
+      <Link>Models\OrderLine.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderStatus.cs">
+      <Link>Models\OrderStatus.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Person.cs">
+      <Link>Models\Person.cs</Link>
+    </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\TransactionLog.cs">
+      <Link>Models\TransactionLog.cs</Link>
+    </Compile>
     <Compile Include="Databases\MSAccess\MsAccessDatabaseTests.cs" />
     <Compile Include="Databases\MSAccess\MsAccessDBTestProvider.cs" />
     <Compile Include="Databases\MSAccess\MsAccessDeleteTests.cs" />
@@ -79,7 +128,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="PetaPoco.Tests.Integration.x86.ruleset">
       <SubType>Designer</SubType>
@@ -94,10 +145,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PetaPoco.Tests.Integration\PetaPoco.Tests.Integration.csproj">
-      <Project>{560cd8e5-d810-4a57-a5fe-4e39d97662cc}</Project>
-      <Name>PetaPoco.Tests.Integration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PetaPoco\PetaPoco.csproj">
       <Project>{33699753-151d-4100-8f12-9ae1aeb5c5bd}</Project>
       <Name>PetaPoco</Name>
