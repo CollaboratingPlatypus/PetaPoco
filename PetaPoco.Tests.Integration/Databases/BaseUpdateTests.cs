@@ -28,6 +28,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             Quantity = 5,
             SellPrice = 4.99m,
+            Status = OrderLineStatus.Pending
         };
 
         private Person _person = new Person
@@ -279,6 +280,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             orderLine.Quantity = 6;
             orderLine.SellPrice = 5.99m;
+            orderLine.Status = OrderLineStatus.Allocated;
         }
     }
 }

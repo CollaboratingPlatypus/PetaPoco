@@ -180,6 +180,7 @@
     <Compile Include="Models\NoteNullablePrimary.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderLine.cs" />
+    <Compile Include="Models\OrderLineStatus.cs" />
     <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\TransactionLog.cs" />

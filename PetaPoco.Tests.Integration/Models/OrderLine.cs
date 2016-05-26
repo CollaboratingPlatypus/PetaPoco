@@ -24,6 +24,9 @@ namespace PetaPoco.Tests.Integration.Models
         [Column]
         public decimal SellPrice { get; set; }
 
+        [Column]
+        public OrderLineStatus Status { get; set; }
+
         [ResultColumn]
         public decimal Total
         {
@@ -35,6 +38,7 @@ namespace PetaPoco.Tests.Integration.Models
             Id.ShouldBe(other.Id);
             OrderId.ShouldBe(other.OrderId);
             Quantity.ShouldBe(other.Quantity);
+            Status.ShouldBe(other.Status);
             SellPrice.ShouldBe(other.SellPrice);
         }
 
@@ -51,6 +55,7 @@ namespace PetaPoco.Tests.Integration.Models
                 OrderId.ShouldNotBe(other.OrderId);
             }
             Quantity.ShouldNotBe(other.Quantity);
+            Status.ShouldNotBe(other.Status);
             SellPrice.ShouldNotBe(other.SellPrice);
         }
     }

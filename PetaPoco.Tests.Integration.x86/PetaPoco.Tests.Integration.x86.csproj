@@ -108,6 +108,9 @@
     <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderLine.cs">
       <Link>Models\OrderLine.cs</Link>
     </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderLineStatus.cs">
+      <Link>Models\OrderLineStatus.cs</Link>
+    </Compile>
     <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderStatus.cs">
       <Link>Models\OrderStatus.cs</Link>
     </Compile>

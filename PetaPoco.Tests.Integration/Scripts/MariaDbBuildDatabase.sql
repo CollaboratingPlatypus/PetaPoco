@@ -29,6 +29,7 @@ CREATE TABLE `OrderLines` (
 	`Id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	`OrderId` INT NOT NULL,
 	`Qty` SMALLINT NOT NULL,
+	`Status` SMALLINT NOT NULL,
 	`SellPrice` DECIMAL(10, 4) NOT NULL,
 	FOREIGN KEY `FK_OrderLines_Orders`(`OrderId`) REFERENCES `Orders`(`Id`)
 ) ENGINE=INNODB;
@@ -55,6 +56,7 @@ CREATE TABLE `SpecificOrderLines` (
 	`Id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	`OrderId` INT NOT NULL,
 	`Qty` SMALLINT NOT NULL,
+	`Status` SMALLINT NOT NULL,
 	`SellPrice` DECIMAL(10, 4) NOT NULL,
 	FOREIGN KEY FK_SpecificOrderLines_SpecificOrders(OrderId) REFERENCES SpecificOrders(Id)
 ) ENGINE=INNODB;
