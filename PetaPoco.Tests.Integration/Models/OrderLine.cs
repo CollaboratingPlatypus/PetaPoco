@@ -25,7 +25,10 @@ namespace PetaPoco.Tests.Integration.Models
         public decimal SellPrice { get; set; }
 
         [ResultColumn]
-        public decimal Total { get; set; }
+        public decimal Total
+        {
+            get { return SellPrice * Quantity; }
+        }
 
         public void ShouldBe(OrderLine other)
         {

@@ -405,14 +405,13 @@ namespace PetaPoco.Tests.Integration.Databases
                 };
                 DB.Insert(order);
 
-                for (var j = 0; j < 2; j++)
+                for (var j = 1; j <= 2; j++)
                 {
                     DB.Insert(new OrderLine
                     {
                         OrderId = order.Id,
                         Quantity = (short) j,
-                        SellPrice = 9.99m * j,
-                        Total = 9.99m * j * j
+                        SellPrice = 9.99m * j
                     });
                 }
             }
