@@ -577,5 +577,21 @@ namespace PetaPoco
         /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
         /// <returns>A collection of POCO's as a List</returns>
         List<T1> Fetch<T1, T2, T3, T4>(Sql sql);
+
+        /// <summary> 
+        /// Perform a multi-results set query 
+        /// </summary> 
+        /// <param name="sql">An SQL builder object representing the query and it's arguments</param> 
+        /// <returns>A GridReader to be queried</returns> 
+        IGridReader QueryMultiple(Sql sql);
+
+
+        /// <summary> 
+        /// Perform a multi-results set query 
+        /// </summary> 
+        /// <param name="sql">The SQL query to be executed</param> 
+        /// <param name="args">Arguments to any embedded parameters in the SQL</param> 
+        /// <returns>A GridReader to be queried</returns>
+        IGridReader QueryMultiple(string sql, params object[] args);
     }
 }
