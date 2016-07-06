@@ -52,6 +52,8 @@
     <Compile Include="Core\AnsiString.cs" />
     <Compile Include="Core\ColumnInfo.cs" />
     <Compile Include="Core\ConventionMapper.cs" />
+    <Compile Include="Core\GridReader.cs" />
+    <Compile Include="Core\IGridReader.cs" />
     <Compile Include="Core\Inflection\Inflector.cs" />
     <Compile Include="Core\IProvider.cs" />
     <Compile Include="Core\ITransaction.cs" />

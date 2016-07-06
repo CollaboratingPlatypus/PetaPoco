@@ -36,6 +36,7 @@ CREATE TABLE dbo.[OrderLines] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[OrderId] INT NOT NULL FOREIGN KEY REFERENCES dbo.[Orders](Id),
 	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
 	[SellPrice] NUMERIC(10, 4) NOT NULL
 )
 
@@ -60,6 +61,7 @@ CREATE TABLE dbo.[SpecificOrderLines] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[OrderId] INT NOT NULL FOREIGN KEY REFERENCES dbo.[SpecificOrders](Id),
 	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
 	[SellPrice] NUMERIC(10, 4) NOT NULL
 )
 

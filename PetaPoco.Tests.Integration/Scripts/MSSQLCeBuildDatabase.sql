@@ -28,6 +28,7 @@ CREATE TABLE [OrderLines] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[OrderId] INT NOT NULL REFERENCES [Orders](Id),
 	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
 	[SellPrice] NUMERIC(10, 4) NOT NULL
 );
 
@@ -52,6 +53,7 @@ CREATE TABLE [SpecificOrderLines] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[OrderId] INT NOT NULL REFERENCES [SpecificOrders](Id),
 	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
 	[SellPrice] NUMERIC(10, 4) NOT NULL
 );
 

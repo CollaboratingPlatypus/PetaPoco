@@ -29,6 +29,7 @@ CREATE TABLE "OrderLines" (
 	"Id" SERIAL PRIMARY KEY NOT NULL,
 	"OrderId" INT NOT NULL,
 	"Qty" SMALLINT NOT NULL,
+	"Status" SMALLINT NOT NULL,
 	"SellPrice" NUMERIC(10, 4) NOT NULL,
 	CONSTRAINT "FK_OrderLines_Orders" FOREIGN KEY ("OrderId") REFERENCES "Orders"("Id")
 );
@@ -55,6 +56,7 @@ CREATE TABLE "SpecificOrderLines" (
 	"Id" SERIAL PRIMARY KEY NOT NULL,
 	"OrderId" INT NOT NULL,
 	"Qty" SMALLINT NOT NULL,
+	"Status" SMALLINT NOT NULL,
 	"SellPrice" NUMERIC(10, 4) NOT NULL,
 	CONSTRAINT "FK_SpecificOrderLines_SpecificOrders" FOREIGN KEY ("OrderId") REFERENCES "SpecificOrders"("Id")
 );

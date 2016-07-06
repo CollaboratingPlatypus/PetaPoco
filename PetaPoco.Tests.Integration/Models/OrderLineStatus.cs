@@ -6,11 +6,10 @@
 
 namespace PetaPoco.Tests.Integration.Models
 {
-    public enum OrderStatus
+    public enum OrderLineStatus : byte
     {
-        Pending,
-        Accepted,
-        Rejected,
-        Deleted
+        Allocated,
+        Backorder,
+        Pending
     }
 }

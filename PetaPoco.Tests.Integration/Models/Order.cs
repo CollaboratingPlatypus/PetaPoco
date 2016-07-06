@@ -2,9 +2,10 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/07</date>
+// <date>2016/05/27</date>
 
 using System;
+using System.Collections.Generic;
 using Shouldly;
 
 namespace PetaPoco.Tests.Integration.Models
@@ -31,6 +32,10 @@ namespace PetaPoco.Tests.Integration.Models
 
         [Column("OrderStatus")]
         public OrderStatus Status { get; set; }
+
+        public Person Person { get; set; }
+
+        public List<OrderLine> OrderLines { get; set; }
 
         public void ShouldBe(Order other)
         {
