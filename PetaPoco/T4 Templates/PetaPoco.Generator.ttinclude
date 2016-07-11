@@ -8,8 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace <#=Namespace #>
 {
@@ -152,7 +150,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 <# } #>
 <# } #>
 <# if (tbl.PK!=null && !tbl.PK.IsAutoIncrement) { #>
-	[PrimaryKey("<#=tbl.PK.Name#>", autoIncrement=false)]
+	[PrimaryKey("<#=tbl.PK.Name#>", AutoIncrement=false)]
 <# } #>
 <# if (ExplicitColumns) { #>
 	[ExplicitColumns]
