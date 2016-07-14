@@ -91,6 +91,7 @@ bool GenerateCommon = true;
 bool GeneratePocos = true;
 bool ExplicitColumns = true;
 bool TrackModifiedColumns = false;
+string[] ExcludePrefix = new string[] {};
 
 
 public class Table
@@ -419,6 +420,10 @@ Tables LoadTables()
 					result.RemoveAt(i);
 					continue;
 				}
+				if(StartsWithAny(result[i].ClassName, ExcludePrefix)) {
+					result.RemoveAt(i);
+					continue;
+				}
 			}
 
 			conn.Close();
@@ -454,6 +459,14 @@ Tables LoadTables()
 	}
 
         
+}
+
+bool StartsWithAny(string s, IEnumerable<string> items)
+{
+    if (s == null)
+        return false;
+
+    return items.Any(i => s.StartsWith(i));
 }
 
 abstract class SchemaReader

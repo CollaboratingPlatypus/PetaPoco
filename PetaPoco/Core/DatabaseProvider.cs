@@ -196,8 +196,6 @@ namespace PetaPoco.Core
                 return Singleton<OracleDatabaseProvider>.Instance;
             if (typeName.StartsWith("SQLite"))
                 return Singleton<SQLiteDatabaseProvider>.Instance;
-            if (typeName.StartsWith("Oracle"))
-                return Singleton<OracleDatabaseProvider>.Instance;
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
                 return Singleton<SqlServerDatabaseProvider>.Instance;
             if (typeName.StartsWith("FbConnection") || typeName.EndsWith("FirebirdClientFactory"))
@@ -238,8 +236,6 @@ namespace PetaPoco.Core
                 return Singleton<OracleDatabaseProvider>.Instance;
             if (providerName.IndexOf("SQLite", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SQLiteDatabaseProvider>.Instance;
-            if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
-                return Singleton<OracleDatabaseProvider>.Instance;
             if (providerName.IndexOf("Firebird", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("FbConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
