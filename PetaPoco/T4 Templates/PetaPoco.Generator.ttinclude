@@ -153,7 +153,9 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 <# if (tbl.PK!=null && !tbl.PK.IsAutoIncrement) { #>
 	[PrimaryKey("<#=tbl.PK.Name#>", AutoIncrement=false)]
 <# } #>
+<# if (ExplicitColumns) { #>
 	[ExplicitColumns]
+<# } #>
     public partial class <#=tbl.ClassName#> <# if (GenerateOperations) { #>: <#=RepoName#>.Record<<#=tbl.ClassName#>> <# } #> 
     {
 <#
@@ -165,7 +167,9 @@ foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 <# if (col.Name!=col.PropertyName) { #>
         [Column("<#=col.Name#>")] 
 <# } else { #>
+<# if (ExplicitColumns) { #>
         [Column] 
+<# } #>
 <# } #>
 		public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> 
 		{ 
@@ -185,7 +189,7 @@ foreach(Column col in from c in tbl.Columns where !c.Ignore select c)
 <# if (col.Name!=col.PropertyName) { #>
 		[Column("<#=col.Name#>")] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
 <# } else { #>
-		[Column] public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
+		<# if (ExplicitColumns) { #>[Column] <# } #>public <#=col.PropertyType #><#=CheckNullable(col)#> <#=col.PropertyName #> { get; set; }
 <# } #>
 <# } #>
 <# } #>

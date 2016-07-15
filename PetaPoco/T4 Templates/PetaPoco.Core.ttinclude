@@ -89,6 +89,7 @@ bool IncludeViews = false;
 bool GenerateOperations = false;
 bool GenerateCommon = true;
 bool GeneratePocos = true;
+bool ExplicitColumns = true;
 bool TrackModifiedColumns = false;
 string[] ExcludePrefix = new string[] {};
 
