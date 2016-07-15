@@ -32,4 +32,3 @@
 #>
 <#@ include file="PetaPoco.Generator.ttinclude" #>
 <# } #>
-
