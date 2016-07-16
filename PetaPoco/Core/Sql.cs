@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2016/07/16</date>
 
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Instantiate a new SQL Builder object.  Weirdly implemented as a property but makes
-        ///     for more elegantly readble fluent style construction of SQL Statements
+        ///     for more elegantly readable fluent style construction of SQL Statements
         ///     eg: db.Query(Sql.Builder.Append(....))
         /// </summary>
         public static Sql Builder
@@ -107,7 +107,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Append an SQL fragement to the right-hand-side of this SQL builder
+        ///     Append an SQL fragment to the right-hand-side of this SQL builder
         /// </summary>
         /// <param name="sql">The SQL statement or fragment</param>
         /// <param name="args">Arguments to any parameters embedded in the SQL</param>
@@ -124,7 +124,7 @@ namespace PetaPoco
 
         private void Build(StringBuilder sb, List<object> args, Sql lhs)
         {
-            if (!String.IsNullOrEmpty(_sql))
+            if (!string.IsNullOrEmpty(_sql))
             {
                 // Add SQL to the string
                 if (sb.Length > 0)
@@ -179,19 +179,17 @@ namespace PetaPoco
         /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
         public Sql OrderBy(params object[] columns)
         {
-            return Append(new Sql("ORDER BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+            return Append(new Sql("ORDER BY " + string.Join(", ", (from x in columns select x.ToString()).ToArray())));
         }
 
         /// <summary>
         ///     Appends an SQL SELECT clause to this SQL builder
         /// </summary>
-        /// <param name="columns">
-        ///     A collection of SQL column names to select
-        ///     <param>
-        ///         <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="columns">A collection of SQL column names to select</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
         public Sql Select(params object[] columns)
         {
-            return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+            return Append(new Sql("SELECT " + string.Join(", ", (from x in columns select x.ToString()).ToArray())));
         }
 
         /// <summary>
@@ -201,7 +199,7 @@ namespace PetaPoco
         /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
         public Sql From(params object[] tables)
         {
-            return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
+            return Append(new Sql("FROM " + string.Join(", ", (from x in tables select x.ToString()).ToArray())));
         }
 
         /// <summary>
@@ -211,12 +209,12 @@ namespace PetaPoco
         /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
         public Sql GroupBy(params object[] columns)
         {
-            return Append(new Sql("GROUP BY " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+            return Append(new Sql("GROUP BY " + string.Join(", ", (from x in columns select x.ToString()).ToArray())));
         }
 
-        private SqlJoinClause Join(string JoinType, string table)
+        private SqlJoinClause Join(string joinType, string table)
         {
-            return new SqlJoinClause(Append(new Sql(JoinType + table)));
+            return new SqlJoinClause(Append(new Sql(joinType + table)));
         }
 
         /// <summary>
