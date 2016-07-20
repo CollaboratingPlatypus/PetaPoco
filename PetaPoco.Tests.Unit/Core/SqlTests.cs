@@ -350,5 +350,21 @@ namespace PetaPoco.Tests.Unit.Core
                 .ShouldBe(
                     @"UPDATE [Resource] SET [ResourceName] = @0,[ResourceDescription] = @1,[ResourceContent] = @2,[ResourceData] = @3,[ResourceGUID] = @4,[LaunchPath] = @5,[ResourceType] = @6,[ContentType] = @7,[SchoolID] = @8,[DistrictID] = @9,[IsActive] = @10,[UpdatedBy] = @11,[UpdatedDate] = @12,[Extension] = @13 WHERE ResourceID=@14");
         }
+
+        [Fact]
+        [Description("Investigation of reported bug #106")]
+        public void Sql_CacheShouldBeResetAfterAdditionalChanges_ShouldBeValid()
+        {
+            _sql.Select("field");
+            var sqlCapture1 = _sql.SQL;
+            _sql.From("myTable");
+            var sqlCapture2 = _sql.SQL;
+            _sql.Where("id = @0", 1);
+            var sqlCapture3 = _sql.SQL;
+
+            sqlCapture1.Replace("\n", " ").ShouldBe("SELECT field");
+            sqlCapture2.Replace("\n", " ").ShouldBe("SELECT field FROM myTable");
+            sqlCapture3.Replace("\n", " ").ShouldBe("SELECT field FROM myTable WHERE (id = @0)");
+        }
     }
 }

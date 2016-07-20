@@ -563,7 +563,9 @@ class SqlServerSchemaReader : SchemaReader
 					col.PropertyName=CleanUp(col.Name);
 					col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
 					col.IsNullable=rdr["IsNullable"].ToString()=="YES";
-					col.IsAutoIncrement=((int)rdr["IsIdentity"])==1;
+					col.IsAutoIncrement=((int)rdr["IsIdentity"])==1 || 
+							(!DBNull.Value.Equals(rdr["DefaultSetting"]) && ((string)rdr["DefaultSetting"] == "(newsequentialid())" ||
+							(string)rdr["DefaultSetting"] == "(newid())"));
 					result.Add(col);
 				}
 			}
