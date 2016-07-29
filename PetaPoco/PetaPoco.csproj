@@ -33,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
     <CodeAnalysisRuleSet>PetaPoco.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\v4.0\PetaPoco.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
     <DefineConstants>$(DefineConstants);NET40</DefineConstants>
