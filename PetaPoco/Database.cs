@@ -1297,7 +1297,7 @@ namespace PetaPoco
                             }
 
                             names.Add(_provider.EscapeSqlIdentifier(i.Key));
-                            values.Add(string.Format("{0}{1}", _paramPrefix, index++));
+                            values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
                             AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
                         }
 
@@ -1551,7 +1551,7 @@ namespace PetaPoco
                                 // Build the sql
                                 if (index > 0)
                                     sb.Append(", ");
-                                sb.AppendFormat("{0} = {1}{2}", _provider.EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
+                                sb.AppendFormat(i.Value.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
 
                                 // Store the parameter in the command
                                 AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
@@ -1566,7 +1566,7 @@ namespace PetaPoco
                                 // Build the sql
                                 if (index > 0)
                                     sb.Append(", ");
-                                sb.AppendFormat("{0} = {1}{2}", _provider.EscapeSqlIdentifier(colname), _paramPrefix, index++);
+                                sb.AppendFormat(pc.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(colname), _paramPrefix, index++);
 
                                 // Store the parameter in the command
                                 AddParam(cmd, pc.GetValue(poco), pc.PropertyInfo);

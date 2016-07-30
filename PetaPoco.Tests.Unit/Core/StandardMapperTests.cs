@@ -94,6 +94,7 @@ namespace PetaPoco.Tests.Unit.Core
         {
             var columnInfo1 = _mapper.GetColumnInfo(typeof(TeraEntity).GetProperty(nameof(TeraEntity.TheId)));
             var columnInfo2 = _mapper.GetColumnInfo(typeof(TeraEntity).GetProperty(nameof(TeraEntity.AnotherColumn)));
+            var columnInfo3 = _mapper.GetColumnInfo(typeof(TeraEntity).GetProperty(nameof(TeraEntity.ColumnWithInsertTemplate)));
 
             columnInfo1.ColumnName.ShouldBe("Id");
             columnInfo1.ForceToUtc.ShouldBeFalse();
@@ -102,6 +103,10 @@ namespace PetaPoco.Tests.Unit.Core
             columnInfo2.ColumnName.ShouldBe("another_column");
             columnInfo2.ForceToUtc.ShouldBeFalse();
             columnInfo2.ResultColumn.ShouldBeFalse();
+
+            columnInfo3.ColumnName.ShouldBe("ColumnWithInsertTemplate");
+            columnInfo3.InsertTemplate.ShouldBe("test");
+            columnInfo3.UpdateTemplate.ShouldBe("test1");
         }
 
         [Fact]
@@ -151,6 +156,9 @@ namespace PetaPoco.Tests.Unit.Core
 
             [Column(ForceToUtc = true)]
             public DateTime Created { get; set; }
+
+            [Column(InsertTemplate = "test", UpdateTemplate = "test1")]
+            public string ColumnWithInsertTemplate { get; set; }
         }
 
         [TableName("yotta_entities")]
