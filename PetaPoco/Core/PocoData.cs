@@ -57,6 +57,8 @@ namespace PetaPoco.Core
                 pc.ColumnName = ci.ColumnName;
                 pc.ResultColumn = ci.ResultColumn;
                 pc.ForceToUtc = ci.ForceToUtc;
+                pc.InsertTemplate = ci.InsertTemplate;
+                pc.UpdateTemplate = ci.UpdateTemplate;
 
                 // Store it
                 Columns.Add(pc.ColumnName, pc);
