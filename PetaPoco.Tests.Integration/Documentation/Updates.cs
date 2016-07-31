@@ -16,118 +16,144 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("MssqlTests")]
-    public class Inserts : BaseDatabase
+    public class Updates : BaseDatabase
     {
-        public Inserts()
+        public Updates()
             : base(new MssqlDBTestProvider())
         {
             PocoData.FlushCaches();
         }
 
         [Fact]
-        public void Insert()
+        public void Update()
         {
-            // Create the person
+            // Create and insert the person
             var person = new Person { Id = Guid.NewGuid(), Name = "PetaPoco", Dob = new DateTime(2011, 1, 1), Age = (DateTime.Now.Year - 2011), Height = 242 };
-
-            // Tell PetaPoco to insert it
             var id = DB.Insert(person);
 
-            // Obviously the ID returned will be the same at the one we set
-            id.ShouldBe(person.Id);
+            // Update a few properties of the person
+            person.Age = 70;
+            person.Name = "The PetaPoco";
+
+            // Tell PetaPoco to update the DB
+            DB.Update(person);
 
             // Get a clone/copy from the DB
             var clone = DB.Single<Person>(id);
 
-            // See, they're are the same
-            clone.ShouldBe(person);
-
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
-            person.Equals(clone).ShouldBeFalse();
+            // See, the person has been updated
+            clone.Id.ShouldBe(person.Id);
+            clone.Dob.ShouldBe(person.Dob);
+            clone.Height.ShouldBe(person.Height);
+            clone.Age.ShouldBe(person.Age);
+            clone.Name.ShouldBe(person.Name);
         }
 
         [Fact]
-        public void InsertAutoIncrement()
+        public void UpdatePartial()
         {
+            // Create and insert the person
             var person = new Person { Id = Guid.NewGuid(), Name = "PetaPoco", Dob = new DateTime(2011, 1, 1), Age = (DateTime.Now.Year - 2011), Height = 242 };
-            DB.Insert(person);
+            var id = DB.Insert(person);
 
-            // Create the order
-            var order = new Order { PersonId = person.Id, PoNumber = "PETAPOCO", Status = OrderStatus.Pending, CreatedBy = "Office PetaPoco", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
+            // Update a few properties of the person
+            person.Age = 70;
+            person.Name = "The PetaPoco";
 
-            // Tell PetaPoco to insert it
-            var id = DB.Insert(order);
+            // Get the poco data
+            var pocoData = PocoData.ForType(person.GetType(), DB.DefaultMapper);
 
-            // PetaPoco updates the POCO's ID for us, see
-            id.ShouldBe(order.Id);
+            // Tell PetaPoco to update only ther person's name
+            // The update statement produced is `UPDATE [People] SET [FullName] = @0 WHERE [Id] = @1`
+            DB.Update(person, new [] { pocoData.GetColumnName(nameof(Person.Name)) });
 
             // Get a clone/copy from the DB
-            var clone = DB.Single<Order>(id);
+            var clone = DB.Single<Person>(id);
 
-            // See, they're are the same
-            clone.ShouldBe(order);
+            // See, the person has been updated, but only the name
+            clone.Id.ShouldBe(person.Id);
+            clone.Dob.ShouldBe(person.Dob);
+            clone.Height.ShouldBe(person.Height);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
-            order.Equals(clone).ShouldBeFalse();
+            clone.Age.ShouldNotBe(70);
+            clone.Name.ShouldBe("The PetaPoco");
         }
 
         [Fact]
-        public void InsertToDifferentTable()
+        public void UpdateToDifferentTable()
         {
-            // Create the person
+            // Create the and insert the person
             var person = new Person { Id = Guid.NewGuid(), Name = "PetaPoco", Dob = new DateTime(2011, 1, 1), Age = (DateTime.Now.Year - 2011), Height = 242 };
+            var id = DB.Insert("SpecificPeople", "Id", person);
 
-            // Tell PetaPoco to insert it, but to the "SpecificPeople" table and not the "People" table.
-            // Note: the id will only be returned if PetaPoco can tell which is the primary key via mapping or convention.
-            var id = DB.Insert("SpecificPeople", person);
+            // Update a few properties of the person
+            person.Age = 70;
+            person.Name = "The PetaPoco";
 
-            // Obviously the ID returned will be the same at the one we set
-            id.ShouldBe(person.Id);
-
-            // Get a clone/copy from "People" table (Default table as per mappings)
-            var clone = DB.SingleOrDefault<Person>(id);
-
-            // As expected, doesn't exist
-            clone.ShouldBeNull();
+            // Tell PetaPoco to update the DB table SpecificPeople
+            // The update statement produced is `UPDATE [SpecificPeople] SET [FullName] = @0, [Age] = @1, [Height] = @2, [Dob] = @3 WHERE [Id] = @4`
+            DB.Update("SpecificPeople", "Id", person);
 
             // We need to get the clone/copy from the correct table
             // Note: we can't use auto select builder here because PetaPoco would create columns such as People.Id
-            clone = DB.Query<Person>("SELECT * FROM [SpecificPeople] sp WHERE sp.[Id] = @0", id).Single();
+            var clone = DB.Query<Person>("SELECT * FROM [SpecificPeople] sp WHERE sp.[Id] = @0", id).Single();
 
-            // See, they're are the same
-            clone.ShouldBe(person);
-
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
-            person.Equals(clone).ShouldBeFalse();
+            // See, the person has been updated
+            clone.Id.ShouldBe(person.Id);
+            clone.Dob.ShouldBe(person.Dob);
+            clone.Height.ShouldBe(person.Height);
+            clone.Age.ShouldBe(person.Age);
+            clone.Name.ShouldBe(person.Name);
         }
 
         [Fact]
-        public void InsertConventionalPoco()
+        public void UpdateConventionalPoco()
         {
             // Clear out any notes and reset the ID sequence counter
             DB.Execute("TRUNCATE TABLE [Note]");
 
             // Insert some notes using all APIs
+            var note1 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
+            var note2 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
+            var note3 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
+            var note4 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
+            var note5 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
 
             // Each of the API usuages here are effectively the same, as PetaPoco is providing the correct unknown values. 
             // This is because the poco has been mapped by convention and therefore PetaPoco understands how to do this.
-            var id1 = DB.Insert(new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) });
-            var id2 = DB.Insert("Note", new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) });
-            var id3 = DB.Insert("Note", "Id", new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) });
-            var id4 = DB.Insert("Note", "Id", true, new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) });
+            DB.Insert(note1);
+            DB.Insert(note2);
+            DB.Insert(note3);
+            DB.Insert(note4);
+            DB.Insert(note5);
 
-            // Am I right?
-            id1.ShouldBe(1);
-            id2.ShouldBe(2);
-            id3.ShouldBe(3);
-            id4.ShouldBe(4);
+            //Update the notes
+            note1.Text += " some more text";
+            note2.Text += " some more text";
+            note3.Text += " some more text";
+            note4.Text += " some more text";
+            note5.Text += " some more text";
 
+            // Get the poco data
+            var pocoData = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+
+            // Update all notes using all APIs
+            DB.Update(note1);
+            DB.Update(note2, note2.Id);
+            DB.Update(note3, note3.Id, pocoData.UpdateColumns);
+            var sql1 = $"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
+                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0";
+            DB.Update<Note>(sql1, note4.Id, note4.Text);
+            var sql2 = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
+                               $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0", note5.Id, note5.Text);
+            DB.Update<Note>(sql2);
+            
             // Just to be sure
-            DB.ExecuteScalar<int>("SELECT COUNT(*) FROM [Note] WHERE CAST(Text AS NVARCHAR(MAX)) = @0", "PetaPoco's note").ShouldBe(4);
+            DB.ExecuteScalar<int>("SELECT COUNT(*) FROM [Note] WHERE CAST(Text AS NVARCHAR(MAX)) = @0", "PetaPoco's note some more text").ShouldBe(5);
         }
 
         [Fact]
-        public void InsertUnconventionalPoco()
+        public void UpdateUnconventionalPoco()
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
@@ -145,18 +171,20 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Insert the poco
             var id = DB.Insert("TBL_UnconventionalPocos", "PrimaryKey", true, poco);
 
+            // Update the poco
+            poco.Text += " some more text";
+            DB.Update("TBL_UnconventionalPocos", "PrimaryKey", poco);
+
             // Get a clone/copy from the DB
             var clone = DB.Query<UnconventionalPoco>("SELECT * FROM [TBL_UnconventionalPocos] WHERE [PrimaryKey] = @0", id).Single();
 
-            // See, they're are the same
-            clone.ShouldBe(poco);
-
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
-            poco.Equals(clone).ShouldBeFalse();
+            // Just to be sure
+            poco.PrimaryKey.ShouldBe(clone.PrimaryKey);
+            poco.Text.ShouldBe(clone.Text);
         }
 
         [Fact]
-        public void InsertConventionalUnconventionalPoco()
+        public void UpdateConventionalUnconventionalPoco()
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
@@ -194,12 +222,21 @@ namespace PetaPoco.Tests.Integration.Documentation
             // See, they're are the same
             clone.ShouldBe(poco);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
-            poco.Equals(clone).ShouldBeFalse();
+            // Update the original poco
+            poco.Text += " some more text";
+
+            // Update the poco
+            DB.Update(poco);
+
+            // Get the clone from teh database again
+            clone = DB.SingleOrDefault<UnconventionalPoco>(id);
+
+            // Confirm the text was updated
+            clone.Text.ShouldBe("PetaPoco some more text");
         }
 
         [Fact]
-        public void InsertAnonymousPocoWithConventionalNaming()
+        public void UpdateAnonymousPocoWithConventionalNaming()
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
@@ -215,6 +252,12 @@ namespace PetaPoco.Tests.Integration.Documentation
 
             // Tell PetaPoco to insert it
             var id = DB.Insert("XFiles", "Id", true, xfile);
+
+            // Update the poco
+            xfile = new { FileName = "Agent Mulder.sec" };
+
+            // Update the database
+            DB.Update("XFiles", "Id", xfile);
 
             // Get a clone/copy from the DB
             // Note: Check out the name parameters - cool eh?
@@ -244,6 +287,12 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Tell PetaPoco to insert it
             var id = DB.Insert("XFiles", "Id", true, (object) xfile);
 
+            // Update the poco
+            xfile.FileName = "Agent Mulder.sec" ;
+
+            // Update the database
+            DB.Update("XFiles", "Id", (object) xfile);
+
             // Get a clone/copy from the DB
             // Note: Check out the name parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
@@ -252,121 +301,5 @@ namespace PetaPoco.Tests.Integration.Documentation
             id.ShouldBe((int)clone.Id);
             ((string)xfile.FileName).ShouldBe((string)clone.FileName);
         }
-    }
-
-    public class UnconventionalPoco
-    {
-        public int PrimaryKey { get; set; }
-
-        public string Text { get; set; }
-
-        public void ShouldBe(UnconventionalPoco other)
-        {
-            PrimaryKey.ShouldBe(other.PrimaryKey);
-            Text.ShouldBe(other.Text);
-        }
-    }
-
-    [TableName("People")]
-    [PrimaryKey("Id", AutoIncrement = false)]
-    public class Person
-    {
-        [Column]
-        public Guid Id { get; set; }
-
-        [Column(Name = "FullName")]
-        public string Name { get; set; }
-
-        [Column]
-        public long Age { get; set; }
-
-        [Column]
-        public int Height { get; set; }
-
-        [Column]
-        public DateTime? Dob { get; set; }
-
-        [Ignore]
-        public string NameAndAge => $"{Name} is of {Age}";
-
-        public void ShouldBe(Person other)
-        {
-            Id.ShouldBe(other.Id);
-            Name.ShouldBe(other.Name);
-            Age.ShouldBe(other.Age);
-            Height.ShouldBe(other.Height);
-            Dob.ShouldBe(other.Dob);
-        }
-    }
-
-    public class Note
-    {
-        public int Id { get; set; }
-
-        public DateTime CreatedOn { get; set; }
-
-        public string Text { get; set; }
-    }
-
-    [ExplicitColumns]
-    [TableName("Orders")]
-    [PrimaryKey("Id")]
-    public class Order
-    {
-        [Column]
-        public int Id { get; set; }
-
-        [Column]
-        public Guid PersonId { get; set; }
-
-        [Column]
-        public string PoNumber { get; set; }
-
-        [Column]
-        public DateTime CreatedOn { get; set; }
-
-        [Column]
-        public string CreatedBy { get; set; }
-
-        [Column("OrderStatus")]
-        public OrderStatus Status { get; set; }
-
-        public void ShouldBe(Order other)
-        {
-            Id.ShouldBe(other.Id);
-            PersonId.ShouldBe(other.PersonId);
-            PoNumber.ShouldBe(other.PoNumber);
-            Status.ShouldBe(other.Status);
-            CreatedOn.ShouldBe(other.CreatedOn);
-            CreatedBy.ShouldBe(other.CreatedBy);
-        }
-    }
-
-    public enum OrderStatus
-    {
-        Pending,
-        Accepted,
-        Rejected,
-        Deleted
-    }
-
-    [TableName("OrderLines")]
-    [PrimaryKey("Id")]
-    public class OrderLine
-    {
-        [Column]
-        public int Id { get; set; }
-
-        [Column]
-        public int OrderId { get; set; }
-
-        [Column(Name = "Qty")]
-        public short Quantity { get; set; }
-
-        [Column]
-        public decimal SellPrice { get; set; }
-
-        [ResultColumn]
-        public decimal Total { get; set; }
     }
 }
