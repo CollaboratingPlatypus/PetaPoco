@@ -1358,6 +1358,7 @@ from USER_VIEWS";
  nullable IsNullable
  from USER_TAB_COLS utc 
  where table_name = :tableName
+ and virtual_column = 'NO'
  order by column_id";
 	  
 }
