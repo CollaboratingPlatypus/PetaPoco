@@ -1025,6 +1025,9 @@ class PostGreSqlSchemaReader : SchemaReader
 			case "date":	
 				return "DateTime";
 
+			case "uuid":
+				return "Guid";
+
 			default:
 				return "string";
 		}
