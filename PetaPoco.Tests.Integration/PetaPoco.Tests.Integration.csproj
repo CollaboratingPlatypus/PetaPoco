@@ -63,6 +63,10 @@
       <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Npgsql, Version=3.0.3.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.3.0.3\lib\net45\Npgsql.dll</HintPath>
       <Private>True</Private>
@@ -175,6 +179,7 @@
     <Compile Include="Databases\Sqlite\SqliteExecuteTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteInsertTests.cs" />
     <Compile Include="Databases\Sqlite\SqliteUpdateTests.cs" />
+    <Compile Include="Documentation\Updates.cs" />
     <Compile Include="Documentation\Inserts.cs" />
     <Compile Include="Models\Note.cs" />
     <Compile Include="Models\NoteNullablePrimary.cs" />
@@ -183,6 +188,7 @@
     <Compile Include="Models\OrderLineStatus.cs" />
     <Compile Include="Models\OrderStatus.cs" />
     <Compile Include="Models\Person.cs" />
+    <Compile Include="Models\Postgres\JsonTypesPoco.cs" />
     <Compile Include="Models\TransactionLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeExtensions.cs" />

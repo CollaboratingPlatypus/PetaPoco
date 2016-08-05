@@ -27,6 +27,13 @@ namespace PetaPoco.Core
         private Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
         public Type Type;
         public string[] QueryColumns { get; private set; }
+
+        public string[] UpdateColumns
+        {
+            // No need to cache as it's not used by PetaPoco internally
+            get { return (from c in Columns where !c.Value.ResultColumn && c.Value.ColumnName != TableInfo.PrimaryKey select c.Key).ToArray(); }
+        }
+
         public TableInfo TableInfo { get; private set; }
         public Dictionary<string, PocoColumn> Columns { get; private set; }
 
@@ -57,6 +64,8 @@ namespace PetaPoco.Core
                 pc.ColumnName = ci.ColumnName;
                 pc.ResultColumn = ci.ResultColumn;
                 pc.ForceToUtc = ci.ForceToUtc;
+                pc.InsertTemplate = ci.InsertTemplate;
+                pc.UpdateTemplate = ci.UpdateTemplate;
 
                 // Store it
                 Columns.Add(pc.ColumnName, pc);
@@ -387,6 +396,11 @@ namespace PetaPoco.Core
         internal static void FlushCaches()
         {
             _pocoDatas.Flush();
+        }
+
+        public string GetColumnName(string propertyName)
+        {
+            return Columns.Values.First(c => c.PropertyInfo.Name.Equals(propertyName)).ColumnName;
         }
     }
 }

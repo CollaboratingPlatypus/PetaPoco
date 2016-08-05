@@ -143,6 +143,10 @@ namespace PetaPoco.Tests.Unit.Core
             ci.ColumnName.ShouldBe("Col1");
             ci.ResultColumn.ShouldBeFalse();
             ci.ForceToUtc.ShouldBeFalse();
+
+            ci = _mapper.GetColumnInfo(typeof(EntityWithAttributes).GetProperty(nameof(EntityWithAttributes.ColumnTwo)));
+            ci.InsertTemplate.ShouldBe("Test");
+            ci.UpdateTemplate.ShouldBe("Test1");
         }
 
         [Fact]
@@ -200,6 +204,9 @@ namespace PetaPoco.Tests.Unit.Core
             public int NonPersistedColumn { get; set; }
 
             public DateTime UnmappedColumn { get; set; }
+
+            [Column(InsertTemplate = "test", UpdateTemplate = "test1")]
+            public string ColumnTwo { get; set; }
         }
 
         public class Order

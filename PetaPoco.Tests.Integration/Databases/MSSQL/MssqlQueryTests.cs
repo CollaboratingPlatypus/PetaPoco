@@ -67,6 +67,20 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
+        public void Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection()
+        {
+            AddPeople(15, 5);
+
+            var page = DB.Page<Person>(1, 5, "WHERE 1 = 1 ORDER BY [FullName]");
+            page.CurrentPage.ShouldBe(1);
+            page.TotalPages.ShouldBe(4);
+
+            page = DB.Page<Person>(2, 5, "WHERE 1 = 1 ORDER BY [FullName]");
+            page.CurrentPage.ShouldBe(2);
+            page.TotalPages.ShouldBe(4);
+        }
+
+        [Fact]
         public void Query_ForPocoGivenSqlString_GivenSqlStartingWithSet__ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
