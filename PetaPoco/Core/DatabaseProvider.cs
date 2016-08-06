@@ -254,5 +254,21 @@ namespace PetaPoco.Core
             // Assume SQL Server
             return Singleton<SqlServerDatabaseProvider>.Instance;
         }
+
+        /// <summary>
+        ///     Unwraps a wrapped <see cref="DbProviderFactory"/>.
+        /// </summary>
+        /// <param name="factory">The factory to unwrap.</param>
+        /// <returns>The unwrapped factory or the original factory if no wrapping occurred.</returns>
+        internal static DbProviderFactory Unwrap(DbProviderFactory factory)
+        {
+            var sp = factory as IServiceProvider;
+
+            if (sp == null)
+                return factory;
+
+            var unwrapped = sp.GetService(factory.GetType()) as DbProviderFactory;
+            return unwrapped == null ? factory : Unwrap(unwrapped);
+        }
     }
 }

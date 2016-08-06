@@ -114,7 +114,7 @@ namespace PetaPoco
                 throw new ArgumentNullException("factory");
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(factory.GetType(), false, _connectionString), null);
+            Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), null);
         }
 
         /// <summary>
