@@ -21,7 +21,7 @@ namespace PetaPoco
         /// <returns>
         ///     The column name.
         /// </returns>
-        public string Value { get; private set; }
+        public string[] Value { get; private set; }
 
         /// <summary>
         ///     The sequence name.
@@ -43,7 +43,7 @@ namespace PetaPoco
         ///     Constructs a new instance of the <seealso cref="PrimaryKeyAttribute" />.
         /// </summary>
         /// <param name="primaryKey">The name of the primary key column.</param>
-        public PrimaryKeyAttribute(string primaryKey)
+        public PrimaryKeyAttribute(params string[] primaryKey)
         {
             Value = primaryKey;
             AutoIncrement = true;

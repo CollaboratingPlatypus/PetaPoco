@@ -333,7 +333,7 @@ namespace PetaPoco
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
         /// <param name="primaryKey">The primary key value to look for</param>
         /// <returns>True if a record with the specified primary key value exists.</returns>
-        bool Exists<T>(object primaryKey);
+        bool Exists<T>(params object[] primaryKey);
 
         /// <summary>
         ///     Checks for the existence of a row matching the specified condition
@@ -353,7 +353,7 @@ namespace PetaPoco
         /// <remarks>
         ///     Throws an exception if there are zero or more than one record with the specified primary key value.
         /// </remarks>
-        T Single<T>(object primaryKey);
+        T Single<T>(params object[] primaryKey);
 
         /// <summary>
         ///     Runs a query that should always return a single row.
@@ -395,7 +395,7 @@ namespace PetaPoco
         /// <remarks>
         ///     If there are no records with the specified primary key value, default(T) (typically null) is returned.
         /// </remarks>
-        T SingleOrDefault<T>(object primaryKey);
+        T SingleOrDefault<T>(params object[] primaryKey);
 
         /// <summary>
         ///     Runs a query that should always return either a single row, or no rows

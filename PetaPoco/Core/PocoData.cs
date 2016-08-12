@@ -31,7 +31,7 @@ namespace PetaPoco.Core
         public string[] UpdateColumns
         {
             // No need to cache as it's not used by PetaPoco internally
-            get { return (from c in Columns where !c.Value.ResultColumn && c.Value.ColumnName != TableInfo.PrimaryKey select c.Key).ToArray(); }
+            get { return (from c in Columns where !c.Value.ResultColumn &&  !TableInfo.PrimaryKey.Contains(c.Value.ColumnName) select c.Key).ToArray(); }
         }
 
         public TableInfo TableInfo { get; private set; }
@@ -84,7 +84,7 @@ namespace PetaPoco.Core
                 pd.TableInfo = new TableInfo();
                 pd.Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
                 pd.Columns.Add(primaryKeyName, new ExpandoColumn() {ColumnName = primaryKeyName});
-                pd.TableInfo.PrimaryKey = primaryKeyName;
+                pd.TableInfo.PrimaryKey = new string[] { primaryKeyName };
                 pd.TableInfo.AutoIncrement = true;
                 foreach (var col in (obj as IDictionary<string, object>).Keys)
                 {

@@ -1021,7 +1021,7 @@ namespace PetaPoco
         #endregion
 
         #region operation: Exists
-
+        
         /// <summary>
         ///     Checks for the existence of a row matching the specified condition
         /// </summary>
@@ -1045,7 +1045,7 @@ namespace PetaPoco
         /// <typeparam name="T">The Type representing the table being queried</typeparam>
         /// <param name="primaryKey">The primary key value to look for</param>
         /// <returns>True if a record with the specified primary key value exists.</returns>
-        public bool Exists<T>(object primaryKey)
+        public bool Exists<T>(params object[] primaryKey)
         {
             return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
@@ -1063,7 +1063,7 @@ namespace PetaPoco
         /// <remarks>
         ///     Throws an exception if there are zero or more than one record with the specified primary key value.
         /// </remarks>
-        public T Single<T>(object primaryKey)
+        public T Single<T>(params object[] primaryKey)
         {
             return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
@@ -1077,7 +1077,7 @@ namespace PetaPoco
         /// <remarks>
         ///     If there are no records with the specified primary key value, default(T) (typically null) is returned.
         /// </remarks>
-        public T SingleOrDefault<T>(object primaryKey)
+        public T SingleOrDefault<T>(params object[] primaryKey)
         {
             return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
@@ -1476,7 +1476,7 @@ namespace PetaPoco
         /// <param name="poco">The POCO object that specifies the column values to be updated</param>
         /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
         /// <returns>The number of affected rows</returns>
-        public int Update(object poco, object primaryKeyValue)
+        public int Update(object poco, params object[] primaryKeyValue)
         {
             return Update(poco, primaryKeyValue, null);
         }
@@ -1488,7 +1488,7 @@ namespace PetaPoco
         /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
         /// <param name="columns">The column names of the columns to be updated, or null for all</param>
         /// <returns>The number of affected rows</returns>
-        public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
+        public int Update(object poco, IEnumerable<string> columns, params object[] primaryKeyValue)
         {
             if (poco == null)
                 throw new ArgumentNullException("poco");
@@ -1691,7 +1691,7 @@ namespace PetaPoco
         /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
         /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
         /// <returns></returns>
-        public int Delete<T>(object pocoOrPrimaryKey)
+        public int Delete<T>(params object[] pocoOrPrimaryKey)
         {
             if (pocoOrPrimaryKey.GetType() == typeof(T))
                 return Delete(pocoOrPrimaryKey);
