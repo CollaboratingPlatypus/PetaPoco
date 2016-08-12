@@ -13,7 +13,7 @@ namespace PetaPoco
     /// <summary>
     ///     Specifies the database contract.
     /// </summary>
-    public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute
+    public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor
     {
         /// <summary>
         ///     Gets the default mapper. (Default is <see cref="ConventionMapper" />)
