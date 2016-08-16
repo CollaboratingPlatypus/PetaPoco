@@ -24,7 +24,7 @@ namespace PetaPoco
     /// <summary>
     ///     The main PetaPoco Database class.  You can either use this class directly, or derive from it.
     /// </summary>
-    public class Database : IDisposable, IDatabase
+    public class Database : IDatabase
     {
         #region IDisposable
 
@@ -114,7 +114,7 @@ namespace PetaPoco
                 throw new ArgumentNullException("factory");
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(factory.GetType(), false, _connectionString), null);
+            Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), null);
         }
 
         /// <summary>
@@ -294,6 +294,17 @@ namespace PetaPoco
         #endregion
 
         #region Transaction Management
+
+        /// <summary>
+        ///     Gets the current transaction instance.
+        /// </summary>
+        /// <returns>
+        ///     The current transaction instance; else, <c>null</c> if not transaction is in progress.
+        /// </returns>
+        IDbTransaction ITransactionAccessor.Transaction
+        {
+            get { return _transaction; }
+        }
 
         // Helper to create a transaction scope
 

@@ -7,6 +7,7 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Dynamic;
 using Moq;
 using PetaPoco.Core;
@@ -27,6 +28,18 @@ namespace PetaPoco.Tests.Unit
         public DatabaseTests()
         {
             DB = new Database("cs", _provider);
+        }
+
+        [Fact]
+        public void Construct_GivenWrappedFactory_ShouldNotThrow()
+        {
+            new Database("some connection string", new DbProviderWrapper());
+        }
+
+        [Fact]
+        public void Construct_GivenUnwrappedFactory_ShouldNotThrow()
+        {
+            new Database("some connection string", SqlClientFactory.Instance);
         }
 
         [Fact]
@@ -212,6 +225,17 @@ namespace PetaPoco.Tests.Unit
             public DateTime CreatedOn { get; set; }
 
             public string Text { get; set; }
+        }
+
+        public class DbProviderWrapper : DbProviderFactory, IServiceProvider
+        {
+            public object GetService(Type serviceType)
+            {
+                if (serviceType == typeof(DbProviderWrapper))
+                    return SqlClientFactory.Instance;
+
+                return null;
+            }
         }
     }
 }

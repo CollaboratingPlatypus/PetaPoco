@@ -145,8 +145,8 @@ namespace PetaPoco.Tests.Unit.Core
             ci.ForceToUtc.ShouldBeFalse();
 
             ci = _mapper.GetColumnInfo(typeof(EntityWithAttributes).GetProperty(nameof(EntityWithAttributes.ColumnTwo)));
-            ci.InsertTemplate.ShouldBe("Test");
-            ci.UpdateTemplate.ShouldBe("Test1");
+            ci.InsertTemplate.ShouldBe("test");
+            ci.UpdateTemplate.ShouldBe("test1");
         }
 
         [Fact]
