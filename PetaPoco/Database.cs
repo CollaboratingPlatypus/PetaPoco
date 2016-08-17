@@ -1047,7 +1047,9 @@ namespace PetaPoco
         /// <returns>True if a record with the specified primary key value exists.</returns>
         public bool Exists<T>(params object[] primaryKey)
         {
-            return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+
+            return Exists<T>(BuildMultiPartLogic(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey), primaryKey);
+            //return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
         #endregion
@@ -1065,7 +1067,8 @@ namespace PetaPoco
         /// </remarks>
         public T Single<T>(params object[] primaryKey)
         {
-            return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+            return Single<T>("WHERE " + BuildMultiPartLogic(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey), primaryKey);
+            //return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
         /// <summary>
@@ -1079,7 +1082,23 @@ namespace PetaPoco
         /// </remarks>
         public T SingleOrDefault<T>(params object[] primaryKey)
         {
-            return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+            return SingleOrDefault<T>("WHERE " + BuildMultiPartLogic(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey), primaryKey);
+            //return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+        }
+
+        private string BuildMultiPartLogic(string[] primaryKey)
+        {
+            int idx = 0;
+            StringBuilder output = new StringBuilder();
+            foreach(var pk in primaryKey)
+            {
+                if (idx > 0)
+                    output.Append("AND ");
+                output.AppendFormat("{0}=@{1} ", _provider.EscapeSqlIdentifier(pk), idx);
+
+                idx++;
+            }
+            return output.ToString();
         }
 
         /// <summary>
@@ -1235,6 +1254,33 @@ namespace PetaPoco
         /// </summary>
         /// <param name="tableName">The name of the table to insert into</param>
         /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        public object Insert(string tableName, string[] primaryKeyName, object poco)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            var t = poco.GetType();
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement ||
+                                t.Name.Contains("AnonymousType") &&
+                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+
+            return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
+        }
+
+        /// <summary>
+        ///     Performs an SQL Insert
+        /// </summary>
+        /// <param name="tableName">The name of the table to insert into</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
         /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB</param>
         /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
         /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
@@ -1249,6 +1295,33 @@ namespace PetaPoco
                 throw new ArgumentNullException("tableName");
 
             if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
+        }
+
+        /// <summary>
+        ///     Performs an SQL Insert
+        /// </summary>
+        /// <param name="tableName">The name of the table to insert into</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB</param>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        /// <remarks>
+        ///     Inserts a poco into a table.  If the poco has a property with the same name
+        ///     as the primary key the id of the new record is assigned to it.  Either way,
+        ///     the new id is returned.
+        /// </remarks>
+        public object Insert(string tableName, string[] primaryKeyName, bool autoIncrement, object poco)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
                 throw new ArgumentNullException("primaryKeyName");
 
             if (poco == null)
@@ -1275,7 +1348,7 @@ namespace PetaPoco
             return ExecuteInsert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
         }
 
-        private object ExecuteInsert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
+        private object ExecuteInsert(string tableName, string[] primaryKeyName, bool autoIncrement, object poco)
         {
             try
             {
@@ -1295,7 +1368,7 @@ namespace PetaPoco
                                 continue;
 
                             // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-                            if (autoIncrement && primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true) == 0)
+                            if (autoIncrement && primaryKeyName != null && primaryKeyName.Contains(i.Key))
                             {
                                 // Setup auto increment expression
                                 string autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
@@ -1389,6 +1462,28 @@ namespace PetaPoco
             if (poco == null)
                 throw new ArgumentNullException("poco");
 
+            return ExecuteUpdate(tableName, new[] { primaryKeyName}, poco, new[] { primaryKeyValue }, null);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <returns>The number of affected records</returns>
+        public int Update(string tableName, string[] primaryKeyName, object poco, params object[] primaryKeyValue)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
 
@@ -1407,6 +1502,30 @@ namespace PetaPoco
                 throw new ArgumentNullException("tableName");
 
             if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteUpdate(tableName, new[] { primaryKeyName }, poco, new[] { primaryKeyValue }, columns);
+        }
+
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(string tableName, string[] primaryKeyName, object poco, IEnumerable<string> columns, params object[] primaryKeyValue)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
                 throw new ArgumentNullException("primaryKeyName");
 
             if (poco == null)
@@ -1433,6 +1552,18 @@ namespace PetaPoco
         /// <param name="tableName">The name of the table to update</param>
         /// <param name="primaryKeyName">The name of the primary key column of the table</param>
         /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(string tableName, string[] primaryKeyName, object poco)
+        {
+            return Update(tableName, primaryKeyName, poco, null);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
         /// <param name="columns">The column names of the columns to be updated, or null for all</param>
         /// <returns>The number of affected rows</returns>
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
@@ -1441,6 +1572,28 @@ namespace PetaPoco
                 throw new ArgumentNullException("tableName");
 
             if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException("primaryKeyName");
+
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            return ExecuteUpdate(tableName, new[] { primaryKeyName }, poco, null, columns);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(string tableName, string[] primaryKeyName, object poco, IEnumerable<string> columns)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException("tableName");
+
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
                 throw new ArgumentNullException("primaryKeyName");
 
             if (poco == null)
@@ -1479,6 +1632,22 @@ namespace PetaPoco
         public int Update(object poco, params object[] primaryKeyValue)
         {
             return Update(poco, primaryKeyValue, null);
+        }
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
+        {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return ExecuteUpdate(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, new[] { primaryKeyValue }, columns);
         }
 
         /// <summary>
@@ -1531,7 +1700,7 @@ namespace PetaPoco
             return Execute(new Sql(string.Format("UPDATE {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
         }
 
-        private int ExecuteUpdate(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+        private int ExecuteUpdate(string tableName, string[] primaryKeyName, object poco, object[] primaryKeyValue, IEnumerable<string> columns)
         {
             try
             {
@@ -1625,7 +1794,7 @@ namespace PetaPoco
                 return -1;
             }
         }
-
+        
         #endregion
 
         #region operation: Delete
@@ -1638,6 +1807,18 @@ namespace PetaPoco
         /// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
         /// <returns>The number of rows affected</returns>
         public int Delete(string tableName, string primaryKeyName, object poco)
+        {
+            return Delete(tableName, primaryKeyName, poco, null);
+        }
+
+        /// <summary>
+        ///     Performs and SQL Delete
+        /// </summary>
+        /// <param name="tableName">The name of the table to delete from</param>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
+        /// <returns>The number of rows affected</returns>
+        public int Delete(string tableName, string[] primaryKeyName, object poco)
         {
             return Delete(tableName, primaryKeyName, poco, null);
         }
@@ -1675,6 +1856,38 @@ namespace PetaPoco
         }
 
         /// <summary>
+        ///     Performs and SQL Delete
+        /// </summary>
+        /// <param name="tableName">The name of the table to delete from</param>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">
+        ///     The POCO object whose primary key value will be used to delete the row (or null to use the supplied
+        ///     primary key value)
+        /// </param>
+        /// <param name="primaryKeyValue">
+        ///     The value of the primary key identifing the record to be deleted (or null, or get this
+        ///     value from the POCO instance)
+        /// </param>
+        /// <returns>The number of rows affected</returns>
+        public int Delete(string tableName, string[] primaryKeyName, object poco, params object[] primaryKeyValue)
+        {
+            // If primary key value not specified, pick it up from the object
+            if (primaryKeyValue == null)
+            {
+                var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+                PocoColumn pc;
+                if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+                {
+                    primaryKeyValue = pc.GetValue(poco);
+                }
+            }
+
+            // Do it
+            var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", _provider.EscapeTableName(tableName), _provider.EscapeSqlIdentifier(primaryKeyName));
+            return Execute(sql, primaryKeyValue);
+        }
+
+        /// <summary>
         ///     Performs an SQL Delete
         /// </summary>
         /// <param name="poco">The POCO object specifying the table name and primary key value of the row to be deleted</param>
@@ -1691,7 +1904,7 @@ namespace PetaPoco
         /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
         /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
         /// <returns></returns>
-        public int Delete<T>(params object[] pocoOrPrimaryKey)
+        public int Delete<T>(object pocoOrPrimaryKey)
         {
             if (pocoOrPrimaryKey.GetType() == typeof(T))
                 return Delete(pocoOrPrimaryKey);
@@ -1761,6 +1974,24 @@ namespace PetaPoco
             return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName, _defaultMapper), poco);
         }
 
+        /// <summary>
+        ///     Check if a poco represents a new row
+        /// </summary>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">The object instance whose "newness" is to be tested</param>
+        /// <returns>True if the POCO represents a record already in the database</returns>
+        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
+        public bool IsNew(string[] primaryKeyName, object poco)
+        {
+            if (poco == null)
+                throw new ArgumentNullException("poco");
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentException("primaryKeyName");
+
+            return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName, _defaultMapper), poco);
+        }
+
         protected virtual bool IsNew(string primaryKeyName, PocoData pd, object poco)
         {
             if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
@@ -1810,6 +2041,56 @@ namespace PetaPoco
             return pk == Activator.CreateInstance(pk.GetType());
         }
 
+
+        protected virtual bool IsNew(string[] primaryKeyName, PocoData pd, object poco)
+        {
+            if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
+                throw new InvalidOperationException("IsNew() and Save() are only supported on tables with identity (inc auto-increment) primary key columns");
+
+            object pk;
+            PocoColumn pc;
+            PropertyInfo pi;
+            if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+            {
+                pk = pc.GetValue(poco);
+                pi = pc.PropertyInfo;
+            }
+            else
+            {
+                pi = poco.GetType().GetProperty(primaryKeyName);
+                if (pi == null)
+                    throw new ArgumentException(string.Format("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName));
+                pk = pi.GetValue(poco, null);
+            }
+
+            var type = pk != null ? pk.GetType() : pi.PropertyType;
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) || !type.IsValueType)
+                return pk == null;
+
+            if (type == typeof(string))
+                return string.IsNullOrEmpty((string)pk);
+            if (!pi.PropertyType.IsValueType)
+                return pk == null;
+            if (type == typeof(long))
+                return (long)pk == default(long);
+            if (type == typeof(int))
+                return (int)pk == default(int);
+            if (type == typeof(Guid))
+                return (Guid)pk == default(Guid);
+            if (type == typeof(ulong))
+                return (ulong)pk == default(ulong);
+            if (type == typeof(uint))
+                return (uint)pk == default(uint);
+            if (type == typeof(short))
+                return (short)pk == default(short);
+            if (type == typeof(ushort))
+                return (ushort)pk == default(ushort);
+
+            // Create a default instance and compare
+            return pk == Activator.CreateInstance(pk.GetType());
+        }
+
         /// <summary>
         ///     Check if a poco represents a new row
         /// </summary>
@@ -1846,6 +2127,25 @@ namespace PetaPoco
                 Update(tableName, primaryKeyName, poco);
             }
         }
+
+        /// <summary>
+        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
+        /// </summary>
+        /// <param name="tableName">The name of the table to be updated</param>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">The POCO object to be saved</param>
+        public void Save(string tableName, string[] primaryKeyName, object poco)
+        {
+            if (IsNew(primaryKeyName, poco))
+            {
+                Insert(tableName, primaryKeyName, true, poco);
+            }
+            else
+            {
+                Update(tableName, primaryKeyName, poco);
+            }
+        }
+
 
         /// <summary>
         ///     Saves a POCO by either performing either an SQL Insert or SQL Update

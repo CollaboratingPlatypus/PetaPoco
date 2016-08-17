@@ -96,6 +96,30 @@ namespace PetaPoco.Core
             return ForType(t, defaultMapper);
         }
 
+        public static PocoData ForObject(object obj, string[] primaryKeyName, IMapper defaultMapper)
+        {
+            var t = obj.GetType();
+            if (t == typeof(System.Dynamic.ExpandoObject))
+            {
+                var pd = new PocoData();
+                pd.TableInfo = new TableInfo();
+                pd.Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
+                foreach(var pk in primaryKeyName)
+                {
+                    pd.Columns.Add(pk, new ExpandoColumn() { ColumnName = pk });
+                }
+                pd.TableInfo.PrimaryKey = primaryKeyName;
+                pd.TableInfo.AutoIncrement = true;
+                foreach (var col in (obj as IDictionary<string, object>).Keys)
+                {
+                    if(!primaryKeyName.Contains(col))
+                        pd.Columns.Add(col, new ExpandoColumn() { ColumnName = col });
+                }
+                return pd;
+            }
+            return ForType(t, defaultMapper);
+        }
+
         public static PocoData ForType(Type type, IMapper defaultMapper)
         {
             if (type == typeof(System.Dynamic.ExpandoObject))

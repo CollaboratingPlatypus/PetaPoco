@@ -32,6 +32,15 @@ namespace PetaPoco
         /// </summary>
         /// <param name="tableName">The name of the table to insert into.</param>
         /// <param name="primaryKeyName">The name of the primary key column of the table.</param>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
+        object Insert(string tableName, string[] primaryKeyName, object poco);
+
+        /// <summary>
+        ///     Performs an SQL Insert.
+        /// </summary>
+        /// <param name="tableName">The name of the table to insert into.</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table.</param>
         /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB.</param>
         /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
         /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
@@ -41,6 +50,21 @@ namespace PetaPoco
         ///     the new id is returned.
         /// </remarks>
         object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco);
+
+        /// <summary>
+        ///     Performs an SQL Insert.
+        /// </summary>
+        /// <param name="tableName">The name of the table to insert into.</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table.</param>
+        /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB.</param>
+        /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
+        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
+        /// <remarks>
+        ///     Inserts a poco into a table. If the poco has a property with the same name
+        ///     as the primary key, the id of the new record is assigned to it. Either way,
+        ///     the new id is returned.
+        /// </remarks>
+        object Insert(string tableName, string primaryKeyName[], bool autoIncrement, object poco);
 
         /// <summary>
         ///     Performs an SQL Insert.
@@ -70,9 +94,30 @@ namespace PetaPoco
         /// <param name="primaryKeyName">The name of the primary key column of the table</param>
         /// <param name="poco">The POCO object that specifies the column values to be updated</param>
         /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <returns>The number of affected records</returns>
+        int Update(string tableName, string[] primaryKeyName, object poco, params object[] primaryKeyValue);
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
         /// <param name="columns">The column names of the columns to be updated, or null for all</param>
         /// <returns>The number of affected rows</returns>
         int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns);
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        int Update(string tableName, string[] primaryKeyName, object poco, IEnumerable<string> columns, params object[] primaryKeyValue);
 
         /// <summary>
         ///     Performs an SQL update
@@ -89,9 +134,28 @@ namespace PetaPoco
         /// <param name="tableName">The name of the table to update</param>
         /// <param name="primaryKeyName">The name of the primary key column of the table</param>
         /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <returns>The number of affected rows</returns>
+        int Update(string tableName, string[] primaryKeyName, object poco);
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
         /// <param name="columns">The column names of the columns to be updated, or null for all</param>
         /// <returns>The number of affected rows</returns>
         int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns);
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="tableName">The name of the table to update</param>
+        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        int Update(string tableName, string[] primaryKeyName, object poco, IEnumerable<string> columns);
 
         /// <summary>
         ///     Performs an SQL update
@@ -114,7 +178,7 @@ namespace PetaPoco
         /// <param name="poco">The POCO object that specifies the column values to be updated</param>
         /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
         /// <returns>The number of affected rows</returns>
-        int Update(object poco, object primaryKeyValue);
+        int Update(object poco, params object[] primaryKeyValue);
 
         /// <summary>
         ///     Performs an SQL update
@@ -124,6 +188,16 @@ namespace PetaPoco
         /// <param name="columns">The column names of the columns to be updated, or null for all</param>
         /// <returns>The number of affected rows</returns>
         int Update(object poco, object primaryKeyValue, IEnumerable<string> columns);
+
+
+        /// <summary>
+        ///     Performs an SQL update
+        /// </summary>
+        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
+        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
+        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
+        /// <returns>The number of affected rows</returns>
+        int Update(object poco, IEnumerable<string> columns, params object[] primaryKeyValue);
 
         /// <summary>
         ///     Performs an SQL update
@@ -159,6 +233,15 @@ namespace PetaPoco
         /// </summary>
         /// <param name="tableName">The name of the table to delete from</param>
         /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
+        /// <returns>The number of rows affected</returns>
+        int Delete(string tableName, string[] primaryKeyName, object poco);
+
+        /// <summary>
+        ///     Performs and SQL Delete
+        /// </summary>
+        /// <param name="tableName">The name of the table to delete from</param>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
         /// <param name="poco">
         ///     The POCO object whose primary key value will be used to delete the row (or null to use the supplied
         ///     primary key value)
@@ -169,6 +252,22 @@ namespace PetaPoco
         /// </param>
         /// <returns>The number of rows affected</returns>
         int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue);
+
+        /// <summary>
+        ///     Performs and SQL Delete
+        /// </summary>
+        /// <param name="tableName">The name of the table to delete from</param>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">
+        ///     The POCO object whose primary key value will be used to delete the row (or null to use the supplied
+        ///     primary key value)
+        /// </param>
+        /// <param name="primaryKeyValue">
+        ///     The value of the primary key identifing the record to be deleted (or null, or get this
+        ///     value from the POCO instance)
+        /// </param>
+        /// <returns>The number of rows affected</returns>
+        int Delete(string tableName, string[] primaryKeyName, object poco, params object[] primaryKeyValue);
 
         /// <summary>
         ///     Performs an SQL Delete
@@ -214,6 +313,16 @@ namespace PetaPoco
         /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
         bool IsNew(string primaryKeyName, object poco);
 
+
+        /// <summary>
+        ///     Check if a poco represents a new row
+        /// </summary>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">The object instance whose "newness" is to be tested</param>
+        /// <returns>True if the POCO represents a record already in the database</returns>
+        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
+        bool IsNew(string[] primaryKeyName, object poco);
+
         /// <summary>
         ///     Check if a poco represents a new row
         /// </summary>
@@ -229,6 +338,14 @@ namespace PetaPoco
         /// <param name="primaryKeyName">The name of the primary key column</param>
         /// <param name="poco">The POCO object to be saved</param>
         void Save(string tableName, string primaryKeyName, object poco);
+
+        /// <summary>
+        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
+        /// </summary>
+        /// <param name="tableName">The name of the table to be updated</param>
+        /// <param name="primaryKeyName">The name of the primary key column</param>
+        /// <param name="poco">The POCO object to be saved</param>
+        void Save(string tableName, string[] primaryKeyName, object poco);
 
         /// <summary>
         ///     Saves a POCO by either performing either an SQL Insert or SQL Update
