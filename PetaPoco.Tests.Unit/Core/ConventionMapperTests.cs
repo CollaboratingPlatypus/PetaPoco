@@ -72,22 +72,22 @@ namespace PetaPoco.Tests.Unit.Core
             var ti4 = _mapper.GetTableInfo(typeof(Box));
 
             ti1.TableName.ShouldBe("Order");
-            ti1.PrimaryKey.ShouldBe("OrderId");
+            ti1.PrimaryKey[0].ShouldBe("OrderId");
             ti1.AutoIncrement.ShouldBeTrue();
             ti1.SequenceName.ShouldBeNull();
 
             ti2.TableName.ShouldBe("OrderLine");
-            ti2.PrimaryKey.ShouldBe("OrderLine_Id");
+            ti2.PrimaryKey[0].ShouldBe("OrderLine_Id");
             ti2.AutoIncrement.ShouldBeTrue();
             ti2.SequenceName.ShouldBeNull();
 
             ti3.TableName.ShouldBe("Product");
-            ti3.PrimaryKey.ShouldBe("Id");
+            ti3.PrimaryKey[0].ShouldBe("Id");
             ti3.AutoIncrement.ShouldBeTrue();
             ti3.SequenceName.ShouldBeNull();
 
             ti4.TableName.ShouldBe("Box");
-            ti4.PrimaryKey.ShouldBe("Id");
+            ti4.PrimaryKey[0].ShouldBe("Id");
             ti4.AutoIncrement.ShouldBeFalse();
             ti4.SequenceName.ShouldBeNull();
         }
@@ -122,7 +122,7 @@ namespace PetaPoco.Tests.Unit.Core
         {
             var ti = _mapper.GetTableInfo(typeof(EntityWithAttributes));
             ti.TableName.ShouldBe("Test1");
-            ti.PrimaryKey.ShouldBe("ThatId");
+            ti.PrimaryKey[0].ShouldBe("ThatId");
             ti.AutoIncrement.ShouldBeTrue();
             ti.SequenceName.ShouldBeNull();
         }
@@ -181,7 +181,7 @@ namespace PetaPoco.Tests.Unit.Core
             var ti = _mapper.GetTableInfo(typeof(OrderLine));
 
             ti.TableName.ShouldBe("order_line");
-            ti.PrimaryKey.ShouldBe("OrderLine_Id");
+            ti.PrimaryKey[0].ShouldBe("OrderLine_Id");
             ti.AutoIncrement.ShouldBeTrue();
             ti.SequenceName.ShouldBeNull();
         }

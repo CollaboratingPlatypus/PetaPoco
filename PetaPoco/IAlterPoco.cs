@@ -64,7 +64,7 @@ namespace PetaPoco
         ///     as the primary key, the id of the new record is assigned to it. Either way,
         ///     the new id is returned.
         /// </remarks>
-        object Insert(string tableName, string primaryKeyName[], bool autoIncrement, object poco);
+        object Insert(string tableName, string[] primaryKeyName, bool autoIncrement, object poco);
 
         /// <summary>
         ///     Performs an SQL Insert.
@@ -282,7 +282,7 @@ namespace PetaPoco
         /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
         /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
         /// <returns></returns>
-        int Delete<T>(object pocoOrPrimaryKey);
+        int Delete<T>(params object[] pocoOrPrimaryKey);
 
         /// <summary>
         ///     Performs an SQL Delete

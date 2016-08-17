@@ -1086,17 +1086,16 @@ namespace PetaPoco
             //return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
-        private string BuildMultiPartLogic(string[] primaryKey)
+        private string BuildMultiPartLogic(string[] primaryKey, int index = 0)
         {
-            int idx = 0;
             StringBuilder output = new StringBuilder();
             foreach(var pk in primaryKey)
             {
-                if (idx > 0)
+                if (index > 0)
                     output.Append("AND ");
-                output.AppendFormat("{0}=@{1} ", _provider.EscapeSqlIdentifier(pk), idx);
+                output.AppendFormat("{0}=@{1} ", _provider.EscapeSqlIdentifier(pk), index);
 
-                idx++;
+                index++;
             }
             return output.ToString();
         }
@@ -1246,7 +1245,7 @@ namespace PetaPoco
                                 t.Name.Contains("AnonymousType") &&
                                 !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
 
-            return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
+            return ExecuteInsert(tableName, new[] { primaryKeyName }, autoIncrement, poco);
         }
 
         /// <summary>
@@ -1300,7 +1299,7 @@ namespace PetaPoco
             if (poco == null)
                 throw new ArgumentNullException("poco");
 
-            return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
+            return ExecuteInsert(tableName, new[] { primaryKeyName }, autoIncrement, poco);
         }
 
         /// <summary>
@@ -1555,7 +1554,7 @@ namespace PetaPoco
         /// <returns>The number of affected rows</returns>
         public int Update(string tableName, string[] primaryKeyName, object poco)
         {
-            return Update(tableName, primaryKeyName, poco, null);
+            return Update(tableName, primaryKeyName, poco, (IEnumerable<string>)null);
         }
 
         /// <summary>
@@ -1610,7 +1609,7 @@ namespace PetaPoco
         /// <returns>The number of affected rows</returns>
         public int Update(object poco, IEnumerable<string> columns)
         {
-            return Update(poco, null, columns);
+            return Update(poco, (object)null, columns);
         }
 
         /// <summary>
@@ -1770,9 +1769,12 @@ namespace PetaPoco
                                 : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
                         }
 
-                        cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}",
-                            _provider.EscapeTableName(tableName), sb.ToString(), _provider.EscapeSqlIdentifier(primaryKeyName), _paramPrefix, index++);
-                        AddParam(cmd, primaryKeyValue, pkpi);
+                        cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2}",
+                            _provider.EscapeTableName(tableName), sb.ToString(), BuildMultiPartLogic(primaryKeyName, index++));
+                        foreach (var value in primaryKeyValue)
+                        {
+                            AddParam(cmd, value, pkpi);
+                        }
 
                         DoPreExecute(cmd);
 
@@ -1883,7 +1885,7 @@ namespace PetaPoco
             }
 
             // Do it
-            var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", _provider.EscapeTableName(tableName), _provider.EscapeSqlIdentifier(primaryKeyName));
+            var sql = string.Format("DELETE FROM {0} WHERE {1}", _provider.EscapeTableName(tableName), BuildMultiPartLogic(primaryKeyName));
             return Execute(sql, primaryKeyValue);
         }
 
@@ -1904,21 +1906,28 @@ namespace PetaPoco
         /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
         /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
         /// <returns></returns>
-        public int Delete<T>(object pocoOrPrimaryKey)
+        public int Delete<T>(params object[] pocoOrPrimaryKey)
         {
-            if (pocoOrPrimaryKey.GetType() == typeof(T))
-                return Delete(pocoOrPrimaryKey);
+            if (pocoOrPrimaryKey.First().GetType() == typeof(T))
+                return Delete(pocoOrPrimaryKey.First());
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
 
+            // First element may be a anonymous object.  If so convert it to an array of values.
+
             if (pocoOrPrimaryKey.GetType().Name.Contains("AnonymousType"))
             {
-                var pi = pocoOrPrimaryKey.GetType().GetProperty(pd.TableInfo.PrimaryKey);
+                List<object> newObject = new List<object>();
 
-                if (pi == null)
-                    throw new InvalidOperationException(string.Format("Anonymous type does not contain an id for PK column `{0}`.", pd.TableInfo.PrimaryKey));
+                foreach(var pk in pd.TableInfo.PrimaryKey) { 
+                    var pi = pocoOrPrimaryKey.GetType().GetProperty(pk);
 
-                pocoOrPrimaryKey = pi.GetValue(pocoOrPrimaryKey, new object[0]);
+                    if (pi == null)
+                        throw new InvalidOperationException(string.Format("Anonymous type does not contain an id for PK column `{0}`.", pd.TableInfo.PrimaryKey));
+
+                    newObject.Add(pi.GetValue(pocoOrPrimaryKey, new object[0]));
+                }
+                pocoOrPrimaryKey = newObject.ToArray();
             }
 
             return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
@@ -1986,7 +1995,7 @@ namespace PetaPoco
             if (poco == null)
                 throw new ArgumentNullException("poco");
 
-            if (string.IsNullOrEmpty(primaryKeyName))
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
                 throw new ArgumentException("primaryKeyName");
 
             return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName, _defaultMapper), poco);

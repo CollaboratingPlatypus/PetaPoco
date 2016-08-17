@@ -33,7 +33,7 @@ namespace PetaPoco.Tests.Unit.Core
             var zettaEntity = _mapper.GetTableInfo(typeof(ZettaEntity));
 
             exaEntity.TableName.ShouldBe("ExaEntity");
-            exaEntity.PrimaryKey.ShouldBe("Id");
+            exaEntity.PrimaryKey[0].ShouldBe("Id");
             exaEntity.AutoIncrement.ShouldBeTrue();
             exaEntity.SequenceName.ShouldBeNull();
 
@@ -50,12 +50,12 @@ namespace PetaPoco.Tests.Unit.Core
             var yottaEntity = _mapper.GetTableInfo(typeof(YottaEntity));
 
             teraEntity.TableName.ShouldBe("TblTeraEntity");
-            teraEntity.PrimaryKey.ShouldBe("TheId");
+            teraEntity.PrimaryKey[0].ShouldBe("TheId");
             teraEntity.AutoIncrement.ShouldBeFalse();
             teraEntity.SequenceName.ShouldBeNull();
 
             yottaEntity.TableName.ShouldBe("yotta_entities");
-            yottaEntity.PrimaryKey.ShouldBe("Id");
+            yottaEntity.PrimaryKey[0].ShouldBe("Id");
             yottaEntity.AutoIncrement.ShouldBeTrue();
             yottaEntity.SequenceName.ShouldBe("SEQ_1");
         }

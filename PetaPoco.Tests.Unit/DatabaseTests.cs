@@ -89,7 +89,7 @@ namespace PetaPoco.Tests.Unit
         public void Update_GivenInvalidArguments_ShouldThrow()
         {
             Should.Throw<ArgumentNullException>(() => DB.Update(null, "primaryKeyName", new Person(), 1));
-            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", null, new Person(), 1));
+            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", (System.Collections.Generic.IEnumerable<string>)null, new Person(), 1));
             Should.Throw<ArgumentNullException>(() => DB.Update("tableName", "primaryKeyName", null, 1));
 
             Should.Throw<ArgumentNullException>(() => DB.Update(null, "primaryKeyName", new Person(), 1, null));
@@ -97,14 +97,14 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentNullException>(() => DB.Update("tableName", "primaryKeyName", null, 1, null));
 
             Should.Throw<ArgumentNullException>(() => DB.Update(null, "primaryKeyName", new Person()));
-            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", null, new Person()));
+            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", (string)null, new Person()));
             Should.Throw<ArgumentNullException>(() => DB.Update("tableName", "primaryKeyName", (Person) null));
 
             Should.Throw<ArgumentNullException>(() => DB.Update(null, "primaryKeyName", new Person(), null));
-            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", null, new Person(), null));
+            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", (string)null, new Person(), null));
             Should.Throw<ArgumentNullException>(() => DB.Update("tableName", "primaryKeyName", null, null));
 
-            Should.Throw<ArgumentNullException>(() => DB.Update(null, null));
+            Should.Throw<ArgumentNullException>(() => DB.Update(null, (System.Collections.Generic.IEnumerable<string>)null));
 
             Should.Throw<ArgumentNullException>(() => DB.Update(null));
 
@@ -123,7 +123,7 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentNullException>(() => DB.Insert(null));
             Should.Throw<ArgumentNullException>(() => DB.Insert(null, null));
             Should.Throw<ArgumentNullException>(() => DB.Insert(null, "SomeColumn", new Person()));
-            Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", null, new Person()));
+            Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", (string)null, new Person()));
             Should.Throw<ArgumentNullException>(() => DB.Insert("SomeTable", "SomeColumn", null));
         }
 
@@ -131,7 +131,7 @@ namespace PetaPoco.Tests.Unit
         public void IsNew_GivenInvalidArguments_ShouldThrow()
         {
             Should.Throw<ArgumentNullException>(() => DB.IsNew(null));
-            Should.Throw<ArgumentNullException>(() => DB.IsNew(null, null));
+            Should.Throw<ArgumentNullException>(() => DB.IsNew((string)null, null));
 
             Should.Throw<ArgumentException>(() => DB.IsNew("MissingId", new { }));
 
