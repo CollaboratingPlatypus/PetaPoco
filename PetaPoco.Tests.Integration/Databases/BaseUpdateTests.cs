@@ -84,7 +84,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var personOther = DB.Single<Person>(_person.Id);
             UpdateProperties(personOther);
-            DB.Update(personOther, null).ShouldBe(1);
+            DB.Update(personOther, (System.Collections.Generic.IEnumerable<string>)null).ShouldBe(1);
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -97,7 +97,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var personOther = DB.Single<Person>(_person.Id);
             UpdateProperties(personOther);
-            DB.Update(personOther, new[] { "FullName", "Height" }).ShouldBe(1);
+            DB.Update(personOther, new string[] { "FullName", "Height" }.AsEnumerable()).ShouldBe(1);
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.Id.ShouldBe(_person.Id);
@@ -199,7 +199,7 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
             var sql = $"SET {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} = @1 " +
-                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey)} = @0";
+                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey[0])} = @0";
 
             DB.Update<Person>(sql, _person.Id, "Feta's Order").ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
@@ -214,7 +214,7 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
             var sql = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} = @1 " +
-                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey)} = @0", _person.Id, "Feta's Order");
+                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey[0])} = @0", _person.Id, "Feta's Order");
 
             DB.Update<Person>(sql);
             var personOther = DB.Single<Person>(_person.Id);
