@@ -122,16 +122,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent Condition="!$(DefineConstants.Contains('SKIP_POST_BUILD'))">
-      "$(SolutionDir)Tools\PetaPoco.Cs.Joiner.exe" -o:"$(SolutionDir)\Output\PetaPoco.cs" "$(ProjectDir)\Database.cs" -r *.cs -x:"$(ProjectDir)\Properties\*.cs"
-      COPY "$(ProjectDir)T4 Templates\*" "$(SolutionDir)Output\"
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
     <PostBuildEvent>
-      "$(ProjectDir)..\Tools\PetaPoco.Cs.Joiner.exe" $(ProjectDir) 
+      "$(ProjectDir)..\Tools\PetaPoco.Cs.Joiner.exe" "$(ProjectDir)\"
       COPY "$(ProjectDir)T4 Templates\*" "$(ProjectDir)..\Output\"
-</PostBuildEvent>
+     </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
