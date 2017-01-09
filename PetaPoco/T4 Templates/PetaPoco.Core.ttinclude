@@ -1,4 +1,5 @@
-<#@ template language="C#v3.5" hostspecific="True" #>
+<#@ template language="C#" hostspecific="True" #>
+<#@ output extension=".cs" #>
 <#@ assembly name="EnvDTE" #>
 <#@ assembly name="System.Core.dll" #>
 <#@ assembly name="System.Data" #>
@@ -282,49 +283,99 @@ public string ProviderName
 
 public EnvDTE.Project GetCurrentProject()  {
 
-    IServiceProvider _ServiceProvider = (IServiceProvider)Host;
-    if (_ServiceProvider == null)
-        throw new Exception("Host property returned unexpected value (null)");
+	IServiceProvider _ServiceProvider = Host as IServiceProvider;
+	if (_ServiceProvider == null)
+		return null;
 	
-    EnvDTE.DTE dte = (EnvDTE.DTE)_ServiceProvider.GetService(typeof(EnvDTE.DTE));
-    if (dte == null)
-        throw new Exception("Unable to retrieve EnvDTE.DTE");
+	EnvDTE.DTE dte = _ServiceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+	if (dte == null)
+		return null;
 	
-    Array activeSolutionProjects = (Array)dte.ActiveSolutionProjects;
-    if (activeSolutionProjects == null)
-        throw new Exception("DTE.ActiveSolutionProjects returned null");
+	Array activeSolutionProjects = dte.ActiveSolutionProjects as Array;
+	if (activeSolutionProjects == null)
+		return null;
 	
-    EnvDTE.Project dteProject = (EnvDTE.Project)activeSolutionProjects.GetValue(0);
-    if (dteProject == null)
-        throw new Exception("DTE.ActiveSolutionProjects[0] returned null");
+	EnvDTE.Project dteProject = activeSolutionProjects.GetValue(0) as EnvDTE.Project;
+	if (dteProject == null)
+		return null;
 	
-    return dteProject;
+	return dteProject;
 
 }
 
 private string GetProjectPath()
 {
-    EnvDTE.Project project = GetCurrentProject();
-    System.IO.FileInfo info = new System.IO.FileInfo(project.FullName);
-    return info.Directory.FullName;
+	EnvDTE.Project project = GetCurrentProject();
+	if (project != null)
+	{
+		System.IO.FileInfo info = new System.IO.FileInfo(project.FullName);
+		return info.Directory.FullName;
+	}
+	else
+	{
+		string currentDir = System.IO.Path.GetDirectoryName(Host.TemplateFile);
+		return GetProjectPath(currentDir);
+	}
+}
+
+private string GetProjectPath(string startingSearchDir)
+{
+	string[] projFiles = Directory.GetFiles(startingSearchDir, "*.csproj");
+	if (projFiles.Length != 0)
+	{
+		System.IO.FileInfo projectFileInfo = new System.IO.FileInfo(projFiles[0]);
+		return projectFileInfo.Directory.FullName;
+	}
+	else
+	{
+		var parentDir = Directory.GetParent(startingSearchDir);
+		if (parentDir != null)
+		{
+			return GetProjectPath(parentDir.FullName);
+		}
+	}
+	return string.Empty;
 }
 
 private string GetConfigPath()
 {
-    EnvDTE.Project project = GetCurrentProject();
-    foreach (EnvDTE.ProjectItem item in project.ProjectItems)
-    {
-        // if it is the app.config file, then open it up
-        if (item.Name.Equals("App.config",StringComparison.InvariantCultureIgnoreCase) || item.Name.Equals("Web.config",StringComparison.InvariantCultureIgnoreCase))
-			return GetProjectPath() + "\\" + item.Name;
-    }
-    return String.Empty;
+	EnvDTE.Project project = GetCurrentProject();
+	if (project != null)
+	{
+		foreach (EnvDTE.ProjectItem item in project.ProjectItems)
+		{
+			// if it is the app.config file, then open it up
+			if (item.Name.Equals("App.config",StringComparison.InvariantCultureIgnoreCase) || item.Name.Equals("Web.config",StringComparison.InvariantCultureIgnoreCase))
+				return GetProjectPath() + "\\" + item.Name;
+		}
+	}
+	else
+	{
+		string projectDir = GetProjectPath();
+		var configFiles = Directory.GetFiles(projectDir, "*.config");
+		foreach (var configFile in configFiles)
+		{
+			if (configFile.EndsWith("App.config", StringComparison.OrdinalIgnoreCase) ||
+				configFile.EndsWith("Web.config", StringComparison.OrdinalIgnoreCase))
+			{
+				return configFile;
+			}
+		}
+	}
+	return String.Empty;
 }
 
 public string GetDataDirectory()
 {
-    EnvDTE.Project project=GetCurrentProject();
-    return System.IO.Path.GetDirectoryName(project.FileName)+"\\App_Data\\";
+	EnvDTE.Project project=GetCurrentProject();
+	if (project != null)
+	{
+		return System.IO.Path.GetDirectoryName(project.FileName)+"\\App_Data\\";
+	}
+	else
+	{
+		return GetProjectPath() + "\\App_Data\\";
+	}
 }
 
 static string zap_password(string connectionString)
