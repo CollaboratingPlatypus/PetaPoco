@@ -989,6 +989,11 @@ class PostGreSqlSchemaReader : SchemaReader
 			p.Value=tbl.Name;
 			cmd.Parameters.Add(p);
 
+			var s = cmd.CreateParameter();
+			s.ParameterName = "@tableSchema";
+			s.Value=tbl.Schema;
+			cmd.Parameters.Add(s);
+
 			var result=new List<Column>();
 			using (IDataReader rdr=cmd.ExecuteReader())
 			{
@@ -1096,7 +1101,7 @@ class PostGreSqlSchemaReader : SchemaReader
 	const string COLUMN_SQL=@"
 			SELECT column_name, is_nullable, udt_name, column_default
 			FROM information_schema.columns 
-			WHERE table_name=@tableName;
+			WHERE table_name=@tableName and table_schema = @tableSchema;
 			";
 	
 }
