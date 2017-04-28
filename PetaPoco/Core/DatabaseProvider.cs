@@ -83,7 +83,7 @@ namespace PetaPoco.Core
         public virtual object MapParameterValue(object value)
         {
             if (value is bool)
-                return ((bool) value) ? 1 : 0;
+                return ((bool)value) ? 1 : 0;
 
             return value;
         }
@@ -166,10 +166,15 @@ namespace PetaPoco.Core
         {
             var ft = Type.GetType(assemblyQualifiedName);
 
+            // Work for OracleConnection when using the Oracle.DataAccess.dll, 2.112.1.0
+            if (ft == null && assemblyQualifiedName.StartsWith("Oracle"))
+            {
+                ft = Type.GetType("Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
+            }
             if (ft == null)
                 throw new ArgumentException("Could not load the " + GetType().Name + " DbProviderFactory.");
 
-            return (DbProviderFactory) ft.GetField("Instance").GetValue(null);
+            return (DbProviderFactory)ft.GetField("Instance").GetValue(null);
         }
 
         /// <summary>
