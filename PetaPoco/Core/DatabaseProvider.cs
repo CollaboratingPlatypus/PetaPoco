@@ -159,18 +159,22 @@ namespace PetaPoco.Core
         /// <summary>
         ///     Returns the .net standard conforming DbProviderFactory.
         /// </summary>
-        /// <param name="assemblyQualifiedName">The assembly qualified name of the provider factory.</param>
+        /// <param name="assemblyQualifiedNames">The assembly qualified name of the provider factory.</param>
         /// <returns>The db provider factory.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="assemblyQualifiedName" /> does not match a type.</exception>
-        protected DbProviderFactory GetFactory(string assemblyQualifiedName)
+        /// <exception cref="ArgumentException">Thrown when <paramref name="assemblyQualifiedNames" /> does not match a type.</exception>
+        protected DbProviderFactory GetFactory(params string[] assemblyQualifiedNames)
         {
-            var ft = Type.GetType(assemblyQualifiedName);
-
-            // Work for OracleConnection when using the Oracle.DataAccess.dll, 2.112.1.0
-            if (ft == null && assemblyQualifiedName.StartsWith("Oracle"))
+            Type ft = null;
+            foreach (var assemblyName in assemblyQualifiedNames)
             {
-                ft = Type.GetType("Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
+                ft = Type.GetType(assemblyName);
+
+                if (ft != null)
+                {
+                    break;
+                }
             }
+
             if (ft == null)
                 throw new ArgumentException("Could not load the " + GetType().Name + " DbProviderFactory.");
 
