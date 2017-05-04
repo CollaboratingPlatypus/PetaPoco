@@ -37,7 +37,10 @@ namespace PetaPoco.Providers
 
         public override DbProviderFactory GetFactory()
         {
-            return GetFactory("Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess, Culture=neutral, PublicKeyToken=89b483f429c47342");
+            // "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" is for Oracle.ManagedDataAccess.dll
+            // "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess" is for Oracle.DataAccess.dll
+            return GetFactory("Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess, Culture=neutral, PublicKeyToken=89b483f429c47342",
+                              "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
         }
 
         public override string EscapeSqlIdentifier(string sqlIdentifier)
