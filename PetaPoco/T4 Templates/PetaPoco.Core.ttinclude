@@ -1,4 +1,5 @@
-<#@ template language="C#v3.5" hostspecific="True" #>
+<#@ template language="C#" hostspecific="True" #>
+<#@ output extension=".cs" #>
 <#@ assembly name="EnvDTE" #>
 <#@ assembly name="System.Core.dll" #>
 <#@ assembly name="System.Data" #>
@@ -40,6 +41,10 @@
  using Visual Studio 2010 the file you want is here:
 
 	C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config\machine.config
+	
+ If you are using VS2015 or VS2017 you may also need to update machine.config file located here:
+
+	C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\machine.config
 
  After making changes to machine.config you will also need to restart Visual Studio.
 
@@ -53,7 +58,7 @@
 			<add name="SqlClient Data Provider" invariant="System.Data.SqlClient" description=".Net Framework Data Provider for SqlServer" type="System.Data.SqlClient.SqlClientFactory, System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"/>
 			<add name="MySQL Data Provider" invariant="MySql.Data.MySqlClient" description=".Net Framework Data Provider for MySQL" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Version=6.3.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d"/>
 			<add name="Microsoft SQL Server Compact Data Provider" invariant="System.Data.SqlServerCe.3.5" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"/><add name="Microsoft SQL Server Compact Data Provider 4.0" invariant="System.Data.SqlServerCe.4.0" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"/>
-			<add name="Npgsql Data Provider" invariant="Npgsql" support="FF" description=".Net Framework Data Provider for Postgresql Server" type="Npgsql.NpgsqlFactory, Npgsql, Version=2.0.11.91, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7" />
+			<add name="Npgsql" invariant="Npgsql" description=".NET Data Provider for PostgreSQL" type="Npgsql.NpgsqlFactory, Npgsql, Version=3.2.2.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7"/>
 		</DbProviderFactories>
 	</system.data>
 
@@ -63,6 +68,7 @@
 
 	 gacutil /i Npgsql.dll
 	 gacutil /i Mono.Security.dll
+	 gacutil /i System.Threading.Tasks.Extensions.dll
 
  -----------------------------------------------------------------------------------------
  
@@ -282,49 +288,99 @@ public string ProviderName
 
 public EnvDTE.Project GetCurrentProject()  {
 
-    IServiceProvider _ServiceProvider = (IServiceProvider)Host;
-    if (_ServiceProvider == null)
-        throw new Exception("Host property returned unexpected value (null)");
+	IServiceProvider _ServiceProvider = Host as IServiceProvider;
+	if (_ServiceProvider == null)
+		return null;
 	
-    EnvDTE.DTE dte = (EnvDTE.DTE)_ServiceProvider.GetService(typeof(EnvDTE.DTE));
-    if (dte == null)
-        throw new Exception("Unable to retrieve EnvDTE.DTE");
+	EnvDTE.DTE dte = _ServiceProvider.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+	if (dte == null)
+		return null;
 	
-    Array activeSolutionProjects = (Array)dte.ActiveSolutionProjects;
-    if (activeSolutionProjects == null)
-        throw new Exception("DTE.ActiveSolutionProjects returned null");
+	Array activeSolutionProjects = dte.ActiveSolutionProjects as Array;
+	if (activeSolutionProjects == null)
+		return null;
 	
-    EnvDTE.Project dteProject = (EnvDTE.Project)activeSolutionProjects.GetValue(0);
-    if (dteProject == null)
-        throw new Exception("DTE.ActiveSolutionProjects[0] returned null");
+	EnvDTE.Project dteProject = activeSolutionProjects.GetValue(0) as EnvDTE.Project;
+	if (dteProject == null)
+		return null;
 	
-    return dteProject;
+	return dteProject;
 
 }
 
 private string GetProjectPath()
 {
-    EnvDTE.Project project = GetCurrentProject();
-    System.IO.FileInfo info = new System.IO.FileInfo(project.FullName);
-    return info.Directory.FullName;
+	EnvDTE.Project project = GetCurrentProject();
+	if (project != null)
+	{
+		System.IO.FileInfo info = new System.IO.FileInfo(project.FullName);
+		return info.Directory.FullName;
+	}
+	else
+	{
+		string currentDir = System.IO.Path.GetDirectoryName(Host.TemplateFile);
+		return GetProjectPath(currentDir);
+	}
+}
+
+private string GetProjectPath(string startingSearchDir)
+{
+	string[] projFiles = Directory.GetFiles(startingSearchDir, "*.csproj");
+	if (projFiles.Length != 0)
+	{
+		System.IO.FileInfo projectFileInfo = new System.IO.FileInfo(projFiles[0]);
+		return projectFileInfo.Directory.FullName;
+	}
+	else
+	{
+		var parentDir = Directory.GetParent(startingSearchDir);
+		if (parentDir != null)
+		{
+			return GetProjectPath(parentDir.FullName);
+		}
+	}
+	return string.Empty;
 }
 
 private string GetConfigPath()
 {
-    EnvDTE.Project project = GetCurrentProject();
-    foreach (EnvDTE.ProjectItem item in project.ProjectItems)
-    {
-        // if it is the app.config file, then open it up
-        if (item.Name.Equals("App.config",StringComparison.InvariantCultureIgnoreCase) || item.Name.Equals("Web.config",StringComparison.InvariantCultureIgnoreCase))
-			return GetProjectPath() + "\\" + item.Name;
-    }
-    return String.Empty;
+	EnvDTE.Project project = GetCurrentProject();
+	if (project != null)
+	{
+		foreach (EnvDTE.ProjectItem item in project.ProjectItems)
+		{
+			// if it is the app.config file, then open it up
+			if (item.Name.Equals("App.config",StringComparison.InvariantCultureIgnoreCase) || item.Name.Equals("Web.config",StringComparison.InvariantCultureIgnoreCase))
+				return GetProjectPath() + "\\" + item.Name;
+		}
+	}
+	else
+	{
+		string projectDir = GetProjectPath();
+		var configFiles = Directory.GetFiles(projectDir, "*.config");
+		foreach (var configFile in configFiles)
+		{
+			if (configFile.EndsWith("App.config", StringComparison.OrdinalIgnoreCase) ||
+				configFile.EndsWith("Web.config", StringComparison.OrdinalIgnoreCase))
+			{
+				return configFile;
+			}
+		}
+	}
+	return String.Empty;
 }
 
 public string GetDataDirectory()
 {
-    EnvDTE.Project project=GetCurrentProject();
-    return System.IO.Path.GetDirectoryName(project.FileName)+"\\App_Data\\";
+	EnvDTE.Project project=GetCurrentProject();
+	if (project != null)
+	{
+		return System.IO.Path.GetDirectoryName(project.FileName)+"\\App_Data\\";
+	}
+	else
+	{
+		return GetProjectPath() + "\\App_Data\\";
+	}
 }
 
 static string zap_password(string connectionString)
@@ -938,6 +994,11 @@ class PostGreSqlSchemaReader : SchemaReader
 			p.Value=tbl.Name;
 			cmd.Parameters.Add(p);
 
+			var s = cmd.CreateParameter();
+			s.ParameterName = "@tableSchema";
+			s.Value=tbl.Schema;
+			cmd.Parameters.Add(s);
+
 			var result=new List<Column>();
 			using (IDataReader rdr=cmd.ExecuteReader())
 			{
@@ -1045,7 +1106,7 @@ class PostGreSqlSchemaReader : SchemaReader
 	const string COLUMN_SQL=@"
 			SELECT column_name, is_nullable, udt_name, column_default
 			FROM information_schema.columns 
-			WHERE table_name=@tableName;
+			WHERE table_name=@tableName and table_schema = @tableSchema;
 			";
 	
 }

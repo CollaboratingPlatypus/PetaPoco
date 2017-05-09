@@ -19,6 +19,7 @@ namespace PetaPoco.Core
     {
         private static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
         private static List<Func<object, object>> _converters = new List<Func<object, object>>();
+        private static object _converterLock = new object();
         private static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] {typeof(int)});
         private static MethodInfo fnIsDBNull = typeof(IDataRecord).GetMethod("IsDBNull");
         private static FieldInfo fldConverters = typeof(PocoData).GetField("_converters", BindingFlags.Static | BindingFlags.GetField | BindingFlags.NonPublic);
@@ -337,8 +338,13 @@ namespace PetaPoco.Core
             if (converter != null)
             {
                 // Add the converter
-                int converterIndex = _converters.Count;
-                _converters.Add(converter);
+                int converterIndex;
+
+                lock (_converterLock)
+                {
+                    converterIndex = _converters.Count;
+                    _converters.Add(converter);
+                }
 
                 // Generate IL to push the converter onto the stack
                 il.Emit(OpCodes.Ldsfld, fldConverters);
