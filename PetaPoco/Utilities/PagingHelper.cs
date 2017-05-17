@@ -21,6 +21,8 @@ namespace PetaPoco.Utilities
                 @"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
                 RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
+        public Regex SimpleRegexOrderBy = new Regex(@"\bORDER\s+BY\s+", RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
         public static IPagingHelper Instance { get; private set; }
 
         static PagingHelper()
@@ -56,12 +58,12 @@ namespace PetaPoco.Utilities
                 parts.SqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
 
             // Look for the last "ORDER BY <whatever>" clause not part of a ROW_NUMBER expression
-            m = RegexOrderBy.Match(parts.SqlCount);
+            m = SimpleRegexOrderBy.Match(parts.SqlCount);
             if (m.Success)
             {
                 g = m.Groups[0];
-                parts.SqlOrderBy = g.ToString();
-                parts.SqlCount = parts.SqlCount.Substring(0, g.Index) + parts.SqlCount.Substring(g.Index + g.Length);
+                parts.SqlOrderBy = g + parts.SqlCount.Substring(g.Index + g.Length);
+                parts.SqlCount = parts.SqlCount.Substring(0, g.Index);
             }
 
             return true;
