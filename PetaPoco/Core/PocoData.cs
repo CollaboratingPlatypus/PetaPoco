@@ -20,7 +20,7 @@ namespace PetaPoco.Core
         private static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
         private static List<Func<object, object>> _converters = new List<Func<object, object>>();
         private static object _converterLock = new object();
-        private static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] {typeof(int)});
+        private static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) });
         private static MethodInfo fnIsDBNull = typeof(IDataRecord).GetMethod("IsDBNull");
         private static FieldInfo fldConverters = typeof(PocoData).GetField("_converters", BindingFlags.Static | BindingFlags.GetField | BindingFlags.NonPublic);
         private static MethodInfo fnListGetItem = typeof(List<Func<object, object>>).GetProperty("Item").GetGetMethod();
@@ -73,7 +73,7 @@ namespace PetaPoco.Core
             }
 
             // Build column list for automatic select
-            QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
+            QueryColumns = Columns.Keys.ToArray();
         }
 
         public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
@@ -84,13 +84,13 @@ namespace PetaPoco.Core
                 var pd = new PocoData();
                 pd.TableInfo = new TableInfo();
                 pd.Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
-                pd.Columns.Add(primaryKeyName, new ExpandoColumn() {ColumnName = primaryKeyName});
+                pd.Columns.Add(primaryKeyName, new ExpandoColumn() { ColumnName = primaryKeyName });
                 pd.TableInfo.PrimaryKey = primaryKeyName;
                 pd.TableInfo.AutoIncrement = true;
                 foreach (var col in (obj as IDictionary<string, object>).Keys)
                 {
                     if (col != primaryKeyName)
-                        pd.Columns.Add(col, new ExpandoColumn() {ColumnName = col});
+                        pd.Columns.Add(col, new ExpandoColumn() { ColumnName = col });
                 }
                 return pd;
             }
@@ -120,7 +120,7 @@ namespace PetaPoco.Core
             return PocoFactories.Get(key, () =>
             {
                 // Create the method
-                var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), Type, new Type[] {typeof(IDataReader)}, true);
+                var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), Type, new Type[] { typeof(IDataReader) }, true);
                 var il = m.GetILGenerator();
                 var mapper = Mappers.GetMapper(Type, defaultMapper);
 
@@ -140,7 +140,7 @@ namespace PetaPoco.Core
                         il.Emit(OpCodes.Ldstr, reader.GetName(i)); // obj, obj, fieldname
 
                         // Get the converter
-                        Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo) null, srcType);
+                        Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo)null, srcType);
 
                         /*
 						if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
@@ -249,7 +249,7 @@ namespace PetaPoco.Core
                         bool Handled = false;
                         if (converter == null)
                         {
-                            var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] {typeof(int)});
+                            var valuegetter = typeof(IDataRecord).GetMethod("Get" + srcType.Name, new Type[] { typeof(int) });
                             if (valuegetter != null
                                 && valuegetter.ReturnType == srcType
                                 && (valuegetter.ReturnType == dstType || valuegetter.ReturnType == Nullable.GetUnderlyingType(dstType)))
@@ -261,7 +261,7 @@ namespace PetaPoco.Core
                                 // Convert to Nullable
                                 if (Nullable.GetUnderlyingType(dstType) != null)
                                 {
-                                    il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] {Nullable.GetUnderlyingType(dstType)}));
+                                    il.Emit(OpCodes.Newobj, dstType.GetConstructor(new Type[] { Nullable.GetUnderlyingType(dstType) }));
                                 }
 
                                 il.Emit(OpCodes.Callvirt, pc.PropertyInfo.GetSetMethod(true)); // poco
@@ -344,7 +344,7 @@ namespace PetaPoco.Core
             // Standard DateTime->Utc mapper
             if (pc != null && pc.ForceToUtc && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
             {
-                return delegate(object src) { return new DateTime(((DateTime) src).Ticks, DateTimeKind.Utc); };
+                return delegate (object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
             }
 
             // unwrap nullable types
@@ -372,15 +372,15 @@ namespace PetaPoco.Core
             {
                 if (dstType.IsEnum && srcType == typeof(string))
                 {
-                    return delegate(object src) { return EnumMapper.EnumFromString(dstType, (string) src); };
+                    return delegate (object src) { return EnumMapper.EnumFromString(dstType, (string)src); };
                 }
                 else if (dstType == typeof(Guid) && srcType == typeof(string))
                 {
-                    return delegate(object src) { return Guid.Parse((string) src); };
+                    return delegate (object src) { return Guid.Parse((string)src); };
                 }
                 else
                 {
-                    return delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+                    return delegate (object src) { return Convert.ChangeType(src, dstType, null); };
                 }
             }
 
