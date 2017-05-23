@@ -1,0 +1,29 @@
+﻿/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost
+Source Server Version : 50711
+Source Host           : localhost:3306
+Source Database       : petapoco_test
+
+Target Server Type    : MYSQL
+Target Server Version : 50711
+File Encoding         : 65001
+
+Date: 2017-05-23 20:24:35
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for logs
+-- ----------------------------
+DROP TABLE IF EXISTS `logs`;
+CREATE TABLE `logs` (
+  `LoginId` int(11) NOT NULL AUTO_INCREMENT,
+  `UserId` int(11) NOT NULL,
+  `LoginTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `IpAddress` varchar(255) NOT NULL,
+  PRIMARY KEY (`LoginId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET FOREIGN_KEY_CHECKS=1;

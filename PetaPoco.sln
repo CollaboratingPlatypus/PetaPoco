@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{33699753-151D-4100-8F12-9AE1AEB5C5BD}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -31,6 +31,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.SingleFile", "PetaPoco.Tests.Integration.SingleFile\PetaPoco.Tests.Integration.SingleFile.csproj", "{9B2D7B13-A47D-497C-9E46-85B78C2D074E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.x86", "PetaPoco.Tests.Integration.x86\PetaPoco.Tests.Integration.x86.csproj", "{9AAEF733-6F2A-4297-A0E2-D065212940A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.test.ResultColumn", "PetaPoco.test.ResultColumn\PetaPoco.test.ResultColumn.csproj", "{E476C216-7E4B-4049-BBBA-5BCF0CD970FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E476C216-7E4B-4049-BBBA-5BCF0CD970FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E476C216-7E4B-4049-BBBA-5BCF0CD970FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E476C216-7E4B-4049-BBBA-5BCF0CD970FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E476C216-7E4B-4049-BBBA-5BCF0CD970FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -73,7 +73,8 @@ namespace PetaPoco.Core
             }
 
             // Build column list for automatic select
-            QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
+            //QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
+            QueryColumns = Columns.Keys.ToArray();
         }
 
         public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
