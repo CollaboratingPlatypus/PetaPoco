@@ -49,7 +49,9 @@ namespace PetaPoco
         public Database()
         {
             if (ConfigurationManager.ConnectionStrings.Count == 0)
+            {
                 throw new InvalidOperationException("One or more connection strings must be registered to use the no paramater constructor");
+            }
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
@@ -69,7 +71,9 @@ namespace PetaPoco
         public Database(IDbConnection connection)
         {
             if (connection == null)
+            {
                 throw new ArgumentNullException("connection");
+            }
 
             _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
@@ -92,7 +96,9 @@ namespace PetaPoco
         public Database(string connectionString, string providerName = null)
         {
             if (string.IsNullOrEmpty(connectionString))
+            {
                 throw new ArgumentException("Connection string cannot be null or empty", "connectionString");
+            }
 
             _connectionString = connectionString;
             Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), null);
@@ -108,10 +114,14 @@ namespace PetaPoco
         public Database(string connectionString, DbProviderFactory factory)
         {
             if (string.IsNullOrEmpty(connectionString))
+            {
                 throw new ArgumentException("Connection string must not be null or empty", "connectionString");
+            }
 
             if (factory == null)
+            {
                 throw new ArgumentNullException("factory");
+            }
 
             _connectionString = connectionString;
             Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), null);
@@ -127,12 +137,16 @@ namespace PetaPoco
         public Database(string connectionStringName)
         {
             if (string.IsNullOrEmpty(connectionStringName))
+            {
                 throw new ArgumentException("Connection string name must not be null or empty", "connectionStringName");
+            }
 
             var entry = ConfigurationManager.ConnectionStrings[connectionStringName];
 
             if (entry == null)
+            {
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
+            }
 
             _connectionString = entry.ConnectionString;
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
@@ -150,10 +164,14 @@ namespace PetaPoco
         public Database(string connectionString, IProvider provider, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
+            {
                 throw new ArgumentException("Connection string must not be null or empty", "connectionString");
+            }
 
             if (provider == null)
+            {
                 throw new ArgumentNullException("provider");
+            }
 
             _connectionString = connectionString;
             Initialise(provider, defaultMapper);
@@ -169,7 +187,9 @@ namespace PetaPoco
         public Database(IDatabaseBuildConfiguration configuration)
         {
             if (configuration == null)
+            {
                 throw new ArgumentNullException("configuration");
+            }
 
             var settings = (IBuildConfigurationSettings) configuration;
 
@@ -184,11 +204,15 @@ namespace PetaPoco
                     entry = ConfigurationManager.ConnectionStrings[cn];
 
                     if (entry == null)
+                    {
                         throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", cn));
+                    }
                 }, () =>
                 {
                     if (ConfigurationManager.ConnectionStrings.Count == 0)
+                    {
                         throw new InvalidOperationException("One or more connection strings must be registered to not configure the connection string");
+                    }
 
                     entry = ConfigurationManager.ConnectionStrings[0];
                 });
@@ -200,7 +224,9 @@ namespace PetaPoco
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
             {
                 if (entry == null)
+                {
                     throw new InvalidOperationException("Both a connection string and provider are required or neither.");
+                }
 
                 var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
                 Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
