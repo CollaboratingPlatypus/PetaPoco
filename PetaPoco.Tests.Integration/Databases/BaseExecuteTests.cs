@@ -27,7 +27,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             InsertNotes(5);
             var sql = $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
-                      $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0";
+                      $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey[0])} = @0";
 
             var beforeCount = CountNotes();
             var result = DB.Execute(sql, 1);
@@ -45,7 +45,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var beforeCount = CountNotes();
             var result = DB.Execute($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
-                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0,@1)", 1, 2);
+                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey[0])} IN(@0,@1)", 1, 2);
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -60,7 +60,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var beforeCount = CountNotes();
             var result = DB.Execute($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
-                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = 1");
+                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey[0])} = 1");
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -75,7 +75,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var beforeCount = CountNotes();
             var result = DB.Execute($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
-                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(1,2)");
+                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey[0])} IN(1,2)");
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -97,7 +97,7 @@ namespace PetaPoco.Tests.Integration.Databases
             InsertNotes(4);
 
             DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
-                                  $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} <= @0", 2).ShouldBe(2);
+                                  $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey[0])} <= @0", 2).ShouldBe(2);
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace PetaPoco.Tests.Integration.Databases
             InsertNotes(5);
 
             DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
-                                  $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0, @1)", 1, 2).ShouldBe(2);
+                                  $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey[0])} IN(@0, @1)", 1, 2).ShouldBe(2);
         }
 
         private int CountNotes()

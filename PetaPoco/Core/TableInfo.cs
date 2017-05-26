@@ -22,7 +22,7 @@ namespace PetaPoco
         /// <summary>
         ///     The name of the primary key column of the table
         /// </summary>
-        public string PrimaryKey { get; set; }
+        public string[] PrimaryKey { get; set; }
 
         /// <summary>
         ///     True if the primary key column is an auto-incrementing
@@ -53,7 +53,7 @@ namespace PetaPoco
             ti.SequenceName = a.Length == 0 ? null : (a[0] as PrimaryKeyAttribute).SequenceName;
             ti.AutoIncrement = a.Length == 0 ? false : (a[0] as PrimaryKeyAttribute).AutoIncrement;
 
-            if (string.IsNullOrEmpty(ti.PrimaryKey))
+            if (ti.PrimaryKey.Length == 0 || string.IsNullOrEmpty(ti.PrimaryKey.First()))
             {
                 var prop = t.GetProperties().FirstOrDefault(p =>
                 {
@@ -68,7 +68,7 @@ namespace PetaPoco
 
                 if (prop != null)
                 {
-                    ti.PrimaryKey = prop.Name;
+                    ti.PrimaryKey = new string[] { prop.Name };
                     ti.AutoIncrement = prop.PropertyType.IsValueType;
                 }
             }

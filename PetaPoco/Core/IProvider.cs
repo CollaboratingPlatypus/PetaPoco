@@ -82,12 +82,29 @@ namespace PetaPoco.Core
         object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName);
 
         /// <summary>
+        ///     Performs an Insert operation
+        /// </summary>
+        /// <param name="database">The calling Database object</param>
+        /// <param name="cmd">The insert command to be executed</param>
+        /// <param name="primaryKeyName">The primary key of the table being inserted into</param>
+        /// <returns>The ID of the newly inserted record</returns>
+        object ExecuteInsert(Database database, IDbCommand cmd, string[] primaryKeyName);
+
+        /// <summary>
         ///     Returns an SQL expression that can be used to specify the return value of auto incremented columns.
         /// </summary>
         /// <param name="primaryKeyName">The primary key of the row being inserted.</param>
         /// <returns>An expression describing how to return the new primary key value</returns>
         /// <remarks>See the SQLServer database provider for an example of how this method is used.</remarks>
         string GetInsertOutputClause(string primaryKeyName);
+
+        /// <summary>
+        ///     Returns an SQL expression that can be used to specify the return value of auto incremented columns.
+        /// </summary>
+        /// <param name="primaryKeyName">The primary key of the row being inserted.</param>
+        /// <returns>An expression describing how to return the new primary key value</returns>
+        /// <remarks>See the SQLServer database provider for an example of how this method is used.</remarks>
+        string GetInsertOutputClause(string[] primaryKeyName);
 
         /// <summary>
         ///     Returns the prefix used to delimit parameters in SQL query strings.

@@ -176,7 +176,7 @@ namespace PetaPoco.Tests.Integration.Documentation
                 if (prop == null)
                     return false;
 
-                ti.PrimaryKey = prop.Name;
+                ti.PrimaryKey = new[] { prop.Name };
                 ti.AutoIncrement = ((ConventionMapper)DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
                 return true;
             };

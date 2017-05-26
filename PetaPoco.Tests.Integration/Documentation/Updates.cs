@@ -65,7 +65,7 @@ namespace PetaPoco.Tests.Integration.Documentation
 
             // Tell PetaPoco to update only ther person's name
             // The update statement produced is `UPDATE [People] SET [FullName] = @0 WHERE [Id] = @1`
-            DB.Update(person, new [] { pocoData.GetColumnName(nameof(Person.Name)) });
+            DB.Update(person, new [] { pocoData.GetColumnName(nameof(Person.Name)) }.AsEnumerable());
 
             // Get a clone/copy from the DB
             var clone = DB.Single<Person>(id);
@@ -142,10 +142,10 @@ namespace PetaPoco.Tests.Integration.Documentation
             DB.Update(note2, note2.Id);
             DB.Update(note3, note3.Id, pocoData.UpdateColumns);
             var sql1 = $"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
-                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0";
+                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey[0])} = @0";
             DB.Update<Note>(sql1, note4.Id, note4.Text);
             var sql2 = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
-                               $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0", note5.Id, note5.Text);
+                               $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey[0])} = @0", note5.Id, note5.Text);
             DB.Update<Note>(sql2);
             
             // Just to be sure
@@ -204,7 +204,7 @@ namespace PetaPoco.Tests.Integration.Documentation
                 if (prop == null)
                     return false;
 
-                ti.PrimaryKey = prop.Name;
+                ti.PrimaryKey = new[] { prop.Name };
                 ti.AutoIncrement = ((ConventionMapper)DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
                 return true;
             };
