@@ -4,6 +4,7 @@ using System.Data.Common;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
+using System.Text.RegularExpressions;
 
 namespace PetaPoco.Providers
 {
