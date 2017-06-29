@@ -79,6 +79,7 @@
     <Compile Include="Providers\SqlServerDatabaseProvider.cs" />
     <Compile Include="Providers\SqlServerCEDatabaseProviders.cs" />
     <Compile Include="Providers\MySqlDatabaseProvider.cs" />
+    <Compile Include="Providers\TeradataProvider.cs" />
     <Compile Include="IAlterPoco.cs" />
     <Compile Include="IDatabase.cs" />
     <Compile Include="IExecute.cs" />
