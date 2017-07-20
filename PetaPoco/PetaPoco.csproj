@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ColumnAttribute.cs" />
-    <Compile Include="Attributes\ValueConverterAttribute.cs" />
     <Compile Include="Core\AnsiString.cs" />
     <Compile Include="Core\ColumnInfo.cs" />
     <Compile Include="Core\ConventionMapper.cs" />

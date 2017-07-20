@@ -155,20 +155,6 @@ namespace PetaPoco
 
                 return true;
             };
-            FromDbConverter = (pi, t) =>
-            {
-                var valueConverter = pi.GetCustomAttributes(typeof(ValueConverterAttribute), true).FirstOrDefault() as ValueConverterAttribute;
-                if (valueConverter != null)
-                    return valueConverter.ConvertFromDb;
-                return null;
-            };
-            ToDbConverter = (pi) =>
-            {
-                var valueConverter = pi.GetCustomAttributes(typeof(ValueConverterAttribute), true).FirstOrDefault() as ValueConverterAttribute;
-                if (valueConverter != null)
-                    return valueConverter.ConvertToDb;
-                return null;
-            };
         }
 
         /// <summary>
