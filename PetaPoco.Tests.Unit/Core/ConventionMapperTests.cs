@@ -34,6 +34,20 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
+        public void GetFromDbConverter_GivenPropertyWithValueConverterAttribute_ShouldNotBeNull()
+        {
+            var func = _mapper.GetFromDbConverter(typeof(Order).GetProperty(nameof(Order.PO)), typeof(string));
+            func.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void GetToDbConverter_GivenPropertyWithValueConverterAttribute_ShouldNotBeNull()
+        {
+            var func = _mapper.GetToDbConverter(typeof(Order).GetProperty(nameof(Order.PO)));
+            func.ShouldNotBeNull();
+        }
+
+        [Fact]
         public void GetFromDbConverter_GivenPropertyTypeAndInterceptSet_ShouldCallback()
         {
             var wasCalled = false;
@@ -209,12 +223,27 @@ namespace PetaPoco.Tests.Unit.Core
             public string ColumnTwo { get; set; }
         }
 
+        public class EmptyValueConverterAttribute : ValueConverterAttribute
+        {
+            public override object ConvertFromDb(object value)
+            {
+                return value;
+            }
+
+            public override object ConvertToDb(object value)
+            {
+                return value;
+            }
+        }
+
+
         public class Order
         {
             public long OrderId { get; set; }
 
             public DateTime CreatedOn { get; set; }
 
+            [EmptyValueConverter]
             public string PO { get; set; }
 
             public decimal? Discount { get; set; }
