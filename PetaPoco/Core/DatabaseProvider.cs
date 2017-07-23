@@ -168,11 +168,8 @@ namespace PetaPoco.Core
             foreach (var assemblyName in assemblyQualifiedNames)
             {
                 ft = Type.GetType(assemblyName);
-
                 if (ft != null)
-                {
                     break;
-                }
             }
 
             if (ft == null)
