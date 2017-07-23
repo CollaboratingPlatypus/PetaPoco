@@ -20,15 +20,18 @@ namespace PetaPoco.Providers
             return GetFactory("System.Data.SqlClient.SqlClientFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         }
 
-        private static readonly Regex simpleRegexOrderBy = new Regex(@"\bORDER\s+BY\s+", RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var helper = (PagingHelper)PagingUtility;
             // when the query does not contain an "order by", it is very slow
-            if (simpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
+            if (helper.SimpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
             {
-                parts.SqlSelectRemoved = helper.RegexOrderBy.Replace(parts.SqlSelectRemoved, "", 1);
+                var m = helper.SimpleRegexOrderBy.Match(parts.SqlSelectRemoved);
+                if (m.Success)
+                {
+                    var g = m.Groups[0];
+                    parts.SqlSelectRemoved = parts.SqlSelectRemoved.Substring(0, g.Index);
+                }
             }
             if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
             {
