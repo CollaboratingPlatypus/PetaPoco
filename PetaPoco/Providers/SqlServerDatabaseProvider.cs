@@ -44,7 +44,7 @@ namespace PetaPoco.Providers
 
         public override object ExecuteInsert(Database db, System.Data.IDbCommand cmd, string primaryKeyName)
         {
-            return db.ExecuteScalarHelper(cmd);
+            return ExecuteScalarHelper(db, cmd);
         }
 
         public override string GetExistsSql()

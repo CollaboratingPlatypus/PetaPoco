@@ -29,11 +29,11 @@ namespace PetaPoco.Providers
             if (primaryKeyName != null)
             {
                 cmd.CommandText += ";\nSELECT last_insert_rowid();";
-                return db.ExecuteScalarHelper(cmd);
+                return ExecuteScalarHelper(db, cmd);
             }
             else
             {
-                db.ExecuteNonQueryHelper(cmd);
+                ExecuteNonQueryHelper(db, cmd);
                 return -1;
             }
         }

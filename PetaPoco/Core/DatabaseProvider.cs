@@ -153,7 +153,7 @@ namespace PetaPoco.Core
         public virtual object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
         {
             cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
-            return database.ExecuteScalarHelper(cmd);
+            return ExecuteScalarHelper(database, cmd);
         }
 
         /// <summary>
@@ -276,5 +276,22 @@ namespace PetaPoco.Core
             var unwrapped = sp.GetService(factory.GetType()) as DbProviderFactory;
             return unwrapped == null ? factory : Unwrap(unwrapped);
         }
+
+        protected void ExecuteNonQueryHelper(Database db, IDbCommand cmd)
+        {
+            db.DoPreExecute(cmd);
+            cmd.ExecuteNonQuery();
+            db.OnExecutedCommand(cmd);
+        }
+
+        protected object ExecuteScalarHelper(Database db, IDbCommand cmd)
+        {
+            db.DoPreExecute(cmd);
+            object r = cmd.ExecuteScalar();
+            db.OnExecutedCommand(cmd);
+            return r;
+        }
+
+
     }
 }
