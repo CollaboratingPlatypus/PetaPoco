@@ -34,7 +34,7 @@ namespace PetaPoco.Providers
                 cmd.CommandText = cmd.CommandText.Substring(0, cmd.CommandText.Length - 1);
 
             cmd.CommandText += " RETURNING " + EscapeSqlIdentifier(primaryKeyName) + ";";
-            return database.ExecuteScalarHelper(cmd);
+            return ExecuteScalarHelper(database, cmd);
         }
 
         public override string EscapeSqlIdentifier(string sqlIdentifier)
