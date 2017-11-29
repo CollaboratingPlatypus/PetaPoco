@@ -29,7 +29,7 @@ namespace PetaPoco.Providers
 
         public override object ExecuteInsert(Database db, System.Data.IDbCommand cmd, string primaryKeyName)
         {
-            db.ExecuteNonQueryHelper(cmd);
+            ExecuteNonQueryHelper(db, cmd);
             return db.ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
         }
     }

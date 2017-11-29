@@ -45,11 +45,11 @@ namespace PetaPoco.Providers
             if (primaryKeyName != null)
             {
                 cmd.CommandText += string.Format("returning {0} as NewID", EscapeSqlIdentifier(primaryKeyName));
-                return db.ExecuteScalarHelper(cmd);
+                return ExecuteScalarHelper(db, cmd);
             }
             else
             {
-                db.ExecuteNonQueryHelper(cmd);
+                ExecuteNonQueryHelper(db, cmd);
                 return -1;
             }
         }

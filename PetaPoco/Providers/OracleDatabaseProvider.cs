@@ -67,12 +67,12 @@ namespace PetaPoco.Providers
                 param.Direction = ParameterDirection.ReturnValue;
                 param.DbType = DbType.Int64;
                 cmd.Parameters.Add(param);
-                db.ExecuteNonQueryHelper(cmd);
+                ExecuteNonQueryHelper(db, cmd);
                 return param.Value;
             }
             else
             {
-                db.ExecuteNonQueryHelper(cmd);
+                ExecuteNonQueryHelper(db, cmd);
                 return -1;
             }
         }

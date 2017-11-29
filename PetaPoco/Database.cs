@@ -2482,21 +2482,6 @@ namespace PetaPoco
 
         #region Internal operations
 
-        internal void ExecuteNonQueryHelper(IDbCommand cmd)
-        {
-            DoPreExecute(cmd);
-            cmd.ExecuteNonQuery();
-            OnExecutedCommand(cmd);
-        }
-
-        internal object ExecuteScalarHelper(IDbCommand cmd)
-        {
-            DoPreExecute(cmd);
-            object r = cmd.ExecuteScalar();
-            OnExecutedCommand(cmd);
-            return r;
-        }
-
         internal void DoPreExecute(IDbCommand cmd)
         {
             // Setup command timeout

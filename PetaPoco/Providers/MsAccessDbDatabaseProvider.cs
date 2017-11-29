@@ -21,9 +21,9 @@ namespace PetaPoco.Providers
 
         public override object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
         {
-            database.ExecuteNonQueryHelper(cmd);
+            ExecuteNonQueryHelper(database, cmd);
             cmd.CommandText = "SELECT @@IDENTITY AS NewID;";
-            return database.ExecuteScalarHelper(cmd);
+            return ExecuteScalarHelper(database, cmd);
         }
 
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
