@@ -16,7 +16,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
     {
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("mssqlce").Create();
 
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLCeBuildDatabase.sql";
+        //protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLCeBuildDatabase.sql";
+        protected override string ScriptResourceName => @"Scripts\MSSQLCeBuildDatabase.sql";
 
         public override IDatabase Execute()
         {

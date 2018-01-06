@@ -1,0 +1,148 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>PetaPoco.Tests.Integration</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseDatabase.cs" Link="Databases\BaseDatabase.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseDatabaseTests.cs" Link="Databases\BaseDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseDeleteTests.cs" Link="Databases\BaseDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseExecuteTests.cs" Link="Databases\BaseExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseInsertTests.cs" Link="Databases\BaseInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseQueryLinqTests.cs" Link="Databases\BaseQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseQueryTests.cs" Link="Databases\BaseQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\BaseUpdateTests.cs" Link="Databases\BaseUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\DBTestProvider.cs" Link="Databases\DBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdDatabaseTests.cs" Link="Databases\Firebird\FirebirdDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdDBTestProvider.cs" Link="Databases\Firebird\FirebirdDBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdDeleteTests.cs" Link="Databases\Firebird\FirebirdDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdExecuteTests.cs" Link="Databases\Firebird\FirebirdExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdInsertTests.cs" Link="Databases\Firebird\FirebirdInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdQueryLinqTests.cs" Link="Databases\Firebird\FirebirdQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdQueryTests.cs" Link="Databases\Firebird\FirebirdQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Firebird\FirebirdUpdateTests.cs" Link="Databases\Firebird\FirebirdUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbDatabaseTests.cs" Link="Databases\MariaDb\MariaDbDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbDBTestProvider.cs" Link="Databases\MariaDb\MariaDbDBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbDeleteTests.cs" Link="Databases\MariaDb\MariaDbDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbExecuteTests.cs" Link="Databases\MariaDb\MariaDbExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbInsertTests.cs" Link="Databases\MariaDb\MariaDbInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbQueryLinqTests.cs" Link="Databases\MariaDb\MariaDbQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaDbUpdateTests.cs" Link="Databases\MariaDb\MariaDbUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MariaDb\MariaQueryTests.cs" Link="Databases\MariaDb\MariaQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlDatabaseTests.cs" Link="Databases\MSSQL\MssqlDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlDBTestProvider.cs" Link="Databases\MSSQL\MssqlDBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlDeleteTests.cs" Link="Databases\MSSQL\MssqlDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlExecuteTests.cs" Link="Databases\MSSQL\MssqlExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlInsertTests.cs" Link="Databases\MSSQL\MssqlInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlQueryLinqTests.cs" Link="Databases\MSSQL\MssqlQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlQueryTests.cs" Link="Databases\MSSQL\MssqlQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MSSQL\MssqlUpdateTests.cs" Link="Databases\MSSQL\MssqlUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlDatabaseTests.cs" Link="Databases\MySQL\MySqlDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlDBTestProvider.cs" Link="Databases\MySQL\MySqlDBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlDeleteTests.cs" Link="Databases\MySQL\MySqlDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlExecuteTests.cs" Link="Databases\MySQL\MySqlExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlInsertTests.cs" Link="Databases\MySQL\MySqlInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlMiscellaneousTests.cs" Link="Databases\MySQL\MySqlMiscellaneousTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlQueryLinqTests.cs" Link="Databases\MySQL\MySqlQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlQueryTests.cs" Link="Databases\MySQL\MySqlQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\MySQL\MySqlUpdateTests.cs" Link="Databases\MySQL\MySqlUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresDatabaseTests.cs" Link="Databases\Postgres\PostgresDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresDBTestProvider.cs" Link="Databases\Postgres\PostgresDBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresDeleteTests.cs" Link="Databases\Postgres\PostgresDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresExecuteTests.cs" Link="Databases\Postgres\PostgresExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresInsertTests.cs" Link="Databases\Postgres\PostgresInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresQueryLinqTests.cs" Link="Databases\Postgres\PostgresQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresQueryTests.cs" Link="Databases\Postgres\PostgresQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Postgres\PostgresUpdateTests.cs" Link="Databases\Postgres\PostgresUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteDatabaseTests.cs" Link="Databases\Sqlite\SqliteDatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteDBTestProvider.cs" Link="Databases\Sqlite\SqliteDBTestProvider.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteDeleteTests.cs" Link="Databases\Sqlite\SqliteDeleteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteExecuteTests.cs" Link="Databases\Sqlite\SqliteExecuteTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteInsertTests.cs" Link="Databases\Sqlite\SqliteInsertTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteQueryLinqTests.cs" Link="Databases\Sqlite\SqliteQueryLinqTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteQueryTests.cs" Link="Databases\Sqlite\SqliteQueryTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Databases\Sqlite\SqliteUpdateTests.cs" Link="Databases\Sqlite\SqliteUpdateTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Documentation\Inserts.cs" Link="Documentation\Inserts.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Documentation\Updates.cs" Link="Documentation\Updates.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Note.cs" Link="Models\Note.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\NoteNullablePrimary.cs" Link="Models\NoteNullablePrimary.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Order.cs" Link="Models\Order.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderLine.cs" Link="Models\OrderLine.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderLineStatus.cs" Link="Models\OrderLineStatus.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\OrderStatus.cs" Link="Models\OrderStatus.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Person.cs" Link="Models\Person.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Postgres\JsonTypesPoco.cs" Link="Models\Postgres\JsonTypesPoco.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\TransactionLog.cs" Link="Models\TransactionLog.cs" />
+    <Compile Include="..\PetaPoco.Tests.Integration\TypeExtensions.cs" Link="TypeExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dotNetCore.Data.OracleClient" Version="1.0.0" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
+    <PackageReference Include="Microsoft.Data.SQLite" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="Moq" Version="4.8.0" />
+    <PackageReference Include="MySql.Data" Version="6.10.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Npgsql" Version="3.2.6" />
+    <PackageReference Include="Shouldly" Version="2.8.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PetaPoco.NetStandard\PetaPoco.NetStandard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Databases\Firebird\" />
+    <Folder Include="Databases\MariaDb\" />
+    <Folder Include="Databases\MSSQL\" />
+    <Folder Include="Databases\MySQL\" />
+    <Folder Include="Databases\Postgres\" />
+    <Folder Include="Databases\Sqlite\" />
+    <Folder Include="Documentation\" />
+    <Folder Include="Models\Postgres\" />
+    <Folder Include="Scripts\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\PetaPoco.Tests.Integration\Scripts\FirebirdDbBuildDatabase.sql" Link="Scripts\FirebirdDbBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PetaPoco.Tests.Integration\Scripts\MariaDbBuildDatabase.sql" Link="Scripts\MariaDbBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PetaPoco.Tests.Integration\Scripts\MSSQLBuildDatabase.sql" Link="Scripts\MSSQLBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PetaPoco.Tests.Integration\Scripts\MySqlBuildDatabase.sql" Link="Scripts\MySqlBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PetaPoco.Tests.Integration\Scripts\PostgresBuildDatabase.sql" Link="Scripts\PostgresBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\PetaPoco.Tests.Integration\Scripts\SqliteBuildDatabase.sql" Link="Scripts\SqliteBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

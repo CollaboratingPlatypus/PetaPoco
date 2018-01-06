@@ -36,7 +36,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETFULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>PetaPoco.Tests.Integration.ruleset</CodeAnalysisRuleSet>
@@ -45,7 +45,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NETFULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>PetaPoco.Tests.Integration.ruleset</CodeAnalysisRuleSet>
@@ -208,16 +208,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\MySqlBuildDatabase.sql" />
+    <Content Include="Scripts\MySqlBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
+    <Content Include="Scripts\PostgresBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\SqliteBuildDatabase.sql" />
+    <Content Include="Scripts\SqliteBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\MSSQLBuildDatabase.sql" />
+    <Content Include="Scripts\MSSQLBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Databases\MSSQL\petapoco.mdf">
@@ -227,9 +235,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>petapoco.mdf</DependentUpon>
     </Content>
-    <EmbeddedResource Include="Scripts\FirebirdDbBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MSSQLCeBuildDatabase.sql" />
+    <Content Include="Scripts\FirebirdDbBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\MariaDbBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\MSSQLCeBuildDatabase.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

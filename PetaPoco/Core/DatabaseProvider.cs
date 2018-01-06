@@ -206,11 +206,13 @@ namespace PetaPoco.Core
                 return Singleton<SqlServerDatabaseProvider>.Instance;
             if (typeName.StartsWith("FbConnection") || typeName.EndsWith("FirebirdClientFactory"))
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
+#if NETFULL
             if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
                 && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
                 return Singleton<MsAccessDbDatabaseProvider>.Instance;
             }
+#endif
             if (!allowDefault)
                 throw new ArgumentException("Could not match `" + type.FullName + "` to a provider.", "type");
 
@@ -245,11 +247,13 @@ namespace PetaPoco.Core
             if (providerName.IndexOf("Firebird", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("FbConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
+#if NETFULL
             if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
                 && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
                 return Singleton<MsAccessDbDatabaseProvider>.Instance;
             }
+#endif
             if (providerName.IndexOf("SqlServer", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerDatabaseProvider>.Instance;

@@ -8,8 +8,13 @@ namespace PetaPoco.Tests.Integration.Databases.MariaDb
 {
     public class MariaDbDBTestProvider : DBTestProvider
     {
+#if NETFULL
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("MariaDb").Create();
+#else
+        protected override IDatabase Database => CreateConfiguration("MariaDB").Create();
+#endif
 
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MariaDbBuildDatabase.sql";
+        //protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MariaDbBuildDatabase.sql";
+        protected override string ScriptResourceName => @"Scripts\MariaDbBuildDatabase.sql";
     }
 }

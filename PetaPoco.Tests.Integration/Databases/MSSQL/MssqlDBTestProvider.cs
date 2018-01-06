@@ -8,8 +8,12 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     public class MssqlDBTestProvider : DBTestProvider
     {
+#if NETFULL
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("mssql").Create();
-
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
+#else
+        protected override IDatabase Database => CreateConfiguration("MsSQL").Create();
+#endif
+        //protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
+        protected override string ScriptResourceName => @"Scripts\MSSQLBuildDatabase.sql";
     }
 }

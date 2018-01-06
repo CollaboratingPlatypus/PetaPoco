@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>PetaPoco.Tests.Unit</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\ConventionMapperRegressionTests.cs" Link="Core\ConventionMapperRegressionTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\ConventionMapperTests.cs" Link="Core\ConventionMapperTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\Inflection\EnglishInflectorTests.cs" Link="Core\Inflection\EnglishInflectorTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\Inflection\InflectorTests.cs" Link="Core\Inflection\InflectorTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\PocoDataTests.cs" Link="Core\PocoDataTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\SqlTests.cs" Link="Core\SqlTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Core\StandardMapperTests.cs" Link="Core\StandardMapperTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\DatabaseConfigurationTests.cs" Link="DatabaseConfigurationTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\DatabaseTests.cs" Link="DatabaseTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\DescriptionAttribute.cs" Link="DescriptionAttribute.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Models\Note.cs" Link="Models\Note.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Models\Order.cs" Link="Models\Order.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Models\OrderLine.cs" Link="Models\OrderLine.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Models\OrderStatus.cs" Link="Models\OrderStatus.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Models\Person.cs" Link="Models\Person.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Models\TransactionLog.cs" Link="Models\TransactionLog.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\Providers\SqlServerDatabaseProviderTests.cs" Link="Providers\SqlServerDatabaseProviderTests.cs" />
+    <Compile Include="..\PetaPoco.Tests.Unit\RequiresCleanUpAttribute.cs" Link="RequiresCleanUpAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="Moq" Version="4.8.0" />
+    <PackageReference Include="Shouldly" Version="2.8.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.2" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\Inflection\" />
+    <Folder Include="Models\" />
+    <Folder Include="Providers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PetaPoco.NetStandard\PetaPoco.NetStandard.csproj" />
+  </ItemGroup>
+
+</Project>

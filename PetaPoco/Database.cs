@@ -26,7 +26,7 @@ namespace PetaPoco
     /// </summary>
     public class Database : IDatabase
     {
-        #region IDisposable
+#region IDisposable
 
         /// <summary>
         ///     Automatically close one open shared connection
@@ -37,11 +37,10 @@ namespace PetaPoco
             //  (Works with KeepConnectionAlive and manually opening a shared connection)
             CloseSharedConnection();
         }
+#endregion
 
-        #endregion
-
-        #region Constructors
-
+#region Constructors
+#if NETFULL
         /// <summary>
         ///     Constructs an instance using the first connection string found in the app/web configuration file.
         /// </summary>
@@ -56,7 +55,7 @@ namespace PetaPoco
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
         }
-
+#endif
         /// <summary>
         ///     Constructs an instance using a supplied IDbConnection.
         /// </summary>
@@ -117,6 +116,7 @@ namespace PetaPoco
             Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), null);
         }
 
+#if NETFULL
         /// <summary>
         ///     Constructs an instance using a supplied connection string name. The actual connection string and provider will be
         ///     read from app/web.config.
@@ -138,7 +138,7 @@ namespace PetaPoco
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
         }
-
+#endif
         /// <summary>
         ///     Constructs an instance using the supplied provider and optional default mapper.
         /// </summary>
@@ -176,6 +176,7 @@ namespace PetaPoco
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
+#if NETFULL
             ConnectionStringSettings entry = null;
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
             {
@@ -196,7 +197,14 @@ namespace PetaPoco
                 // ReSharper disable once PossibleNullReferenceException
                 _connectionString = entry.ConnectionString;
             });
+#else
+            settings.TryGetSetting<string>(
+                DatabaseConfigurationExtensions.ConnectionString,
+                cs => _connectionString = cs,
+                () => throw new InvalidOperationException("One or more connection strings must be registered to not configure the connection string"));
+#endif
 
+#if NETFULL
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
             {
                 if (entry == null)
@@ -205,7 +213,12 @@ namespace PetaPoco
                 var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
                 Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
             });
-
+#else
+            settings.TryGetSetting<IProvider>(
+                DatabaseConfigurationExtensions.Provider,
+                v => Initialise(v, defaultMapper),
+                () => Initialise(DatabaseProvider.Resolve("System.Data.SqlClient", false, _connectionString), defaultMapper));
+#endif
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
@@ -230,9 +243,9 @@ namespace PetaPoco
             _defaultMapper = mapper ?? new ConventionMapper();
         }
 
-        #endregion
+#endregion
 
-        #region Connection Management
+#region Connection Management
 
         /// <summary>
         ///     When set to true the first opened connection is kept alive until this object is disposed
@@ -291,9 +304,9 @@ namespace PetaPoco
             get { return _sharedConnection; }
         }
 
-        #endregion
+#endregion
 
-        #region Transaction Management
+#region Transaction Management
 
         /// <summary>
         ///     Gets the current transaction instance.
@@ -402,9 +415,9 @@ namespace PetaPoco
                 CleanupTransaction();
         }
 
-        #endregion
+#endregion
 
-        #region Command Management
+#region Command Management
 
         /// <summary>
         ///     Add a parameter to a DB command
@@ -536,9 +549,9 @@ namespace PetaPoco
             return cmd;
         }
 
-        #endregion
+#endregion
 
-        #region Exception Reporting and Logging
+#region Exception Reporting and Logging
 
         /// <summary>
         ///     Called if an exception occurs during processing of a DB operation.  Override to provide custom logging/handling.
@@ -594,9 +607,9 @@ namespace PetaPoco
         {
         }
 
-        #endregion
+#endregion
 
-        #region operation: Execute 
+#region operation: Execute 
 
         /// <summary>
         ///     Executes a non-query command
@@ -641,9 +654,9 @@ namespace PetaPoco
             return Execute(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: ExecuteScalar
+#region operation: ExecuteScalar
 
         /// <summary>
         ///     Executes a query and return the first column of the first row in the result set.
@@ -696,9 +709,9 @@ namespace PetaPoco
             return ExecuteScalar<T>(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Fetch
+#region operation: Fetch
 
         /// <summary>
         ///     Runs a query and returns the result set as a typed list
@@ -723,9 +736,9 @@ namespace PetaPoco
             return Fetch<T>(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Page
+#region operation: Page
 
         /// <summary>
         ///     Starting with a regular SELECT statement, derives the SQL statements required to query a
@@ -853,9 +866,9 @@ namespace PetaPoco
             return Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Fetch (page)
+#region operation: Fetch (page)
 
         /// <summary>
         ///     Retrieves a page of records (without the total count)
@@ -892,9 +905,9 @@ namespace PetaPoco
             return SkipTake<T>((page - 1)*itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: SkipTake
+#region operation: SkipTake
 
         /// <summary>
         ///     Retrieves a range of records from result set
@@ -933,9 +946,9 @@ namespace PetaPoco
             return SkipTake<T>(skip, take, sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Query
+#region operation: Query
 
         /// <summary>
         ///     Runs an SQL query, returning the results as an IEnumerable collection
@@ -1018,9 +1031,9 @@ namespace PetaPoco
             return Query<T>(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Exists
+#region operation: Exists
 
         /// <summary>
         ///     Checks for the existence of a row matching the specified condition
@@ -1050,9 +1063,9 @@ namespace PetaPoco
             return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
-        #endregion
+#endregion
 
-        #region operation: linq style (Exists, Single, SingleOrDefault etc...)
+#region operation: linq style (Exists, Single, SingleOrDefault etc...)
 
         /// <summary>
         ///     Returns the record with the specified primary key value
@@ -1180,9 +1193,9 @@ namespace PetaPoco
             return Query<T>(sql).FirstOrDefault();
         }
 
-        #endregion
+#endregion
 
-        #region operation: Insert
+#region operation: Insert
 
         /// <summary>
         ///     Performs an SQL Insert
@@ -1366,9 +1379,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region operation: Update
+#region operation: Update
 
         /// <summary>
         ///     Performs an SQL update
@@ -1626,9 +1639,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region operation: Delete
+#region operation: Delete
 
         /// <summary>
         ///     Performs and SQL Delete
@@ -1739,9 +1752,9 @@ namespace PetaPoco
             return Execute(new Sql(string.Format("DELETE FROM {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
         }
 
-        #endregion
+#endregion
 
-        #region operation: IsNew
+#region operation: IsNew
 
         /// <summary>
         ///     Check if a poco represents a new row
@@ -1825,9 +1838,9 @@ namespace PetaPoco
             return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Save
+#region operation: Save
 
         /// <summary>
         ///     Saves a POCO by either performing either an SQL Insert or SQL Update
@@ -1857,9 +1870,9 @@ namespace PetaPoco
             Save(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Multi-Poco Query/Fetch
+#region operation: Multi-Poco Query/Fetch
 
         /// <summary>
         ///     Perform a multi-poco fetch
@@ -2413,9 +2426,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region operation: Multi-Result Set
+#region operation: Multi-Result Set
         /// <summary>
         /// Perform a multi-results set query
         /// </summary>
@@ -2452,9 +2465,9 @@ namespace PetaPoco
             }
             return result;
         }
-        #endregion
+#endregion
 
-        #region Last Command
+#region Last Command
 
         /// <summary>
         ///     Retrieves the SQL of the last executed statement
@@ -2480,9 +2493,9 @@ namespace PetaPoco
             get { return FormatCommand(_lastSql, _lastArgs); }
         }
 
-        #endregion
+#endregion
 
-        #region FormatCommand
+#region FormatCommand
 
         /// <summary>
         ///     Formats the contents of a DB command for display
@@ -2518,9 +2531,9 @@ namespace PetaPoco
             return sb.ToString();
         }
 
-        #endregion
+#endregion
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         ///     Gets the default mapper.
@@ -2591,9 +2604,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region Member Fields
+#region Member Fields
 
         // Member variables
         private IMapper _defaultMapper;
@@ -2610,9 +2623,9 @@ namespace PetaPoco
         private DbProviderFactory _factory;
         private IsolationLevel? _isolationLevel;
 
-        #endregion
+#endregion
 
-        #region Internal operations
+#region Internal operations
 
         internal void DoPreExecute(IDbCommand cmd)
         {
@@ -2635,6 +2648,6 @@ namespace PetaPoco
             _lastArgs = (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray();
         }
 
-        #endregion
+#endregion
     }
 }
