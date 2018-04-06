@@ -61,12 +61,13 @@ namespace PetaPoco
         ///     Constructs an instance using a supplied IDbConnection.
         /// </summary>
         /// <param name="connection">The IDbConnection to use.</param>
+        /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <remarks>
         ///     The supplied IDbConnection will not be closed/disposed by PetaPoco - that remains
         ///     the responsibility of the caller.
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
-        public Database(IDbConnection connection)
+        public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
@@ -76,7 +77,7 @@ namespace PetaPoco
             // Prevent closing external connection
             _sharedConnectionDepth = 2;
 
-            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), null);
+            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
         /// <summary>
