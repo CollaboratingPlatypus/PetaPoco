@@ -79,6 +79,7 @@
     <Compile Include="Core\SqlTests.cs" />
     <Compile Include="DatabaseConfigurationTests.cs" />
     <Compile Include="DatabaseTests.cs" />
+    <Compile Include="Providers\CustomProviderRegistrationTests.cs" />
     <Compile Include="Providers\SqlServerDatabaseProviderTests.cs" />
     <Compile Include="DescriptionAttribute.cs" />
     <Compile Include="Models\Note.cs" />
