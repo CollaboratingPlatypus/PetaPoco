@@ -105,6 +105,7 @@ namespace PetaPoco
                 throw new ArgumentNullException("provider");
             if (configure == null)
                 throw new ArgumentNullException("configure");
+            configure(provider);
             source.SetSetting(Provider, provider);
             return source;
         }
