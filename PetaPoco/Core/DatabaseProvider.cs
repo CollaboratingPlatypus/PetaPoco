@@ -5,6 +5,7 @@
 // <date>2016/01/11</date>
 
 using System;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -178,6 +179,42 @@ namespace PetaPoco.Core
             return (DbProviderFactory)ft.GetField("Instance").GetValue(null);
         }
 
+        private static readonly ConcurrentDictionary<string, IProvider> _customProviders = new ConcurrentDictionary<string, IProvider>();
+        
+        /// <summary>
+        /// Registers a custom IProvider with a string that will the beginning of the name
+        /// of the provider, DbConnection, or DbProviderFactory.
+        /// </summary>
+        /// <typeparam name="T">Type of IProvider to be registered.</typeparam>
+        /// <param name="initialString">String to be matched against the beginning of the provider name.</param>
+        public static void RegisterCustomProvider<T>(string initialString) where T: IProvider, new()
+        {
+            if (String.IsNullOrWhiteSpace(initialString))
+                throw new ArgumentException("Initial string must not be null or empty", "initialString");
+
+            _customProviders[initialString] = Singleton<T>.Instance;
+        }
+
+        private static IProvider GetCustomProvider(string name)
+        {
+            IProvider provider;
+            foreach (var initialString in _customProviders.Keys)
+            {
+                if (name.IndexOf(initialString, StringComparison.InvariantCultureIgnoreCase) == 0
+                    && _customProviders.TryGetValue(initialString, out provider))
+                {
+                    return provider;
+                }
+            }
+
+            return null;
+        }
+
+        internal static void ClearCustomProviders()
+        {
+            _customProviders.Clear();
+        }
+
         /// <summary>
         ///     Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
         /// </summary>
@@ -190,6 +227,10 @@ namespace PetaPoco.Core
             var typeName = type.Name;
 
             // Try using type name first (more reliable)
+            var custom = GetCustomProvider(typeName);
+            if (custom != null)
+                return custom;
+
             if (typeName.StartsWith("MySql"))
                 return Singleton<MySqlDatabaseProvider>.Instance;
             if (typeName.StartsWith("MariaDb"))
@@ -228,6 +269,10 @@ namespace PetaPoco.Core
         internal static IProvider Resolve(string providerName, bool allowDefault, string connectionString)
         {
             // Try again with provider name
+            var custom = GetCustomProvider(providerName);
+            if (custom != null)
+                return custom;
+
             if (providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<MySqlDatabaseProvider>.Instance;
             if (providerName.IndexOf("MariaDb", StringComparison.InvariantCultureIgnoreCase) >= 0)
