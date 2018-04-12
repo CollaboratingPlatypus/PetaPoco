@@ -81,16 +81,15 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using a supplied connections string and optionally a provider name. If no provider name is
-        ///     given, the default database provider will be MS SQL Server.
+        ///     Constructs an instance using a supplied connections string and provider name. 
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
-        /// <param name="providerName">The database provider name, if given.</param>
+        /// <param name="providerName">The database provider name.</param>
         /// <remarks>
         ///     PetaPoco will automatically close and dispose any connections it creates.
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
-        public Database(string connectionString, string providerName = null)
+        public Database(string connectionString, string providerName)
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException("Connection string cannot be null or empty", "connectionString");
