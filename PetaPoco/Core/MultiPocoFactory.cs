@@ -91,7 +91,12 @@ namespace PetaPoco.Internal
             {
                 // Split if field name has already been used, or if the field doesn't exist in current poco but does in the next
                 var fieldName = r.GetName(pos);
-                if (usedColumns.ContainsKey(fieldName) || (!pdThis.Columns.ContainsKey(fieldName) && pdNext.Columns.ContainsKey(fieldName)))
+                var pdThisWithTableName = pdThis.Columns.FirstOrDefault(x => pdThis.TableInfo.TableName + "." + x.Key == fieldName);
+                var pdNextWithTableName = pdNext.Columns.FirstOrDefault(x => pdNext.TableInfo.TableName + "." + x.Key == fieldName);
+
+                if (usedColumns.ContainsKey(fieldName) || (!pdThis.Columns.ContainsKey(fieldName) && pdNext.Columns.ContainsKey(fieldName))
+                    || (pdThisWithTableName.Equals(new KeyValuePair<string, PocoColumn>()) && !pdNextWithTableName.Equals(new KeyValuePair<string, PocoColumn>()))
+                 )
                 {
                     return pdThis.GetFactory(sql, connectionString, firstColumn, pos - firstColumn, r, defaultMapper);
                 }

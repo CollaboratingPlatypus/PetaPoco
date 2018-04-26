@@ -227,7 +227,17 @@ namespace PetaPoco.Core
                         // Get the PocoColumn for this db column, ignore if not known
                         PocoColumn pc;
                         if (!Columns.TryGetValue(reader.GetName(i), out pc))
-                            continue;
+                        {
+                            var k = Columns.FirstOrDefault(x => TableInfo.TableName + "." + x.Key == reader.GetName(i));
+                            if (!k.Equals(new KeyValuePair<string, PocoColumn>()))
+                            {
+                                pc = k.Value;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
 
                         // Get the source type for this column
                         var srcType = reader.GetFieldType(i);
