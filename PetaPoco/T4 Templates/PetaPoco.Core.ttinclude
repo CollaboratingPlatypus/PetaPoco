@@ -454,6 +454,11 @@ Tables LoadTables()
 				// Oracle
 				reader=new OracleSchemaReader();
 			}
+			else if(_factory.GetType().Name == "OleDbFactory")
+			{
+			  reader =new OleDbSchemaReader ();
+			} 
+
 			else
 			{
 				// Assume SQL Server
@@ -1427,7 +1432,117 @@ from USER_VIEWS";
 	  
 }
 
+class OleDbSchemaReader : SchemaReader
+    {
+      
+        public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
+        {
+            
+            var result = new Tables();
+            var dtTables = ((System.Data.OleDb.OleDbConnection)connection).GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, new object[] { null, null, null, "TABLE" });
+          
+            /*var dtViews = ((System.Data.OleDb.OleDbConnection)connection).GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables, new object[] { null, null, null, "VIEW" });*/
+            /*var dtViewColumns = ((System.Data.OleDb.OleDbConnection)connection).GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Columns, new object[] { null, null, dtViews.Rows[0]["TABLE_NAME"].ToString(), null});*/
+            foreach (System.Data.DataRow item in dtTables.Rows)
+            {
+                Table tbl = new Table();
+                tbl.Name = item["TABLE_NAME"].ToString();
+                tbl.Schema = item["TABLE_SCHEMA"].ToString();
+                tbl.IsView = string.Compare(item["TABLE_TYPE"].ToString(), "View", true) == 0;
+                tbl.CleanName = CleanUp(tbl.Name);
+                tbl.ClassName = Inflector.MakeSingular(tbl.CleanName);
 
+                var dtTableColumns = ((System.Data.OleDb.OleDbConnection)connection).GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Columns, new object[] { null, null, tbl.Name, null });
+                var dtTablePrimaryKeys = ((System.Data.OleDb.OleDbConnection)connection).GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Primary_Keys, new object[] { null, null, tbl.Name });
+                /*var dtTableIndexes = ((System.Data.OleDb.OleDbConnection)connection).GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Indexes, new object[] { null, null, null, null, tbl.Name });*/
+
+                tbl.Columns = dtTableColumns.Rows.Count > 0 ? new List<Column>() : null;
+                foreach (System.Data.DataRow rdr in dtTableColumns.Rows)
+                {
+                    Column col = new Column();
+                    col.Name = rdr["COLUMN_NAME"].ToString();
+                    col.PropertyName = CleanUp(col.Name);
+                    col.PropertyType = GetPropertyType((int)rdr["DATA_TYPE"]);// GetPropertyType(rdr["DATA_TYPE"].ToString());
+                    col.IsNullable = rdr["IS_NULLABLE"].ToString() == "True";
+                    col.IsAutoIncrement = ((long)rdr["COLUMN_FLAGS"]) == 90 && ((int)rdr["DATA_TYPE"]) == 3;
+
+                    foreach (System.Data.DataRow ItemPk in dtTablePrimaryKeys.Rows)
+                    {
+                       col.IsPK = ItemPk["COLUMN_NAME"].ToString().ToLower() == rdr["COLUMN_NAME"].ToString().ToLower();
+                    }
+                    
+                    tbl.Columns.Add(col);
+                }
+                result.Add(tbl);
+            }
+            return result;
+        }
+        private static string GetPropertyType(int oleDbDataType)
+        {
+            
+            switch (((System.Data.OleDb.OleDbType)oleDbDataType))
+            {
+                case System.Data.OleDb.OleDbType.Empty:
+                case System.Data.OleDb.OleDbType.VarChar:
+                case System.Data.OleDb.OleDbType.VarWChar:
+                case System.Data.OleDb.OleDbType.WChar:
+                case System.Data.OleDb.OleDbType.BSTR:
+                case System.Data.OleDb.OleDbType.LongVarChar:
+                case System.Data.OleDb.OleDbType.Char:
+                    return "string";
+                case System.Data.OleDb.OleDbType.BigInt:
+                    return "long";       // In Jet this is 32 bit while bigint is 64 bits
+                case System.Data.OleDb.OleDbType.Binary:
+                case System.Data.OleDb.OleDbType.LongVarBinary:
+                
+                case System.Data.OleDb.OleDbType.VarBinary:
+                    return "byte[]";
+                case System.Data.OleDb.OleDbType.Boolean:
+                    return "bool";
+                case System.Data.OleDb.OleDbType.DBDate:
+                case System.Data.OleDb.OleDbType.Date:
+                case System.Data.OleDb.OleDbType.DBTimeStamp:
+                case System.Data.OleDb.OleDbType.Filetime:
+                    return "DateTime";
+                case System.Data.OleDb.OleDbType.Decimal:
+                case System.Data.OleDb.OleDbType.Numeric:
+                case System.Data.OleDb.OleDbType.VarNumeric:
+                case System.Data.OleDb.OleDbType.Currency:
+                    return "decimal";
+                case System.Data.OleDb.OleDbType.Double:
+                    return "double";
+                case System.Data.OleDb.OleDbType.Integer:
+                    return "int";
+                case System.Data.OleDb.OleDbType.UnsignedInt:
+                    return "uint";
+                case System.Data.OleDb.OleDbType.Single:
+                    return "float";
+                case System.Data.OleDb.OleDbType.SmallInt:
+                    return "short";
+                case System.Data.OleDb.OleDbType.UnsignedSmallInt:
+                    return "ushort";
+                case System.Data.OleDb.OleDbType.TinyInt:
+                    return "sbyte";  // Signed byte not handled by jet so we need 16 bits
+                case System.Data.OleDb.OleDbType.Guid:
+                    return  "Guid";
+                case System.Data.OleDb.OleDbType.IUnknown:
+                case System.Data.OleDb.OleDbType.IDispatch:
+                case System.Data.OleDb.OleDbType.Variant:
+                case System.Data.OleDb.OleDbType.PropVariant:
+                    return "Object";
+                case System.Data.OleDb.OleDbType.Error:
+                    return "Exception";
+                case System.Data.OleDb.OleDbType.DBTime:
+                    return "TimeSpan";
+                case System.Data.OleDb.OleDbType.UnsignedBigInt:
+                    return "ulong";
+                case System.Data.OleDb.OleDbType.UnsignedTinyInt:
+                    return "byte";
+                default:
+                    return "string";
+            }
+        }
+    }
 
 
 /// <summary>
