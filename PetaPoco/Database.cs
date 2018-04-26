@@ -488,6 +488,27 @@ namespace PetaPoco
                     p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
                     p.Value = value;
                 }
+                else if (value.GetType().Name.Contains("DateTime") && Provider.GetType() == Type.GetType("PetaPoco.MsAccessDbDatabaseProvider"))
+                {
+                    var copy = new DateTime(
+                          ((DateTime)value).Year
+                        , ((DateTime)value).Month
+                        , ((DateTime)value).Day
+                        , ((DateTime)value).Hour
+                        , ((DateTime)value).Minute
+                        , ((DateTime)value).Second
+                        , 0 //Millisencond 
+                            //0= Works
+                            //1= Exception in insert and update
+                        , ((DateTime)value).Kind
+                        );
+                    //var k = new DateTime(1000, 1, 1, 1, 1, 1, DateTimeKind.Local);
+                    //var copy = (DateTime)value;
+
+                    //value = (copy).AddMilliseconds(-copy.Millisecond);
+
+                    p.Value = copy;
+                }
                 else
                 {
                     p.Value = value;
