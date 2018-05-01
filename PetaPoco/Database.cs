@@ -1047,7 +1047,8 @@ namespace PetaPoco
         /// <returns>True if a record with the specified primary key value exists.</returns>
         public bool Exists<T>(object primaryKey)
         {
-            return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+            var poco = PocoData.ForType(typeof(T), _defaultMapper);
+            return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)), primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
         }
 
         #endregion
