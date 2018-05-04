@@ -1019,6 +1019,39 @@ namespace PetaPoco
             return Query<T>(sql.SQL, sql.Arguments);
         }
 
+        /// <summary>
+        /// Query return table
+        /// </summary>
+        /// <param name="sql">The complete SQL statement, EnableAutoSelect will be used as false.</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
+        /// <returns></returns>
+        public DataTable Query(string sql, params object[] args)
+        {
+            OpenSharedConnection();
+            try
+            {
+                DataTable table = new DataTable();
+                using (var cmd = CreateCommand(_sharedConnection, sql, args))
+                {
+                    try
+                    {
+                        table.Load(cmd.ExecuteReader());
+                        OnExecutedCommand(cmd);
+                    }
+                    catch (Exception x)
+                    {
+                        if (OnException(x))
+                            throw;
+                    }
+                }
+                return table;
+            }
+            finally
+            {
+                CloseSharedConnection();
+            }
+        }
+
         #endregion
 
         #region operation: Exists
