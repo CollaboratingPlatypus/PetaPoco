@@ -1030,7 +1030,7 @@ namespace PetaPoco
             OpenSharedConnection();
             try
             {
-                DataTable table = new DataTable();
+                var table = new DataTable();
                 using (var cmd = CreateCommand(_sharedConnection, sql, args))
                 {
                     try
