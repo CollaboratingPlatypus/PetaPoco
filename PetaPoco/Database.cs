@@ -1033,18 +1033,15 @@ namespace PetaPoco
                 var table = new DataTable();
                 using (var cmd = CreateCommand(_sharedConnection, sql, args))
                 {
-                    try
-                    {
-                        table.Load(cmd.ExecuteReader());
-                        OnExecutedCommand(cmd);
-                    }
-                    catch (Exception x)
-                    {
-                        if (OnException(x))
-                            throw;
-                    }
+                    table.Load(cmd.ExecuteReader());
+                    OnExecutedCommand(cmd);
                 }
                 return table;
+            }
+            catch (Exception x)
+            {
+                OnException(x);
+                throw;
             }
             finally
             {
