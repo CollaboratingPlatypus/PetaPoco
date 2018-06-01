@@ -182,12 +182,14 @@ namespace PetaPoco.Tests.Unit
             db.ConnectionString.ShouldBe("cs");
         }
 
+#if NET461
         [Fact]
         public void UsingConnectionStringName_GivenInvalidArguments_Throws()
         {
             Should.Throw<ArgumentException>(() => config.UsingConnectionStringName(null));
             Should.Throw<ArgumentException>(() => config.UsingConnectionStringName(string.Empty));
         }
+#endif
 
         [Fact(Skip = "Can't be tested as testing would require connection strings in the app/web config.")]
         public void UsingConnectionStringName_GivenTimeoutAndAfterCreate_ShouldBeSameAsPetaPocoInstance()

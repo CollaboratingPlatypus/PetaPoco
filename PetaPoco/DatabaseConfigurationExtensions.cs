@@ -179,6 +179,7 @@ namespace PetaPoco
             return source;
         }
 
+#if NET40
         /// <summary>
         ///     Adds a connection string name.
         /// </summary>
@@ -193,6 +194,7 @@ namespace PetaPoco
             source.SetSetting(ConnectionStringName, connectionStringName);
             return source;
         }
+#endif
 
         /// <summary>
         ///     Specifies the default mapper to use when no specific mapper has been registered.

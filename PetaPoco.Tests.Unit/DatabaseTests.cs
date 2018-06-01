@@ -45,15 +45,17 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void Construct_GivenInvalidArguments_ShouldThrow()
         {
+#if NET461
             Should.Throw<InvalidOperationException>(() => new Database());
+            Should.Throw<ArgumentException>(() => new Database((string) null));
+            Should.Throw<InvalidOperationException>(() => new Database("some connection string name"));
+#endif
 
             Should.Throw<ArgumentNullException>(() => new Database((IDbConnection) null));
 
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (IProvider) null));
             Should.Throw<ArgumentException>(() => new Database(null, _provider));
 
-            Should.Throw<ArgumentException>(() => new Database((string) null));
-            Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
 
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
@@ -67,7 +69,11 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
+#if NET461
                     e.Message.ShouldContain("One or more connection strings");
+#else
+                    e.Message.ShouldContain("Connection string is required");
+#endif
                     throw;
                 }
             });
@@ -79,7 +85,11 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
+#if NET461
                     e.Message.ShouldContain("Both a connection string and provider are required");
+#else
+                    e.Message.ShouldContain("Provider is required");
+#endif
                     throw;
                 }
             });
