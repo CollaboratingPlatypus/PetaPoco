@@ -1,4 +1,4 @@
 # ToDo
 
-- [ ] Multi target unit tests
-- [ ] Remove anything from Database that needs a config file
+- [x] Multi target unit tests
+- [x] Remove anything from Database that needs a config file
