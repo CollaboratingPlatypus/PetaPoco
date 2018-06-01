@@ -84,6 +84,7 @@ namespace PetaPoco.Tests.Integration.Databases
             }
         }
 
+#if NETFULL
         [Fact]
         public void Construct_GivenConnectionStringName_ShouldBeValid()
         {
@@ -99,7 +100,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 _note.ShouldBe(otherNote);
             }
         }
-
+#endif
         [Fact]
         public void Construct_GivenConnectionStringAndProvider_ShouldBeValid()
         {

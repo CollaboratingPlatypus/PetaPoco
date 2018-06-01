@@ -45,16 +45,18 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void Construct_GivenInvalidArguments_ShouldThrow()
         {
+#if NETFULL
             Should.Throw<InvalidOperationException>(() => new Database());
-
+#endif
             Should.Throw<ArgumentNullException>(() => new Database((IDbConnection) null));
 
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (IProvider) null));
             Should.Throw<ArgumentException>(() => new Database(null, _provider));
 
             Should.Throw<ArgumentException>(() => new Database((string) null));
+#if NETFULL
             Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
-
+#endif
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
 
@@ -71,6 +73,7 @@ namespace PetaPoco.Tests.Unit
                     throw;
                 }
             });
+#if NETFULL
             Should.Throw<InvalidOperationException>(() =>
             {
                 try
@@ -83,6 +86,7 @@ namespace PetaPoco.Tests.Unit
                     throw;
                 }
             });
+#endif
         }
 
         [Fact]

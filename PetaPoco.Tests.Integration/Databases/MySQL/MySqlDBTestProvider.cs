@@ -8,8 +8,12 @@ namespace PetaPoco.Tests.Integration.Databases.MySQL
 {
     public class MySqlDBTestProvider : DBTestProvider
     {
+#if NETFULL
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("mysql").Create();
-
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MySqlBuildDatabase.sql";
+#else
+        protected override IDatabase Database => CreateConfiguration("MySQL").Create();
+#endif
+        //protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MySqlBuildDatabase.sql";
+        protected override string ScriptResourceName => @"Scripts\MySqlBuildDatabase.sql";
     }
 }

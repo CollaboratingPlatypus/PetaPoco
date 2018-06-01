@@ -1,0 +1,240 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net40;net45;net451;net452;net46;net461;net462;net47;net471</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard2.0;netcoreapp2.0;net40;net403;net45;net451;net452;net46;net461;net462;net47;net471</TargetFrameworks>-->
+    <RootNamespace>PetaPoco</RootNamespace>
+    <AssemblyName>PetaPoco</AssemblyName>
+    <Description>A Tiny ORMish thing for your POCO's.</Description>
+    <Version>5.0.1.283</Version>
+    <AssemblyVersion>5.0.1.283</AssemblyVersion>
+    <Company>Collaborating Platypus</Company>
+    <Copyright>Copyright © 2011-2018. Collaborating Platypus</Copyright>
+    <RepositoryUrl>https://github.com/CollaboratingPlatypus/PetaPoco</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2_256.png</PackageIconUrl>
+    <PackageTags>Peta Poco Peta-Poco PetaPoco ORM-Micro Micro-ORM ORM ormmicro MVC MVC4 MVC5 MVC6 MySql Postgres MSSQL Database DAL SQL Easy</PackageTags>
+    <PackageLicenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</PackageProjectUrl>
+    <Authors>Collaborating Platypus</Authors>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>PetaPoco is a tiny, single file .NET data access layer inspired by Massive that works with both non-dynamic POCO objects and dynamics.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0'">
+    <DefineConstants>NETCOREAPP2_0;NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net40'">
+    <DefineConstants>NET40;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <!--<PropertyGroup Condition=" '$(TargetFramework)' == 'net403'">
+    <DefineConstants>NET40;NET403;NETFULL</DefineConstants>
+  </PropertyGroup>-->
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
+    <DefineConstants>NET45;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451'">
+    <DefineConstants>NET451;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452'">
+    <DefineConstants>NET452;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46'">
+    <DefineConstants>NET46;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net461'">
+    <DefineConstants>NET461;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net462'">
+    <DefineConstants>NET462;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net47'">
+    <DefineConstants>NET47;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net471'">
+    <DefineConstants>NET471;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'net403' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>-->
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PetaPoco\Attributes\ColumnAttribute.cs" Link="Attributes\ColumnAttribute.cs" />
+    <Compile Include="..\PetaPoco\Attributes\ExplicitColumnsAttribute.cs" Link="Attributes\ExplicitColumnsAttribute.cs" />
+    <Compile Include="..\PetaPoco\Attributes\IgnoreAttribute.cs" Link="Attributes\IgnoreAttribute.cs" />
+    <Compile Include="..\PetaPoco\Attributes\PrimaryKeyAttribute.cs" Link="Attributes\PrimaryKeyAttribute.cs" />
+    <Compile Include="..\PetaPoco\Attributes\ResultColumnAttribute.cs" Link="Attributes\ResultColumnAttribute.cs" />
+    <Compile Include="..\PetaPoco\Attributes\TableNameAttribute.cs" Link="Attributes\TableNameAttribute.cs" />
+    <Compile Include="..\PetaPoco\Attributes\ValueConverterAttribute.cs" Link="Attributes\ValueConverterAttribute.cs" />
+    <Compile Include="..\PetaPoco\Core\AnsiString.cs" Link="Core\AnsiString.cs" />
+    <Compile Include="..\PetaPoco\Core\ColumnInfo.cs" Link="Core\ColumnInfo.cs" />
+    <Compile Include="..\PetaPoco\Core\ConventionMapper.cs" Link="Core\ConventionMapper.cs" />
+    <Compile Include="..\PetaPoco\Core\DatabaseProvider.cs" Link="Core\DatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Core\ExpandoColumn.cs" Link="Core\ExpandoColumn.cs" />
+    <Compile Include="..\PetaPoco\Core\GridReader.cs" Link="Core\GridReader.cs" />
+    <Compile Include="..\PetaPoco\Core\IGridReader.cs" Link="Core\IGridReader.cs" />
+    <Compile Include="..\PetaPoco\Core\IMapper.cs" Link="Core\IMapper.cs" />
+    <Compile Include="..\PetaPoco\Core\Inflection\EnglishInflector.cs" Link="Core\Inflection\EnglishInflector.cs" />
+    <Compile Include="..\PetaPoco\Core\Inflection\IInflector.cs" Link="Core\Inflection\IInflector.cs" />
+    <Compile Include="..\PetaPoco\Core\Inflection\Inflector.cs" Link="Core\Inflection\Inflector.cs" />
+    <Compile Include="..\PetaPoco\Core\IProvider.cs" Link="Core\IProvider.cs" />
+    <Compile Include="..\PetaPoco\Core\ITransaction.cs" Link="Core\ITransaction.cs" />
+    <Compile Include="..\PetaPoco\Core\Mappers.cs" Link="Core\Mappers.cs" />
+    <Compile Include="..\PetaPoco\Core\MultiPocoFactory.cs" Link="Core\MultiPocoFactory.cs" />
+    <Compile Include="..\PetaPoco\Core\Page.cs" Link="Core\Page.cs" />
+    <Compile Include="..\PetaPoco\Core\PocoColumn.cs" Link="Core\PocoColumn.cs" />
+    <Compile Include="..\PetaPoco\Core\PocoData.cs" Link="Core\PocoData.cs" />
+    <Compile Include="..\PetaPoco\Core\Sql.cs" Link="Core\Sql.cs" />
+    <Compile Include="..\PetaPoco\Core\StandardMapper.cs" Link="Core\StandardMapper.cs" />
+    <Compile Include="..\PetaPoco\Core\TableInfo.cs" Link="Core\TableInfo.cs" />
+    <Compile Include="..\PetaPoco\Core\Transaction.cs" Link="Core\Transaction.cs" />
+    <Compile Include="..\PetaPoco\Database.cs" Link="Database.cs" />
+    <Compile Include="..\PetaPoco\DatabaseConfiguration.cs" Link="DatabaseConfiguration.cs" />
+    <Compile Include="..\PetaPoco\DatabaseConfigurationExtensions.cs" Link="DatabaseConfigurationExtensions.cs" />
+    <Compile Include="..\PetaPoco\IAlterPoco.cs" Link="IAlterPoco.cs" />
+    <Compile Include="..\PetaPoco\IBuildConfigurationSettings.cs" Link="IBuildConfigurationSettings.cs" />
+    <Compile Include="..\PetaPoco\IDatabase.cs" Link="IDatabase.cs" />
+    <Compile Include="..\PetaPoco\IDatabaseBuildConfiguration.cs" Link="IDatabaseBuildConfiguration.cs" />
+    <Compile Include="..\PetaPoco\IExecute.cs" Link="IExecute.cs" />
+    <Compile Include="..\PetaPoco\IHideObjectMethods.cs" Link="IHideObjectMethods.cs" />
+    <Compile Include="..\PetaPoco\IQuery.cs" Link="IQuery.cs" />
+    <Compile Include="..\PetaPoco\ITransactionAccessor.cs" Link="ITransactionAccessor.cs" />
+    <Compile Include="..\PetaPoco\OracleProvider.cs" Link="OracleProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\FirebirdDbDatabaseProvider.cs" Link="Providers\FirebirdDbDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\MariaDbDatabaseProvider.cs" Link="Providers\MariaDbDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\MsAccessDbDatabaseProvider.cs" Link="Providers\MsAccessDbDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\MySqlDatabaseProvider.cs" Link="Providers\MySqlDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\OracleDatabaseProvider.cs" Link="Providers\OracleDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\PostgreSQLDatabaseProvider.cs" Link="Providers\PostgreSQLDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\SQLiteDatabaseProvider.cs" Link="Providers\SQLiteDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Providers\SqlServerCEDatabaseProviders.cs" Link="Providers\SqlServerCEDatabaseProviders.cs" />
+    <Compile Include="..\PetaPoco\Providers\SqlServerDatabaseProvider.cs" Link="Providers\SqlServerDatabaseProvider.cs" />
+    <Compile Include="..\PetaPoco\Utilities\ArrayKey.cs" Link="Utilities\ArrayKey.cs" />
+    <Compile Include="..\PetaPoco\Utilities\AutoSelectHelper.cs" Link="Utilities\AutoSelectHelper.cs" />
+    <Compile Include="..\PetaPoco\Utilities\Cache.cs" Link="Utilities\Cache.cs" />
+    <Compile Include="..\PetaPoco\Utilities\EnumMapper.cs" Link="Utilities\EnumMapper.cs" />
+    <Compile Include="..\PetaPoco\Utilities\IPagingHelper.cs" Link="Utilities\IPagingHelper.cs" />
+    <Compile Include="..\PetaPoco\Utilities\PagingHelper.cs" Link="Utilities\PagingHelper.cs" />
+    <Compile Include="..\PetaPoco\Utilities\ParametersHelper.cs" Link="Utilities\ParametersHelper.cs" />
+    <Compile Include="..\PetaPoco\Utilities\Singleton.cs" Link="Utilities\Singleton.cs" />
+    <Compile Include="..\PetaPoco\Utilities\SQLParts.cs" Link="Utilities\SQLParts.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+    <Folder Include="Core\Inflection\" />
+    <Folder Include="Utilities\" />
+    <Folder Include="Providers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\PetaPoco\PetaPoco.ruleset" Link="PetaPoco.ruleset" />
+  </ItemGroup>
+
+</Project>

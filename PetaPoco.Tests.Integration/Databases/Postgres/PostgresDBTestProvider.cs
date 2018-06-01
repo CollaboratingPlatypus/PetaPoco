@@ -8,8 +8,12 @@ namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
     public class PostgresDBTestProvider : DBTestProvider
     {
+#if NETFULL
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("postgres").Create();
-
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.PostgresBuildDatabase.sql";
+#else
+        protected override IDatabase Database => CreateConfiguration("PostgreSQL").Create();
+#endif
+        //protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.PostgresBuildDatabase.sql";
+        protected override string ScriptResourceName => @"Scripts\PostgresBuildDatabase.sql";
     }
 }

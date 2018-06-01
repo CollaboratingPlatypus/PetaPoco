@@ -12,6 +12,7 @@ using PetaPoco.Utilities;
 
 namespace PetaPoco.Providers
 {
+#if NETFULL
     public class MsAccessDbDatabaseProvider : DatabaseProvider
     {
         public override DbProviderFactory GetFactory()
@@ -31,4 +32,5 @@ namespace PetaPoco.Providers
             throw new NotSupportedException("The Access provider does not support paging.");
         }
     }
+#endif
 }

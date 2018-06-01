@@ -13,23 +13,30 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     public class FirebirdDBTestProvider : DBTestProvider
     {
+#if NETFULL
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("firebird").Create();
-
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.FirebirdDbBuildDatabase.sql";
+#else
+        protected override IDatabase Database => CreateConfiguration("Firebird").Create();
+#endif
+        //protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.FirebirdDbBuildDatabase.sql";
+        protected override string ScriptResourceName => @"Scripts\FirebirdDbBuildDatabase.sql";
 
         public override IDatabase Execute()
         {
             var db = Database;
             FbScript script;
 
-            using (var s = GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
-            {
-                using (var r = new StreamReader(s, Encoding.UTF8))
-                {
-                    script = new FbScript(r.ReadToEnd());
-                    script.Parse();
-                }
-            }
+            //using (var s = GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
+            //{
+            //    using (var r = new StreamReader(s, Encoding.UTF8))
+            //    {
+            //        script = new FbScript(r.ReadToEnd());
+            //        script.Parse();
+            //    }
+            //}
+            var sql = File.ReadAllText(ScriptResourceName, Encoding.UTF8);
+            script = new FbScript(sql);
+            script.Parse();
 
             try
             {

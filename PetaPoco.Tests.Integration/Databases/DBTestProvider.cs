@@ -10,7 +10,7 @@ using System.Text;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-    public abstract class DBTestProvider : IDisposable
+    public abstract partial class DBTestProvider : IDisposable
     {
         protected abstract IDatabase Database { get; }
 
@@ -23,13 +23,15 @@ namespace PetaPoco.Tests.Integration.Databases
         public virtual IDatabase Execute()
         {
             var db = Database;
-            using (var s = this.GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
-            {
-                using (var r = new StreamReader(s, Encoding.UTF8))
-                {
-                    ExecuteBuildScript(db, r.ReadToEnd());
-                }
-            }
+            //using (var s = this.GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
+            //{
+            //    using (var r = new StreamReader(s, Encoding.UTF8))
+            //    {
+            //        ExecuteBuildScript(db, r.ReadToEnd());
+            //    }
+            //}
+            var sql = File.ReadAllText(ScriptResourceName, Encoding.UTF8);
+            ExecuteBuildScript(db, sql);
             return db;
         }
 
