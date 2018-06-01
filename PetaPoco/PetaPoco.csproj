@@ -1,138 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{33699753-151D-4100-8F12-9AE1AEB5C5BD}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PetaPoco</RootNamespace>
-    <AssemblyName>PetaPoco</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-    <FileAlignment>512</FileAlignment>
-    <LangVersion>5</LangVersion>
+    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
+    <AssemblyTitle>PetaPoco</AssemblyTitle>
+    <Description>A Tiny ORMish thing for your POCO's.</Description>
+    <Company>Collaborating Platypus</Company>
+    <Product>PetaPoco</Product>
+    <Copyright>Copyright © 2011-2016. Collaborating Platypus</Copyright>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
-    <CodeAnalysisRuleSet>PetaPoco.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <OutputPath>bin\$(Configuration)\$(TargetFrameworkVersion)\</OutputPath>
-    <CodeAnalysisRuleSet>PetaPoco.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\v4.0\PetaPoco.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFrameworkVersion)' == 'v4.0'">
-    <DefineConstants>$(DefineConstants);NET40</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFrameworkVersion)' == 'v4.5'">
-    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.XML" />
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
+    <Reference Include="System.Configuration" />
   </ItemGroup>
+  
+  
+
   <ItemGroup>
-    <Compile Include="Attributes\ColumnAttribute.cs" />
-    <Compile Include="Attributes\ValueConverterAttribute.cs" />
-    <Compile Include="Core\AnsiString.cs" />
-    <Compile Include="Core\ColumnInfo.cs" />
-    <Compile Include="Core\ConventionMapper.cs" />
-    <Compile Include="Core\GridReader.cs" />
-    <Compile Include="Core\IGridReader.cs" />
-    <Compile Include="Core\Inflection\Inflector.cs" />
-    <Compile Include="Core\IProvider.cs" />
-    <Compile Include="Core\ITransaction.cs" />
-    <Compile Include="Core\Mappers.cs" />
-    <Compile Include="Core\MultiPocoFactory.cs" />
-    <Compile Include="Core\DatabaseProvider.cs" />
-    <Compile Include="Core\Inflection\EnglishInflector.cs" />
-    <Compile Include="Core\Inflection\IInflector.cs" />
-    <Compile Include="Core\StandardMapper.cs" />
-    <Compile Include="DatabaseConfiguration.cs" />
-    <Compile Include="DatabaseConfigurationExtensions.cs" />
-    <Compile Include="IBuildConfigurationSettings.cs" />
-    <Compile Include="IDatabaseBuildConfiguration.cs" />
-    <Compile Include="IHideObjectMethods.cs" />
-    <Compile Include="ITransactionAccessor.cs" />
-    <Compile Include="Providers\FirebirdDbDatabaseProvider.cs" />
-    <Compile Include="Providers\MariaDbDatabaseProvider.cs" />
-    <Compile Include="Providers\MsAccessDbDatabaseProvider.cs" />
-    <Compile Include="Providers\SQLiteDatabaseProvider.cs" />
-    <Compile Include="Providers\OracleDatabaseProvider.cs" />
-    <Compile Include="Providers\PostgreSQLDatabaseProvider.cs" />
-    <Compile Include="Providers\SqlServerDatabaseProvider.cs" />
-    <Compile Include="Providers\SqlServerCEDatabaseProviders.cs" />
-    <Compile Include="Providers\MySqlDatabaseProvider.cs" />
-    <Compile Include="IAlterPoco.cs" />
-    <Compile Include="IDatabase.cs" />
-    <Compile Include="IExecute.cs" />
-    <Compile Include="IQuery.cs" />
-    <Compile Include="Utilities\AutoSelectHelper.cs" />
-    <Compile Include="Utilities\IPagingHelper.cs" />
-    <Compile Include="Utilities\PagingHelper.cs" />
-    <Compile Include="Utilities\ParametersHelper.cs" />
-    <Compile Include="Core\ExpandoColumn.cs" />
-    <Compile Include="Core\PocoColumn.cs" />
-    <Compile Include="Core\PocoData.cs" />
-    <Compile Include="Core\IMapper.cs" />
-    <Compile Include="Core\Transaction.cs" />
-    <Compile Include="Core\Sql.cs" />
-    <Compile Include="Core\TableInfo.cs" />
-    <Compile Include="Core\Page.cs" />
-    <Compile Include="Attributes\PrimaryKeyAttribute.cs" />
-    <Compile Include="Attributes\TableNameAttribute.cs" />
-    <Compile Include="Attributes\ResultColumnAttribute.cs" />
-    <Compile Include="Attributes\IgnoreAttribute.cs" />
-    <Compile Include="Attributes\ExplicitColumnsAttribute.cs" />
-    <Compile Include="OracleProvider.cs" />
-    <Compile Include="Database.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\ArrayKey.cs" />
-    <Compile Include="Utilities\Cache.cs" />
-    <Compile Include="Utilities\EnumMapper.cs" />
-    <Compile Include="Utilities\Singleton.cs" />
-    <Compile Include="Utilities\SQLParts.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="PetaPoco.ruleset" />
-    <None Include="T4 Templates\PetaPoco.Core.ttinclude" />
-    <None Include="T4 Templates\PetaPoco.Generator.ttinclude" />
-    <None Include="T4 Templates\Database.tt">
-      <LastGenOutput>Database.cs</LastGenOutput>
+    <None Update="T4 Templates\Database.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  
+  
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-      "$(ProjectDir)..\Tools\PetaPoco.Cs.Joiner.exe" "$(ProjectDir)\"
-      COPY "$(ProjectDir)T4 Templates\*" "$(ProjectDir)..\Output\"
-     </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  
+  
+
 </Project>

@@ -1,13 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{33699753-151D-4100-8F12-9AE1AEB5C5BD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{53F07078-98EA-4494-9829-74245992A7F1} = {53F07078-98EA-4494-9829-74245992A7F1}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Cs.Joiner", "PetaPoco.Cs.Joiner\PetaPoco.Cs.Joiner.csproj", "{53F07078-98EA-4494-9829-74245992A7F1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Peta Single File", "Peta Single File", "{2DAA4086-AC09-4C47-95DF-21917E529022}"
@@ -31,6 +26,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.SingleFile", "PetaPoco.Tests.Integration.SingleFile\PetaPoco.Tests.Integration.SingleFile.csproj", "{9B2D7B13-A47D-497C-9E46-85B78C2D074E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.x86", "PetaPoco.Tests.Integration.x86\PetaPoco.Tests.Integration.x86.csproj", "{9AAEF733-6F2A-4297-A0E2-D065212940A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,8 +63,15 @@ Global
 		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC2D57D2-EAB5-4E28-92DC-2E5CB4AEBDF1}
 	EndGlobalSection
 EndGlobal

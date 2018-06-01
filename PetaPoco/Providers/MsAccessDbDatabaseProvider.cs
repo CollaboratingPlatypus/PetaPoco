@@ -16,7 +16,7 @@ namespace PetaPoco.Providers
     {
         public override DbProviderFactory GetFactory()
         {
-            return DbProviderFactories.GetFactory("System.Data.OleDb");
+            return GetFactory("System.Data.OleDb.OleDbFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
         }
 
         public override object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
