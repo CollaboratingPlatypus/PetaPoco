@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Specs", "Nuget Specs"
 		Nuget\PetaPoco.nuspec = Nuget\PetaPoco.nuspec
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Dep", "PetaPoco.Tests.Dep\PetaPoco.Tests.Dep.csproj", "{E6787C52-7549-44CD-AA6E-AB9D55946AB9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration", "PetaPoco.Tests.Integration\PetaPoco.Tests.Integration.csproj", "{560CD8E5-D810-4A57-A5FE-4E39D97662CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Unit", "PetaPoco.Tests.Unit\PetaPoco.Tests.Unit.csproj", "{80586BD7-13C7-4EF7-918D-D1F048672CC9}"
@@ -27,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.x86", "PetaPoco.Tests.Integration.x86\PetaPoco.Tests.Integration.x86.csproj", "{9AAEF733-6F2A-4297-A0E2-D065212940A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,18 +33,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{53F07078-98EA-4494-9829-74245992A7F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{53F07078-98EA-4494-9829-74245992A7F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53F07078-98EA-4494-9829-74245992A7F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53F07078-98EA-4494-9829-74245992A7F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
