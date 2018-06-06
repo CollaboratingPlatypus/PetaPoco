@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Databases\MSSQL\petapoco.mdf" />
-    <None Remove="Databases\MSSQL\petapoco_log.ldf" />
+    <None Remove="Databases\MSAccess\petapoco.accdb" />
     <None Remove="Scripts\FirebirdDbBuildDatabase.sql" />
     <None Remove="Scripts\MariaDbBuildDatabase.sql" />
+    <None Remove="Scripts\MSAccessBuildDatabase.sql" />
     <None Remove="Scripts\MSSQLBuildDatabase.sql" />
     <None Remove="Scripts\MSSQLCeBuildDatabase.sql" />
     <None Remove="Scripts\MySqlBuildDatabase.sql" />
@@ -23,8 +23,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Databases\MSAccess\petapoco.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Scripts\FirebirdDbBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSSQLBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSSQLCeBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MySqlBuildDatabase.sql" />
