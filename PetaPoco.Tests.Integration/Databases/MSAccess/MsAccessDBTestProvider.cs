@@ -6,9 +6,8 @@
 
 using System;
 using System.Linq;
-using PetaPoco.Tests.Integration.Databases;
 
-namespace PetaPoco.Tests.Integration.x86.Databases.MSAccess
+namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     public class MsAccessDBTestProvider : DBTestProvider
     {
