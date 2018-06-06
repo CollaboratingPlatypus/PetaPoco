@@ -31,9 +31,9 @@ firebirddb:
   container_name: firebirddb_petapoco
   ports:
     - "5004:3050"
-oracledb:
-  image: sath89/oracle-12c:latest
-  container_name: oracledb_petapoco
-  ports:
-    - "5005:1521"
-    - "5006:8008"
+#oracledb:
+#  image: sath89/oracle-12c:latest
+#  container_name: oracledb_petapoco
+#  ports:
+#    - "5005:1521"
+#    - "5006:8008"
