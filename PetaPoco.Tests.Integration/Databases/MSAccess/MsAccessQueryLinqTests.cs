@@ -4,22 +4,16 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2016/01/29</date>
 
-using PetaPoco.Tests.Integration.Databases;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.x86.Databases.MSAccess
+namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     [Collection("MSAccessTests")]
-    public class MsAccessDatabaseTests : BaseDatabaseTests
+    public class MsAccessQueryLinqTests : BaseQueryLinqTests
     {
-        public MsAccessDatabaseTests()
+        public MsAccessQueryLinqTests()
             : base(new MsAccessDBTestProvider())
         {
-        }
-
-        public override void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
-        {
-            // Not supported by provider.
         }
     }
 }

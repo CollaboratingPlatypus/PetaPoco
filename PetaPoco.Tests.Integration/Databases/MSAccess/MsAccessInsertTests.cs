@@ -4,15 +4,14 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2016/01/29</date>
 
-using PetaPoco.Tests.Integration.Databases;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.x86.Databases.MSAccess
+namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     [Collection("MSAccessTests")]
-    public class MsAccessDeleteTests : BaseDeleteTests
+    public class MsAccessInsertTests : BaseInsertTests
     {
-        public MsAccessDeleteTests()
+        public MsAccessInsertTests()
             : base(new MsAccessDBTestProvider())
         {
         }

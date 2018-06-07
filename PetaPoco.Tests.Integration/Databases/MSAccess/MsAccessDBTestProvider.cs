@@ -6,15 +6,14 @@
 
 using System;
 using System.Linq;
-using PetaPoco.Tests.Integration.Databases;
 
-namespace PetaPoco.Tests.Integration.x86.Databases.MSAccess
+namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     public class MsAccessDBTestProvider : DBTestProvider
     {
         protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("msaccess").Create();
 
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.x86.Scripts.MSAccessBuildDatabase.sql";
+        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSAccessBuildDatabase.sql";
 
         public override void ExecuteBuildScript(IDatabase database, string script)
         {
