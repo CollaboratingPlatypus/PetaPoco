@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net47;netcoreapp2.1</TargetFrameworks>
     <AssemblyTitle>PetaPoco.Tests.Integration</AssemblyTitle>
     <Description>A Tiny ORMish thing for your POCO's.</Description>
     <Company>Collaborating Platypus</Company>
@@ -62,9 +62,23 @@
     <PackageReference Include="xunit.extensibility.execution" version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" version="2.3.1" />
   </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PetaPoco\PetaPoco.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="app.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
