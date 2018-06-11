@@ -247,6 +247,8 @@ namespace PetaPoco.Core
                 return Singleton<SqlServerDatabaseProvider>.Instance;
             if (typeName.StartsWith("FbConnection") || typeName.EndsWith("FirebirdClientFactory"))
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
+            if (typeName.StartsWith("Teradata"))
+                return Singleton<TeradataDatabaseProvider>.Instance;                
             if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
                 && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
@@ -290,6 +292,8 @@ namespace PetaPoco.Core
             if (providerName.IndexOf("Firebird", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("FbConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
+            if (providerName.IndexOf("Teradata", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                return Singleton<TeradataDatabaseProvider>.Instance;                            
             if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
                 && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 || connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
