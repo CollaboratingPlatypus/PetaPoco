@@ -11,17 +11,17 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     public class MssqlDBTestProvider : DBTestProvider
     {
-        private string _connectionStringKey = "mssql";
+        private string _connectionName = "mssql";
 
-        protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName(_connectionStringKey).Create();
+        protected override IDatabase Database => LoadFromConnectionName(_connectionName);
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
 
         public override IDatabase Execute()
         {
-            _connectionStringKey = "mssql_builder";
+            _connectionName = "mssql_builder";
             base.Execute();
-            _connectionStringKey = "mssql";
+            _connectionName = "mssql";
             return Database;
         }
 

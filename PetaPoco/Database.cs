@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
-#if !NETSTANDARD2_0
+#if !NETSTANDARD
 using System.Configuration;
 #endif
 
@@ -68,7 +68,7 @@ namespace PetaPoco
 
         #region Constructors
 
-#if !NETSTANDARD2_0
+#if !NETSTANDARD
         /// <summary>
         ///     Constructs an instance using the first connection string found in the app/web configuration file.
         /// </summary>
@@ -205,7 +205,7 @@ namespace PetaPoco
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
-#if !NETSTANDARD2_0
+#if !NETSTANDARD
             ConnectionStringSettings entry = null;
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
             {

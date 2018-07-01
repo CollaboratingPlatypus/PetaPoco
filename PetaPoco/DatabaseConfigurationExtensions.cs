@@ -25,7 +25,7 @@ namespace PetaPoco
 
         internal const string ConnectionString = "ConnectionString";
 
-#if !NETSTANDARD2_0
+#if !NETSTANDARD
         internal const string ConnectionStringName = "ConnectionStringName";
 #else
         internal const string ProviderName = "ProviderName";
@@ -183,7 +183,7 @@ namespace PetaPoco
             return source;
         }
 
-#if !NETSTANDARD2_0
+#if !NETSTANDARD
         /// <summary>
         ///     Adds a connection string name.
         /// </summary>

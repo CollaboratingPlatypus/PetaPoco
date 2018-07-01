@@ -6,6 +6,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace PetaPoco.Tests.Integration.Databases
@@ -36,6 +37,20 @@ namespace PetaPoco.Tests.Integration.Databases
         public virtual void ExecuteBuildScript(IDatabase database, string script)
         {
             database.Execute(script);
+        }
+
+        protected virtual IDatabase LoadFromConnectionName(string name)
+        {
+#if NETCOREAPP
+            var appSettings = AppSetting.Load();
+
+            return DatabaseConfiguration.Build()
+                .UsingConnectionString(appSettings.ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ConnectionString)
+                .UsingProviderName(appSettings.ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ProviderName)
+                .Create();            
+#else
+            return DatabaseConfiguration.Build().UsingConnectionStringName(name).Create();
+#endif
         }
     }
 }

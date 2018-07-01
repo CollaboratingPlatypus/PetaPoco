@@ -88,7 +88,11 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
+#if !NETCOREAPP
                     e.Message.ShouldContain("Both a connection string and provider are required");
+#else
+                    e.Message.ShouldContain("Either a provider name or provider must be registered");
+#endif
                     throw;
                 }
             });

@@ -11,14 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Databases\Firebird\**" />
-    <Compile Remove="Databases\MariaDb\**" />
     <Compile Remove="Databases\MSAccess\**" />
     <Compile Remove="Databases\MSSQLCe\**" />
-    <Compile Remove="Databases\MSSQL\**" />
-    <Compile Remove="Databases\MySQL\**" />
     <Compile Remove="Databases\Sqlite\**" />
-    <Compile Remove="Documentation\**" />
     <EmbeddedResource Remove="Databases\Firebird\**" />
     <EmbeddedResource Remove="Databases\MariaDb\**" />
     <EmbeddedResource Remove="Databases\MSAccess\**" />
@@ -90,6 +85,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>
