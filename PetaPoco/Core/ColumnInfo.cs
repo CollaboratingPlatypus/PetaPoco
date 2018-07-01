@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/07/30</date>
+// <date>2018/06/28</date>
 
 using System.Reflection;
 
@@ -44,7 +44,8 @@ namespace PetaPoco
 
         /// <summary>
         ///     The update template. If not null, this template is used for generating the update section instead of the deafult
-        ///     string.Format("{0} = {1}{2}", colName, paramPrefix, index"). Setting this allows DB related interactions, such as "{0} = CAST({1}{2} AS
+        ///     string.Format("{0} = {1}{2}", colName, paramPrefix, index"). Setting this allows DB related interactions, such as
+        ///     "{0} = CAST({1}{2} AS
         ///     json)"
         /// </summary>
         public string UpdateTemplate { get; set; }
@@ -81,7 +82,7 @@ namespace PetaPoco
                 var colattr = (ColumnAttribute) colAttrs[0];
                 ci.InsertTemplate = colattr.InsertTemplate;
                 ci.UpdateTemplate = colattr.UpdateTemplate;
-                ci.ColumnName = colattr.Name == null ? propertyInfo.Name : colattr.Name;
+                ci.ColumnName = colattr.Name ?? propertyInfo.Name;
                 ci.ForceToUtc = colattr.ForceToUtc;
                 if ((colattr as ResultColumnAttribute) != null)
                     ci.ResultColumn = true;

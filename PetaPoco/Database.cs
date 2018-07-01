@@ -2,22 +2,23 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/27</date>
+// <date>2018/06/28</date>
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
+#if !NETSTANDARD2_0
+using System.Configuration;
+#endif
 
 namespace PetaPoco
 {
@@ -40,8 +41,34 @@ namespace PetaPoco
 
         #endregion
 
+        #region Internal operations
+
+        internal void DoPreExecute(IDbCommand cmd)
+        {
+            // Setup command timeout
+            if (OneTimeCommandTimeout != 0)
+            {
+                cmd.CommandTimeout = OneTimeCommandTimeout;
+                OneTimeCommandTimeout = 0;
+            }
+            else if (CommandTimeout != 0)
+            {
+                cmd.CommandTimeout = CommandTimeout;
+            }
+
+            // Call hook
+            OnExecutingCommand(cmd);
+
+            // Save it
+            _lastSql = cmd.CommandText;
+            _lastArgs = (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray();
+        }
+
+        #endregion
+
         #region Constructors
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Constructs an instance using the first connection string found in the app/web configuration file.
         /// </summary>
@@ -58,6 +85,29 @@ namespace PetaPoco
         }
 
         /// <summary>
+        ///     Constructs an instance using a supplied connection string name. The actual connection string and provider will be
+        ///     read from app/web.config.
+        /// </summary>
+        /// <param name="connectionStringName">The name of the connection.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when a connection string cannot be found.</exception>
+        public Database(string connectionStringName)
+        {
+            if (string.IsNullOrEmpty(connectionStringName))
+                throw new ArgumentException("Connection string name must not be null or empty", nameof(connectionStringName));
+
+            var entry = ConfigurationManager.ConnectionStrings[connectionStringName];
+
+            if (entry == null)
+                throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
+
+            _connectionString = entry.ConnectionString;
+            var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
+        }
+#endif
+
+        /// <summary>
         ///     Constructs an instance using a supplied IDbConnection.
         /// </summary>
         /// <param name="connection">The IDbConnection to use.</param>
@@ -69,11 +119,9 @@ namespace PetaPoco
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
         public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-
-            _sharedConnection = connection;
+            _sharedConnection = connection ?? throw new ArgumentNullException(nameof(connection));
             _connectionString = connection.ConnectionString;
+
             // Prevent closing external connection
             _sharedConnectionDepth = 2;
 
@@ -81,7 +129,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using a supplied connections string and provider name. 
+        ///     Constructs an instance using a supplied connections string and provider name.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="providerName">The database provider name.</param>
@@ -92,7 +140,7 @@ namespace PetaPoco
         public Database(string connectionString, string providerName)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Connection string cannot be null or empty", "connectionString");
+                throw new ArgumentException("Connection string cannot be null or empty", nameof(connectionString));
 
             _connectionString = connectionString;
             Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), null);
@@ -108,35 +156,13 @@ namespace PetaPoco
         public Database(string connectionString, DbProviderFactory factory)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Connection string must not be null or empty", "connectionString");
+                throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
 
             if (factory == null)
-                throw new ArgumentNullException("factory");
+                throw new ArgumentNullException(nameof(factory));
 
             _connectionString = connectionString;
             Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), null);
-        }
-
-        /// <summary>
-        ///     Constructs an instance using a supplied connection string name. The actual connection string and provider will be
-        ///     read from app/web.config.
-        /// </summary>
-        /// <param name="connectionStringName">The name of the connection.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when a connection string cannot be found.</exception>
-        public Database(string connectionStringName)
-        {
-            if (string.IsNullOrEmpty(connectionStringName))
-                throw new ArgumentException("Connection string name must not be null or empty", "connectionStringName");
-
-            var entry = ConfigurationManager.ConnectionStrings[connectionStringName];
-
-            if (entry == null)
-                throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
-
-            _connectionString = entry.ConnectionString;
-            var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
         }
 
         /// <summary>
@@ -150,32 +176,36 @@ namespace PetaPoco
         public Database(string connectionString, IProvider provider, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Connection string must not be null or empty", "connectionString");
+                throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
 
             if (provider == null)
-                throw new ArgumentNullException("provider");
+                throw new ArgumentNullException(nameof(provider));
 
             _connectionString = connectionString;
             Initialise(provider, defaultMapper);
         }
 
         /// <summary>
-        ///     Constructs an instance using the supplied <paramref name="configuration"/>.
+        ///     Constructs an instance using the supplied <paramref name="configuration" />.
         /// </summary>
         /// <param name="configuration">The configuration for constructing an instance.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration" /> is null.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when no configuration string is configured and app/web config does any connection string registered.</exception>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when no configuration string is configured and app/web config does
+        ///     any connection string registered.
+        /// </exception>
         /// <exception cref="InvalidOperationException">Thrown when a connection string configured and no provider is configured.</exception>
         public Database(IDatabaseBuildConfiguration configuration)
         {
             if (configuration == null)
-                throw new ArgumentNullException("configuration");
+                throw new ArgumentNullException(nameof(configuration));
 
             var settings = (IBuildConfigurationSettings) configuration;
 
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
+#if !NETSTANDARD2_0
             ConnectionStringSettings entry = null;
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
             {
@@ -188,7 +218,7 @@ namespace PetaPoco
                 }, () =>
                 {
                     if (ConfigurationManager.ConnectionStrings.Count == 0)
-                        throw new InvalidOperationException("One or more connection strings must be registered to not configure the connection string");
+                        throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
 
                     entry = ConfigurationManager.ConnectionStrings[0];
                 });
@@ -196,6 +226,7 @@ namespace PetaPoco
                 // ReSharper disable once PossibleNullReferenceException
                 _connectionString = entry.ConnectionString;
             });
+
 
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
             {
@@ -205,7 +236,17 @@ namespace PetaPoco
                 var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
                 Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
             });
+#else
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () => throw new InvalidOperationException("A connection string is required."));
+            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
+                {
+                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName,
+                        v => Initialise(DatabaseProvider.Resolve(v, false, _connectionString), defaultMapper),
+                        () => throw new InvalidOperationException("Either a provider name or provider must be registered."));
+                });
+#endif
 
+            
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
@@ -263,6 +304,7 @@ namespace PetaPoco
                 if (KeepConnectionAlive)
                     _sharedConnectionDepth++; // Make sure you call Dispose
             }
+
             _sharedConnectionDepth++;
         }
 
@@ -286,10 +328,7 @@ namespace PetaPoco
         /// <summary>
         ///     Provides access to the currently open shared connection (or null if none)
         /// </summary>
-        public IDbConnection Connection
-        {
-            get { return _sharedConnection; }
-        }
+        public IDbConnection Connection => _sharedConnection;
 
         #endregion
 
@@ -301,10 +340,7 @@ namespace PetaPoco
         /// <returns>
         ///     The current transaction instance; else, <c>null</c> if not transaction is in progress.
         /// </returns>
-        IDbTransaction ITransactionAccessor.Transaction
-        {
-            get { return _transaction; }
-        }
+        IDbTransaction ITransactionAccessor.Transaction => _transaction;
 
         // Helper to create a transaction scope
 
@@ -325,10 +361,7 @@ namespace PetaPoco
         ///     Transactions can be nested but they must all be completed otherwise the entire
         ///     transaction is aborted.
         /// </remarks>
-        public ITransaction GetTransaction()
-        {
-            return new Transaction(this);
-        }
+        public ITransaction GetTransaction() => new Transaction(this);
 
         /// <summary>
         ///     Called when a transaction starts.  Overridden by the T4 template generated database
@@ -454,7 +487,7 @@ namespace PetaPoco
                 var t = value.GetType();
                 if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
                 {
-                    p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
+                    p.Value = Convert.ChangeType(value, ((Enum) value).GetTypeCode());
                 }
                 else if (t == typeof(Guid) && !_provider.HasNativeGuidSupport)
                 {
@@ -781,9 +814,9 @@ namespace PetaPoco
                 ItemsPerPage = itemsPerPage,
                 TotalItems = ExecuteScalar<long>(sqlCount, countArgs)
             };
-            result.TotalPages = result.TotalItems/itemsPerPage;
+            result.TotalPages = result.TotalItems / itemsPerPage;
 
-            if ((result.TotalItems%itemsPerPage) != 0)
+            if ((result.TotalItems % itemsPerPage) != 0)
                 result.TotalPages++;
 
             OneTimeCommandTimeout = saveTimeout;
@@ -812,7 +845,7 @@ namespace PetaPoco
         public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args)
         {
             string sqlCount, sqlPage;
-            BuildPageQueries<T>((page - 1)*itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
+            BuildPageQueries<T>((page - 1) * itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
             return Page<T>(page, itemsPerPage, sqlCount, args, sqlPage, args);
         }
 
@@ -872,7 +905,7 @@ namespace PetaPoco
         /// </remarks>
         public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args)
         {
-            return SkipTake<T>((page - 1)*itemsPerPage, itemsPerPage, sql, args);
+            return SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
         }
 
         /// <summary>
@@ -889,7 +922,7 @@ namespace PetaPoco
         /// </remarks>
         public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql)
         {
-            return SkipTake<T>((page - 1)*itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
+            return SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
         }
 
         #endregion
@@ -972,7 +1005,9 @@ namespace PetaPoco
                             throw;
                         yield break;
                     }
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r, _defaultMapper) as Func<IDataReader, T>;
+
+                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r,
+                        _defaultMapper) as Func<IDataReader, T>;
                     using (r)
                     {
                         while (true)
@@ -1048,7 +1083,8 @@ namespace PetaPoco
         public bool Exists<T>(object primaryKey)
         {
             var poco = PocoData.ForType(typeof(T), _defaultMapper);
-            return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)), primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
+            return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)),
+                primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
         }
 
         #endregion
@@ -1066,7 +1102,8 @@ namespace PetaPoco
         /// </remarks>
         public T Single<T>(object primaryKey)
         {
-            return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+            return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)),
+                primaryKey);
         }
 
         /// <summary>
@@ -1080,7 +1117,8 @@ namespace PetaPoco
         /// </remarks>
         public T SingleOrDefault<T>(object primaryKey)
         {
-            return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+            return SingleOrDefault<T>(
+                string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
         /// <summary>
@@ -1194,10 +1232,10 @@ namespace PetaPoco
         public object Insert(string tableName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
 
@@ -1214,13 +1252,13 @@ namespace PetaPoco
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (string.IsNullOrEmpty(primaryKeyName))
-                throw new ArgumentNullException("primaryKeyName");
+                throw new ArgumentNullException(nameof(primaryKeyName));
 
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             var t = poco.GetType();
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
@@ -1247,13 +1285,13 @@ namespace PetaPoco
         public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (string.IsNullOrEmpty(primaryKeyName))
-                throw new ArgumentNullException("primaryKeyName");
+                throw new ArgumentNullException(nameof(primaryKeyName));
 
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
@@ -1270,7 +1308,7 @@ namespace PetaPoco
         public object Insert(object poco)
         {
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             return ExecuteInsert(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
@@ -1305,6 +1343,7 @@ namespace PetaPoco
                                     names.Add(i.Key);
                                     values.Add(autoIncExpression);
                                 }
+
                                 continue;
                             }
 
@@ -1324,7 +1363,7 @@ namespace PetaPoco
                             string.Join(",", names.ToArray()),
                             outputClause,
                             string.Join(",", values.ToArray())
-                            );
+                        );
 
                         if (!autoIncrement)
                         {
@@ -1382,13 +1421,13 @@ namespace PetaPoco
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (string.IsNullOrEmpty(primaryKeyName))
-                throw new ArgumentNullException("primaryKeyName");
+                throw new ArgumentNullException(nameof(primaryKeyName));
 
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
@@ -1405,13 +1444,13 @@ namespace PetaPoco
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (string.IsNullOrEmpty(primaryKeyName))
-                throw new ArgumentNullException("primaryKeyName");
+                throw new ArgumentNullException(nameof(primaryKeyName));
 
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns);
         }
@@ -1439,13 +1478,13 @@ namespace PetaPoco
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (string.IsNullOrEmpty(primaryKeyName))
-                throw new ArgumentNullException("primaryKeyName");
+                throw new ArgumentNullException(nameof(primaryKeyName));
 
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             return ExecuteUpdate(tableName, primaryKeyName, poco, null, columns);
         }
@@ -1492,7 +1531,7 @@ namespace PetaPoco
         public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             return ExecuteUpdate(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
@@ -1508,7 +1547,7 @@ namespace PetaPoco
         public int Update<T>(string sql, params object[] args)
         {
             if (string.IsNullOrEmpty(sql))
-                throw new ArgumentNullException("sql");
+                throw new ArgumentNullException(nameof(sql));
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
             return Execute(string.Format("UPDATE {0} {1}", _provider.EscapeTableName(pd.TableInfo.TableName), sql), args);
@@ -1526,7 +1565,7 @@ namespace PetaPoco
         public int Update<T>(Sql sql)
         {
             if (sql == null)
-                throw new ArgumentNullException("sql");
+                throw new ArgumentNullException(nameof(sql));
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
             return Execute(new Sql(string.Format("UPDATE {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
@@ -1754,7 +1793,7 @@ namespace PetaPoco
         public bool IsNew(string primaryKeyName, object poco)
         {
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             if (string.IsNullOrEmpty(primaryKeyName))
                 throw new ArgumentException("primaryKeyName");
@@ -1820,7 +1859,7 @@ namespace PetaPoco
         public bool IsNew(object poco)
         {
             if (poco == null)
-                throw new ArgumentNullException("poco");
+                throw new ArgumentNullException(nameof(poco));
 
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
@@ -2370,6 +2409,7 @@ namespace PetaPoco
                             throw;
                         yield break;
                     }
+
                     var factory = MultiPocoFactory.GetFactory<TRet>(types, _sharedConnection.ConnectionString, sql, r, _defaultMapper);
                     if (cb == null)
                         cb = MultiPocoFactory.GetAutoMapper(types.ToArray());
@@ -2397,6 +2437,7 @@ namespace PetaPoco
                             else
                                 bNeedTerminator = true;
                         }
+
                         if (bNeedTerminator)
                         {
                             var poco = (TRet) (cb as Delegate).DynamicInvoke(new object[types.Length]);
@@ -2417,8 +2458,9 @@ namespace PetaPoco
         #endregion
 
         #region operation: Multi-Result Set
+
         /// <summary>
-        /// Perform a multi-results set query
+        ///     Perform a multi-results set query
         /// </summary>
         /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
         /// <returns>A GridReader to be queried</returns>
@@ -2428,7 +2470,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Perform a multi-results set query
+        ///     Perform a multi-results set query
         /// </summary>
         /// <param name="sql">The SQL query to be executed</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
@@ -2451,8 +2493,10 @@ namespace PetaPoco
                 if (OnException(x))
                     throw;
             }
+
             return result;
         }
+
         #endregion
 
         #region Last Command
@@ -2460,26 +2504,17 @@ namespace PetaPoco
         /// <summary>
         ///     Retrieves the SQL of the last executed statement
         /// </summary>
-        public string LastSQL
-        {
-            get { return _lastSql; }
-        }
+        public string LastSQL => _lastSql;
 
         /// <summary>
         ///     Retrieves the arguments to the last execute statement
         /// </summary>
-        public object[] LastArgs
-        {
-            get { return _lastArgs; }
-        }
+        public object[] LastArgs => _lastArgs;
 
         /// <summary>
         ///     Returns a formatted string describing the last executed SQL statement and it's argument values
         /// </summary>
-        public string LastCommand
-        {
-            get { return FormatCommand(_lastSql, _lastArgs); }
-        }
+        public string LastCommand => FormatCommand(_lastSql, _lastArgs);
 
         #endregion
 
@@ -2514,8 +2549,10 @@ namespace PetaPoco
                 {
                     sb.AppendFormat("\t -> {0}{1} [{2}] = \"{3}\"\n", _paramPrefix, i, args[i].GetType().Name, args[i]);
                 }
+
                 sb.Remove(sb.Length - 1, 1);
             }
+
             return sb.ToString();
         }
 
@@ -2526,10 +2563,7 @@ namespace PetaPoco
         /// <summary>
         ///     Gets the default mapper.
         /// </summary>
-        public IMapper DefaultMapper
-        {
-            get { return _defaultMapper; }
-        }
+        public IMapper DefaultMapper => _defaultMapper;
 
         /// <summary>
         ///     When set to true, PetaPoco will automatically create the "SELECT columns" part of any query that looks like it
@@ -2558,10 +2592,7 @@ namespace PetaPoco
         /// <returns>
         ///     The loaded database type.
         /// </returns>
-        public IProvider Provider
-        {
-            get { return _provider; }
-        }
+        public IProvider Provider => _provider;
 
         /// <summary>
         ///     Gets the connection string.
@@ -2569,10 +2600,7 @@ namespace PetaPoco
         /// <returns>
         ///     The connection string.
         /// </returns>
-        public string ConnectionString
-        {
-            get { return _connectionString; }
-        }
+        public string ConnectionString => _connectionString;
 
         /// <summary>
         ///     Gets or sets the transaction isolation level.
@@ -2582,7 +2610,7 @@ namespace PetaPoco
         /// </remarks>
         public IsolationLevel? IsolationLevel
         {
-            get { return _isolationLevel; }
+            get => _isolationLevel;
             set
             {
                 if (_transaction != null)
@@ -2610,31 +2638,6 @@ namespace PetaPoco
         private string _paramPrefix;
         private DbProviderFactory _factory;
         private IsolationLevel? _isolationLevel;
-
-        #endregion
-
-        #region Internal operations
-
-        internal void DoPreExecute(IDbCommand cmd)
-        {
-            // Setup command timeout
-            if (OneTimeCommandTimeout != 0)
-            {
-                cmd.CommandTimeout = OneTimeCommandTimeout;
-                OneTimeCommandTimeout = 0;
-            }
-            else if (CommandTimeout != 0)
-            {
-                cmd.CommandTimeout = CommandTimeout;
-            }
-
-            // Call hook
-            OnExecutingCommand(cmd);
-
-            // Save it
-            _lastSql = cmd.CommandText;
-            _lastArgs = (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray();
-        }
 
         #endregion
     }

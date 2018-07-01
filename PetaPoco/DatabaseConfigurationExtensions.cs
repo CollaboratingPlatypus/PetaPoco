@@ -25,7 +25,11 @@ namespace PetaPoco
 
         internal const string ConnectionString = "ConnectionString";
 
+#if !NETSTANDARD2_0
         internal const string ConnectionStringName = "ConnectionStringName";
+#else
+        internal const string ProviderName = "ProviderName";
+#endif
 
         internal const string DefaultMapper = "DefaultMapper";
 
@@ -84,7 +88,7 @@ namespace PetaPoco
             where T : class, IProvider
         {
             if (provider == null)
-                throw new ArgumentNullException("provider");
+                throw new ArgumentNullException(nameof(provider));
             source.SetSetting(Provider, provider);
             return source;
         }
@@ -102,9 +106,9 @@ namespace PetaPoco
             where T : class, IProvider
         {
             if (provider == null)
-                throw new ArgumentNullException("provider");
+                throw new ArgumentNullException(nameof(provider));
             if (configure == null)
-                throw new ArgumentNullException("configure");
+                throw new ArgumentNullException(nameof(configure));
             configure(provider);
             source.SetSetting(Provider, provider);
             return source;
@@ -135,7 +139,7 @@ namespace PetaPoco
             where T : class, IProvider, new()
         {
             if (configure == null)
-                throw new ArgumentNullException("configure");
+                throw new ArgumentNullException(nameof(configure));
             var provider = new T();
             configure(provider);
             source.SetSetting(Provider, provider);
@@ -174,11 +178,12 @@ namespace PetaPoco
         public static IDatabaseBuildConfiguration UsingConnectionString(this IDatabaseBuildConfiguration source, string connectionString)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Argument is null or empty", "connectionString");
+                throw new ArgumentException("Argument is null or empty", nameof(connectionString));
             source.SetSetting(ConnectionString, connectionString);
             return source;
         }
 
+#if !NETSTANDARD2_0
         /// <summary>
         ///     Adds a connection string name.
         /// </summary>
@@ -189,10 +194,26 @@ namespace PetaPoco
         public static IDatabaseBuildConfiguration UsingConnectionStringName(this IDatabaseBuildConfiguration source, string connectionStringName)
         {
             if (string.IsNullOrEmpty(connectionStringName))
-                throw new ArgumentException("Argument is null or empty", "connectionStringName");
+                throw new ArgumentException("Argument is null or empty", nameof(connectionStringName));
             source.SetSetting(ConnectionStringName, connectionStringName);
             return source;
         }
+#else
+        /// <summary>
+        ///     Adds a provider name string - see <see cref="DatabaseProvider.Resolve(string, bool, string)" />.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="providerName">The provider name.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="providerName" /> is null or empty.</exception>
+        /// <returns>The configuration source to form a fluent interface.</returns>
+        public static IDatabaseBuildConfiguration UsingProviderName(this IDatabaseBuildConfiguration source, string providerName)
+        {
+            if (string.IsNullOrEmpty(providerName))
+                throw new ArgumentException("Argument is null or empty", nameof(providerName));
+            source.SetSetting(ProviderName, providerName);
+            return source;
+        }        
+#endif
 
         /// <summary>
         ///     Specifies the default mapper to use when no specific mapper has been registered.
@@ -205,7 +226,7 @@ namespace PetaPoco
             where T : class, IMapper
         {
             if (mapper == null)
-                throw new ArgumentNullException("mapper");
+                throw new ArgumentNullException(nameof(mapper));
             source.SetSetting(DefaultMapper, mapper);
             return source;
         }
@@ -223,9 +244,9 @@ namespace PetaPoco
             where T : class, IMapper
         {
             if (mapper == null)
-                throw new ArgumentNullException("mapper");
+                throw new ArgumentNullException(nameof(mapper));
             if (configure == null)
-                throw new ArgumentNullException("configure");
+                throw new ArgumentNullException(nameof(configure));
             configure(mapper);
             source.SetSetting(DefaultMapper, mapper);
             return source;
@@ -256,7 +277,7 @@ namespace PetaPoco
             where T : class, IMapper, new()
         {
             if (configure == null)
-                throw new ArgumentNullException("configure");
+                throw new ArgumentNullException(nameof(configure));
 
             var mapper = new T();
             configure(mapper);

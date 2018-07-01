@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/10</date>
+// <date>2018/06/29</date>
 
 using System;
 using System.Collections.Generic;
@@ -32,14 +32,13 @@ namespace PetaPoco
                 _settings.Remove(key);
         }
 
-        void IBuildConfigurationSettings.TryGetSetting<T>(string key, Action<T> setSetting, Action onFail = null)
+        void IBuildConfigurationSettings.TryGetSetting<T>(string key, Action<T> setSetting, Action onFail)
         {
             // Note: no argument checking because, pref, enduser unlikely and handled by RT/FW
-            object setting;
-            if (_settings.TryGetValue(key, out setting))
+            if (_settings.TryGetValue(key, out var setting))
                 setSetting((T) setting);
-            else if (onFail != null)
-                onFail();
+            else
+                onFail?.Invoke();
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/30</date>
+// <date>2018/06/29</date>
 
 using System;
 
@@ -15,17 +15,10 @@ namespace PetaPoco
     [AttributeUsage(AttributeTargets.Property)]
     public class ResultColumnAttribute : ColumnAttribute
     {
-        /// <summary>
-        ///     Constructs a new instance of the <seealso cref="ResultColumnAttribute" />.
-        /// </summary>
         public ResultColumnAttribute()
         {
         }
 
-        /// <summary>
-        ///     Constructs a new instance of the <seealso cref="ResultColumnAttribute" />.
-        /// </summary>
-        /// <param name="name">The name of the DB column.</param>
         public ResultColumnAttribute(string name)
             : base(name)
         {

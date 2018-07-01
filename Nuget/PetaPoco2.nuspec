@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-		<id>PetaPoco.Core</id>
-		<title>PetaPoco.Core - A tiny ORMish thing for your POCOs (Core Only)</title>
+		<id>PetaPoco 2</id>
+		<title>PetaPoco - A tiny ORMish thing for your POCOs</title>
 		<version>5.0.1</version>
 	    <authors>Collaborating Platypus</authors>
 	    <owners>Collaborating Platypus</owners>
@@ -13,16 +13,25 @@
 		<description>
 PetaPoco is a tiny, single file .NET data access layer inspired by Massive that works with both non-dynamic POCO objects and dynamics.
 
-This package includes the just the core PetaPoco library (ie: no T4 templates)
-
+This package includes the core PetaPoco library.
 		</description>
 		<tags>Peta Poco Peta-Poco PetaPoco ORM-Micro Micro-ORM ORM ormmicro MVC MVC4 MVC5 MVC6 MySql Postgres MSSQL Database DAL SQL Easy</tags>
 		<frameworkAssemblies>
-			<frameworkAssembly assemblyName="System.Data" />
-			<frameworkAssembly assemblyName="System.Configuration" />
+			<frameworkAssembly assemblyName="System.Data" targetFramwork="net40" />
+			<frameworkAssembly assemblyName="System.Configuration" targetFramwork="net40" />
+		  <frameworkAssembly assemblyName="System.Data" targetFramwork="net45" />
+		  <frameworkAssembly assemblyName="System.Configuration" targetFramwork="net45" />
 		</frameworkAssemblies>
 	</metadata>
-	<files>
-		<file src="PetaPoco.cs" target="Content\Models" />
-	</files>
+  <files>
+    <file src="v4.0\PetaPoco.dll" target="lib\net40" />
+    <file src="v4.0\PetaPoco.pdb" target="lib\net40" />
+    <file src="v4.0\PetaPoco.xml" target="lib\net40" />    
+    <file src="v4.5\PetaPoco.dll" target="lib\net45" />
+    <file src="v4.5\PetaPoco.pdb" target="lib\net45" />
+    <file src="v4.5\PetaPoco.xml" target="lib\net45" />
+    <file src="netstandard2.0\PetaPoco.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\PetaPoco.pdb" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\PetaPoco.xml" target="lib\netstandard2.0" />    
+  </files>
 </package>

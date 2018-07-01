@@ -5,9 +5,7 @@ VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Specs", "Nuget Specs", "{7DF13330-C9DE-4553-93E5-F9043EEA5DA5}"
 	ProjectSection(SolutionItems) = preProject
-		Nuget\PetaPoco.Compiled.nuspec = Nuget\PetaPoco.Compiled.nuspec
-		Nuget\PetaPoco.Core.nuspec = Nuget\PetaPoco.Core.nuspec
-		Nuget\PetaPoco.nuspec = Nuget\PetaPoco.nuspec
+		Nuget\PetaPoco2.nuspec = Nuget\PetaPoco2.nuspec
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}"
@@ -16,7 +14,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Tests.Integration"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Tests.Unit", "PetaPoco.Tests.Unit\PetaPoco.Tests.Unit.csproj", "{5F2570E2-999C-401C-B5EC-8E64193C7A37}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Cs.Joiner", "PetaPoco.Cs.Joiner\PetaPoco.Cs.Joiner.csproj", "{09CF7A7F-3DB9-4820-BA85-88F7BBAF8414}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeGen", "CodeGen", "{0ADE9D42-D89F-4CBA-A1EA-762C4C2CB5AA}"
+	ProjectSection(SolutionItems) = preProject
+		CodeGen\Database.tt = CodeGen\Database.tt
+		CodeGen\PetaPoco.Core.ttinclude = CodeGen\PetaPoco.Core.ttinclude
+		CodeGen\PetaPoco.Generator.ttinclude = CodeGen\PetaPoco.Generator.ttinclude
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +39,6 @@ Global
 		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09CF7A7F-3DB9-4820-BA85-88F7BBAF8414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09CF7A7F-3DB9-4820-BA85-88F7BBAF8414}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09CF7A7F-3DB9-4820-BA85-88F7BBAF8414}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09CF7A7F-3DB9-4820-BA85-88F7BBAF8414}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
