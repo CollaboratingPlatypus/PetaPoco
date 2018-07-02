@@ -4,8 +4,8 @@ install:
 - ps: "if ($env:APPVEYOR_REPO_BRANCH -ieq \"development\")\n{\n Set-AppveyorBuildVariable 'APPVEYOR_BUILD_INFO_VERSION' $($env:APPVEYOR_BUILD_INFO_VERSION + '-beta') \n}"
 branches:
   only:
-  - master
-  - development  
+  - master-v1
+  - development-v1
 skip_tags: true
 configuration: Release
 assembly_info:
@@ -43,4 +43,4 @@ deploy:
     secure: YPGdPLnY9FEYDZz3zZFV/+BKreynP4W2/DoURr0XlBjS8eLkkSypvEkI0BQSfRur
   artifact: /.*\.nupkg/
   on:
-    branch: /master|Development/
+    branch: /master-v1|Development-v1/
