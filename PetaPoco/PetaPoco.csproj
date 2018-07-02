@@ -7,6 +7,14 @@
     <Company>Collaborating Platypus</Company>
     <Product>PetaPoco</Product>
     <Copyright>Collaborating Platypus</Copyright>
+    <Version>2.0.0</Version>
+    <PackageProjectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/CollaboratingPlatypus/PetaPoco</RepositoryUrl>
+    <PackageTags>Peta Poco Peta-Poco PetaPoco ORM-Micro Micro-ORM ORM ormmicro MVC MVC4 MVC5 MVC6 MySql Postgres MSSQL Database DAL SQL Easy</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2Nuget.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageId>PetaPoco2</PackageId>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
