@@ -223,7 +223,7 @@ namespace PetaPoco.Core
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
             if (typeName.StartsWith("Oracle"))
                 return Singleton<OracleDatabaseProvider>.Instance;
-            if (typeName.StartsWith("SQLite"))
+            if (typeName.StartsWith("SQLite") || typeName.StartsWith("Sqlite"))
                 return Singleton<SQLiteDatabaseProvider>.Instance;
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
                 return Singleton<SqlServerDatabaseProvider>.Instance;
@@ -307,8 +307,15 @@ namespace PetaPoco.Core
             if (sp == null)
                 return factory;
 
-            var unwrapped = sp.GetService(factory.GetType()) as DbProviderFactory;
-            return unwrapped == null ? factory : Unwrap(unwrapped);
+            try
+            {
+                var unwrapped = sp.GetService(factory.GetType()) as DbProviderFactory;
+                return unwrapped == null ? factory : Unwrap(unwrapped);
+            }
+            catch (Exception)
+            {
+                return factory;
+            }
         }
 
         protected void ExecuteNonQueryHelper(Database db, IDbCommand cmd)

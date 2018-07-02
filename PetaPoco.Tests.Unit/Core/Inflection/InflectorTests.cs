@@ -2,10 +2,9 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/24</date>
+// <date>2018/07/02</date>
 
 using System;
-using System.Runtime;
 using PetaPoco.Core.Inflection;
 using Shouldly;
 using Xunit;
@@ -14,6 +13,11 @@ namespace PetaPoco.Tests.Unit.Core.Inflection
 {
     public class InflectorTests : IDisposable
     {
+        public void Dispose()
+        {
+            Inflector.Instance = null;
+        }
+
         [Fact]
         public void Instance_Default_ShouldBeEnglish()
         {
@@ -93,11 +97,6 @@ namespace PetaPoco.Tests.Unit.Core.Inflection
             {
                 return WookieeReponse;
             }
-        }
-
-        public void Dispose()
-        {
-            Inflector.Instance = null;
         }
     }
 }

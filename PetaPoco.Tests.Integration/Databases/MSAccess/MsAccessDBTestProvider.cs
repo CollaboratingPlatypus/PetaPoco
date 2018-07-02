@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/29</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     public class MsAccessDBTestProvider : DBTestProvider
     {
-        protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("msaccess").Create();
+        protected override IDatabase Database => LoadFromConnectionName("msaccess");
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSAccessBuildDatabase.sql";
 
@@ -31,9 +31,10 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
                     catch
                     {
                     }
+
                     return;
                 }
-                
+
                 base.ExecuteBuildScript(database, s);
             });
         }

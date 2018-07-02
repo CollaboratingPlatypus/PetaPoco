@@ -13,7 +13,7 @@ namespace PetaPoco.Providers
     {
         public override DbProviderFactory GetFactory()
         {
-            return GetFactory("System.Data.SQLite.SQLiteFactory, System.Data.SQLite, Culture=neutral, PublicKeyToken=db937bc2d44ff139");
+            return GetFactory("System.Data.SQLite.SQLiteFactory, System.Data.SQLite", "Microsoft.Data.Sqlite.SqliteFactory, Microsoft.Data.Sqlite");
         }
 
         public override object MapParameterValue(object value)

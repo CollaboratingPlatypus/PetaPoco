@@ -2,12 +2,11 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Linq;
 using PetaPoco.Core;
-using PetaPoco.Core.Inflection;
 using PetaPoco.Tests.Integration.Databases;
 using PetaPoco.Tests.Integration.Databases.MSSQL;
 using Shouldly;
@@ -53,7 +52,14 @@ namespace PetaPoco.Tests.Integration.Documentation
             DB.Insert(person);
 
             // Create the order
-            var order = new Order { PersonId = person.Id, PoNumber = "PETAPOCO", Status = OrderStatus.Pending, CreatedBy = "Office PetaPoco", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
+            var order = new Order
+            {
+                PersonId = person.Id,
+                PoNumber = "PETAPOCO",
+                Status = OrderStatus.Pending,
+                CreatedBy = "Office PetaPoco",
+                CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc)
+            };
 
             // Tell PetaPoco to insert it
             var id = DB.Insert(order);
@@ -171,20 +177,20 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: I can't think of a valid reason, other than for a purpose such as this, where you would configure the convention mapper in this way.
             ((ConventionMapper) DB.DefaultMapper).MapPrimaryKey = (ti, t) =>
             {
-                var prop =  t.GetProperties().FirstOrDefault(p => p.Name == "PrimaryKey");
+                var prop = t.GetProperties().FirstOrDefault(p => p.Name == "PrimaryKey");
 
                 if (prop == null)
                     return false;
 
                 ti.PrimaryKey = prop.Name;
-                ti.AutoIncrement = ((ConventionMapper)DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
+                ti.AutoIncrement = ((ConventionMapper) DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
                 return true;
             };
             ((ConventionMapper) DB.DefaultMapper).InflectTableName = (i, tn) => "TBL_" + tn + "s";
 
             // Create the POCO
             var poco = new UnconventionalPoco { Text = "PetaPoco" };
-            
+
             // Tell PetaPoco to insert it
             var id = DB.Insert(poco);
 
@@ -221,8 +227,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they're are the same
-            id.ShouldBe((int)clone.Id);
-            xfile.FileName.ShouldBe((string)clone.FileName);
+            id.ShouldBe((int) clone.Id);
+            xfile.FileName.ShouldBe((string) clone.FileName);
         }
 
         [Fact]
@@ -249,8 +255,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they're are the same
-            id.ShouldBe((int)clone.Id);
-            ((string)xfile.FileName).ShouldBe((string)clone.FileName);
+            id.ShouldBe((int) clone.Id);
+            ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }
     }
 
