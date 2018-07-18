@@ -1,4 +1,4 @@
-### Version 6 - Netstandard 2.0
+### Version 6 - Netstandard 2.0, 4.0, 4.5+
 
 Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
 
@@ -8,9 +8,9 @@ Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/
 
 ### Version 5 - Legacy
 
-|Master|Development|Nuget|Nuget Core|Nuget Core Compiled|
-|:-----|:----------|:----|:---------|:------------------|
-|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master-v5?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master-v5)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development-v5?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development-v5)|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco)](https://www.nuget.org/packages/PetaPoco/)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core)](https://www.nuget.org/packages/PetaPoco.Core)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core.Compiled)](https://www.nuget.org/packages/PetaPoco.Core.Compiled)|
+|Nuget (Single file)|Nuget Core (+t4 templates)|Nuget Core Compiled (dll)|
+|:----|:---------|:------------------|
+|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco)](https://www.nuget.org/packages/PetaPoco/)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core)](https://www.nuget.org/packages/PetaPoco.Core)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core.Compiled)](https://www.nuget.org/packages/PetaPoco.Core.Compiled)|
 
 <img align="right" alt="PetaPoco Logo" width="128" src="https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2_256.png">
 
@@ -42,11 +42,10 @@ Originally the brainchild of [Brad Robinson],
 * Includes T4 templates to automatically generate POCO classes for you.
 * Hooks for logging exceptions, installing value converters and mapping columns to properties without attributes.
 * Works with SQL Server, SQL Server CE, MS Access, SQLite, MySQL, MariaDB, Firebird, and PostgreSQL. (Oracle supported but does not have integration tests).
-* Works under .NET 4.0/4.5/4.6 or Mono 2.8 and later.
+* Works under Net Standard 2.0, .NET 4.0/4.5+ or Mono 2.8 and later.
 * Has [Xunit] unit tests.
 * Has supported DBs integration tests.
 * OpenSource (Apache License)
-* All of this in about 1,500 lines of code
 
 ## Super easy use and configuration
 
@@ -81,9 +80,7 @@ For configuration, code examples and other general information [See the docs]
 
 PetaPoco is available from:
 
-* **NuGet Peta** - <https://www.nuget.org/packages/PetaPoco/> - A single file include with [T4 text templates](https://msdn.microsoft.com/en-us/library/bb126445.aspx) to automatically build your pocos for you.
-* **NuGet Peta Core** - <https://www.nuget.org/packages/PetaPoco.Core/> - A single file include.
-* **NuGet Peta Core Compiled** - <https://www.nuget.org/packages/PetaPoco.Core.Compiled/> - A compiled version which your project references.
+* **NuGet Peta Complied** - <https://www.nuget.org/packages/PetaPoco.Compiled> - A compiled version which your project references.
 
 [Brad Robinson]:http://www.toptensoftware.com/
 [Massive]:https://github.com/FransBouma/Massive
