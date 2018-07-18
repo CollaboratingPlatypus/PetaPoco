@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/06</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Data;
@@ -45,15 +45,19 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void Construct_GivenInvalidArguments_ShouldThrow()
         {
+#if !NETCOREAPP
             Should.Throw<InvalidOperationException>(() => new Database());
+#endif
 
             Should.Throw<ArgumentNullException>(() => new Database((IDbConnection) null));
 
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (IProvider) null));
             Should.Throw<ArgumentException>(() => new Database(null, _provider));
 
+#if !NETCOREAPP
             Should.Throw<ArgumentException>(() => new Database((string) null));
             Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
+#endif
 
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
@@ -67,7 +71,11 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
+#if !NETCOREAPP
                     e.Message.ShouldContain("One or more connection strings");
+#else
+                    e.Message.ShouldContain("A connection string is required");
+#endif
                     throw;
                 }
             });
@@ -79,7 +87,11 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
+#if !NETCOREAPP
                     e.Message.ShouldContain("Both a connection string and provider are required");
+#else
+                    e.Message.ShouldContain("Either a provider name or provider must be registered");
+#endif
                     throw;
                 }
             });

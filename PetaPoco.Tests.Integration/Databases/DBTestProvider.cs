@@ -2,11 +2,14 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.IO;
 using System.Text;
+#if NETCOREAPP
+using System.Linq;
+#endif
 
 namespace PetaPoco.Tests.Integration.Databases
 {
@@ -23,19 +26,38 @@ namespace PetaPoco.Tests.Integration.Databases
         public virtual IDatabase Execute()
         {
             var db = Database;
-            using (var s = this.GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
+            using (var s = GetType().Assembly.GetManifestResourceStream(ScriptResourceName))
             {
                 using (var r = new StreamReader(s, Encoding.UTF8))
                 {
                     ExecuteBuildScript(db, r.ReadToEnd());
                 }
             }
+
             return db;
         }
 
         public virtual void ExecuteBuildScript(IDatabase database, string script)
         {
             database.Execute(script);
+        }
+
+        protected virtual IDatabaseBuildConfiguration BuildFromConnectionName(string name)
+        {
+#if NETCOREAPP
+            var appSettings = AppSetting.Load();
+
+            return DatabaseConfiguration.Build()
+                .UsingConnectionString(appSettings.ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ConnectionString)
+                .UsingProviderName(appSettings.ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ProviderName);
+#else
+            return DatabaseConfiguration.Build().UsingConnectionStringName(name);
+#endif
+        }
+
+        protected virtual IDatabase LoadFromConnectionName(string name)
+        {
+            return BuildFromConnectionName(name).Create();
         }
     }
 }

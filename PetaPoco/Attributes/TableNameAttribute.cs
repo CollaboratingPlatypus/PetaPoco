@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/30</date>
+// <date>2018/06/29</date>
 
 using System;
 
@@ -20,15 +20,12 @@ namespace PetaPoco
         /// <returns>
         ///     The table nane of the database that this entity maps to.
         /// </returns>
-        public string Value { get; private set; }
+        public string Value { get; }
 
         /// <summary>
         ///     Constructs a new instance of the <seealso cref="TableNameAttribute" />.
         /// </summary>
         /// <param name="tableName">The table nane of the database that this entity maps to.</param>
-        public TableNameAttribute(string tableName)
-        {
-            Value = tableName;
-        }
+        public TableNameAttribute(string tableName) => Value = tableName;
     }
 }

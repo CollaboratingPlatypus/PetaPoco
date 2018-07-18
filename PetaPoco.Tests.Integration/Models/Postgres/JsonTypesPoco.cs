@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/07/30</date>
+// <date>2018/07/02</date>
 
 using Newtonsoft.Json.Linq;
 using Shouldly;
@@ -53,6 +53,7 @@ namespace PetaPoco.Tests.Integration.Models.Postgres
             {
                 Id.ShouldNotBe(other.Id);
             }
+
             dynamic j1 = JObject.Parse(Json1);
             dynamic jo1 = JObject.Parse(other.Json1);
             dynamic j2 = JObject.Parse(Json2);

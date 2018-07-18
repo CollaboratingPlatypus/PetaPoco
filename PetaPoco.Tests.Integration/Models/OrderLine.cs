@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/07</date>
+// <date>2018/07/02</date>
 
 using Shouldly;
 
@@ -54,6 +54,7 @@ namespace PetaPoco.Tests.Integration.Models
                 Id.ShouldNotBe(other.Id);
                 OrderId.ShouldNotBe(other.OrderId);
             }
+
             Quantity.ShouldNotBe(other.Quantity);
             Status.ShouldNotBe(other.Status);
             SellPrice.ShouldNotBe(other.SellPrice);

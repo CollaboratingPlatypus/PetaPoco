@@ -1,8 +1,8 @@
-﻿// <copyright file="AnsiString.cs" company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
+// <date>2018/06/29</date>
 
 namespace PetaPoco
 {
@@ -14,15 +14,12 @@ namespace PetaPoco
         /// <summary>
         ///     The string value
         /// </summary>
-        public string Value { get; private set; }
+        public string Value { get; }
 
         /// <summary>
         ///     Constructs an AnsiString
         /// </summary>
         /// <param name="str">The C# string to be converted to ANSI before being passed to the DB</param>
-        public AnsiString(string str)
-        {
-            Value = str;
-        }
+        public AnsiString(string str) => Value = str;
     }
 }

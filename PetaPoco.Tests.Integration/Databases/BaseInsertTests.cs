@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/02/16</date>
+// <date>2018/07/02</date>
 
 using System;
 using PetaPoco.Tests.Integration.Models;
@@ -107,7 +107,8 @@ namespace PetaPoco.Tests.Integration.Databases
                 DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
                     _person.Id);
             var orderOther =
-                DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+                DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _order.Id);
             var orderLineOther =
                 DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
                     _orderLine.Id);
@@ -206,7 +207,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var id = DB.Insert("Note", "Id", note);
 
             var otherNote = DB.Single<Note>(id);
-            
+
             otherNote.Text.ShouldBe(note.Text);
             otherNote.CreatedOn.ShouldBe(note.CreatedOn);
         }

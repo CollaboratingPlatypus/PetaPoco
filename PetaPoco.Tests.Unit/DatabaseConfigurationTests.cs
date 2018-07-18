@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/28</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Data;
@@ -182,12 +182,14 @@ namespace PetaPoco.Tests.Unit
             db.ConnectionString.ShouldBe("cs");
         }
 
+#if !NETCOREAPP
         [Fact]
         public void UsingConnectionStringName_GivenInvalidArguments_Throws()
         {
             Should.Throw<ArgumentException>(() => config.UsingConnectionStringName(null));
             Should.Throw<ArgumentException>(() => config.UsingConnectionStringName(string.Empty));
         }
+#endif
 
         [Fact(Skip = "Can't be tested as testing would require connection strings in the app/web config.")]
         public void UsingConnectionStringName_GivenTimeoutAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
