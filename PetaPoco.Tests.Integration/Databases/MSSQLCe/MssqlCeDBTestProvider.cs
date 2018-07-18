@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Configuration;
@@ -14,20 +14,37 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     public class MssqlCeDBTestProvider : DBTestProvider
     {
-        protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("mssqlce").Create();
+        protected override IDatabase Database => LoadFromConnectionName("mssqlce");
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLCeBuildDatabase.sql";
+
+        public MssqlCeDBTestProvider()
+        {
+            // Hack: Nuget package is old and dones't support newer content
+            // ReSharper disable AssignNullToNotNullAttribute
+            var codeBase = typeof(SqlCeConnection).Assembly.CodeBase;
+            var uri = new UriBuilder(codeBase);
+            var dllPath = Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
+            var nativeBinaryPath = Path.GetFullPath(Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                $".nuget\\packages\\microsoft.sqlserver.compact\\4.0.8876.1\\NativeBinaries\\{(Environment.Is64BitProcess ? "amd64" : "x86")}"));
+            Directory.GetFiles(nativeBinaryPath, "*", SearchOption.AllDirectories).ToList()
+                .ForEach(f =>
+                {
+                    var destFilePath = Path.Combine(dllPath, Path.GetFileName(f));
+                    if (!File.Exists(destFilePath))
+                        File.Copy(f, destFilePath);
+                });
+            // ReSharper restore AssignNullToNotNullAttribute
+        }
 
         public override IDatabase Execute()
         {
             if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
-            {
                 using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
                 {
                     engine.CreateDatabase();
                 }
-                //File.Delete(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf"));
-            }
 
             return base.Execute();
         }
@@ -48,6 +65,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
                     catch
                     {
                     }
+
                     return;
                 }
 

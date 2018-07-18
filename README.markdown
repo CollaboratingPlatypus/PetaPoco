@@ -1,6 +1,16 @@
+### Version 6 - Netstandard 2.0
+
+Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
+
+|Master|Development|Nuget|
+|:-----|:----------|:----|
+|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development)|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco.Compiled)](https://www.nuget.org/packages/PetaPoco.Compiled/)|
+
+### Version 5 - Legacy
+
 |Master|Development|Nuget|Nuget Core|Nuget Core Compiled|
 |:-----|:----------|:----|:---------|:------------------|
-|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development)|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco)](https://www.nuget.org/packages/PetaPoco/)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core)](https://www.nuget.org/packages/PetaPoco.Core)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core.Compiled)](https://www.nuget.org/packages/PetaPoco.Core.Compiled)|
+|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master-v5?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master-v5)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development-v5?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development-v5)|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco)](https://www.nuget.org/packages/PetaPoco/)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core)](https://www.nuget.org/packages/PetaPoco.Core)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core.Compiled)](https://www.nuget.org/packages/PetaPoco.Core.Compiled)|
 
 <img align="right" alt="PetaPoco Logo" width="128" src="https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2_256.png">
 

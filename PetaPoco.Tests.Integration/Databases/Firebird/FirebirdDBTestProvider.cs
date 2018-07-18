@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/31</date>
+// <date>2018/07/02</date>
 
 using System.IO;
 using System.Text;
@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     public class FirebirdDBTestProvider : DBTestProvider
     {
-        protected override IDatabase Database => DatabaseConfiguration.Build().UsingConnectionStringName("firebird").Create();
+        protected override IDatabase Database => LoadFromConnectionName("Firebird");
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.FirebirdDbBuildDatabase.sql";
 

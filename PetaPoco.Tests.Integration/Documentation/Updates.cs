@@ -2,12 +2,11 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/13</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Linq;
 using PetaPoco.Core;
-using PetaPoco.Core.Inflection;
 using PetaPoco.Tests.Integration.Databases;
 using PetaPoco.Tests.Integration.Databases.MSSQL;
 using Shouldly;
@@ -65,7 +64,7 @@ namespace PetaPoco.Tests.Integration.Documentation
 
             // Tell PetaPoco to update only ther person's name
             // The update statement produced is `UPDATE [People] SET [FullName] = @0 WHERE [Id] = @1`
-            DB.Update(person, new [] { pocoData.GetColumnName(nameof(Person.Name)) });
+            DB.Update(person, new[] { pocoData.GetColumnName(nameof(Person.Name)) });
 
             // Get a clone/copy from the DB
             var clone = DB.Single<Person>(id);
@@ -142,12 +141,12 @@ namespace PetaPoco.Tests.Integration.Documentation
             DB.Update(note2, note2.Id);
             DB.Update(note3, note3.Id, pocoData.UpdateColumns);
             var sql1 = $"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
-                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0";
+                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0";
             DB.Update<Note>(sql1, note4.Id, note4.Text);
             var sql2 = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
                                $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0", note5.Id, note5.Text);
             DB.Update<Note>(sql2);
-            
+
             // Just to be sure
             DB.ExecuteScalar<int>("SELECT COUNT(*) FROM [Note] WHERE CAST(Text AS NVARCHAR(MAX)) = @0", "PetaPoco's note some more text").ShouldBe(5);
         }
@@ -199,20 +198,20 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: I can't think of a valid reason, other than for a purpose such as this, where you would configure the convention mapper in this way.
             ((ConventionMapper) DB.DefaultMapper).MapPrimaryKey = (ti, t) =>
             {
-                var prop =  t.GetProperties().FirstOrDefault(p => p.Name == "PrimaryKey");
+                var prop = t.GetProperties().FirstOrDefault(p => p.Name == "PrimaryKey");
 
                 if (prop == null)
                     return false;
 
                 ti.PrimaryKey = prop.Name;
-                ti.AutoIncrement = ((ConventionMapper)DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
+                ti.AutoIncrement = ((ConventionMapper) DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
                 return true;
             };
             ((ConventionMapper) DB.DefaultMapper).InflectTableName = (i, tn) => "TBL_" + tn + "s";
 
             // Create the POCO
             var poco = new UnconventionalPoco { Text = "PetaPoco" };
-            
+
             // Tell PetaPoco to insert it
             var id = DB.Insert(poco);
 
@@ -264,8 +263,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they're are the same
-            id.ShouldBe((int)clone.Id);
-            xfile.FileName.ShouldBe((string)clone.FileName);
+            id.ShouldBe((int) clone.Id);
+            xfile.FileName.ShouldBe((string) clone.FileName);
         }
 
         [Fact]
@@ -288,7 +287,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             var id = DB.Insert("XFiles", "Id", true, (object) xfile);
 
             // Update the poco
-            xfile.FileName = "Agent Mulder.sec" ;
+            xfile.FileName = "Agent Mulder.sec";
 
             // Update the database
             DB.Update("XFiles", "Id", (object) xfile);
@@ -298,8 +297,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they're are the same
-            id.ShouldBe((int)clone.Id);
-            ((string)xfile.FileName).ShouldBe((string)clone.FileName);
+            id.ShouldBe((int) clone.Id);
+            ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }
     }
 }

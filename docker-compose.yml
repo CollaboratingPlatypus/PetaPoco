@@ -1,0 +1,50 @@
+postgres:
+  image: postgres:latest
+  container_name: postgres_petapoco
+  ports:
+    - "5001:5432"
+  environment:
+    - POSTGRES_PASSWORD=petapoco
+    - POSTGRES_USER=petapoco
+mysql:
+  image: mysql:latest
+  container_name: mysql_petapoco
+  ports:
+    - "5002:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=petapoco
+    - MYSQL_DATABASE=petapoco
+    - MYSQL_PASSWORD=petapoco
+    - MYSQL_USER=petapoco
+mariadb:
+  image: mariadb:latest
+  container_name: mariadb_petapoco
+  ports:
+    - "5003:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=petapoco
+    - MYSQL_DATABASE=petapoco
+    - MYSQL_PASSWORD=petapoco
+    - MYSQL_USER=petapoco
+firebirddb:
+  image: jacobalberty/firebird:latest
+  container_name: firebirddb_petapoco
+  ports:
+    - "5004:3050"
+  environment:
+    - EnableWireCrypt=true
+    - ISC_PASSWORD=petapoco
+mssql:
+  image: microsoft/mssql-server-linux
+  container_name: mssql_petapoco
+  ports:
+    - "5005:1433"
+  environment:
+    - ACCEPT_EULA=Y
+    - SA_PASSWORD=pAtAp0c8
+#oracledb:
+#  image: sath89/oracle-12c:latest
+#  container_name: oracledb_petapoco
+#  ports:
+#    - "5005:1521"
+#    - "5006:8008"
