@@ -18,5 +18,5 @@ build_script:
     } else {
       dotnet pack -c "Release" /p:PackageVersion=$env:APPVEYOR_BUILD_VERSION 
     }
-    dotnet nuget push ".\PetaPoco\bin\Release\*.nupkg" -k $env:NUGET_API_KEY -Source https://www.nuget.org/api/v2/package
+    dotnet nuget push ".\PetaPoco\bin\Release\*.nupkg" -k $env:NUGET_API_KEY -s https://www.nuget.org/api/v2/package
 test: off
