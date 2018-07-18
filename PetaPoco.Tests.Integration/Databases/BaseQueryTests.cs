@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/02/04</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Collections.Generic;
@@ -139,7 +139,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
             }
 
-            var results = DB.Query<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null }).ToList();
+            var results = DB.Query<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }).ToList();
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -253,7 +253,8 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
-            var sql =$"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @Status AND @NullableProperty IS NULL";
+            var sql =
+                $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @Status AND @NullableProperty IS NULL";
 
             if (DB.Provider.GetType() == typeof(PostgreSQLDatabaseProvider))
             {
@@ -264,7 +265,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
             }
 
-            var results = DB.Fetch<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
+            var results = DB.Fetch<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -362,6 +363,7 @@ namespace PetaPoco.Tests.Integration.Databases
                         Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
                     });
                 }
+
                 if (sallysToAdd > i)
                 {
                     DB.Insert(new Person

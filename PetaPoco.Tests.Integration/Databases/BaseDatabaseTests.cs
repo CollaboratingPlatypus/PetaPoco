@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/06</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Configuration;
@@ -84,6 +84,7 @@ namespace PetaPoco.Tests.Integration.Databases
             }
         }
 
+#if !NETCOREAPP
         [Fact]
         public void Construct_GivenConnectionStringName_ShouldBeValid()
         {
@@ -99,6 +100,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 _note.ShouldBe(otherNote);
             }
         }
+#endif
 
         [Fact]
         public void Construct_GivenConnectionStringAndProvider_ShouldBeValid()

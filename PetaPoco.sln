@@ -1,36 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{33699753-151D-4100-8F12-9AE1AEB5C5BD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{53F07078-98EA-4494-9829-74245992A7F1} = {53F07078-98EA-4494-9829-74245992A7F1}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Cs.Joiner", "PetaPoco.Cs.Joiner\PetaPoco.Cs.Joiner.csproj", "{53F07078-98EA-4494-9829-74245992A7F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Tests.Integration", "PetaPoco.Tests.Integration\PetaPoco.Tests.Integration.csproj", "{9519751A-BE37-4D9A-85B5-ECAA974FE6F9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Peta Single File", "Peta Single File", "{2DAA4086-AC09-4C47-95DF-21917E529022}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Tests.Unit", "PetaPoco.Tests.Unit\PetaPoco.Tests.Unit.csproj", "{5F2570E2-999C-401C-B5EC-8E64193C7A37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeGen", "CodeGen", "{0ADE9D42-D89F-4CBA-A1EA-762C4C2CB5AA}"
 	ProjectSection(SolutionItems) = preProject
-		Output\PetaPoco.cs = Output\PetaPoco.cs
+		CodeGen\Database.tt = CodeGen\Database.tt
+		CodeGen\PetaPoco.Core.ttinclude = CodeGen\PetaPoco.Core.ttinclude
+		CodeGen\PetaPoco.Generator.ttinclude = CodeGen\PetaPoco.Generator.ttinclude
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Specs", "Nuget Specs", "{7DF13330-C9DE-4553-93E5-F9043EEA5DA5}"
-	ProjectSection(SolutionItems) = preProject
-		Nuget\PetaPoco.Compiled.nuspec = Nuget\PetaPoco.Compiled.nuspec
-		Nuget\PetaPoco.Core.nuspec = Nuget\PetaPoco.Core.nuspec
-		Nuget\PetaPoco.nuspec = Nuget\PetaPoco.nuspec
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Dep", "PetaPoco.Tests.Dep\PetaPoco.Tests.Dep.csproj", "{E6787C52-7549-44CD-AA6E-AB9D55946AB9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration", "PetaPoco.Tests.Integration\PetaPoco.Tests.Integration.csproj", "{560CD8E5-D810-4A57-A5FE-4E39D97662CC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Unit", "PetaPoco.Tests.Unit\PetaPoco.Tests.Unit.csproj", "{80586BD7-13C7-4EF7-918D-D1F048672CC9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.SingleFile", "PetaPoco.Tests.Integration.SingleFile\PetaPoco.Tests.Integration.SingleFile.csproj", "{9B2D7B13-A47D-497C-9E46-85B78C2D074E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetaPoco.Tests.Integration.x86", "PetaPoco.Tests.Integration.x86\PetaPoco.Tests.Integration.x86.csproj", "{9AAEF733-6F2A-4297-A0E2-D065212940A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,36 +22,23 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33699753-151D-4100-8F12-9AE1AEB5C5BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{53F07078-98EA-4494-9829-74245992A7F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{53F07078-98EA-4494-9829-74245992A7F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{53F07078-98EA-4494-9829-74245992A7F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{53F07078-98EA-4494-9829-74245992A7F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6787C52-7549-44CD-AA6E-AB9D55946AB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{560CD8E5-D810-4A57-A5FE-4E39D97662CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80586BD7-13C7-4EF7-918D-D1F048672CC9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B2D7B13-A47D-497C-9E46-85B78C2D074E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AAEF733-6F2A-4297-A0E2-D065212940A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9519751A-BE37-4D9A-85B5-ECAA974FE6F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9519751A-BE37-4D9A-85B5-ECAA974FE6F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9519751A-BE37-4D9A-85B5-ECAA974FE6F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9519751A-BE37-4D9A-85B5-ECAA974FE6F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F2570E2-999C-401C-B5EC-8E64193C7A37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC2D57D2-EAB5-4E28-92DC-2E5CB4AEBDF1}
 	EndGlobalSection
 EndGlobal

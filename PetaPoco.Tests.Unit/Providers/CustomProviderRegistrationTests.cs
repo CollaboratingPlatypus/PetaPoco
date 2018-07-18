@@ -2,27 +2,22 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/04/10</date>
+// <date>2018/07/02</date>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using Shouldly;
-using PetaPoco.Core;
 using System.Data.Common;
+using PetaPoco.Core;
 using PetaPoco.Providers;
-using System.Data;
+using Shouldly;
+using Xunit;
 
 namespace PetaPoco.Tests.Unit.Providers
 {
-    public class CustomProviderRegistrationTests: IDisposable
+    public class CustomProviderRegistrationTests : IDisposable
     {
         public void Dispose()
         {
-            DatabaseProvider.ClearCustomProviders();            
+            DatabaseProvider.ClearCustomProviders();
         }
 
         private void RegisterProviders()
@@ -82,9 +77,6 @@ namespace PetaPoco.Tests.Unit.Providers
             Should.Throw<ArgumentException>(() => DatabaseProvider.RegisterCustomProvider<MyCustomProvider>(input));
         }
 
-
-
-
         private class MyCustomProvider : DatabaseProvider
         {
             public override DbProviderFactory GetFactory()
@@ -101,10 +93,16 @@ namespace PetaPoco.Tests.Unit.Providers
             }
         }
 
-        private class FooType { }
+        private class FooType
+        {
+        }
 
-        private class BarType { }
+        private class BarType
+        {
+        }
 
-        private class MariaDbType { }
+        private class MariaDbType
+        {
+        }
     }
 }

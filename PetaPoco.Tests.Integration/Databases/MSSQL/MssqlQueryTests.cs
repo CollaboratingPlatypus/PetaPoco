@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/02/06</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             : base(new MssqlDBTestProvider())
         {
         }
-        
+
         [Fact]
         public void Query_ForPocoGivenDbColumPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
@@ -42,28 +42,6 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
             poco2.Column1.ShouldBe("B");
             poco2.Column2.ShouldBe("A");
-        }
-
-        [ExplicitColumns]
-        [TableName("BugInvestigation_64O6LT8U")]
-        public class PocoOverlapPoco1
-        {
-            [Column("ColumnA")]
-            public string Column1 { get; set; }
-
-            [Column]
-            public string Column2 { get; set; }
-        }
-
-        [ExplicitColumns]
-        [TableName("BugInvestigation_5TN5C4U4")]
-        public class PocoOverlapPoco2
-        {
-            [Column("ColumnA")]
-            public string Column1 { get; set; }
-
-            [Column]
-            public string Column2 { get; set; }
         }
 
         [Fact]
@@ -151,7 +129,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
                 o.CreatedBy.ShouldStartWith("Harry");
             });
         }
-        
+
         [Fact]
         public void Query_MultiResultsSet_SingleResultsSetSinglePoco__ShouldReturnValidPocoCollection()
         {
@@ -187,7 +165,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             List<Order> result;
             using (var multi = DB.QueryMultiple(sql, "Peta0"))
             {
-                result = multi.Read<Order, Person, Order>((o, p) => { o.Person = p; return o; }).ToList();
+                result = multi.Read<Order, Person, Order>((o, p) =>
+                {
+                    o.Person = p;
+                    return o;
+                }).ToList();
             }
 
             result.Count.ShouldBe(1);
@@ -212,7 +194,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
             var od = PocoData.ForType(typeof(Order), DB.DefaultMapper);
-            var sql = $"SET CONCAT_NULL_YIELDS_NULL ON;SELECT * FROM [{od.TableInfo.TableName}] o WHERE [{od.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName}] = @0;SELECT * FROM [{pd.TableInfo.TableName}] p WHERE [{pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName}] = @1;";
+            var sql =
+                $"SET CONCAT_NULL_YIELDS_NULL ON;SELECT * FROM [{od.TableInfo.TableName}] o WHERE [{od.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName}] = @0;SELECT * FROM [{pd.TableInfo.TableName}] p WHERE [{pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName}] = @1;";
 
             Order order;
             using (var multi = DB.QueryMultiple(sql, "1", "Peta0"))
@@ -247,7 +230,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             List<Order> results;
             using (var multi = DB.QueryMultiple(sql))
             {
-                results = multi.Read<Order, Person, Order>((o, p) => { o.Person = p; return o; }).ToList();
+                results = multi.Read<Order, Person, Order>((o, p) =>
+                {
+                    o.Person = p;
+                    return o;
+                }).ToList();
                 var orderLines = multi.Read<OrderLine>().ToList();
 
                 foreach (var order in results)
@@ -279,6 +266,28 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
                 secondOrderLine.Quantity.ToString().ShouldBe("2");
                 secondOrderLine.SellPrice.ShouldBe(19.98m);
             });
+        }
+
+        [ExplicitColumns]
+        [TableName("BugInvestigation_64O6LT8U")]
+        public class PocoOverlapPoco1
+        {
+            [Column("ColumnA")]
+            public string Column1 { get; set; }
+
+            [Column]
+            public string Column2 { get; set; }
+        }
+
+        [ExplicitColumns]
+        [TableName("BugInvestigation_5TN5C4U4")]
+        public class PocoOverlapPoco2
+        {
+            [Column("ColumnA")]
+            public string Column1 { get; set; }
+
+            [Column]
+            public string Column2 { get; set; }
         }
     }
 }

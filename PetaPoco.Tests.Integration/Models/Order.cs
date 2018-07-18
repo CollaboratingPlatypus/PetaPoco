@@ -2,7 +2,7 @@
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/05/27</date>
+// <date>2018/07/02</date>
 
 using System;
 using System.Collections.Generic;
@@ -59,6 +59,7 @@ namespace PetaPoco.Tests.Integration.Models
                 Id.ShouldNotBe(other.Id);
                 PersonId.ShouldNotBe(other.PersonId);
             }
+
             PoNumber.ShouldNotBe(other.PoNumber);
             Status.ShouldNotBe(other.Status);
             CreatedOn.ShouldNotBe(other.CreatedOn);
