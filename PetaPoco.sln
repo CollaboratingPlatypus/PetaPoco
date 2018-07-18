@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Specs", "Nuget Specs", "{7DF13330-C9DE-4553-93E5-F9043EEA5DA5}"
-	ProjectSection(SolutionItems) = preProject
-		Nuget\PetaPoco2.nuspec = Nuget\PetaPoco2.nuspec
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco", "PetaPoco\PetaPoco.csproj", "{F6CC0E46-DEDB-401A-91B2-5CBEDE8F950B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Tests.Integration", "PetaPoco.Tests.Integration\PetaPoco.Tests.Integration.csproj", "{9519751A-BE37-4D9A-85B5-ECAA974FE6F9}"
