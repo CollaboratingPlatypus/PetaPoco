@@ -7,7 +7,6 @@
     <Company>Collaborating Platypus</Company>
     <Product>PetaPoco</Product>
     <Copyright>Collaborating Platypus</Copyright>
-    <Version>6.0.0</Version>
     <PackageProjectUrl>https://github.com/CollaboratingPlatypus/PetaPoco</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/CollaboratingPlatypus/PetaPoco</RepositoryUrl>
