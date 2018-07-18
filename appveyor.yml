@@ -15,7 +15,7 @@ build_script:
 - ps: >-
     $packVersion = $env:APPVEYOR_BUILD_VERSION
     if ($env:APPVEYOR_REPO_BRANCH -ieq "development") {
-      $packVersion += "-beta"
+        $packVersion += "-beta"
     }
     dotnet pack -c "Release" /p:PackageVersion=$packVersion
     dotnet nuget push ".\PetaPoco\bin\Release\*.nupkg" -k $env:NUGET_API_KEY -s https://www.nuget.org/api/v2/package
