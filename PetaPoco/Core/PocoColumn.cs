@@ -15,6 +15,7 @@ namespace PetaPoco.Core
         public bool ForceToUtc;
         public PropertyInfo PropertyInfo;
         public bool ResultColumn;
+        public bool AutoSelectedResultColumn;
         public string InsertTemplate { get; set; }
         public string UpdateTemplate { get; set; }
 
