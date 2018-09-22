@@ -145,6 +145,7 @@ namespace PetaPoco
                     ci.ColumnName = column.Name ?? InflectColumnName(Inflector.Instance, pi.Name);
                     ci.ForceToUtc = column.ForceToUtc;
                     ci.ResultColumn = (column as ResultColumnAttribute) != null;
+                    ci.AutoSelectedResultColumn = (column as ResultColumnAttribute)?.IncludeInAutoSelect == IncludeInAutoSelect.Yes;
                     ci.InsertTemplate = column.InsertTemplate;
                     ci.UpdateTemplate = column.UpdateTemplate;
                 }
