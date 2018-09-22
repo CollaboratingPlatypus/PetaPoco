@@ -9,11 +9,11 @@ using System.Reflection;
 namespace PetaPoco
 {
     /// <summary>
-    ///     Hold information about a column in the database.
+    ///     Holds information about a column in the database.
     /// </summary>
     /// <remarks>
-    ///     Typically ColumnInfo is automatically populated from the attributes on a POCO object and it's properties. It can
-    ///     however also be returned from the IMapper interface to provide your owning bindings between the DB and your POCOs.
+    ///     Typically ColumnInfo is automatically populated from the attributes on a POCO object and its properties. It can
+    ///     however also be returned from the IMapper interface to provide your own bindings between the DB and your POCOs.
     /// </remarks>
     public class ColumnInfo
     {
@@ -27,6 +27,11 @@ namespace PetaPoco
         ///     operations.
         /// </summary>
         public bool ResultColumn { get; set; }
+
+        /// <summary>
+        /// True if this is a result column but should be included in auto select queries.
+        /// </summary>
+        public bool AutoSelectedResultColumn { get; set; }
 
         /// <summary>
         ///     True if time and date values returned through this column should be forced to UTC DateTimeKind. (no conversion is
