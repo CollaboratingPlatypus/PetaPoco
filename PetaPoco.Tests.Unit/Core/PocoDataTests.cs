@@ -29,5 +29,33 @@ namespace PetaPoco.Tests.Unit.Core
             {
             }
         }
+
+        public class PocoWithResultColumn
+        {
+            public string RegularProperty { get; set; }
+            [ResultColumn]
+            public string ResultProperty { get; set; }
+        }
+
+        public class PocoWithIncludedResultColumn
+        {
+            public string RegularProperty { get; set; }
+            [ResultColumn(IncludeInAutoSelect.Yes)]
+            public string ResultProperty { get; set; }
+        }
+
+        [Fact]
+        public void PD_ResultColumn_NotInAutoSelect()
+        {
+            var pd = PocoData.ForType(typeof(PocoWithResultColumn), new ConventionMapper());
+            pd.QueryColumns.ShouldBe(new[] { "RegularProperty" });
+        }
+
+        [Fact]
+        public void PD_IncludedResultColumn_InAutoSelect()
+        {
+            var pd = PocoData.ForType(typeof(PocoWithIncludedResultColumn), new ConventionMapper());
+            pd.QueryColumns.ShouldBe(new[] { "RegularProperty", "ResultProperty" });
+        }
     }
 }
