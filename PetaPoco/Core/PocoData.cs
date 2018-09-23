@@ -64,6 +64,7 @@ namespace PetaPoco.Core
                 pc.PropertyInfo = pi;
                 pc.ColumnName = ci.ColumnName;
                 pc.ResultColumn = ci.ResultColumn;
+                pc.AutoSelectedResultColumn = ci.AutoSelectedResultColumn;
                 pc.ForceToUtc = ci.ForceToUtc;
                 pc.InsertTemplate = ci.InsertTemplate;
                 pc.UpdateTemplate = ci.UpdateTemplate;
@@ -73,7 +74,9 @@ namespace PetaPoco.Core
             }
 
             // Build column list for automatic select
-            QueryColumns = (from c in Columns where !c.Value.ResultColumn select c.Key).ToArray();
+            QueryColumns = (from c in Columns
+                            where !c.Value.ResultColumn || c.Value.AutoSelectedResultColumn
+                            select c.Key).ToArray();
         }
 
         public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
