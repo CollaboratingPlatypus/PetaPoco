@@ -1102,8 +1102,7 @@ namespace PetaPoco
         /// </remarks>
         public T Single<T>(object primaryKey)
         {
-            return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)),
-                primaryKey);
+            return Single<T>(GenerateSingleByKeySql<T>(primaryKey));
         }
 
         /// <summary>
@@ -1117,8 +1116,19 @@ namespace PetaPoco
         /// </remarks>
         public T SingleOrDefault<T>(object primaryKey)
         {
-            return SingleOrDefault<T>(
-                string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
+            return SingleOrDefault<T>(GenerateSingleByKeySql<T>(primaryKey));
+        }
+
+        private Sql GenerateSingleByKeySql<T>(object primaryKey)
+        {
+            string pkName = _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey);
+            var sql = $"WHERE {pkName} = @0";
+
+            if (!EnableAutoSelect)
+                // We're going to be nice and add the SELECT anyway
+                sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
+
+            return new Sql(sql, primaryKey);
         }
 
         /// <summary>
