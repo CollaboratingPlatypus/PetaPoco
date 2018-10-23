@@ -96,6 +96,10 @@ PetaPoco is available from:
 [we have a special place to honour them]:./honourRoll.md
 [fluent configuration]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki/Fluent-Configuration
 
+## Add-ons
+
+* [PetaPoco.SqlKata](//github.com/asherber/PetaPoco.SqlKata) lets you use the powerful query builder [SqlKata](//sqlkata.com)  to [build SQL queries](//github.com/CollaboratingPlatypus/PetaPoco/wiki/Building-SQL-Queries) for PetaPoco.
+
 ## Contributing
 
 PetaPoco welcomes input from the community. After all, what is a product without users? If you’d like to contribute, please take the time to read [the contribution guide]. We would also suggest you have a quick read of [Contributing to Open Source on GitHub].
