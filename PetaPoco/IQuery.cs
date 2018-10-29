@@ -12,6 +12,18 @@ namespace PetaPoco
     public interface IQuery
     {
         /// <summary>
+        ///     Runs a SELECT * query, returning the results as an IEnumerable collection
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <returns>An enumerable collection of result records</returns>
+        /// <remarks>
+        ///     For some DB providers, care should be taken to not start a new Query before finishing with
+        ///     and disposing the previous one. In cases where this is an issue, consider using Fetch which
+        ///     returns the results as a List rather than an IEnumerable.
+        /// </remarks>
+        IEnumerable<T> Query<T>();
+
+        /// <summary>
         ///     Runs an SQL query, returning the results as an IEnumerable collection
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
@@ -242,6 +254,13 @@ namespace PetaPoco
         IEnumerable<TRet> Query<TRet>(Type[] types, object cb, string sql, params object[] args);
 
         /// <summary>
+        ///     Runs a SELECT * query and returns the result set as a typed list
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <returns>A List holding the results of the query</returns>
+        List<T> Fetch<T>();
+
+        /// <summary>
         ///     Runs a query and returns the result set as a typed list
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
@@ -275,6 +294,20 @@ namespace PetaPoco
         ///     object.
         /// </remarks>
         Page<T> Page<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs);
+
+        /// <summary>
+        ///     Retrieves a page of records	and the total number of available records
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="page">The 1 based page number to retrieve</param>
+        /// <param name="itemsPerPage">The number of records per page</param>
+        /// <returns>A Page of results</returns>
+        /// <remarks>
+        ///     PetaPoco will automatically modify a default SELECT * statement to only retrieve the
+        ///     records for the specified page.  It will also execute a second query to retrieve the
+        ///     total number of records in the result set.
+        /// </remarks>
+        Page<T> Page<T>(long page, long itemsPerPage);
 
         /// <summary>
         ///     Retrieves a page of records	and the total number of available records
@@ -329,6 +362,19 @@ namespace PetaPoco
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
         /// <param name="page">The 1 based page number to retrieve</param>
         /// <param name="itemsPerPage">The number of records per page</param>
+        /// <returns>A List of results</returns>
+        /// <remarks>
+        ///     PetaPoco will automatically modify a default SELECT * statement to only retrieve the
+        ///     records for the specified page.
+        /// </remarks>
+        List<T> Fetch<T>(long page, long itemsPerPage);
+
+        /// <summary>
+        ///     Retrieves a page of records (without the total count)
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="page">The 1 based page number to retrieve</param>
+        /// <param name="itemsPerPage">The number of records per page</param>
         /// <param name="sql">The base SQL query</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
         /// <returns>A List of results</returns>
@@ -351,6 +397,20 @@ namespace PetaPoco
         ///     records for the specified page.
         /// </remarks>
         List<T> Fetch<T>(long page, long itemsPerPage, Sql sql);
+
+
+        /// <summary>
+        ///     Retrieves a range of records from result set
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="skip">The number of rows at the start of the result set to skip over</param>
+        /// <param name="take">The number of rows to retrieve</param>
+        /// <returns>A List of results</returns>
+        /// <remarks>
+        ///     PetaPoco will automatically modify a default SELECT * statement to only retrieve the
+        ///     records for the specified range.
+        /// </remarks>
+        List<T> SkipTake<T>(long skip, long take);
 
         /// <summary>
         ///     Retrieves a range of records from result set
