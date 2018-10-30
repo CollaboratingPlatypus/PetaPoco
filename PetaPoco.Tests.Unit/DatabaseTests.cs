@@ -165,6 +165,7 @@ namespace PetaPoco.Tests.Unit
             DB.IsNew(new GenericIdEntity<ulong>()).ShouldBeTrue();
             DB.IsNew(new GenericIdEntity<string>()).ShouldBeTrue();
             DB.IsNew(new GenericIdEntity<ComplexPrimaryKey>()).ShouldBeTrue();
+            DB.IsNew(new GenericIdEntity<decimal>()).ShouldBeTrue();
         }
 
         [Fact]
@@ -180,6 +181,7 @@ namespace PetaPoco.Tests.Unit
             DB.IsNew(new GenericIdEntity<ulong>() { Id = 1 }).ShouldBeFalse();
             DB.IsNew(new GenericIdEntity<string>() { Id = "ID-1" }).ShouldBeFalse();
             DB.IsNew(new GenericIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<decimal>() { Id = 1.0M }).ShouldBeFalse();
         }
 
         [Fact]
@@ -195,6 +197,7 @@ namespace PetaPoco.Tests.Unit
             DB.IsNew("Id", new GenericNoMapsIdEntity<ulong>()).ShouldBeTrue();
             DB.IsNew("Id", new GenericNoMapsIdEntity<string>()).ShouldBeTrue();
             DB.IsNew("Id", new GenericNoMapsIdEntity<ComplexPrimaryKey>()).ShouldBeTrue();
+            DB.IsNew("Id", new GenericNoMapsIdEntity<decimal>()).ShouldBeTrue();
         }
 
         [Fact]
@@ -210,6 +213,7 @@ namespace PetaPoco.Tests.Unit
             DB.IsNew("id", new GenericNoMapsIdEntity<ulong>() { Id = 1 }).ShouldBeFalse();
             DB.IsNew("id", new GenericNoMapsIdEntity<string>() { Id = "ID-1" }).ShouldBeFalse();
             DB.IsNew("id", new GenericNoMapsIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<decimal>() { Id = 1.0M }).ShouldBeFalse();
         }
 
         [ExplicitColumns]

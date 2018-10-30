@@ -1914,6 +1914,8 @@ namespace PetaPoco
                 return (short) pk == default(short);
             if (type == typeof(ushort))
                 return (ushort) pk == default(ushort);
+            if (type == typeof(decimal))
+                return (decimal) pk == default(decimal);
 
             // Create a default instance and compare
             return pk == Activator.CreateInstance(pk.GetType());
