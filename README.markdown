@@ -18,14 +18,13 @@ Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/
 
 Originally the brainchild of [Brad Robinson],
 
-## PetaPoco is a tiny, fast, single-file micro-ORM for .NET and Mono
+## PetaPoco is a tiny & fast micro-ORM for .NET
 
 * Like [Dapper], it's fast because it uses dynamic method generation (MSIL) to assign column values to properties
-* Like [Massive] it's available as single file that you easily add to any project or complied.
-* Like [Massive], it now also supports dynamic Expandos too - [read more](http://www.toptensoftware.com/blog/posts/104-PetaPoco-Not-So-Poco-or-adding-support-for-dynamic)
-* Unlike [Massive] it works with strongly typed [POCO]'s
+* Like [Massive] it's available as single file that you easily add to any project or complied. (V5 only)
+* Like [Massive], it now also supports dynamic Expandos too
 * Like [ActiveRecord], it supports a close relationship between object and database table
-* Like [SubSonic], it supports generation of poco classes with T4 templates
+* Like [SubSonic], it supports generation of poco classes with T4 templates (V5 only)
 
 ## Features at a Glance
 
@@ -39,13 +38,13 @@ Originally the brainchild of [Brad Robinson],
 * Great performance by eliminating Linq and fast property assignment with DynamicMethod generation.
 * The query language is good ole SQL.
 * Includes a low friction SQL builder class that makes writing inline SQL *much* easier.
-* Includes T4 templates to automatically generate POCO classes for you.
+* Includes T4 templates to automatically generate POCO classes for you. (V5)
 * Hooks for logging exceptions, installing value converters and mapping columns to properties without attributes.
 * Works with SQL Server, SQL Server CE, MS Access, SQLite, MySQL, MariaDB, Firebird, and PostgreSQL. (Oracle supported but does not have integration tests).
 * Works under Net Standard 2.0, .NET 4.0/4.5+ or Mono 2.8 and later.
 * Has [Xunit] unit tests.
 * Has supported DBs integration tests.
-* OpenSource (Apache License)
+* OpenSource (MIT License or Apache 2.0)
 
 ## Super easy use and configuration
 
