@@ -132,7 +132,7 @@ namespace PetaPoco
                     sb.Append("\n");
                 }
 
-                var sql = ParametersHelper.ProcessParams(_sql, _args, args);
+                var sql = ParametersHelper.ProcessQueryParams(_sql, _args, args);
 
                 if (Is(lhs, "WHERE ") && Is(this, "WHERE "))
                     sql = "AND " + sql.Substring(6);

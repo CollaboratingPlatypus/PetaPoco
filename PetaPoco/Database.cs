@@ -445,7 +445,7 @@ namespace PetaPoco
         /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added</param>
         /// <param name="value">The value to assign to the parameter</param>
         /// <param name="pi">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
-        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi)
+        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi) 
         {
             // Convert value to from poco type to db type
             if (pi != null)
@@ -457,103 +457,66 @@ namespace PetaPoco
             }
 
             // Support passed in parameters
-            var idbParam = value as IDbDataParameter;
-            if (idbParam != null)
+            if (value is IDbDataParameter idbParam)
             {
-                idbParam.ParameterName = string.Format("{0}{1}", _paramPrefix, cmd.Parameters.Count);
+                if (cmd.CommandType == CommandType.Text)
+                    idbParam.ParameterName = $"{_paramPrefix}{cmd.Parameters.Count}";
+                else if (idbParam.ParameterName?.StartsWith(_paramPrefix) != true)
+                    idbParam.ParameterName = $"{_paramPrefix}{idbParam.ParameterName}";
                 cmd.Parameters.Add(idbParam);
-                return;
-            }
-
-            // Create the parameter
-            var p = cmd.CreateParameter();
-            p.ParameterName = string.Format("{0}{1}", _paramPrefix, cmd.Parameters.Count);
-
-            // Assign the parmeter value
-            if (value == null)
-            {
-                p.Value = DBNull.Value;
-
-                if (pi != null && pi.PropertyType.Name == "Byte[]")
-                {
-                    p.DbType = DbType.Binary;
-                }
             }
             else
             {
-                // Give the database type first crack at converting to DB required type
-                value = _provider.MapParameterValue(value);
+                // Create a new parameter
+                var p = cmd.CreateParameter();
+                p.ParameterName = $"{_paramPrefix}{cmd.Parameters.Count}";
+                ParametersHelper.SetParameterValue(p, value, _provider, pi);
 
-                var t = value.GetType();
-                if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
-                {
-                    p.Value = Convert.ChangeType(value, ((Enum) value).GetTypeCode());
-                }
-                else if (t == typeof(Guid) && !_provider.HasNativeGuidSupport)
-                {
-                    p.Value = value.ToString();
-                    p.DbType = DbType.String;
-                    p.Size = 40;
-                }
-                else if (t == typeof(string))
-                {
-                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
-                    if ((value as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
-                        p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null);
-
-                    p.Size = Math.Max((value as string).Length + 1, 4000); // Help query plan caching by using common size
-                    p.Value = value;
-                }
-                else if (t == typeof(AnsiString))
-                {
-                    // Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
-                    p.Size = Math.Max((value as AnsiString).Value.Length + 1, 4000);
-                    p.Value = (value as AnsiString).Value;
-                    p.DbType = DbType.AnsiString;
-                }
-                else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
-                {
-                    p.GetType().GetProperty("UdtTypeName").SetValue(p, "geography", null); //geography is the equivalent SQL Server Type
-                    p.Value = value;
-                }
-                else if (value.GetType().Name == "SqlGeometry") //SqlGeometry is a CLR Type
-                {
-                    p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
-                    p.Value = value;
-                }
-                else
-                {
-                    p.Value = value;
-                }
+                // Add to the collection
+                cmd.Parameters.Add(p);
             }
-
-            // Add to the collection
-            cmd.Parameters.Add(p);
         }
 
         // Create a command
         private static Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 
-        public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args)
+        public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args) => CreateCommand(connection, CommandType.Text, sql, args);
+
+        public IDbCommand CreateCommand(IDbConnection connection, CommandType commandType, string sql, params object[] args)
         {
-            // Perform named argument replacements
-            if (EnableNamedParams)
-            {
-                var new_args = new List<object>();
-                sql = ParametersHelper.ProcessParams(sql, args, new_args);
-                args = new_args.ToArray();
-            }
-
-            // Perform parameter prefix replacements
-            if (_paramPrefix != "@")
-                sql = rxParamsPrefix.Replace(sql, m => _paramPrefix + m.Value.Substring(1));
-            sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
-
-            // Create the command and add parameters
+            // Create the command
             IDbCommand cmd = connection.CreateCommand();
             cmd.Connection = connection;
+            cmd.CommandType = commandType;
             cmd.CommandText = sql;
             cmd.Transaction = _transaction;
+
+            switch (commandType)
+            {
+                case CommandType.Text:
+                    // Perform named argument replacements
+                    if (EnableNamedParams)
+                    {
+                        var new_args = new List<object>();
+                        sql = ParametersHelper.ProcessQueryParams(sql, args, new_args);
+                        args = new_args.ToArray();
+                    }
+
+                    // Perform parameter prefix replacements
+                    if (_paramPrefix != "@")
+                        sql = rxParamsPrefix.Replace(sql, m => _paramPrefix + m.Value.Substring(1));
+                    sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
+                    break;
+                case CommandType.StoredProcedure:
+                    args = ParametersHelper.ProcessStoredProcParams(cmd, args);
+                    break;
+                case CommandType.TableDirect:
+                    break;
+                default:
+                    break;
+            }
+
+
             foreach (var item in args)
             {
                 AddParam(cmd, item, null);
@@ -2567,6 +2530,62 @@ namespace PetaPoco
 
             return result;
         }
+
+        #endregion
+
+        #region operation: StoredProc
+        public IEnumerable<T> QueryProc<T>(string storedProcedureName, params object[] args)
+        {
+            OpenSharedConnection();
+            try
+            {
+                using (var cmd = CreateCommand(_sharedConnection, CommandType.StoredProcedure, storedProcedureName, args))
+                {
+                    IDataReader r;
+                    var pd = PocoData.ForType(typeof(T), _defaultMapper);
+                    try
+                    {
+                        r = cmd.ExecuteReader();
+                        OnExecutedCommand(cmd);
+                    }
+                    catch (Exception x)
+                    {
+                        if (OnException(x))
+                            throw;
+                        yield break;
+                    }
+
+                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r,
+                        _defaultMapper) as Func<IDataReader, T>;
+                    using (r)
+                    {
+                        while (true)
+                        {
+                            T poco;
+                            try
+                            {
+                                if (!r.Read())
+                                    yield break;
+                                poco = factory(r);
+                            }
+                            catch (Exception x)
+                            {
+                                if (OnException(x))
+                                    throw;
+                                yield break;
+                            }
+
+                            yield return poco;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                CloseSharedConnection();
+            }
+        }
+
 
         #endregion
 
