@@ -470,10 +470,72 @@ namespace PetaPoco
                 // Create a new parameter
                 var p = cmd.CreateParameter();
                 p.ParameterName = $"{_paramPrefix}{cmd.Parameters.Count}";
-                ParametersHelper.SetParameterValue(p, value, _provider, pi);
+                SetParameterProperties(p, value, pi);
+                
 
                 // Add to the collection
                 cmd.Parameters.Add(p);
+            }
+        }
+
+        private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi)
+        {
+            // Assign the parameter value
+            if (value == null)
+            {
+                p.Value = DBNull.Value;
+
+                if (pi?.PropertyType.Name == "Byte[]")
+                {
+                    p.DbType = DbType.Binary;
+                }
+            }
+            else
+            {
+                // Give the database type first crack at converting to DB required type
+                value = _provider.MapParameterValue(value);
+
+                var t = value.GetType();
+                if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
+                {
+                    p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
+                }
+                else if (t == typeof(Guid) && !_provider.HasNativeGuidSupport)
+                {
+                    p.Value = value.ToString();
+                    p.DbType = DbType.String;
+                    p.Size = 40;
+                }
+                else if (t == typeof(string))
+                {
+                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
+                    if ((value as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
+                        p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null);
+
+                    p.Size = Math.Max((value as string).Length + 1, 4000); // Help query plan caching by using common size
+                    p.Value = value;
+                }
+                else if (t == typeof(AnsiString))
+                {
+                    // Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
+                    p.Size = Math.Max((value as AnsiString).Value.Length + 1, 4000);
+                    p.Value = (value as AnsiString).Value;
+                    p.DbType = DbType.AnsiString;
+                }
+                else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
+                {
+                    p.GetType().GetProperty("UdtTypeName").SetValue(p, "geography", null); //geography is the equivalent SQL Server Type
+                    p.Value = value;
+                }
+                else if (value.GetType().Name == "SqlGeometry") //SqlGeometry is a CLR Type
+                {
+                    p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
+                    p.Value = value;
+                }
+                else
+                {
+                    p.Value = value;
+                }
             }
         }
 
@@ -490,6 +552,7 @@ namespace PetaPoco
             cmd.CommandType = commandType;
             cmd.CommandText = sql;
             cmd.Transaction = _transaction;
+
 
             switch (commandType)
             {
@@ -508,7 +571,7 @@ namespace PetaPoco
                     sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
                     break;
                 case CommandType.StoredProcedure:
-                    args = ParametersHelper.ProcessStoredProcParams(cmd, args);
+                    args = ParametersHelper.ProcessStoredProcParams(cmd, args, SetParameterProperties);
                     break;
                 case CommandType.TableDirect:
                     break;

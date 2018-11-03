@@ -4,7 +4,6 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2015/12/05</date>
 
-using PetaPoco.Core;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -79,11 +78,9 @@ namespace PetaPoco.Internal
                 );
         }
 
-        public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args)
+        public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PropertyInfo> setParameterProperties)
         {
-            // TODO: args could be POCOs, or params, or lists of params
-            // If it's a param, we assume it doesn't need fixing up.
-            // TODO: This needs provider and pi in order to use SetParameterValue!            
+            // For a stored proc, we assume that we're only getting POCOs or parameters
             var result = new List<IDbDataParameter>();
 
             foreach (var arg in args)
@@ -96,80 +93,19 @@ namespace PetaPoco.Internal
                 {
                     var type = arg.GetType();
                     if (type.IsValueType || type == typeof(string))
-                        throw new Exception();
+                        throw new ArgumentException($"Value type or string passed as stored procedure argument: {arg}");
                     var readableProps = type.GetProperties().Where(p => p.CanRead);
                     foreach (var prop in readableProps)
                     {
                         var param = cmd.CreateParameter();
                         param.ParameterName = prop.Name;
-                        param.Value = prop.GetValue(arg, null);
+                        setParameterProperties(param, prop.GetValue(arg, null), null);
                         result.Add(param);
                     }
                 }
             }
 
             return result.ToArray();
-        }
-
-        public static void SetParameterValue(IDbDataParameter p, object value, IProvider provider, PropertyInfo pi)
-        {
-            // Assign the parameter value
-            if (value == null)
-            {
-                p.Value = DBNull.Value;
-
-                if (pi?.PropertyType.Name == "Byte[]")
-                {
-                    p.DbType = DbType.Binary;
-                }
-            }
-            else
-            {
-                // Give the database type first crack at converting to DB required type
-                value = provider.MapParameterValue(value);
-
-                var t = value.GetType();
-                if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
-                {
-                    p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
-                }
-                else if (t == typeof(Guid) && !provider.HasNativeGuidSupport)
-                {
-                    p.Value = value.ToString();
-                    p.DbType = DbType.String;
-                    p.Size = 40;
-                }
-                else if (t == typeof(string))
-                {
-                    // out of memory exception occurs if trying to save more than 4000 characters to SQL Server CE NText column. Set before attempting to set Size, or Size will always max out at 4000
-                    if ((value as string).Length + 1 > 4000 && p.GetType().Name == "SqlCeParameter")
-                        p.GetType().GetProperty("SqlDbType").SetValue(p, SqlDbType.NText, null);
-
-                    p.Size = Math.Max((value as string).Length + 1, 4000); // Help query plan caching by using common size
-                    p.Value = value;
-                }
-                else if (t == typeof(AnsiString))
-                {
-                    // Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
-                    p.Size = Math.Max((value as AnsiString).Value.Length + 1, 4000);
-                    p.Value = (value as AnsiString).Value;
-                    p.DbType = DbType.AnsiString;
-                }
-                else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
-                {
-                    p.GetType().GetProperty("UdtTypeName").SetValue(p, "geography", null); //geography is the equivalent SQL Server Type
-                    p.Value = value;
-                }
-                else if (value.GetType().Name == "SqlGeometry") //SqlGeometry is a CLR Type
-                {
-                    p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
-                    p.Value = value;
-                }
-                else
-                {
-                    p.Value = value;
-                }
-            }
         }
     }
 }
