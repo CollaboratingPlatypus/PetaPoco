@@ -1,9 +1,9 @@
 # Stored Procs
 
-- [ ] QueryProc
-- [ ] FetchProc
-- [ ] ExecuteScalarProc
-- [ ] ExecuteNonQueryProc
+- [x] QueryProc
+- [x] FetchProc
+- [x] ExecuteScalarProc
+- [x] ExecuteNonQueryProc
 
 
 
