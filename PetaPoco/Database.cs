@@ -662,14 +662,16 @@ namespace PetaPoco
         /// <param name="sql">The SQL statement to execute</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <returns>The number of rows affected</returns>
-        public int Execute(string sql, params object[] args)
+        public int Execute(string sql, params object[] args) => ExecuteInternal(CommandType.Text, sql, args);
+
+        protected int ExecuteInternal(CommandType commandType, string sql, params object[] args)
         {
             try
             {
                 OpenSharedConnection();
                 try
                 {
-                    using (var cmd = CreateCommand(_sharedConnection, sql, args))
+                    using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
                         var retv = cmd.ExecuteNonQuery();
                         OnExecutedCommand(cmd);
@@ -2642,7 +2644,7 @@ namespace PetaPoco
         /// <param name="storedProcedureName">The name of the stored procedure to run</param>
         /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>The scalar value cast to T</returns>
-        /// /// <remarks>
+        /// <remarks>
         /// For any arguments which are POCOs, each readable property will be turned into a named parameter
         /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
         /// argument types will throw an exception.
@@ -2650,6 +2652,22 @@ namespace PetaPoco
         public T ExecuteScalarProc<T>(string storedProcedureName, params object[] args)
         {
             return ExecuteScalarInternal<T>(CommandType.StoredProcedure, storedProcedureName, args);
+        }
+
+        /// <summary>
+        ///     Executes a non-query stored procedure
+        /// </summary>
+        /// <param name="storedProcedureName">The name of the stored procedure to run</param>
+        /// <param name="args">Arguments for the stored procedure</param>
+        /// <returns>The number of rows affected</returns>
+        /// <remarks>
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
+        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
+        /// argument types will throw an exception.
+        /// </remarks>
+        public int ExecuteNonQueryProc(string storedProcedureName, params object[] args)
+        {
+            return ExecuteInternal(CommandType.StoredProcedure, storedProcedureName, args);
         }
 
         #endregion
