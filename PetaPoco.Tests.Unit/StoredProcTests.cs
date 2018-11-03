@@ -63,6 +63,29 @@ namespace PetaPoco.Tests.Unit
             }
         }
 
+        [Fact]
+        public void ScalarNoParams()
+        {
+            using (var db = new Database(_config))
+            {
+                var count = db.ExecuteScalarProc<int>("ScalarNoParams");
+                count.ShouldBe(6574680);
+            }
+        }
+
+        [Theory]
+        [InlineData("subcode")]
+        [InlineData("@subcode")]
+        public void ScalarWithDbParam(string name)
+        {
+            using (var db = new Database(_config))
+            {
+                var parm = new SqlParameter(name, "E8124872");
+                var count = db.ExecuteScalarProc<int>("ScalarWithParams", parm);
+                count.ShouldBe(149229);
+            }
+        }
+
         public class AAS_TRACE
         {
             public int TX_ID { get; set; }

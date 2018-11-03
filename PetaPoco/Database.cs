@@ -710,14 +710,16 @@ namespace PetaPoco
         /// <param name="sql">The SQL query to execute</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <returns>The scalar value cast to T</returns>
-        public T ExecuteScalar<T>(string sql, params object[] args)
+        public T ExecuteScalar<T>(string sql, params object[] args) => ExecuteScalarInternal<T>(CommandType.Text, sql, args);     
+
+        protected T ExecuteScalarInternal<T>(CommandType commandType, string sql, params object[] args)
         {
             try
             {
                 OpenSharedConnection();
                 try
                 {
-                    using (var cmd = CreateCommand(_sharedConnection, sql, args))
+                    using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
                         object val = cmd.ExecuteScalar();
                         OnExecutedCommand(cmd);
@@ -727,7 +729,7 @@ namespace PetaPoco
                         if (u != null && (val == null || val == DBNull.Value))
                             return default(T);
 
-                        return (T) Convert.ChangeType(val, u == null ? typeof(T) : u);
+                        return (T)Convert.ChangeType(val, u == null ? typeof(T) : u);
                     }
                 }
                 finally
@@ -2606,8 +2608,8 @@ namespace PetaPoco
         /// Runs a stored procedure, returning the results as an IEnumerable collection
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="storedProcedureName"></param>
-        /// <param name="args">Arguments for the stored procedure.</param>
+        /// <param name="storedProcedureName">The name of the stored procedure to run</param>
+        /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>An enumerable collection of result records</returns>
         /// <remarks>
         /// For any arguments which are POCOs, each readable property will be turned into a named parameter
@@ -2623,8 +2625,8 @@ namespace PetaPoco
         /// Runs a stored procedure, returning the results as typed list
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="storedProcedureName"></param>
-        /// <param name="args">Arguments for the stored procedure.</param>
+        /// <param name="storedProcedureName">The name of the stored procedure to run</param>
+        /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>A List holding the results of the query</returns>
         /// <remarks>
         /// For any arguments which are POCOs, each readable property will be turned into a named parameter
@@ -2633,6 +2635,22 @@ namespace PetaPoco
         /// </remarks>
         public List<T> FetchProc<T>(string storedProcedureName, params object[] args) => QueryProc<T>(storedProcedureName, args).ToList();
 
+        /// <summary>
+        ///     Executes a stored procedure and returns the first column of the first row in the result set.
+        /// </summary>
+        /// <typeparam name="T">The type that the result value should be cast to</typeparam>
+        /// <param name="storedProcedureName">The name of the stored procedure to run</param>
+        /// <param name="args">Arguments for the stored procedure</param>
+        /// <returns>The scalar value cast to T</returns>
+        /// /// <remarks>
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
+        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
+        /// argument types will throw an exception.
+        /// </remarks>
+        public T ExecuteScalarProc<T>(string storedProcedureName, params object[] args)
+        {
+            return ExecuteScalarInternal<T>(CommandType.StoredProcedure, storedProcedureName, args);
+        }
 
         #endregion
 
