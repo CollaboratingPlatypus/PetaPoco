@@ -470,8 +470,7 @@ namespace PetaPoco
                 // Create a new parameter
                 var p = cmd.CreateParameter();
                 p.ParameterName = $"{_paramPrefix}{cmd.Parameters.Count}";
-                SetParameterProperties(p, value, pi);
-                
+                SetParameterProperties(p, value, pi);                
 
                 // Add to the collection
                 cmd.Parameters.Add(p);
@@ -1072,10 +1071,15 @@ namespace PetaPoco
             if (EnableAutoSelect)
                 sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
 
+            return ExecuteReader<T>(CommandType.Text, sql, args);
+        }
+
+        protected IEnumerable<T> ExecuteReader<T>(CommandType commandType, string sql, params object[] args)
+        {
             OpenSharedConnection();
             try
             {
-                using (var cmd = CreateCommand(_sharedConnection, sql, args))
+                using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                 {
                     IDataReader r;
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
@@ -2597,56 +2601,22 @@ namespace PetaPoco
         #endregion
 
         #region operation: StoredProc
+
+        /// <summary>
+        /// Runs a stored procedure, returning the results as an IEnumerable collection
+        /// </summary>
+        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
+        /// <param name="storedProcedureName"></param>
+        /// <param name="args">Arguments for the stored procedure.</param>
+        /// <returns>An enumerable collection of result records</returns>
+        /// <remarks>
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
+        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
+        /// argument types will throw an exception.
+        /// </remarks>
         public IEnumerable<T> QueryProc<T>(string storedProcedureName, params object[] args)
         {
-            OpenSharedConnection();
-            try
-            {
-                using (var cmd = CreateCommand(_sharedConnection, CommandType.StoredProcedure, storedProcedureName, args))
-                {
-                    IDataReader r;
-                    var pd = PocoData.ForType(typeof(T), _defaultMapper);
-                    try
-                    {
-                        r = cmd.ExecuteReader();
-                        OnExecutedCommand(cmd);
-                    }
-                    catch (Exception x)
-                    {
-                        if (OnException(x))
-                            throw;
-                        yield break;
-                    }
-
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r,
-                        _defaultMapper) as Func<IDataReader, T>;
-                    using (r)
-                    {
-                        while (true)
-                        {
-                            T poco;
-                            try
-                            {
-                                if (!r.Read())
-                                    yield break;
-                                poco = factory(r);
-                            }
-                            catch (Exception x)
-                            {
-                                if (OnException(x))
-                                    throw;
-                                yield break;
-                            }
-
-                            yield return poco;
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                CloseSharedConnection();
-            }
+            return ExecuteReader<T>(CommandType.StoredProcedure, storedProcedureName, args);            
         }
 
 
