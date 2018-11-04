@@ -63,6 +63,20 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
+        public void QueryWithNamedParams_Should_Match()
+        {
+            var inputSql = "select * from foo where bar=@thing1";
+            var args = new { thing1 = "baz" };
+            var expectedSql = "select * from foo where bar=@0";
+            var expectedArgs = new (string, object)[] { ("@0", "baz") };
+
+            var output = _db.CreateCommand(_conn, inputSql, args);
+            output.CommandType.ShouldBe(CommandType.Text);
+            output.CommandText.ShouldBe(expectedSql);
+            Compare(output, expectedArgs);
+        }
+
+        [Fact]
         public void QueryWithSql_Should_Work()
         {
             var sql = Sql.Builder.Select("*").From("SomeTable");
