@@ -460,16 +460,16 @@ namespace PetaPoco
             if (value is IDbDataParameter idbParam)
             {
                 if (cmd.CommandType == CommandType.Text)
-                    idbParam.ParameterName = $"{_paramPrefix}{cmd.Parameters.Count}";
+                    idbParam.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 else if (idbParam.ParameterName?.StartsWith(_paramPrefix) != true)
-                    idbParam.ParameterName = $"{_paramPrefix}{idbParam.ParameterName}";
+                    idbParam.ParameterName = idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
                 cmd.Parameters.Add(idbParam);
             }
             else
             {
                 // Create a new parameter
                 var p = cmd.CreateParameter();
-                p.ParameterName = $"{_paramPrefix}{cmd.Parameters.Count}";
+                p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 SetParameterProperties(p, value, pi);                
 
                 // Add to the collection
@@ -539,8 +539,6 @@ namespace PetaPoco
         }
 
         // Create a command
-        private static Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
-
         public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args) => CreateCommand(connection, CommandType.Text, sql, args);
 
         public IDbCommand CreateCommand(IDbConnection connection, CommandType commandType, string sql, params object[] args)
@@ -565,7 +563,7 @@ namespace PetaPoco
 
                     // Perform parameter prefix replacements
                     if (_paramPrefix != "@")
-                        sql = rxParamsPrefix.Replace(sql, m => _paramPrefix + m.Value.Substring(1));
+                        sql = sql.ReplaceParamPrefix(_paramPrefix);
                     sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
                     break;
                 case CommandType.StoredProcedure:
