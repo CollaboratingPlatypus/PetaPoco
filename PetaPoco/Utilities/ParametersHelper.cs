@@ -16,11 +16,28 @@ namespace PetaPoco.Internal
 {
     internal static class ParametersHelper
     {
-        private static Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+        private static Regex ParamPrefixRegex = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+        private static Regex NonWordStartRegex = new Regex(@"^\W+", RegexOptions.Compiled);
+
+        public static string ReplaceParamPrefix(this string sql, string paramPrefix)
+        {
+            return ParamPrefixRegex.Replace(sql, m => paramPrefix + m.Value.Substring(1));
+        }
+
+        public static string EnsureParamPrefix(this int input, string paramPrefix) => $"{paramPrefix}{input}";
+
+        public static string EnsureParamPrefix(this string input, string paramPrefix)
+        {
+            if (input.StartsWith(paramPrefix))
+                return input;
+            else
+                return NonWordStartRegex.Replace(input, paramPrefix);
+        }
+
         // Helper to handle named parameters from object properties
         public static string ProcessQueryParams(string sql, object[] args_src, List<object> args_dest)
-        {
-            return rxParams.Replace(sql, m =>
+        {   
+            return ParamPrefixRegex.Replace(sql, m =>
             {
                 string param = m.Value.Substring(1);
 
