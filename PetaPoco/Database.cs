@@ -549,7 +549,6 @@ namespace PetaPoco
             IDbCommand cmd = connection.CreateCommand();
             cmd.Connection = connection;
             cmd.CommandType = commandType;
-            cmd.CommandText = sql;
             cmd.Transaction = _transaction;
 
 
@@ -578,6 +577,7 @@ namespace PetaPoco
                     break;
             }
 
+            cmd.CommandText = sql;
 
             foreach (var item in args)
             {
