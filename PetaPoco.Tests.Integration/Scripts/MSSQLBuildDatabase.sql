@@ -1,13 +1,4 @@
-﻿ If(db_id(N'PetaPoco') IS NULL)
- BEGIN
- 	CREATE DATABASE [PetaPoco]
- END
-
- GO
-
- USE [PetaPoco]
-
-IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'OrderLines')
+﻿IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'OrderLines')
 	DROP TABLE dbo.[OrderLines]
 IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'Orders')
 	DROP TABLE dbo.[Orders]
@@ -124,3 +115,70 @@ CREATE TABLE dbo.[BugInvestigation_5TN5C4U4] (
 	[ColumnA] VARCHAR(20),
 	[Column2] VARCHAR(20),
 )
+GO
+
+-- Stored procedures
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeople')
+	DROP PROCEDURE SelectPeople
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeopleWithParam')
+	DROP PROCEDURE SelectPeopleWithParam
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'CountPeople')
+	DROP PROCEDURE CountPeople
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'CountPeopleWithParam')
+	DROP PROCEDURE CountPeopleWithParam
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePeople')
+	DROP PROCEDURE UpdatePeople
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePeopleWithParam')
+	DROP PROCEDURE UpdatePeopleWithParam
+GO
+
+CREATE PROCEDURE dbo.SelectPeople 
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT * FROM [People]
+END
+GO
+
+CREATE PROCEDURE dbo.SelectPeopleWithParam
+	@@age int = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT * FROM [People] WHERE Age > @@age
+END
+GO
+
+CREATE PROCEDURE dbo.CountPeople 
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT COUNT(*) FROM [People]
+END
+GO
+
+CREATE PROCEDURE dbo.CountPeopleWithParam
+	@@age int = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT COUNT(*) FROM [People] WHERE Age > @@age
+END
+GO
+
+CREATE PROCEDURE dbo.UpdatePeople 
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE [People] SET [FullName] = 'Updated' 
+END
+GO
+
+CREATE PROCEDURE dbo.UpdatePeopleWithParam
+	@@age int = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE [People] SET [FullName] = 'Updated' WHERE Age > @@age
+END
+GO
