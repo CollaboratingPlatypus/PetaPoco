@@ -94,21 +94,21 @@ namespace PetaPoco.Tests.Integration.Databases
         public void NonQueryProc_NoParam_ShouldUpdateAll()
         {
             DB.ExecuteNonQueryProc("UpdatePeople");
-            DB.Query<Person>("WHERE FullName='Updated'").Count().ShouldBe(6);
+            DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(6);
         }
 
         [Fact]
         public void NonQueryProc_WithParam_ShouldUpdateSome()
         {
             var count = DB.ExecuteNonQueryProc("UpdatePeopleWithParam", new { age = 20 });
-            DB.Query<Person>("WHERE FullName='Updated'").Count().ShouldBe(3);
+            DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(3);
         }
 
         [Fact]
         public void NonQueryProc_WithDbParam_ShouldUpdateSome()
         {
             var count = DB.ExecuteNonQueryProc("UpdatePeopleWithParam", GetDataParameter());
-            DB.Query<Person>("WHERE FullName='Updated'").Count().ShouldBe(3);
+            DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(3);
         }
     }
 }
