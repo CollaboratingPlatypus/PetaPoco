@@ -19,15 +19,20 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
         public override IDatabase Execute()
         {
-            _connectionName = "mssql_builder";
-            base.Execute();
-            _connectionName = "mssql";
-            return Database;
+            EnsureDatabaseExists();
+            return base.Execute();
         }
 
         public override void ExecuteBuildScript(IDatabase database, string script)
         {
             script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => { base.ExecuteBuildScript(database, s); });
+        }
+
+        private void EnsureDatabaseExists()
+        {
+            _connectionName = "mssql_builder";
+            Database.Execute("IF(db_id(N'PetaPoco') IS NULL) BEGIN CREATE DATABASE[PetaPoco] END");
+            _connectionName = "mssql";
         }
     }
 }
