@@ -1,4 +1,13 @@
-﻿DROP TABLE IF EXISTS "OrderLines";
+﻿-- Need to drop functions first, because Postgres stores the table relations
+DROP FUNCTION IF EXISTS SelectPeople();
+DROP FUNCTION IF EXISTS SelectPeopleWithParam(age integer);
+DROP FUNCTION IF EXISTS CountPeople();
+DROP FUNCTION IF EXISTS CountPeopleWithParam(age integer);
+DROP FUNCTION IF EXISTS UpdatePeople();
+DROP FUNCTION IF EXISTS UpdatePeopleWithParam(age integer);
+
+
+DROP TABLE IF EXISTS "OrderLines";
 DROP TABLE IF EXISTS "Orders";
 DROP TABLE IF EXISTS "People";
 DROP TABLE IF EXISTS "SpecificOrderLines";
@@ -88,3 +97,36 @@ CREATE TABLE "BugInvestigation_7K2TX4VR" (
 	"Json1" JSON NOT NULL,
 	"Json2" JSONB NOT NULL
 );
+
+
+-- Stored Procedures
+
+CREATE FUNCTION SelectPeople()
+RETURNS SETOF "People"
+AS $$ BEGIN RETURN QUERY SELECT * FROM "People";  END $$
+LANGUAGE plpgsql;
+
+CREATE FUNCTION SelectPeopleWithParam(age integer)
+RETURNS SETOF "People"
+AS $$ BEGIN RETURN QUERY SELECT * FROM "People" WHERE "Age" > age;  END $$
+LANGUAGE plpgsql;
+
+CREATE FUNCTION CountPeople()
+RETURNS integer
+AS $$ BEGIN RETURN (SELECT COUNT(*) FROM "People");  END $$
+LANGUAGE plpgsql;
+
+CREATE FUNCTION CountPeopleWithParam(age integer)
+RETURNS integer
+AS $$ BEGIN RETURN (SELECT COUNT(*) FROM "People" WHERE "Age" > age);  END $$
+LANGUAGE plpgsql;
+
+CREATE FUNCTION UpdatePeople()
+RETURNS VOID
+AS $$ BEGIN UPDATE "People" SET "FullName" = 'Updated';  END $$
+LANGUAGE plpgsql;
+
+CREATE  FUNCTION UpdatePeopleWithParam(age integer)
+RETURNS VOID
+AS $$ BEGIN UPDATE "People" SET "FullName" = 'Updated' WHERE "Age" > age;  END $$
+LANGUAGE plpgsql;
