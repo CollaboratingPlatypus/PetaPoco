@@ -4,6 +4,8 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2018/07/02</date>
 
+using System;
+using System.Data.SqlClient;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
@@ -15,5 +17,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             : base(new MssqlDBTestProvider())
         {
         }
+
+        protected override Type DataParameterType => typeof(SqlParameter); 
     }
 }
