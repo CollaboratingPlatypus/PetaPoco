@@ -80,3 +80,30 @@ CREATE TABLE `BugInvestigation_10R9LZYK` (
 	`Id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	`TestColumn1` VARBINARY(32)
 ) ENGINE=INNODB;
+
+-- Stored Procedures
+DROP PROCEDURE IF EXISTS `SelectPeople`;
+DROP PROCEDURE IF EXISTS `SelectPeopleWithParam`;
+DROP PROCEDURE IF EXISTS `CountPeople`;
+DROP PROCEDURE IF EXISTS `CountPeopleWithParam`;
+DROP PROCEDURE IF EXISTS `UpdatePeople`;
+DROP PROCEDURE IF EXISTS `UpdatePeopleWithParam`;
+
+
+CREATE PROCEDURE `SelectPeople` ()
+	SELECT * FROM `People`;
+
+CREATE PROCEDURE `SelectPeopleWithParam` (age INT)
+	SELECT * FROM `People` WHERE `People`.`Age` > age;
+
+CREATE PROCEDURE `CountPeople` () 
+	SELECT COUNT(*) FROM `People`;
+
+CREATE PROCEDURE `CountPeopleWithParam` (age INT)
+	SELECT COUNT(*) FROM `People` WHERE `People`.`Age` > age;
+
+CREATE PROCEDURE `UpdatePeople` () 
+	UPDATE `People` SET `FullName` = 'Updated'; 
+
+CREATE PROCEDURE `UpdatePeopleWithParam` (age INT)
+	UPDATE `People` SET `FullName` = 'Updated' WHERE `People`.`Age` > age;
