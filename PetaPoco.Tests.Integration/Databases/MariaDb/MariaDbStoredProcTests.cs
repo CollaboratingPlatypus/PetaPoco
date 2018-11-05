@@ -4,6 +4,8 @@
 // <author>PetaPoco - CollaboratingPlatypus</author>
 // <date>2018/07/02</date>
 
+using MySql.Data.MySqlClient;
+using System;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MariaDb
@@ -15,5 +17,7 @@ namespace PetaPoco.Tests.Integration.Databases.MariaDb
             : base(new MariaDbDBTestProvider())
         {
         }
+
+        protected override Type DataParameterType => typeof(MySqlParameter);
     }
 }
