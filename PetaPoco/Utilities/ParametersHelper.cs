@@ -74,12 +74,10 @@ namespace PetaPoco.Internal
                 }
 
                 // Expand collections to parameter lists
-                if ((arg_val as System.Collections.IEnumerable) != null &&
-                    (arg_val as string) == null &&
-                    (arg_val as byte[]) == null)
+                if (arg_val.IsEnumerable())
                 {
                     var sb = new StringBuilder();
-                    foreach (var i in arg_val as System.Collections.IEnumerable)
+                    foreach (var i in (arg_val as System.Collections.IEnumerable))
                     {
                         sb.Append((sb.Length == 0 ? "@" : ",@") + args_dest.Count.ToString());
                         args_dest.Add(i);
@@ -95,17 +93,29 @@ namespace PetaPoco.Internal
                 );
         }
 
+        private static bool IsEnumerable(this object input)
+        {
+            return (input as System.Collections.IEnumerable) != null &&
+                    (input as string) == null &&
+                    (input as byte[]) == null;
+        }
+
         public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PropertyInfo> setParameterProperties)
         {
             // For a stored proc, we assume that we're only getting POCOs or parameters
             var result = new List<IDbDataParameter>();
 
-            foreach (var arg in args)
+            void ProcessArg(object arg)
             {
-                if (arg is IDbDataParameter)
+                if (arg.IsEnumerable())
+                {
+                    foreach (var singleArg in (arg as System.Collections.IEnumerable))
+                    {
+                        ProcessArg(singleArg);
+                    }
+                }
+                else if (arg is IDbDataParameter)
                     result.Add((IDbDataParameter)arg);
-                else if (arg is IEnumerable<IDbDataParameter> paramList)
-                    result.AddRange(paramList);
                 else
                 {
                     var type = arg.GetType();
@@ -120,6 +130,11 @@ namespace PetaPoco.Internal
                         result.Add(param);
                     }
                 }
+            }
+
+            foreach (var arg in args)
+            {
+                ProcessArg(arg);
             }
 
             return result.ToArray();
