@@ -1,4 +1,46 @@
-﻿SET TERM !! ;
+﻿-- Drop stored procedures first
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$procedures WHERE rdb$procedure_name = 'SELECTPEOPLE'))	then execute statement 'DROP PROCEDURE "SELECTPEOPLE";';
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$procedures WHERE rdb$procedure_name = 'SELECTPEOPLEWITHPARAM')) then execute statement 'DROP PROCEDURE "SELECTPEOPLEWITHPARAM";';
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$procedures WHERE rdb$procedure_name = 'COUNTPEOPLE'))	then execute statement 'DROP PROCEDURE "COUNTPEOPLE";';
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$procedures WHERE rdb$procedure_name = 'COUNTPEOPLEWITHPARAM'))	then execute statement 'DROP PROCEDURE "COUNTPEOPLEWITHPARAM";';
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$procedures WHERE rdb$procedure_name = 'UPDATEPEOPLE'))	then execute statement 'DROP PROCEDURE "UPDATEPEOPLE";';
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$procedures WHERE rdb$procedure_name = 'UPDATEPEOPLEWITHPARAM'))	then execute statement 'DROP PROCEDURE "UPDATEPEOPLEWITHPARAM";';
+END!!
+SET TERM ; !!
+
+
+
+
+
+
+SET TERM !! ;
 EXECUTE BLOCK AS BEGIN
 	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'OrderLines'))	then execute statement 'DROP TABLE "OrderLines";';
 END!!
@@ -227,5 +269,72 @@ ACTIVE BEFORE INSERT POSITION 0
 AS
 BEGIN
 	IF (NEW."Id" is NULL) THEN NEW."Id" = GEN_ID(GEN_BI_10R9LZYK_ID, 1);
+END!!
+SET TERM ; !!
+
+
+-- Stored procedures
+SET TERM !! ;
+CREATE PROCEDURE SelectPeople
+RETURNS (id varchar(100), fullname varchar(100), age integer)
+AS
+BEGIN
+	FOR SELECT "Id", "FullName", "Age"
+	FROM "People"
+	INTO :id, :fullname, :age DO
+	BEGIN
+		SUSPEND;
+	END
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+CREATE PROCEDURE SelectPeopleWithParam (age integer)
+RETURNS (id varchar(100), fullname varchar(100))
+AS
+BEGIN
+	FOR SELECT "Id", "FullName"
+	FROM "People"
+	WHERE "Age" > :age
+	INTO :id, :fullname DO
+	BEGIN
+		SUSPEND;
+	END
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+CREATE PROCEDURE CountPeople
+RETURNS (numRecs integer)
+AS
+BEGIN
+	SELECT COUNT(*) FROM "People" INTO :numRecs;
+	SUSPEND;
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+CREATE PROCEDURE CountPeopleWithParam (age integer)
+RETURNS (numRecs integer)
+AS
+BEGIN
+	SELECT COUNT(*) FROM "People" WHERE "Age" > :age INTO :numRecs;
+	SUSPEND;
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+CREATE PROCEDURE UpdatePeople
+AS
+BEGIN
+	UPDATE "People" SET "FullName" = 'Updated';
+END!!
+SET TERM ; !!
+
+SET TERM !! ;
+CREATE PROCEDURE UpdatePeopleWithParam (age integer)
+AS
+BEGIN
+	UPDATE "People" SET "FullName" = 'Updated' WHERE "Age" > :age;
 END!!
 SET TERM ; !!
