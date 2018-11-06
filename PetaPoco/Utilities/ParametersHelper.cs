@@ -17,7 +17,7 @@ namespace PetaPoco.Internal
     internal static class ParametersHelper
     {
         private static Regex ParamPrefixRegex = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
-        private static Regex NonWordStartRegex = new Regex(@"^\W+", RegexOptions.Compiled);
+        private static Regex NonWordStartRegex = new Regex(@"^\W*", RegexOptions.Compiled);
 
         public static string ReplaceParamPrefix(this string sql, string paramPrefix)
         {

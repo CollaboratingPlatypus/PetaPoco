@@ -24,6 +24,7 @@ namespace PetaPoco.Tests.Unit.Utilities
         [InlineData("$foo")]
         [InlineData(":foo")]
         [InlineData("^foo")]
+        [InlineData("foo")]
         public void EnsureParamPrefix_string_ShouldWork(string input)
         {
             string output = input.EnsureParamPrefix("@");
