@@ -1,6 +1,4 @@
-﻿using FirebirdSql.Data.FirebirdClient;
-using System;
-// <copyright company="PetaPoco - CollaboratingPlatypus">
+﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
 //      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
 // </copyright>
 // <author>PetaPoco - CollaboratingPlatypus</author>
@@ -8,6 +6,8 @@ using System;
 
 using System;
 using Xunit;
+using FirebirdSql.Data.FirebirdClient;
+
 
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
