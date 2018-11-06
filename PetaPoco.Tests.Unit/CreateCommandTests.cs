@@ -93,24 +93,29 @@ namespace PetaPoco.Tests.Unit
         public static IEnumerable<object[]> ProcParamData => new[]
         {
             new object[] {
-                "procname",
+                "AnonymousType",
                 new object[] { new { Foo = "Bar", Baz = 3 } },
                 new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
             },
             new object[] {
-                "8B182821-6BFE-4F00-8402-AC0278019DD2",
+                "TwoAnonymousTypes",
                 new object[] { new { Foo = "Bar" }, new { Baz = 3 } },
                 new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
             },
             new object[] {
-                "F5C94316-5040-4FF6-A0DA-86D96E96B8AE",
+                "SqlParameter",
                 new object[] { new SqlParameter("@Foo", "Bar") },
                 new (string, object)[] { ("@Foo", "Bar") }
             },
             new object[] {
-                "B5294FE8-766F-4D4B-A47B-EA82CC4F748B",
+                "NoArgs",
                 new object[0],
                 new (string, object)[0]
+            },
+            new object[] {
+                "Array",
+                new object[] { new object[] { new { Foo = "Bar" }, new { Baz = 3 } } },
+                new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
             },
         };
 
