@@ -82,7 +82,7 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
-        public void UsingCreate_GivenMinimalConfiguration_ShouldNotAffectPetaPoocDefaults()
+        public void UsingCreate_GivenMinimalConfiguration_ShouldNotAffectPetaPocoDefaults()
         {
             var db = config
                 .UsingConnectionString("cs")
@@ -268,6 +268,119 @@ namespace PetaPoco.Tests.Unit
                 .Create();
 
             db.IsolationLevel.ShouldBeNull();
+        }
+
+        [Fact]
+        public void UsingCommandExecuting_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<DbCommandEventArgs> handler = (sender, args) => eventFired = true;
+
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingCommandExecuting(handler)
+                .Create();
+
+            // Can't inspect the event directly, so we have to get it to fire
+            (db as Database).OnExecutingCommand(null);
+            eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingCommandExecuted_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<DbCommandEventArgs> handler = (sender, args) => eventFired = true;
+            
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingCommandExecuted(handler)
+                .Create();
+
+            (db as Database).OnExecutedCommand(null);
+            eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingConnectionClosing_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<DbConnectionEventArgs> handler = (sender, args) => eventFired = true;
+
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingConnectionClosing(handler)
+                .Create();
+
+            (db as Database).OnConnectionClosing(null);
+            eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingConnectionOpened_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<DbConnectionEventArgs> handler = (sender, args) => eventFired = true;
+
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingConnectionOpened(handler)
+                .Create();
+
+            (db as Database).OnConnectionOpened(null);
+            eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingTransactionStarted_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<DbTransactionEventArgs> handler = (sender, args) => eventFired = true;
+
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingTransactionStarted(handler)
+                .Create();
+
+            (db as Database).OnBeginTransaction();
+            eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingTransactionEnding_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<DbTransactionEventArgs> handler = (sender, args) => eventFired = true;
+
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingTransactionEnding(handler)
+                .Create();
+
+            (db as Database).OnEndTransaction();
+            eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingExceptionThrown_AfterCreate_InstanceShouldHaveDelegate()
+        {
+            bool eventFired = false;
+            EventHandler<ExceptionEventArgs> handler = (sender, args) => eventFired = true;
+
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<SqlServerDatabaseProvider>()
+                .UsingExceptionThrown(handler)
+                .Create();
+
+            (db as Database).OnException(new Exception());
+            eventFired.ShouldBeTrue();
         }
     }
 }
