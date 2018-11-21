@@ -369,6 +369,7 @@ namespace PetaPoco
         /// </summary>
         public virtual void OnBeginTransaction()
         {
+            TransactionStarted?.Invoke(this, new DbTransactionEventArgs(_transaction));
         }
 
         /// <summary>
@@ -376,6 +377,7 @@ namespace PetaPoco
         /// </summary>
         public virtual void OnEndTransaction()
         {
+            TransactionEnding?.Invoke(this, new DbTransactionEventArgs(_transaction));
         }
 
         /// <summary>
@@ -582,7 +584,10 @@ namespace PetaPoco
         {
             System.Diagnostics.Debug.WriteLine(x.ToString());
             System.Diagnostics.Debug.WriteLine(LastCommand);
-            return true;
+
+            var args = new ExceptionEventArgs(x);
+            ExceptionThrown?.Invoke(this, new ExceptionEventArgs(x));
+            return args.Raise;
         }
 
         /// <summary>
@@ -596,7 +601,9 @@ namespace PetaPoco
         /// </remarks>
         public virtual IDbConnection OnConnectionOpened(IDbConnection conn)
         {
-            return conn;
+            var args = new DbConnectionEventArgs(conn);
+            ConnectionOpened?.Invoke(this, args);
+            return args.Connection;
         }
 
         /// <summary>
@@ -605,6 +612,7 @@ namespace PetaPoco
         /// <param name="conn">The soon to be closed IDBConnection</param>
         public virtual void OnConnectionClosing(IDbConnection conn)
         {
+            ConnectionClosing?.Invoke(this, new DbConnectionEventArgs(conn));
         }
 
         /// <summary>
@@ -617,6 +625,7 @@ namespace PetaPoco
         /// </remarks>
         public virtual void OnExecutingCommand(IDbCommand cmd)
         {
+            CommandExecuting?.Invoke(this, new DbCommandEventArgs(cmd));
         }
 
         /// <summary>
@@ -625,6 +634,7 @@ namespace PetaPoco
         /// <param name="cmd">The IDbCommand that finished executing</param>
         public virtual void OnExecutedCommand(IDbCommand cmd)
         {
+            CommandExecuted?.Invoke(this, new DbCommandEventArgs(cmd));
         }
 
         #endregion
@@ -2710,6 +2720,37 @@ namespace PetaPoco
         private DbProviderFactory _factory;
         private IsolationLevel? _isolationLevel;
 
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Occurs when a new transaction has started.
+        /// </summary>
+        public event EventHandler<DbTransactionEventArgs> TransactionStarted;
+        /// <summary>
+        /// Occurs when a transaction is about to be rolled back or committed.
+        /// </summary>
+        public event EventHandler<DbTransactionEventArgs> TransactionEnding;
+        /// <summary>
+        /// Occurs when a database command is about to be executed.
+        /// </summary>
+        public event EventHandler<DbCommandEventArgs> CommandExecuting;
+        /// <summary>
+        /// Occurs when a database command has been executed.
+        /// </summary>
+        public event EventHandler<DbCommandEventArgs> CommandExecuted;
+        /// <summary>
+        /// Occurs when a database connection is about to be closed.
+        /// </summary>
+        public event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+        /// <summary>
+        /// Occurs when a database connection has been opened.
+        /// </summary>
+        public event EventHandler<DbConnectionEventArgs> ConnectionOpened;
+        /// <summary>
+        /// Occurs when a database exception has been thrown.
+        /// </summary>
+        public event EventHandler<ExceptionEventArgs> ExceptionThrown;
         #endregion
     }
 }
