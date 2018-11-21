@@ -16,13 +16,9 @@ namespace PetaPoco
     public static class DatabaseConfigurationExtensions
     {
         internal const string CommandTimeout = "CommandTimeout";
-
         internal const string EnableAutoSelect = "EnableAutoSelect";
-
         internal const string EnableNamedParams = "EnableNamedParams";
-
         internal const string Provider = "Provider";
-
         internal const string ConnectionString = "ConnectionString";
 
 #if !NETSTANDARD
@@ -32,8 +28,16 @@ namespace PetaPoco
 #endif
 
         internal const string DefaultMapper = "DefaultMapper";
-
         internal const string IsolationLevel = "IsolationLevel";
+        internal const string TransactionStarted = "TransactionStarted";
+        internal const string TransactionEnding = "TransactionEnding";
+        internal const string CommandExecuting = "CommandExecuting";
+        internal const string CommandExecuted = "CommandExecuted";
+        internal const string ConnectionOpened = "ConnectionOpened";
+        internal const string ConnectionClosing = "ConnectionClosing";
+        internal const string ExceptionThrown = "ExceptionThrown";
+
+
 
         private static void SetSetting(this IDatabaseBuildConfiguration source, string key, object value)
         {
@@ -296,6 +300,50 @@ namespace PetaPoco
             source.SetSetting(IsolationLevel, isolationLevel);
             return source;
         }
+
+        public static IDatabaseBuildConfiguration UsingTransactionStarted(this IDatabaseBuildConfiguration source, EventHandler<DbTransactionEventArgs> handler)
+        {
+            source.SetSetting(TransactionStarted, handler);
+            return source;
+        }
+
+        public static IDatabaseBuildConfiguration UsingTransactionEnding(this IDatabaseBuildConfiguration source, EventHandler<DbTransactionEventArgs> handler)
+        {
+            source.SetSetting(TransactionEnding, handler);
+            return source;
+        }
+
+        public static IDatabaseBuildConfiguration UsingCommandExecuting(this IDatabaseBuildConfiguration source, EventHandler<DbCommandEventArgs> handler)
+        {
+            source.SetSetting(CommandExecuting, handler);
+            return source;
+        }
+
+        public static IDatabaseBuildConfiguration UsingCommandExecuted(this IDatabaseBuildConfiguration source, EventHandler<DbCommandEventArgs> handler)
+        {
+            source.SetSetting(CommandExecuted, handler);
+            return source;
+        }
+
+        public static IDatabaseBuildConfiguration UsingConnectionOpened(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
+        {
+            source.SetSetting(ConnectionOpened, handler);
+            return source;
+        }
+
+        public static IDatabaseBuildConfiguration UsingConnectionClosing(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
+        {
+            source.SetSetting(ConnectionClosing, handler);
+            return source;
+        }
+
+        public static IDatabaseBuildConfiguration UsingExceptionThrown(this IDatabaseBuildConfiguration source, EventHandler<ExceptionEventArgs> handler)
+        {
+            source.SetSetting(ExceptionThrown, handler);
+            return source;
+        }
+
+
 
         /// <summary>
         ///     Creates an instance of PetaPooc using the specified <paramref name="source" />.
