@@ -155,5 +155,34 @@ namespace PetaPoco
         ///     Marks the current transaction scope as complete.
         /// </summary>
         void CompleteTransaction();
+
+        /// <summary>
+        /// Occurs when a new transaction has started.
+        /// </summary>
+        event EventHandler<DbTransactionEventArgs> TransactionStarted;
+        /// <summary>
+        /// Occurs when a transaction is about to be rolled back or committed.
+        /// </summary>
+        event EventHandler<DbTransactionEventArgs> TransactionEnding;
+        /// <summary>
+        /// Occurs when a database command is about to be executed.
+        /// </summary>
+        event EventHandler<DbCommandEventArgs> CommandExecuting;
+        /// <summary>
+        /// Occurs when a database command has been executed.
+        /// </summary>
+        event EventHandler<DbCommandEventArgs> CommandExecuted;
+        /// <summary>
+        /// Occurs when a database connection is about to be closed.
+        /// </summary>
+        event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+        /// <summary>
+        /// Occurs when a database connection has been opened.
+        /// </summary>
+        event EventHandler<DbConnectionEventArgs> ConnectionOpened;
+        /// <summary>
+        /// Occurs when a database exception has been thrown.
+        /// </summary>
+        event EventHandler<ExceptionEventArgs> ExceptionThrown;
     }
 }
