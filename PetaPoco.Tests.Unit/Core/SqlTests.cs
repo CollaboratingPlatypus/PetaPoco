@@ -5,6 +5,7 @@
 // <date>2018/07/02</date>
 
 using System;
+using System.Data.SqlClient;
 using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
@@ -365,6 +366,65 @@ namespace PetaPoco.Tests.Unit.Core
             sqlCapture1.Replace("\n", " ").ShouldBe("SELECT field");
             sqlCapture2.Replace("\n", " ").ShouldBe("SELECT field FROM myTable");
             sqlCapture3.Replace("\n", " ").ShouldBe("SELECT field FROM myTable WHERE (id = @0)");
+        }
+
+        [Fact]
+        public void AddParameter_GivenParam_ShouldBeValid()
+        {
+            var param = new SqlParameter();
+            _sql = Sql.Builder.AddParameter(param);
+
+            _sql.SQL.ShouldBeEmpty();
+            _sql.Arguments.Length.ShouldBe(1);
+            _sql.Arguments[0].ShouldBe(param);
+        }
+
+        [Fact]
+        public void AddParameter_GivenSimpleSqlAndParam_ShouldBeValid()
+        {
+            var param = new SqlParameter();
+            _sql = Sql.Builder
+                .Select("*")
+                .From("mytable")
+                .AddParameter(param);
+
+            _sql.SQL.ShouldBe("SELECT *\nFROM mytable");
+            _sql.Arguments.Length.ShouldBe(1);
+            _sql.Arguments[0].ShouldBe(param);
+        }
+
+        [Fact]
+        public void AddParameter_GivenComplexSqlAndParam_ShouldBeValid()
+        {
+            var param = new SqlParameter();
+            _sql = Sql.Builder
+                .Select("*")
+                .From("mytable")
+                .Where("myfield=@0", 4)
+                .AddParameter(param);
+
+            _sql.SQL.ShouldBe("SELECT *\nFROM mytable\nWHERE (myfield=@0)");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe(4);
+            _sql.Arguments[1].ShouldBe(param);
+        }
+
+        [Fact]
+        public void AddParameter_CombineTwoSqls_ShouldBeValid()
+        {
+            var param = new SqlParameter();
+            var paramSql = Sql.Builder.AddParameter(param);
+
+            _sql = Sql.Builder
+                .Select("*")
+                .From("mytable")
+                .Where("myfield=@0", 4)
+                .Append(paramSql);
+
+            _sql.SQL.ShouldBe("SELECT *\nFROM mytable\nWHERE (myfield=@0)");
+            _sql.Arguments.Length.ShouldBe(2);
+            _sql.Arguments[0].ShouldBe(4);
+            _sql.Arguments[1].ShouldBe(param);
         }
     }
 }
