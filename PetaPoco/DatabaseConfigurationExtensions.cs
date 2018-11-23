@@ -157,7 +157,7 @@ namespace PetaPoco
         /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration WithAutoSelect(this IDatabaseBuildConfiguration source)
         {
-            source.SetSetting("EnableAutoSelect", true);
+            source.SetSetting(EnableAutoSelect, true);
             return source;
         }
 
@@ -168,7 +168,7 @@ namespace PetaPoco
         /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration WithoutAutoSelect(this IDatabaseBuildConfiguration source)
         {
-            source.SetSetting("EnableAutoSelect", false);
+            source.SetSetting(EnableAutoSelect, false);
             return source;
         }
 
@@ -301,42 +301,84 @@ namespace PetaPoco
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a new transaction has been started.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingTransactionStarted(this IDatabaseBuildConfiguration source, EventHandler<DbTransactionEventArgs> handler)
         {
             source.SetSetting(TransactionStarted, handler);
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a transaction is about to be rolled back or committed.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingTransactionEnding(this IDatabaseBuildConfiguration source, EventHandler<DbTransactionEventArgs> handler)
         {
             source.SetSetting(TransactionEnding, handler);
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a database command is about to be executed.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingCommandExecuting(this IDatabaseBuildConfiguration source, EventHandler<DbCommandEventArgs> handler)
         {
             source.SetSetting(CommandExecuting, handler);
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a database command has been executed.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingCommandExecuted(this IDatabaseBuildConfiguration source, EventHandler<DbCommandEventArgs> handler)
         {
             source.SetSetting(CommandExecuted, handler);
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a database connection has been opened.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingConnectionOpened(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
         {
             source.SetSetting(ConnectionOpened, handler);
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a database connection is about to be closed.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingConnectionClosing(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
         {
             source.SetSetting(ConnectionClosing, handler);
             return source;
         }
 
+        /// <summary>
+        /// Specifies an event handler to use when a database exception has been thrown.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingExceptionThrown(this IDatabaseBuildConfiguration source, EventHandler<ExceptionEventArgs> handler)
         {
             source.SetSetting(ExceptionThrown, handler);
@@ -346,7 +388,7 @@ namespace PetaPoco
 
 
         /// <summary>
-        ///     Creates an instance of PetaPooc using the specified <paramref name="source" />.
+        ///     Creates an instance of PetaPoco using the specified <paramref name="source" />.
         /// </summary>
         /// <param name="source">The configuration source used to create and configure an instance of PetaPoco.</param>
         /// <returns>An instance of PetaPoco.</returns>
