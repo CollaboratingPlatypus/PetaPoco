@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using PetaPoco.Internal;
@@ -145,18 +144,12 @@ namespace PetaPoco
 
                 sb.Append(sql);
             }
-            else
-            {
-                if (_args != null)
-                    args.AddRange(_args.OfType<IDbDataParameter>());
-            }
 
             // Now do rhs
             if (_rhs != null)
                 _rhs.Build(sb, args, this);
         }
 
-        
         /// <summary>
         ///     Appends an SQL SET clause to this SQL builder
         /// </summary>
@@ -242,16 +235,6 @@ namespace PetaPoco
         public SqlJoinClause LeftJoin(string table)
         {
             return Join("LEFT JOIN ", table);
-        }
-
-        /// <summary>
-        ///     Appends an IDbDataParameter to this SQL builder
-        /// </summary>
-        /// <param name="param">The parameter to add</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
-        public Sql AddParameter(IDbDataParameter param)
-        {
-            return Append(new Sql(null, param));
         }
 
         /// <summary>
