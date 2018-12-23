@@ -76,12 +76,11 @@ namespace PetaPoco
         public Database()
         {
             if (ConfigurationManager.ConnectionStrings.Count == 0)
-                throw new InvalidOperationException("One or more connection strings must be registered to use the no paramater constructor");
+                throw new InvalidOperationException("One or more connection strings must be registered to use the no-parameter constructor");
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
-            var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
+            InitialiseWithEntry(entry);
         }
 
         /// <summary>
@@ -102,9 +101,14 @@ namespace PetaPoco
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
+            InitialiseWithEntry(entry);
+        }
+        private void InitialiseWithEntry(ConnectionStringSettings entry)
+        {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
         }
+
 #endif
 
         /// <summary>
@@ -205,48 +209,64 @@ namespace PetaPoco
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
+
+            string connectionStringName = null;
+            IProvider provider = null;
+            
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs);
+            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
+            
 #if !NETSTANDARD
             ConnectionStringSettings entry = null;
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
-            {
-                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, cn =>
-                {
-                    entry = ConfigurationManager.ConnectionStrings[cn];
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
 
+            if (_connectionString == null)
+            {
+                if (connectionStringName != null)
+                {
+                    entry = ConfigurationManager.ConnectionStrings[connectionStringName];
                     if (entry == null)
-                        throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", cn));
-                }, () =>
+                        throw new InvalidOperationException($"Can't find a connection string with the name '{connectionStringName}'");
+                }
+                else
                 {
                     if (ConfigurationManager.ConnectionStrings.Count == 0)
                         throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
 
                     entry = ConfigurationManager.ConnectionStrings[0];
-                });
+                }
 
-                // ReSharper disable once PossibleNullReferenceException
                 _connectionString = entry.ConnectionString;
-            });
+            }
 
-
-            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
+            if (provider != null)
+                Initialise(provider, defaultMapper);
+            else
             {
-                if (entry == null)
+                if (entry == null)   // meaning we got the connection string on its own
                     throw new InvalidOperationException("Both a connection string and provider are required or neither.");
 
-                var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
-            });
+                InitialiseWithEntry(entry);
+            }
 #else
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () => throw new InvalidOperationException("A connection string is required."));
-            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
-                {
-                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName,
-                        v => Initialise(DatabaseProvider.Resolve(v, false, _connectionString), defaultMapper),
-                        () => throw new InvalidOperationException("Either a provider name or provider must be registered."));
-                });
+            string providerName = null;
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+            
+            if (_connectionString == null)
+                throw new InvalidOperationException("A connection string is required.");
+
+            if (provider != null)
+                Initialise(provider, defaultMapper);
+            else
+            {
+                if (providerName != null)
+                    Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+                else
+                    throw new InvalidOperationException("Either a provider name or provider must be registered.");
+            }            
 #endif
 
-            
+
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
