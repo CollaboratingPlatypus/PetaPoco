@@ -36,6 +36,7 @@ namespace PetaPoco
         internal const string ConnectionOpened = "ConnectionOpened";
         internal const string ConnectionClosing = "ConnectionClosing";
         internal const string ExceptionThrown = "ExceptionThrown";
+        internal const string Connection = "Connection";
 
 
 
@@ -218,7 +219,22 @@ namespace PetaPoco
             return source;
         }        
 #endif
+        /// <summary>
+        ///    Specifies a <see cref="IDbConnection"/> to use.
+        /// </summary>
+        /// <param name="source">The configuration source</param>
+        /// <param name="connection">The connection to use.</param>
+        /// <returns></returns>
+        public static IDatabaseBuildConfiguration UsingConnection(this IDatabaseBuildConfiguration source, IDbConnection connection)
+        {
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
 
+            source.SetSetting(Connection, connection);
+            return source;
+        }
+        
+        
         /// <summary>
         ///     Specifies the default mapper to use when no specific mapper has been registered.
         /// </summary>

@@ -6,6 +6,9 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
+using PetaPoco.Core;
 using PetaPoco.Providers;
 using Shouldly;
 using Xunit;
@@ -381,6 +384,33 @@ namespace PetaPoco.Tests.Unit
 
             (db as Database).OnException(new Exception());
             eventFired.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void UsingConnection_AfterCreate_InstanceShouldBeValid()
+        {
+            var connString = "Data Source = foo";
+            var connection = new SqlConnection(connString);
+            var db = new Database(config.UsingConnection(connection));
+
+            db.ConnectionString.ShouldBe(connString);
+            db.Provider.ShouldBeOfType<SqlServerDatabaseProvider>();
+        }
+
+        public class FakeProvider : DatabaseProvider
+        {
+            public override DbProviderFactory GetFactory() => null;
+        }
+
+        [Fact]
+        public void UsingConnectionWithProvider_AfterCreate_InstanceShouldBeValid()
+        {
+            var connString = "Data Source = foo";
+            var connection = new SqlConnection(connString);
+            var db = new Database(config.UsingConnection(connection).UsingProvider<FakeProvider>());
+
+            db.ConnectionString.ShouldBe(connString);
+            db.Provider.ShouldBeOfType<FakeProvider>();
         }
     }
 }

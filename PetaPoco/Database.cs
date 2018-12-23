@@ -80,7 +80,7 @@ namespace PetaPoco
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
-            InitialiseWithEntry(entry);
+            InitialiseFromEntry(entry);
         }
 
         /// <summary>
@@ -101,9 +101,9 @@ namespace PetaPoco
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
-            InitialiseWithEntry(entry);
+            InitialiseFromEntry(entry);
         }
-        private void InitialiseWithEntry(ConnectionStringSettings entry)
+        private void InitialiseFromEntry(ConnectionStringSettings entry)
         {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
@@ -123,13 +123,20 @@ namespace PetaPoco
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
         public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
-            _sharedConnection = connection ?? throw new ArgumentNullException(nameof(connection));
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+
+            SetupFromConnection(connection);
+            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+        }
+
+        private void SetupFromConnection(IDbConnection connection)
+        {
+            _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
 
             // Prevent closing external connection
             _sharedConnectionDepth = 2;
-
-            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -210,62 +217,77 @@ namespace PetaPoco
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
 
-            string connectionStringName = null;
             IProvider provider = null;
-            
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs);
+            IDbConnection connection = null;
+
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
-            
+            settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+
+            if (connection != null)
+            {
+                SetupFromConnection(connection);
+
+                if (provider != null)
+                    Initialise(provider, defaultMapper);
+                else
+                    Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+            }
+            else
+            {
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs);
+
 #if !NETSTANDARD
-            ConnectionStringSettings entry = null;
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
+                ConnectionStringSettings entry = null;
+                string connectionStringName = null;
 
-            if (_connectionString == null)
-            {
-                if (connectionStringName != null)
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
+
+                if (_connectionString == null)
                 {
-                    entry = ConfigurationManager.ConnectionStrings[connectionStringName];
-                    if (entry == null)
-                        throw new InvalidOperationException($"Can't find a connection string with the name '{connectionStringName}'");
+                    if (connectionStringName != null)
+                    {
+                        entry = ConfigurationManager.ConnectionStrings[connectionStringName];
+                        if (entry == null)
+                            throw new InvalidOperationException($"Can't find a connection string with the name '{connectionStringName}'");
+                    }
+                    else
+                    {
+                        if (ConfigurationManager.ConnectionStrings.Count == 0)
+                            throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
+
+                        entry = ConfigurationManager.ConnectionStrings[0];
+                    }
+
+                    _connectionString = entry.ConnectionString;
                 }
+
+                if (provider != null)
+                    Initialise(provider, defaultMapper);
                 else
                 {
-                    if (ConfigurationManager.ConnectionStrings.Count == 0)
-                        throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
+                    if (entry == null)   // meaning we got the connection string on its own
+                        throw new InvalidOperationException("Both a connection string and provider are required or neither.");
 
-                    entry = ConfigurationManager.ConnectionStrings[0];
+                    InitialiseFromEntry(entry);
                 }
-
-                _connectionString = entry.ConnectionString;
-            }
-
-            if (provider != null)
-                Initialise(provider, defaultMapper);
-            else
-            {
-                if (entry == null)   // meaning we got the connection string on its own
-                    throw new InvalidOperationException("Both a connection string and provider are required or neither.");
-
-                InitialiseWithEntry(entry);
-            }
 #else
-            string providerName = null;
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+                string providerName = null;
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
             
-            if (_connectionString == null)
-                throw new InvalidOperationException("A connection string is required.");
+                if (_connectionString == null)
+                    throw new InvalidOperationException("A connection string is required.");
 
-            if (provider != null)
-                Initialise(provider, defaultMapper);
-            else
-            {
-                if (providerName != null)
-                    Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+                if (provider != null)
+                    Initialise(provider, defaultMapper);
                 else
-                    throw new InvalidOperationException("Either a provider name or provider must be registered.");
-            }            
+                {
+                    if (providerName != null)
+                        Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+                    else
+                        throw new InvalidOperationException("Either a provider name or provider must be registered.");
+                }            
 #endif
-
+            }
 
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
