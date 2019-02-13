@@ -11,7 +11,9 @@ using System.Data.SqlClient;
 using System.Dynamic;
 using Moq;
 using PetaPoco.Core;
+using PetaPoco.Providers;
 using PetaPoco.Tests.Unit.Models;
+using PetaPoco.Utilities;
 using Shouldly;
 using Xunit;
 
@@ -95,6 +97,7 @@ namespace PetaPoco.Tests.Unit
                     throw;
                 }
             });
+            Should.Throw<ArgumentException>(() => new Database<SqlServerDatabaseProvider>(null));
         }
 
         [Fact]
@@ -252,6 +255,6 @@ namespace PetaPoco.Tests.Unit
 
                 return null;
             }
-        }
+        }        
     }
 }

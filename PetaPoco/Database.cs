@@ -72,15 +72,16 @@ namespace PetaPoco
         /// <summary>
         ///     Constructs an instance using the first connection string found in the app/web configuration file.
         /// </summary>
+        /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <exception cref="InvalidOperationException">Thrown when no connection strings can registered.</exception>
-        public Database()
+        public Database(IMapper defaultMapper = null)
         {
             if (ConfigurationManager.ConnectionStrings.Count == 0)
                 throw new InvalidOperationException("One or more connection strings must be registered to use the no-parameter constructor");
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
-            InitialiseFromEntry(entry);
+            InitialiseFromEntry(entry, defaultMapper);
         }
 
         /// <summary>
@@ -88,9 +89,10 @@ namespace PetaPoco
         ///     read from app/web.config.
         /// </summary>
         /// <param name="connectionStringName">The name of the connection.</param>
+        /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when a connection string cannot be found.</exception>
-        public Database(string connectionStringName)
+        public Database(string connectionStringName, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionStringName))
                 throw new ArgumentException("Connection string name must not be null or empty", nameof(connectionStringName));
@@ -101,12 +103,13 @@ namespace PetaPoco
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
-            InitialiseFromEntry(entry);
+            InitialiseFromEntry(entry, defaultMapper);
         }
-        private void InitialiseFromEntry(ConnectionStringSettings entry)
+		
+        private void InitialiseFromEntry(ConnectionStringSettings entry, IMapper defaultMapper)
         {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), null);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
 
 #endif
@@ -140,21 +143,22 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using a supplied connections string and provider name.
+        ///     Constructs an instance using a supplied connection string and provider name.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="providerName">The database provider name.</param>
+        /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <remarks>
         ///     PetaPoco will automatically close and dispose any connections it creates.
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
-        public Database(string connectionString, string providerName)
+        public Database(string connectionString, string providerName, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException("Connection string cannot be null or empty", nameof(connectionString));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), null);
+            Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -162,9 +166,10 @@ namespace PetaPoco
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="factory">The DbProviderFactory to use for instantiating IDbConnection's.</param>
+        /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="factory" /> is null.</exception>
-        public Database(string connectionString, DbProviderFactory factory)
+        public Database(string connectionString, DbProviderFactory factory, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
@@ -173,7 +178,7 @@ namespace PetaPoco
                 throw new ArgumentNullException(nameof(factory));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), null);
+            Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -268,7 +273,7 @@ namespace PetaPoco
                     if (entry == null)   // meaning we got the connection string on its own
                         throw new InvalidOperationException("Both a connection string and provider are required or neither.");
 
-                    InitialiseFromEntry(entry);
+                    InitialiseFromEntry(entry, defaultMapper);
                 }
 #else
                 string providerName = null;
@@ -2902,5 +2907,19 @@ namespace PetaPoco
         /// </summary>
         public event EventHandler<ExceptionEventArgs> ExceptionThrown;
         #endregion
+    }
+
+    public class Database<TDatabaseProvider> : Database where TDatabaseProvider : IProvider
+    {
+        /// <summary>
+        /// Constructs an instance using a supplied connection string and provider type.
+        /// </summary>
+        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
+        public Database(string connectionString, IMapper defaultMapper = null)
+            : base(connectionString, typeof(TDatabaseProvider).Name, defaultMapper)
+        {
+        }
     }
 }
