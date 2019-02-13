@@ -60,6 +60,11 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentException>(() => new Database((string) null));
             Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
 #endif
+            Should.Throw<ArgumentException>(() => new Database("connection string", (string)null));
+            Should.Throw<ArgumentException>(() => new Database("connection string", ""));
+            Should.Throw<ArgumentException>(() => new Database(null, "provider name"));
+            Should.Throw<ArgumentException>(() => new Database("", "provider name"));
+            Should.Throw<ArgumentException>(() => new Database("connection string", "provider name"));
 
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));

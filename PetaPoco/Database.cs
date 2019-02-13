@@ -105,7 +105,7 @@ namespace PetaPoco
             _connectionString = entry.ConnectionString;
             InitialiseFromEntry(entry, defaultMapper);
         }
-		
+
         private void InitialiseFromEntry(ConnectionStringSettings entry, IMapper defaultMapper)
         {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
@@ -155,10 +155,12 @@ namespace PetaPoco
         public Database(string connectionString, string providerName, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Connection string cannot be null or empty", nameof(connectionString));
+                throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
+            if (string.IsNullOrEmpty(providerName))
+                throw new ArgumentException("Provider name must not be null or empty", nameof(providerName));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
 
         /// <summary>
