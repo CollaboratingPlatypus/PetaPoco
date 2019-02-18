@@ -58,7 +58,7 @@ namespace PetaPoco.Tests.Unit
 
 #if !NETCOREAPP
             Should.Throw<ArgumentException>(() => new Database((string) null));
-            Should.Throw<InvalidOperationException>(() => new Database("some connection string"));
+            Should.Throw<InvalidOperationException>(() => new Database("connection string name"));
 #endif
             Should.Throw<ArgumentException>(() => new Database("connection string", (string)null));
             Should.Throw<ArgumentException>(() => new Database("connection string", ""));
@@ -94,11 +94,7 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
-#if !NETCOREAPP
-                    e.Message.ShouldContain("Both a connection string and provider are required");
-#else
                     e.Message.ShouldContain("Either a provider name or provider must be registered");
-#endif
                     throw;
                 }
             });

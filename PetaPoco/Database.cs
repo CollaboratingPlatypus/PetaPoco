@@ -226,9 +226,13 @@ namespace PetaPoco
 
             IProvider provider = null;
             IDbConnection connection = null;
+            string providerName = null;
 
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
             settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+
+
 
             if (connection != null)
             {
@@ -268,32 +272,26 @@ namespace PetaPoco
                     _connectionString = entry.ConnectionString;
                 }
 
-                if (provider != null)
-                    Initialise(provider, defaultMapper);
-                else
-                {
-                    if (entry == null)   // meaning we got the connection string on its own
-                        throw new InvalidOperationException("Both a connection string and provider are required or neither.");
-
+                if (entry != null)
                     InitialiseFromEntry(entry, defaultMapper);
-                }
+                else            
+                    InitialiseWithProviderOrName();
 #else            
                 if (_connectionString == null)
                     throw new InvalidOperationException("A connection string is required.");
 
-                if (provider != null)
-                    Initialise(provider, defaultMapper);
-                else
-                {
-                    string providerName = null;
-                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+                InitialiseWithProviderOrName();
+#endif
 
-                    if (providerName != null)
+                void InitialiseWithProviderOrName()
+                {
+                    if (provider != null)
+                        Initialise(provider, defaultMapper);
+                    else if (providerName != null)
                         Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
                     else
                         throw new InvalidOperationException("Either a provider name or provider must be registered.");
-                }            
-#endif
+                }
             }
 
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);

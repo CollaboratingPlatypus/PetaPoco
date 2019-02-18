@@ -175,6 +175,31 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
+        public void UsingProvider_Overrides_UsingProviderName()
+        {
+            var db = config
+                .UsingConnectionString("cs")
+                .UsingProvider<FakeProvider>()
+                .UsingProviderName("OracleDatabaseProvider")
+                .Create();
+
+            db.Provider.ShouldBeOfType<FakeProvider>();
+        }
+
+        [Fact]
+        public void UsingConnectionString_BadProvider_Throws()
+        {
+            config.UsingConnectionString("cs").UsingProviderName("pn");
+            Should.Throw<ArgumentException>(() => config.Create());
+        }
+
+        [Fact]
+        public void UsingConnectionString_NoProvider_Throws()
+        {
+            Should.Throw<InvalidOperationException>(() => config.UsingConnectionString("cs").Create());
+        }
+
+        [Fact]
         public void UsingConnectionString_GivenTimeoutAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
         {
             var db = config

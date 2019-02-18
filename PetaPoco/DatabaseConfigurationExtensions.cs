@@ -20,11 +20,10 @@ namespace PetaPoco
         internal const string EnableNamedParams = "EnableNamedParams";
         internal const string Provider = "Provider";
         internal const string ConnectionString = "ConnectionString";
+        internal const string ProviderName = "ProviderName";
 
 #if !NETSTANDARD
         internal const string ConnectionStringName = "ConnectionStringName";
-#else
-        internal const string ProviderName = "ProviderName";
 #endif
 
         internal const string DefaultMapper = "DefaultMapper";
@@ -84,6 +83,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="provider">The provider to use.</param>
@@ -100,6 +100,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="configure">The configure provider callback.</param>
@@ -121,6 +122,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <typeparam name="T">The provider type.</typeparam>
@@ -134,6 +136,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="configure">The configure provider callback.</param>
@@ -203,7 +206,8 @@ namespace PetaPoco
             source.SetSetting(ConnectionStringName, connectionStringName);
             return source;
         }
-#else
+#endif
+
         /// <summary>
         ///     Adds a provider name string - see <see cref="DatabaseProvider.Resolve(string, bool, string)" />.
         /// </summary>
@@ -218,7 +222,7 @@ namespace PetaPoco
             source.SetSetting(ProviderName, providerName);
             return source;
         }        
-#endif
+
         /// <summary>
         ///    Specifies a <see cref="IDbConnection"/> to use.
         /// </summary>
