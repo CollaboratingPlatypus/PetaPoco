@@ -277,10 +277,7 @@ namespace PetaPoco
 
                     InitialiseFromEntry(entry, defaultMapper);
                 }
-#else
-                string providerName = null;
-                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
-            
+#else            
                 if (_connectionString == null)
                     throw new InvalidOperationException("A connection string is required.");
 
@@ -288,6 +285,9 @@ namespace PetaPoco
                     Initialise(provider, defaultMapper);
                 else
                 {
+                    string providerName = null;
+                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+
                     if (providerName != null)
                         Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
                     else
