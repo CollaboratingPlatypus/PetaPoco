@@ -77,12 +77,11 @@ namespace PetaPoco
         public Database(IMapper defaultMapper = null)
         {
             if (ConfigurationManager.ConnectionStrings.Count == 0)
-                throw new InvalidOperationException("One or more connection strings must be registered to use the no paramater constructor");
+                throw new InvalidOperationException("One or more connection strings must be registered to use the no-parameter constructor");
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
-            var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+            InitialiseFromEntry(entry, defaultMapper);
         }
 
         /// <summary>
@@ -104,9 +103,15 @@ namespace PetaPoco
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
+            InitialiseFromEntry(entry, defaultMapper);
+        }
+
+        private void InitialiseFromEntry(ConnectionStringSettings entry, IMapper defaultMapper)
+        {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
+
 #endif
 
         /// <summary>
@@ -121,13 +126,20 @@ namespace PetaPoco
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
         public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
-            _sharedConnection = connection ?? throw new ArgumentNullException(nameof(connection));
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+
+            SetupFromConnection(connection);
+            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+        }
+
+        private void SetupFromConnection(IDbConnection connection)
+        {
+            _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
 
             // Prevent closing external connection
             _sharedConnectionDepth = 2;
-
-            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -143,10 +155,12 @@ namespace PetaPoco
         public Database(string connectionString, string providerName, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Connection string cannot be null or empty", nameof(connectionString));
+                throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
+            if (string.IsNullOrEmpty(providerName))
+                throw new ArgumentException("Provider name must not be null or empty", nameof(providerName));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -209,48 +223,77 @@ namespace PetaPoco
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
+
+            IProvider provider = null;
+            IDbConnection connection = null;
+            string providerName = null;
+
+            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
+            settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+
+
+
+            if (connection != null)
+            {
+                SetupFromConnection(connection);
+
+                if (provider != null)
+                    Initialise(provider, defaultMapper);
+                else
+                    Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+            }
+            else
+            {
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs);
+
 #if !NETSTANDARD
-            ConnectionStringSettings entry = null;
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
-            {
-                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, cn =>
+                ConnectionStringSettings entry = null;
+                string connectionStringName = null;
+
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
+
+                if (_connectionString == null)
                 {
-                    entry = ConfigurationManager.ConnectionStrings[cn];
+                    if (connectionStringName != null)
+                    {
+                        entry = ConfigurationManager.ConnectionStrings[connectionStringName];
+                        if (entry == null)
+                            throw new InvalidOperationException($"Can't find a connection string with the name '{connectionStringName}'");
+                    }
+                    else
+                    {
+                        if (ConfigurationManager.ConnectionStrings.Count == 0)
+                            throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
 
-                    if (entry == null)
-                        throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", cn));
-                }, () =>
-                {
-                    if (ConfigurationManager.ConnectionStrings.Count == 0)
-                        throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
+                        entry = ConfigurationManager.ConnectionStrings[0];
+                    }
 
-                    entry = ConfigurationManager.ConnectionStrings[0];
-                });
+                    _connectionString = entry.ConnectionString;
+                }
 
-                // ReSharper disable once PossibleNullReferenceException
-                _connectionString = entry.ConnectionString;
-            });
+                if (entry != null)
+                    InitialiseFromEntry(entry, defaultMapper);
+                else            
+                    InitialiseWithProviderOrName();
+#else            
+                if (_connectionString == null)
+                    throw new InvalidOperationException("A connection string is required.");
 
-
-            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
-            {
-                if (entry == null)
-                    throw new InvalidOperationException("Both a connection string and provider are required or neither.");
-
-                var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
-            });
-#else
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () => throw new InvalidOperationException("A connection string is required."));
-            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
-                {
-                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName,
-                        v => Initialise(DatabaseProvider.Resolve(v, false, _connectionString), defaultMapper),
-                        () => throw new InvalidOperationException("Either a provider name or provider must be registered."));
-                });
+                InitialiseWithProviderOrName();
 #endif
 
-            
+                void InitialiseWithProviderOrName()
+                {
+                    if (provider != null)
+                        Initialise(provider, defaultMapper);
+                    else if (providerName != null)
+                        Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+                    else
+                        throw new InvalidOperationException("Either a provider name or provider must be registered.");
+                }
+            }
+
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
