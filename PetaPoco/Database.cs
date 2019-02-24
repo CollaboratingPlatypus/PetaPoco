@@ -825,35 +825,24 @@ namespace PetaPoco
 
         #region operation: Fetch
 
-        /// <summary>
-        ///     Runs a SELECT * query and returns the result set as a typed list
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <returns>A List holding the results of the query</returns>
-        public List<T> Fetch<T>() => Fetch<T>(String.Empty);
+        /// <inheritdoc />
+        public List<T> Fetch<T>() => Fetch<T>(string.Empty);
 
-        /// <summary>
-        ///     Runs a query and returns the result set as a typed list
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query to execute</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>A List holding the results of the query</returns>
-        public List<T> Fetch<T>(string sql, params object[] args)
-        {
-            return Query<T>(sql, args).ToList();
-        }
+        /// <inheritdoc />
+        public List<T> Fetch<T>(string sql, params object[] args) => Query<T>(sql, args).ToList();
 
-        /// <summary>
-        ///     Runs a query and returns the result set as a typed list
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>A List holding the results of the query</returns>
-        public List<T> Fetch<T>(Sql sql)
-        {
-            return Fetch<T>(sql.SQL, sql.Arguments);
-        }
+        /// <inheritdoc />
+        public List<T> Fetch<T>(Sql sql) => Fetch<T>(sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public List<T> Fetch<T>(long page, long itemsPerPage) => Fetch<T>(page, itemsPerPage, string.Empty);
+
+        /// <inheritdoc />
+        public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
+        
+        /// <inheritdoc />
+        public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
+       
 
         #endregion
 
@@ -997,58 +986,6 @@ namespace PetaPoco
         public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
         {
             return Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
-        }
-
-        #endregion
-
-        #region operation: Fetch (page)
-
-        /// <summary>
-        ///     Retrieves a page of records (without the total count)
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <returns>A List of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify a default SELECT * statement to only retrieve the
-        ///     records for the specified page.
-        /// </remarks>
-        public List<T> Fetch<T>(long page, long itemsPerPage) => Fetch<T>(page, itemsPerPage, String.Empty);
-
-        /// <summary>
-        ///     Retrieves a page of records (without the total count)
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <param name="sql">The base SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>A List of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify the supplied SELECT statement to only retrieve the
-        ///     records for the specified page.
-        /// </remarks>
-        public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args)
-        {
-            return SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
-        }
-
-        /// <summary>
-        ///     Retrieves a page of records (without the total count)
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <param name="sql">An SQL builder object representing the base SQL query and it's arguments</param>
-        /// <returns>A List of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify the supplied SELECT statement to only retrieve the
-        ///     records for the specified page.
-        /// </remarks>
-        public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql)
-        {
-            return SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
         }
 
         #endregion
