@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/06/28</date>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -12,7 +6,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
@@ -23,46 +17,25 @@ using System.Configuration;
 namespace PetaPoco
 {
     /// <summary>
-    ///     The main PetaPoco Database class.  You can either use this class directly, or derive from it.
+    ///     Represents the core functionality of PetaPoco.
     /// </summary>
     public class Database : IDatabase
     {
-        #region IDisposable
+        #region Member Fields
 
-        /// <summary>
-        ///     Automatically close one open shared connection
-        /// </summary>
-        public void Dispose()
-        {
-            // Automatically close one open connection reference
-            //  (Works with KeepConnectionAlive and manually opening a shared connection)
-            CloseSharedConnection();
-        }
-
-        #endregion
-
-        #region Internal operations
-
-        internal void DoPreExecute(IDbCommand cmd)
-        {
-            // Setup command timeout
-            if (OneTimeCommandTimeout != 0)
-            {
-                cmd.CommandTimeout = OneTimeCommandTimeout;
-                OneTimeCommandTimeout = 0;
-            }
-            else if (CommandTimeout != 0)
-            {
-                cmd.CommandTimeout = CommandTimeout;
-            }
-
-            // Call hook
-            OnExecutingCommand(cmd);
-
-            // Save it
-            _lastSql = cmd.CommandText;
-            _lastArgs = (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray();
-        }
+        private IMapper _defaultMapper;
+        private string _connectionString;
+        private IProvider _provider;
+        private IDbConnection _sharedConnection;
+        private IDbTransaction _transaction;
+        private int _sharedConnectionDepth;
+        private int _transactionDepth;
+        private bool _transactionCancelled;
+        private string _lastSql;
+        private object[] _lastArgs;
+        private string _paramPrefix;
+        private DbProviderFactory _factory;
+        private IsolationLevel? _isolationLevel;
 
         #endregion
 
@@ -111,7 +84,6 @@ namespace PetaPoco
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
-
 #endif
 
         /// <summary>
@@ -223,7 +195,6 @@ namespace PetaPoco
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
-
             IProvider provider = null;
             IDbConnection connection = null;
             string providerName = null;
@@ -231,8 +202,6 @@ namespace PetaPoco
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
             settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
-
-
 
             if (connection != null)
             {
@@ -274,9 +243,9 @@ namespace PetaPoco
 
                 if (entry != null)
                     InitialiseFromEntry(entry, defaultMapper);
-                else            
+                else
                     InitialiseWithProviderOrName();
-#else            
+#else
                 if (_connectionString == null)
                     throw new InvalidOperationException("A connection string is required.");
 
@@ -327,27 +296,54 @@ namespace PetaPoco
         }
 
         #endregion
+        
+        #region Internal operations
+
+        internal void DoPreExecute(IDbCommand cmd)
+        {
+            if (CommandTimeout > 0 || OneTimeCommandTimeout > 0)
+            {
+                cmd.CommandTimeout = OneTimeCommandTimeout > 0 ? OneTimeCommandTimeout : CommandTimeout;
+                OneTimeCommandTimeout = 0;
+            }           
+
+            OnExecutingCommand(cmd);
+
+            _lastSql = cmd.CommandText;
+            _lastArgs = cmd.Parameters.Cast<IDataParameter>().Select(parameter => parameter.Value).ToArray();
+        }
+
+        #endregion
 
         #region Connection Management
 
         /// <summary>
-        ///     When set to true the first opened connection is kept alive until this object is disposed
+        ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection"/>
+        ///     or <see cref="Dispose"/> is called.
         /// </summary>
         public bool KeepConnectionAlive { get; set; }
 
         /// <summary>
-        ///     Open a connection that will be used for all subsequent queries.
+        ///     Provides access to the currently open shared connection, or <c>Null</c> when no open
+        ///     connection exist.
+        /// </summary>
+        public IDbConnection Connection => _sharedConnection;
+
+        /// <summary>
+        ///     Opens a connection that will be used for all subsequent queries.
         /// </summary>
         /// <remarks>
-        ///     Calls to Open/CloseSharedConnection are reference counted and should be balanced
+        ///     Calls to <see cref="OpenSharedConnection"/>/<see cref="CloseSharedConnection"/> are reference
+        ///     counted and should be balanced
         /// </remarks>
         public void OpenSharedConnection()
         {
             if (_sharedConnectionDepth == 0)
             {
+                
                 _sharedConnection = _factory.CreateConnection();
                 _sharedConnection.ConnectionString = _connectionString;
-
+                
                 if (_sharedConnection.State == ConnectionState.Broken)
                     _sharedConnection.Close();
 
@@ -364,8 +360,12 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Releases the shared connection
+        ///     Releases the shared connection.
         /// </summary>
+        /// <remarks>
+        ///     Calls to <see cref="OpenSharedConnection"/>/<see cref="CloseSharedConnection"/> are reference
+        ///     counted and should be balanced
+        /// </remarks>
         public void CloseSharedConnection()
         {
             if (_sharedConnectionDepth > 0)
@@ -381,9 +381,17 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Provides access to the currently open shared connection (or null if none)
+        ///     Alias for <see cref="CloseSharedConnection"/>.
         /// </summary>
-        public IDbConnection Connection => _sharedConnection;
+        /// <remarks>
+        ///     Only useful when making use of the .net `using` language feature. 
+        /// </remarks>
+        public void Dispose()
+        {
+            // Automatically close one open connection reference
+            //  (Works with KeepConnectionAlive and manually opening a shared connection)
+            CloseSharedConnection();
+        }
 
         #endregion
 
@@ -502,7 +510,7 @@ namespace PetaPoco
         /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added</param>
         /// <param name="value">The value to assign to the parameter</param>
         /// <param name="pi">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
-        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi) 
+        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi)
         {
             // Convert value to from poco type to db type
             if (pi != null)
@@ -527,7 +535,7 @@ namespace PetaPoco
                 // Create a new parameter
                 var p = cmd.CreateParameter();
                 p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
-                SetParameterProperties(p, value, pi);                
+                SetParameterProperties(p, value, pi);
 
                 // Add to the collection
                 cmd.Parameters.Add(p);
@@ -554,7 +562,7 @@ namespace PetaPoco
                 var t = value.GetType();
                 if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
                 {
-                    p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
+                    p.Value = Convert.ChangeType(value, ((Enum) value).GetTypeCode());
                 }
                 else if (t == typeof(Guid) && !_provider.HasNativeGuidSupport)
                 {
@@ -595,17 +603,15 @@ namespace PetaPoco
             }
         }
 
-        // Create a command
         public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args) => CreateCommand(connection, CommandType.Text, sql, args);
 
         public IDbCommand CreateCommand(IDbConnection connection, CommandType commandType, string sql, params object[] args)
         {
             // Create the command
-            IDbCommand cmd = connection.CreateCommand();
+            var cmd = connection.CreateCommand();
             cmd.Connection = connection;
             cmd.CommandType = commandType;
             cmd.Transaction = _transaction;
-
 
             switch (commandType)
             {
@@ -643,7 +649,7 @@ namespace PetaPoco
             _provider.PreExecute(cmd);
 
             // Call logging
-            if (!String.IsNullOrEmpty(sql))
+            if (!string.IsNullOrEmpty(sql))
                 DoPreExecute(cmd);
 
             return cmd;
@@ -775,7 +781,7 @@ namespace PetaPoco
         /// <param name="sql">The SQL query to execute</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <returns>The scalar value cast to T</returns>
-        public T ExecuteScalar<T>(string sql, params object[] args) => ExecuteScalarInternal<T>(CommandType.Text, sql, args);     
+        public T ExecuteScalar<T>(string sql, params object[] args) => ExecuteScalarInternal<T>(CommandType.Text, sql, args);
 
         protected T ExecuteScalarInternal<T>(CommandType commandType, string sql, params object[] args)
         {
@@ -794,7 +800,7 @@ namespace PetaPoco
                         if (u != null && (val == null || val == DBNull.Value))
                             return default(T);
 
-                        return (T)Convert.ChangeType(val, u == null ? typeof(T) : u);
+                        return (T) Convert.ChangeType(val, u == null ? typeof(T) : u);
                     }
                 }
                 finally
@@ -838,11 +844,11 @@ namespace PetaPoco
         public List<T> Fetch<T>(long page, long itemsPerPage) => Fetch<T>(page, itemsPerPage, string.Empty);
 
         /// <inheritdoc />
-        public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
-        
+        public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) =>
+            SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
+
         /// <inheritdoc />
         public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
-       
 
         #endregion
 
@@ -1056,7 +1062,7 @@ namespace PetaPoco
         ///     and disposing the previous one. In cases where this is an issue, consider using Fetch which
         ///     returns the results as a List rather than an IEnumerable.
         /// </remarks>
-        public IEnumerable<T> Query<T>() => Query<T>(String.Empty);
+        public IEnumerable<T> Query<T>() => Query<T>(string.Empty);
 
         /// <summary>
         ///     Runs an SQL query, returning the results as an IEnumerable collection
@@ -2607,33 +2613,33 @@ namespace PetaPoco
         #region operation: StoredProc
 
         /// <summary>
-        /// Runs a stored procedure, returning the results as an IEnumerable collection
+        ///     Runs a stored procedure, returning the results as an IEnumerable collection
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
         /// <param name="storedProcedureName">The name of the stored procedure to run</param>
         /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>An enumerable collection of result records</returns>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
-        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
-        /// argument types will throw an exception.
+        ///     For any arguments which are POCOs, each readable property will be turned into a named parameter
+        ///     for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other
+        ///     argument types will throw an exception.
         /// </remarks>
         public IEnumerable<T> QueryProc<T>(string storedProcedureName, params object[] args)
         {
-            return ExecuteReader<T>(CommandType.StoredProcedure, storedProcedureName, args);            
+            return ExecuteReader<T>(CommandType.StoredProcedure, storedProcedureName, args);
         }
 
         /// <summary>
-        /// Runs a stored procedure, returning the results as typed list
+        ///     Runs a stored procedure, returning the results as typed list
         /// </summary>
         /// <typeparam name="T">The Type representing a row in the result set</typeparam>
         /// <param name="storedProcedureName">The name of the stored procedure to run</param>
         /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>A List holding the results of the query</returns>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
-        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
-        /// argument types will throw an exception.
+        ///     For any arguments which are POCOs, each readable property will be turned into a named parameter
+        ///     for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other
+        ///     argument types will throw an exception.
         /// </remarks>
         public List<T> FetchProc<T>(string storedProcedureName, params object[] args) => QueryProc<T>(storedProcedureName, args).ToList();
 
@@ -2645,9 +2651,9 @@ namespace PetaPoco
         /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>The scalar value cast to T</returns>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
-        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
-        /// argument types will throw an exception.
+        ///     For any arguments which are POCOs, each readable property will be turned into a named parameter
+        ///     for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other
+        ///     argument types will throw an exception.
         /// </remarks>
         public T ExecuteScalarProc<T>(string storedProcedureName, params object[] args)
         {
@@ -2661,9 +2667,9 @@ namespace PetaPoco
         /// <param name="args">Arguments for the stored procedure</param>
         /// <returns>The number of rows affected</returns>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter
-        /// for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other 
-        /// argument types will throw an exception.
+        ///     For any arguments which are POCOs, each readable property will be turned into a named parameter
+        ///     for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other
+        ///     argument types will throw an exception.
         /// </remarks>
         public int ExecuteNonQueryProc(string storedProcedureName, params object[] args)
         {
@@ -2795,61 +2801,50 @@ namespace PetaPoco
 
         #endregion
 
-        #region Member Fields
-
-        // Member variables
-        private IMapper _defaultMapper;
-        private string _connectionString;
-        private IProvider _provider;
-        private IDbConnection _sharedConnection;
-        private IDbTransaction _transaction;
-        private int _sharedConnectionDepth;
-        private int _transactionDepth;
-        private bool _transactionCancelled;
-        private string _lastSql;
-        private object[] _lastArgs;
-        private string _paramPrefix;
-        private DbProviderFactory _factory;
-        private IsolationLevel? _isolationLevel;
-
-        #endregion
-
         #region Events
+
         /// <summary>
-        /// Occurs when a new transaction has started.
+        ///     Occurs when a new transaction has started.
         /// </summary>
         public event EventHandler<DbTransactionEventArgs> TransactionStarted;
+
         /// <summary>
-        /// Occurs when a transaction is about to be rolled back or committed.
+        ///     Occurs when a transaction is about to be rolled back or committed.
         /// </summary>
         public event EventHandler<DbTransactionEventArgs> TransactionEnding;
+
         /// <summary>
-        /// Occurs when a database command is about to be executed.
+        ///     Occurs when a database command is about to be executed.
         /// </summary>
         public event EventHandler<DbCommandEventArgs> CommandExecuting;
+
         /// <summary>
-        /// Occurs when a database command has been executed.
+        ///     Occurs when a database command has been executed.
         /// </summary>
         public event EventHandler<DbCommandEventArgs> CommandExecuted;
+
         /// <summary>
-        /// Occurs when a database connection is about to be closed.
+        ///     Occurs when a database connection is about to be closed.
         /// </summary>
         public event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+
         /// <summary>
-        /// Occurs when a database connection has been opened.
+        ///     Occurs when a database connection has been opened.
         /// </summary>
         public event EventHandler<DbConnectionEventArgs> ConnectionOpened;
+
         /// <summary>
-        /// Occurs when a database exception has been thrown.
+        ///     Occurs when a database exception has been thrown.
         /// </summary>
         public event EventHandler<ExceptionEventArgs> ExceptionThrown;
+
         #endregion
     }
 
     public class Database<TDatabaseProvider> : Database where TDatabaseProvider : IProvider
     {
         /// <summary>
-        /// Constructs an instance using a supplied connection string and provider type.
+        ///     Constructs an instance using a supplied connection string and provider type.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>

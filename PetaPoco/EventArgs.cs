@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PetaPoco
 {
     public class DbTransactionEventArgs: EventArgs
     {
-        public IDbTransaction Transaction { get; private set; }
+        public IDbTransaction Transaction { get; }
 
         public DbTransactionEventArgs(IDbTransaction transaction)
         {
@@ -19,7 +15,7 @@ namespace PetaPoco
 
     public class DbCommandEventArgs: EventArgs
     {
-        public IDbCommand Command { get; private set; }
+        public IDbCommand Command { get; }
 
         public DbCommandEventArgs(IDbCommand cmd)
         {
@@ -37,10 +33,11 @@ namespace PetaPoco
         }
     }
 
-    public class ExceptionEventArgs: EventArgs
+    public class ExceptionEventArgs : EventArgs
     {
         public bool Raise { get; set; } = true;
-        public Exception Exception { get; private set; }
+
+        public Exception Exception { get; }
 
         public ExceptionEventArgs(Exception ex)
         {
