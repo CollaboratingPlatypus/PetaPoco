@@ -1,9 +1,3 @@
-// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2016/01/21</date>
-
 using System;
 using System.Data;
 using PetaPoco.Core;
@@ -157,31 +151,37 @@ namespace PetaPoco
         void CompleteTransaction();
 
         /// <summary>
-        /// Occurs when a new transaction has started.
+        ///     Occurs when a new transaction has started.
         /// </summary>
         event EventHandler<DbTransactionEventArgs> TransactionStarted;
+
         /// <summary>
-        /// Occurs when a transaction is about to be rolled back or committed.
+        ///     Occurs when a transaction is about to be rolled back or committed.
         /// </summary>
         event EventHandler<DbTransactionEventArgs> TransactionEnding;
+
         /// <summary>
-        /// Occurs when a database command is about to be executed.
+        ///     Occurs when a database command is about to be executed.
         /// </summary>
         event EventHandler<DbCommandEventArgs> CommandExecuting;
+
         /// <summary>
-        /// Occurs when a database command has been executed.
+        ///     Occurs when a database command has been executed.
         /// </summary>
         event EventHandler<DbCommandEventArgs> CommandExecuted;
+
         /// <summary>
-        /// Occurs when a database connection is about to be closed.
+        ///     Occurs when a database connection is about to be closed.
         /// </summary>
         event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+
         /// <summary>
-        /// Occurs when a database connection has been opened.
+        ///     Occurs when a database connection has been opened.
         /// </summary>
         event EventHandler<DbConnectionEventArgs> ConnectionOpened;
+
         /// <summary>
-        /// Occurs when a database exception has been thrown.
+        ///     Occurs when a database exception has been thrown.
         /// </summary>
         event EventHandler<ExceptionEventArgs> ExceptionThrown;
     }
