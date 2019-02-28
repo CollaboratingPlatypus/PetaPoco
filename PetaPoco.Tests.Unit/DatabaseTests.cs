@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -13,9 +7,10 @@ using Moq;
 using PetaPoco.Core;
 using PetaPoco.Providers;
 using PetaPoco.Tests.Unit.Models;
-using PetaPoco.Utilities;
 using Shouldly;
 using Xunit;
+
+// ReSharper disable ObjectCreationAsStatement
 
 namespace PetaPoco.Tests.Unit
 {
@@ -27,22 +22,13 @@ namespace PetaPoco.Tests.Unit
 
         private IDatabase DB { get; }
 
-        public DatabaseTests()
-        {
-            DB = new Database("cs", _provider);
-        }
+        public DatabaseTests() => DB = new Database("cs", _provider);
 
         [Fact]
-        public void Construct_GivenWrappedFactory_ShouldNotThrow()
-        {
-            new Database("some connection string", new DbProviderWrapper());
-        }
+        public void Construct_GivenWrappedFactory_ShouldNotThrow() => new Database("some connection string", new DbProviderWrapper());
 
         [Fact]
-        public void Construct_GivenUnwrappedFactory_ShouldNotThrow()
-        {
-            new Database("some connection string", SqlClientFactory.Instance);
-        }
+        public void Construct_GivenUnwrappedFactory_ShouldNotThrow() => new Database("some connection string", SqlClientFactory.Instance);
 
         [Fact]
         public void Construct_GivenInvalidArguments_ShouldThrow()
@@ -60,7 +46,7 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentException>(() => new Database((string) null));
             Should.Throw<InvalidOperationException>(() => new Database("connection string name"));
 #endif
-            Should.Throw<ArgumentException>(() => new Database("connection string", (string)null));
+            Should.Throw<ArgumentException>(() => new Database("connection string", (string) null));
             Should.Throw<ArgumentException>(() => new Database("connection string", ""));
             Should.Throw<ArgumentException>(() => new Database(null, "provider name"));
             Should.Throw<ArgumentException>(() => new Database("", "provider name"));
@@ -69,7 +55,7 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
 
-            Should.Throw<ArgumentNullException>(() => new Database((IDatabaseBuildConfiguration) null));
+            Should.Throw<ArgumentNullException>(() => new Database((IDatabaseBuildConfiguration)null));
             Should.Throw<InvalidOperationException>(() =>
             {
                 try
@@ -179,13 +165,13 @@ namespace PetaPoco.Tests.Unit
             DB.IsNew(new GenericIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") }).ShouldBeFalse();
             DB.IsNew(new GenericIdEntity<int> { Id = 1 }).ShouldBeFalse();
             DB.IsNew(new GenericIdEntity<uint> { Id = 1 }).ShouldBeFalse();
-            DB.IsNew(new GenericIdEntity<short>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew(new GenericIdEntity<ushort>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew(new GenericIdEntity<long>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew(new GenericIdEntity<ulong>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew(new GenericIdEntity<string>() { Id = "ID-1" }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<short> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<ushort> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<long> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<ulong> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<string> { Id = "ID-1" }).ShouldBeFalse();
             DB.IsNew(new GenericIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() }).ShouldBeFalse();
-            DB.IsNew(new GenericIdEntity<decimal>() { Id = 1.0M }).ShouldBeFalse();
+            DB.IsNew(new GenericIdEntity<decimal> { Id = 1.0M }).ShouldBeFalse();
         }
 
         [Fact]
@@ -211,15 +197,18 @@ namespace PetaPoco.Tests.Unit
             DB.IsNew("id", new GenericNoMapsIdEntity<Guid?> { Id = Guid.Parse("803A25C4-65D9-4F92-9305-0854FD134841") }).ShouldBeFalse();
             DB.IsNew("id", new GenericNoMapsIdEntity<int> { Id = 1 }).ShouldBeFalse();
             DB.IsNew("id", new GenericNoMapsIdEntity<uint> { Id = 1 }).ShouldBeFalse();
-            DB.IsNew("id", new GenericNoMapsIdEntity<short>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew("id", new GenericNoMapsIdEntity<ushort>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew("id", new GenericNoMapsIdEntity<long>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew("id", new GenericNoMapsIdEntity<ulong>() { Id = 1 }).ShouldBeFalse();
-            DB.IsNew("id", new GenericNoMapsIdEntity<string>() { Id = "ID-1" }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<short> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<ushort> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<long> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<ulong> { Id = 1 }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<string> { Id = "ID-1" }).ShouldBeFalse();
             DB.IsNew("id", new GenericNoMapsIdEntity<ComplexPrimaryKey> { Id = new ComplexPrimaryKey() }).ShouldBeFalse();
-            DB.IsNew("id", new GenericNoMapsIdEntity<decimal>() { Id = 1.0M }).ShouldBeFalse();
+            DB.IsNew("id", new GenericNoMapsIdEntity<decimal> { Id = 1.0M }).ShouldBeFalse();
         }
 
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable UnusedAutoPropertyAccessor.Global
+        // ReSharper disable UnusedMember.Global
         [ExplicitColumns]
         [TableName("Orders")]
         [PrimaryKey("Id")]
@@ -256,6 +245,9 @@ namespace PetaPoco.Tests.Unit
 
                 return null;
             }
-        }        
+        }
+        // ReSharper restore UnusedMember.Global
+        // ReSharper restore UnusedAutoPropertyAccessor.Global
+        // ReSharper restore MemberCanBePrivate.Global
     }
 }
