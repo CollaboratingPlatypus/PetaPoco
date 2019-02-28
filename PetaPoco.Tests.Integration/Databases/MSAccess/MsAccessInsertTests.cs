@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
-    [Collection("MSAccessTests")]
+    [Collection("MSAccess")]
     public class MsAccessInsertTests : BaseInsertTests
     {
         public MsAccessInsertTests()

@@ -10,7 +10,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MySQL
 {
-    [Collection("MySqlTests")]
+    [Collection("MySql")]
     public class MySqlStoredProcTests: BaseStoredProcTests
     {
         public MySqlStoredProcTests()

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MariaDb
 {
-    [Collection("MariaDbTests")]
+    [Collection("MariaDb")]
     public class MariaDbInsertTests : BaseInsertTests
     {
         public MariaDbInsertTests()

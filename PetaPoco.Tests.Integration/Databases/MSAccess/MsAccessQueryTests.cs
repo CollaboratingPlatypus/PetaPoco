@@ -10,7 +10,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
-    [Collection("MSAccessTests")]
+    [Collection("MSAccess")]
     public class MsAccessQueryTests : BaseQueryTests
     {
         public MsAccessQueryTests()

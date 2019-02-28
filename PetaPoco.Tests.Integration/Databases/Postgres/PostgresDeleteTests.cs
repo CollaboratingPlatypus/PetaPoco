@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
-    [Collection("PostgresTests")]
+    [Collection("Postgres")]
     public class PostgresDeleteTests : BaseDeleteTests
     {
         public PostgresDeleteTests()

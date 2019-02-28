@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
 {
-    [Collection("SqliteTests")]
+    [Collection("Sqlite")]
     public class SqliteQueryTests : BaseQueryTests
     {
         public SqliteQueryTests()

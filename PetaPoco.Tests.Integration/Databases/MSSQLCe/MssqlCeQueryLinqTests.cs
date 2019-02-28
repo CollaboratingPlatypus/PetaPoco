@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
-    [Collection("MssqlCeTests")]
+    [Collection("MssqlCe")]
     public class MssqlCeQueryLinqTests : BaseQueryLinqTests
     {
         public MssqlCeQueryLinqTests()
