@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 
 namespace PetaPoco
 {
@@ -25,9 +26,9 @@ namespace PetaPoco
 
     public class DbConnectionEventArgs : EventArgs
     {
-        public IDbConnection Connection { get; set; }
+        public DbConnection Connection { get; set; }
 
-        public DbConnectionEventArgs(IDbConnection connection)
+        public DbConnectionEventArgs(DbConnection connection)
         {
             Connection = connection;
         }

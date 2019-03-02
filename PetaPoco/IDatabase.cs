@@ -5,7 +5,7 @@ using PetaPoco.Core;
 namespace PetaPoco
 {
     /// <summary>
-    ///     Specifies the database contract.
+    ///     Represents the core functionality of PetaPoco.
     /// </summary>
     public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc
     {

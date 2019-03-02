@@ -16,9 +16,7 @@ using System.Configuration;
 
 namespace PetaPoco
 {
-    /// <summary>
-    ///     Represents the core functionality of PetaPoco.
-    /// </summary>
+    /// <inheritdoc />
     public class Database : IDatabase
     {
         #region Member Fields
@@ -26,7 +24,7 @@ namespace PetaPoco
         private IMapper _defaultMapper;
         private string _connectionString;
         private IProvider _provider;
-        private IDbConnection _sharedConnection;
+        private DbConnection _sharedConnection;
         private IDbTransaction _transaction;
         private int _sharedConnectionDepth;
         private int _transactionDepth;
@@ -96,7 +94,7 @@ namespace PetaPoco
         ///     the responsibility of the caller.
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
-        public Database(IDbConnection connection, IMapper defaultMapper = null)
+        public Database(DbConnection connection, IMapper defaultMapper = null)
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
@@ -105,7 +103,7 @@ namespace PetaPoco
             Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
-        private void SetupFromConnection(IDbConnection connection)
+        private void SetupFromConnection(DbConnection connection)
         {
             _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
@@ -196,11 +194,11 @@ namespace PetaPoco
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
             IProvider provider = null;
-            IDbConnection connection = null;
+            DbConnection connection = null;
             string providerName = null;
 
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
-            settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+            settings.TryGetSetting<DbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
 
             if (connection != null)
@@ -321,13 +319,46 @@ namespace PetaPoco
         ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection"/>
         ///     or <see cref="Dispose"/> is called.
         /// </summary>
+        /// <seealso cref="OpenSharedConnection"/>
         public bool KeepConnectionAlive { get; set; }
 
         /// <summary>
-        ///     Provides access to the currently open shared connection, or <c>Null</c> when no open
-        ///     connection exist.
+        ///     Provides access to the currently open shared connection.
         /// </summary>
+        /// <returns>
+        ///     The currently open connection, or <c>Null</c>.
+        /// </returns>
+        /// <seealso cref="OpenSharedConnection"/>
+        /// <seealso cref="CloseSharedConnection"/>
+        /// <seealso cref="KeepConnectionAlive"/>
         public IDbConnection Connection => _sharedConnection;
+
+        private async Task OpenSharedConnectionInternal(bool isAsync)
+        {
+            if (_sharedConnectionDepth == 0)
+            {
+                _sharedConnection = _factory.CreateConnection();
+                _sharedConnection.ConnectionString = _connectionString;
+
+                if (_sharedConnection.State == ConnectionState.Broken)
+                    _sharedConnection.Close();
+
+                if (_sharedConnection.State == ConnectionState.Closed)
+                {
+                    if (isAsync)
+                        await _sharedConnection.OpenAsync().ConfigureAwait(false);
+                    else 
+                        _sharedConnection.Open();
+                }
+
+                _sharedConnection = OnConnectionOpened(_sharedConnection);
+
+                if (KeepConnectionAlive)
+                    _sharedConnectionDepth++;
+            }
+
+            _sharedConnectionDepth++;
+        }
 
         /// <summary>
         ///     Opens a connection that will be used for all subsequent queries.
@@ -336,29 +367,23 @@ namespace PetaPoco
         ///     Calls to <see cref="OpenSharedConnection"/>/<see cref="CloseSharedConnection"/> are reference
         ///     counted and should be balanced
         /// </remarks>
+        /// <seealso cref="Connection"/>
+        /// <seealso cref="CloseSharedConnection"/>
+        /// <seealso cref="KeepConnectionAlive"/>
         public void OpenSharedConnection()
         {
-            if (_sharedConnectionDepth == 0)
-            {
-                
-                _sharedConnection = _factory.CreateConnection();
-                _sharedConnection.ConnectionString = _connectionString;
-                
-                if (_sharedConnection.State == ConnectionState.Broken)
-                    _sharedConnection.Close();
-
-                if (_sharedConnection.State == ConnectionState.Closed)
-                    _sharedConnection.Open();
-
-                _sharedConnection = OnConnectionOpened(_sharedConnection);
-
-                if (KeepConnectionAlive)
-                    _sharedConnectionDepth++; // Make sure you call Dispose
-            }
-
-            _sharedConnectionDepth++;
+            // Executes immediately
+            OpenSharedConnectionInternal(false).Wait();
         }
 
+        /// <summary>
+        ///     The async version of <see cref="OpenSharedConnection"/>.
+        /// </summary>
+        public Task OpenSharedConnectionAsync()
+        {
+            return OpenSharedConnectionInternal(true);
+        }
+        
         /// <summary>
         ///     Releases the shared connection.
         /// </summary>
@@ -366,6 +391,9 @@ namespace PetaPoco
         ///     Calls to <see cref="OpenSharedConnection"/>/<see cref="CloseSharedConnection"/> are reference
         ///     counted and should be balanced
         /// </remarks>
+        /// <seealso cref="Connection"/>
+        /// <seealso cref="OpenSharedConnection"/>
+        /// <seealso cref="KeepConnectionAlive"/>
         public void CloseSharedConnection()
         {
             if (_sharedConnectionDepth > 0)
@@ -683,7 +711,7 @@ namespace PetaPoco
         ///     Override this method to provide custom logging of opening connection, or
         ///     to provide a proxy IDbConnection.
         /// </remarks>
-        public virtual IDbConnection OnConnectionOpened(IDbConnection conn)
+        public virtual DbConnection OnConnectionOpened(DbConnection conn)
         {
             var args = new DbConnectionEventArgs(conn);
             ConnectionOpened?.Invoke(this, args);
