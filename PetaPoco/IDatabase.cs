@@ -7,7 +7,7 @@ namespace PetaPoco
     /// <summary>
     ///     Represents the core functionality of PetaPoco.
     /// </summary>
-    public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc
+    public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection
     {
         /// <summary>
         ///     Gets the default mapper. (Default is <see cref="ConventionMapper" />)

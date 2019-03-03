@@ -722,7 +722,7 @@ namespace PetaPoco
         ///     Called when DB connection closed
         /// </summary>
         /// <param name="conn">The soon to be closed IDBConnection</param>
-        public virtual void OnConnectionClosing(IDbConnection conn)
+        public virtual void OnConnectionClosing(DbConnection conn)
         {
             ConnectionClosing?.Invoke(this, new DbConnectionEventArgs(conn));
         }
