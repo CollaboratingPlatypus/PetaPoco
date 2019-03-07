@@ -26,9 +26,9 @@ namespace PetaPoco
 
     public class DbConnectionEventArgs : EventArgs
     {
-        public DbConnection Connection { get; set; }
+        public IDbConnection Connection { get; set; }
 
-        public DbConnectionEventArgs(DbConnection connection)
+        public DbConnectionEventArgs(IDbConnection connection)
         {
             Connection = connection;
         }
