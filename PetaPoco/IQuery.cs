@@ -1,9 +1,3 @@
-// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/15</date>
-
 using System;
 using System.Collections.Generic;
 
@@ -12,14 +6,14 @@ namespace PetaPoco
     public interface IQuery
     {
         /// <summary>
-        ///     Runs a SELECT * query, returning the results as an IEnumerable collection
+        ///     Steams the result of a select all query (SELECT *).
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <returns>An enumerable collection of result records</returns>
+        /// <typeparam name="T">The poco type.</typeparam>
+        /// <returns>An enumerable collection of POCOs</returns>
         /// <remarks>
         ///     For some DB providers, care should be taken to not start a new Query before finishing with
         ///     and disposing the previous one. In cases where this is an issue, consider using Fetch which
-        ///     returns the results as a List rather than an IEnumerable.
+        ///     returns the results as a List rather than streaming as an IEnumerable.
         /// </remarks>
         IEnumerable<T> Query<T>();
 
@@ -745,18 +739,18 @@ namespace PetaPoco
         /// <returns>The first record in the result set, or default(T) if no matching rows</returns>
         T FirstOrDefault<T>(Sql sql);
 
-        /// <summary> 
-        /// Perform a multi-results set query 
-        /// </summary> 
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param> 
-        /// <returns>A GridReader to be queried</returns> 
+        /// <summary>
+        ///     Perform a multi-results set query
+        /// </summary>
+        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+        /// <returns>A GridReader to be queried</returns>
         IGridReader QueryMultiple(Sql sql);
 
-        /// <summary> 
-        /// Perform a multi-results set query 
-        /// </summary> 
-        /// <param name="sql">The SQL query to be executed</param> 
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param> 
+        /// <summary>
+        ///     Perform a multi-results set query
+        /// </summary>
+        /// <param name="sql">The SQL query to be executed</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <returns>A GridReader to be queried</returns>
         IGridReader QueryMultiple(string sql, params object[] args);
     }
