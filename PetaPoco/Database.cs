@@ -24,7 +24,7 @@ namespace PetaPoco
         private IMapper _defaultMapper;
         private string _connectionString;
         private IProvider _provider;
-        private DbConnection _sharedConnection;
+        private IDbConnection _sharedConnection;
         private IDbTransaction _transaction;
         private int _sharedConnectionDepth;
         private int _transactionDepth;
@@ -345,9 +345,10 @@ namespace PetaPoco
 
                 if (_sharedConnection.State == ConnectionState.Closed)
                 {
-                    if (isAsync)
-                        await _sharedConnection.OpenAsync().ConfigureAwait(false);
-                    else 
+                    var con = _sharedConnection as DbConnection;
+                    if (isAsync && con != null)
+                        await con.OpenAsync().ConfigureAwait(false);
+                    else
                         _sharedConnection.Open();
                 }
 
@@ -711,7 +712,7 @@ namespace PetaPoco
         ///     Override this method to provide custom logging of opening connection, or
         ///     to provide a proxy IDbConnection.
         /// </remarks>
-        public virtual DbConnection OnConnectionOpened(DbConnection conn)
+        public virtual IDbConnection OnConnectionOpened(IDbConnection conn)
         {
             var args = new DbConnectionEventArgs(conn);
             ConnectionOpened?.Invoke(this, args);
@@ -722,7 +723,7 @@ namespace PetaPoco
         ///     Called when DB connection closed
         /// </summary>
         /// <param name="conn">The soon to be closed IDBConnection</param>
-        public virtual void OnConnectionClosing(DbConnection conn)
+        public virtual void OnConnectionClosing(IDbConnection conn)
         {
             ConnectionClosing?.Invoke(this, new DbConnectionEventArgs(conn));
         }
@@ -1080,30 +1081,10 @@ namespace PetaPoco
 
         #region operation: Query
 
-        /// <summary>
-        ///     Runs a SELECT * query, returning the results as an IEnumerable collection
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <returns>An enumerable collection of result records</returns>
-        /// <remarks>
-        ///     For some DB providers, care should be taken to not start a new Query before finishing with
-        ///     and disposing the previous one. In cases where this is an issue, consider using Fetch which
-        ///     returns the results as a List rather than an IEnumerable.
-        /// </remarks>
+        /// <inheritdoc />
         public IEnumerable<T> Query<T>() => Query<T>(string.Empty);
 
-        /// <summary>
-        ///     Runs an SQL query, returning the results as an IEnumerable collection
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>An enumerable collection of result records</returns>
-        /// <remarks>
-        ///     For some DB providers, care should be taken to not start a new Query before finishing with
-        ///     and disposing the previous one. In cases where this is an issue, consider using Fetch which
-        ///     returns the results as a List rather than an IEnumerable.
-        /// </remarks>
+        /// <inheritdoc />
         public IEnumerable<T> Query<T>(string sql, params object[] args)
         {
             if (EnableAutoSelect)
