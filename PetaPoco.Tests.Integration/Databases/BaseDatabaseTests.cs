@@ -135,6 +135,7 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public void OpenShredConnection_WhenCalled_ShouldBeValid()
         {
+            DB.Connection.ShouldBeNull();
             DB.OpenSharedConnection();
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
@@ -143,6 +144,7 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public async void OpenSharedConnectionAsync_WhenCalled_ShouldBeValid()
         {
+            DB.Connection.ShouldBeNull();
             await DB.OpenSharedConnectionAsync();
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
