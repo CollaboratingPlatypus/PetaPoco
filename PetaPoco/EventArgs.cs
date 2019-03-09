@@ -34,15 +34,19 @@ namespace PetaPoco
         }
     }
 
+    /// <inheritdoc />
     public class ExceptionEventArgs : EventArgs
     {
+        /// <summary>
+        ///     A flag which specifies whether the exception should be raised or ignored.
+        /// </summary>
         public bool Raise { get; set; } = true;
 
+        /// <summary>
+        ///     The exception which was caught.
+        /// </summary>
         public Exception Exception { get; }
 
-        public ExceptionEventArgs(Exception ex)
-        {
-            Exception = ex;
-        }
+        public ExceptionEventArgs(Exception ex) => Exception = ex;
     }
 }

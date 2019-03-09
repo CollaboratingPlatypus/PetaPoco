@@ -6,10 +6,12 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
+
 #if !NETSTANDARD
 using System.Configuration;
 #endif
@@ -294,7 +296,7 @@ namespace PetaPoco
         }
 
         #endregion
-        
+
         #region Internal operations
 
         internal void DoPreExecute(IDbCommand cmd)
@@ -303,7 +305,7 @@ namespace PetaPoco
             {
                 cmd.CommandTimeout = OneTimeCommandTimeout > 0 ? OneTimeCommandTimeout : CommandTimeout;
                 OneTimeCommandTimeout = 0;
-            }           
+            }
 
             OnExecutingCommand(cmd);
 
@@ -316,10 +318,10 @@ namespace PetaPoco
         #region Connection Management
 
         /// <summary>
-        ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection"/>
-        ///     or <see cref="Dispose"/> is called.
+        ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection" />
+        ///     or <see cref="Dispose" /> is called.
         /// </summary>
-        /// <seealso cref="OpenSharedConnection"/>
+        /// <seealso cref="OpenSharedConnection" />
         public bool KeepConnectionAlive { get; set; }
 
         /// <summary>
@@ -328,12 +330,53 @@ namespace PetaPoco
         /// <returns>
         ///     The currently open connection, or <c>Null</c>.
         /// </returns>
-        /// <seealso cref="OpenSharedConnection"/>
-        /// <seealso cref="CloseSharedConnection"/>
-        /// <seealso cref="KeepConnectionAlive"/>
+        /// <seealso cref="OpenSharedConnection" />
+        /// <seealso cref="CloseSharedConnection" />
+        /// <seealso cref="KeepConnectionAlive" />
         public IDbConnection Connection => _sharedConnection;
 
-        private async Task OpenSharedConnectionInternal(bool isAsync)
+        /// <summary>
+        ///     Opens a connection that will be used for all subsequent queries.
+        /// </summary>
+        /// <remarks>
+        ///     Calls to <see cref="OpenSharedConnection" />/<see cref="CloseSharedConnection" /> are reference
+        ///     counted and should be balanced
+        /// </remarks>
+        /// <seealso cref="Connection" />
+        /// <seealso cref="CloseSharedConnection" />
+        /// <seealso cref="KeepConnectionAlive" />
+        public void OpenSharedConnection()
+        {
+            if (_sharedConnectionDepth == 0)
+            {
+                _sharedConnection = _factory.CreateConnection();
+                _sharedConnection.ConnectionString = _connectionString;
+
+                if (_sharedConnection.State == ConnectionState.Broken)
+                    _sharedConnection.Close();
+
+                if (_sharedConnection.State == ConnectionState.Closed)
+                    _sharedConnection.Open();
+
+                _sharedConnection = OnConnectionOpened(_sharedConnection);
+
+                if (KeepConnectionAlive)
+                    _sharedConnectionDepth++;
+            }
+
+            _sharedConnectionDepth++;
+        }
+
+#if ASYNC
+        /// <summary>
+        ///     The async version of <see cref="OpenSharedConnection" />.
+        /// </summary>
+        public Task OpenSharedConnectionAsync() => OpenSharedConnectionAsync(CancellationToken.None);
+
+        /// <summary>
+        ///     The async version of <see cref="OpenSharedConnection" />.
+        /// </summary>
+        public async Task OpenSharedConnectionAsync(CancellationToken cancellationToken)
         {
             if (_sharedConnectionDepth == 0)
             {
@@ -346,8 +389,8 @@ namespace PetaPoco
                 if (_sharedConnection.State == ConnectionState.Closed)
                 {
                     var con = _sharedConnection as DbConnection;
-                    if (isAsync && con != null)
-                        await con.OpenAsync().ConfigureAwait(false);
+                    if (con != null)
+                        await con.OpenAsync(cancellationToken).ConfigureAwait(false);
                     else
                         _sharedConnection.Open();
                 }
@@ -360,41 +403,18 @@ namespace PetaPoco
 
             _sharedConnectionDepth++;
         }
+#endif
 
-        /// <summary>
-        ///     Opens a connection that will be used for all subsequent queries.
-        /// </summary>
-        /// <remarks>
-        ///     Calls to <see cref="OpenSharedConnection"/>/<see cref="CloseSharedConnection"/> are reference
-        ///     counted and should be balanced
-        /// </remarks>
-        /// <seealso cref="Connection"/>
-        /// <seealso cref="CloseSharedConnection"/>
-        /// <seealso cref="KeepConnectionAlive"/>
-        public void OpenSharedConnection()
-        {
-            // Executes immediately
-            OpenSharedConnectionInternal(false).Wait();
-        }
-
-        /// <summary>
-        ///     The async version of <see cref="OpenSharedConnection"/>.
-        /// </summary>
-        public Task OpenSharedConnectionAsync()
-        {
-            return OpenSharedConnectionInternal(true);
-        }
-        
         /// <summary>
         ///     Releases the shared connection.
         /// </summary>
         /// <remarks>
-        ///     Calls to <see cref="OpenSharedConnection"/>/<see cref="CloseSharedConnection"/> are reference
+        ///     Calls to <see cref="OpenSharedConnection" />/<see cref="CloseSharedConnection" /> are reference
         ///     counted and should be balanced
         /// </remarks>
-        /// <seealso cref="Connection"/>
-        /// <seealso cref="OpenSharedConnection"/>
-        /// <seealso cref="KeepConnectionAlive"/>
+        /// <seealso cref="Connection" />
+        /// <seealso cref="OpenSharedConnection" />
+        /// <seealso cref="KeepConnectionAlive" />
         public void CloseSharedConnection()
         {
             if (_sharedConnectionDepth > 0)
@@ -410,10 +430,10 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Alias for <see cref="CloseSharedConnection"/>.
+        ///     Alias for <see cref="CloseSharedConnection" />.
         /// </summary>
         /// <remarks>
-        ///     Only useful when making use of the .net `using` language feature. 
+        ///     Only useful when making use of the .net `using` language feature.
         /// </remarks>
         public void Dispose()
         {
@@ -636,7 +656,6 @@ namespace PetaPoco
 
         public IDbCommand CreateCommand(IDbConnection connection, CommandType commandType, string sql, params object[] args)
         {
-            // Create the command
             var cmd = connection.CreateCommand();
             cmd.Connection = connection;
             cmd.CommandType = commandType;
@@ -648,9 +667,9 @@ namespace PetaPoco
                     // Perform named argument replacements
                     if (EnableNamedParams)
                     {
-                        var new_args = new List<object>();
-                        sql = ParametersHelper.ProcessQueryParams(sql, args, new_args);
-                        args = new_args.ToArray();
+                        var newArgs = new List<object>();
+                        sql = ParametersHelper.ProcessQueryParams(sql, args, newArgs);
+                        args = newArgs.ToArray();
                     }
 
                     // Perform parameter prefix replacements
@@ -663,21 +682,15 @@ namespace PetaPoco
                     break;
                 case CommandType.TableDirect:
                     break;
-                default:
-                    break;
             }
 
             cmd.CommandText = sql;
 
             foreach (var item in args)
-            {
                 AddParam(cmd, item, null);
-            }
 
-            // Notify the DB type
             _provider.PreExecute(cmd);
 
-            // Call logging
             if (!string.IsNullOrEmpty(sql))
                 DoPreExecute(cmd);
 
@@ -1093,7 +1106,131 @@ namespace PetaPoco
             return ExecuteReader<T>(CommandType.Text, sql, args);
         }
 
-        protected IEnumerable<T> ExecuteReader<T>(CommandType commandType, string sql, params object[] args)
+        /// <inheritdoc />
+        public IEnumerable<T> Query<T>(Sql sql) => Query<T>(sql.SQL, sql.Arguments);
+
+#if ASYNC        
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback) =>
+            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty, new object[0]);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType) =>
+            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty, new object[0]);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken) =>
+            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty, new object[0]);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken) =>
+            ExecuteReaderAsync(receivePocoCallback, commandType, cancellationToken, string.Empty, new object[0]);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, string sql, params object[] args) =>
+            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, string sql, params object[] args) =>
+            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, string sql, params object[] args) =>
+            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, string sql,
+            params object[] args) => ExecuteReaderAsync(receivePocoCallback, commandType, cancellationToken, sql, args);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, Sql sql) =>
+            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, Sql sql) =>
+            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, Sql sql) =>
+            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
+            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CommandType commandType, CancellationToken cancellationToken, string sql,
+            object[] args)
+        {
+            await OpenSharedConnectionAsync(cancellationToken);
+            try
+            {
+                using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
+                {
+                    IDataReader reader;
+                    DbDataReader readerAsync;
+                    var pd = PocoData.ForType(typeof(T), _defaultMapper);
+                    var cmdAsync = cmd as DbCommand;
+
+                    try
+                    {
+                        if (cmdAsync != null)
+                            reader = await cmdAsync.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+                        else
+                            reader = cmd.ExecuteReader();
+                        OnExecutedCommand(cmd);
+                    }
+                    catch (Exception e)
+                    {
+                        if (OnException(e))
+                            throw;
+                        return;
+                    }
+
+                    readerAsync = reader as DbDataReader;
+                    var factory =
+                        pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
+                            _defaultMapper) as Func<IDataReader, T>;
+
+                    using (reader)
+                    {
+                        while (true)
+                        {
+                            T poco;
+                            try
+                            {
+                                if (readerAsync != null)
+                                {
+                                    if (!await readerAsync.ReadAsync(cancellationToken).ConfigureAwait(false))
+                                        return;
+                                }
+                                else
+                                {
+                                    if (!reader.Read())
+                                        return;
+                                }
+
+                                poco = factory(reader);
+                            }
+                            catch (Exception e)
+                            {
+                                if (OnException(e))
+                                    throw;
+                                return;
+                            }
+
+                            processPoco(poco);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                CloseSharedConnection();
+            }
+        }
+#endif
+        
+        protected virtual IEnumerable<T> ExecuteReader<T>(CommandType commandType, string sql, params object[] args)
         {
             OpenSharedConnection();
             try
@@ -1143,22 +1280,6 @@ namespace PetaPoco
             {
                 CloseSharedConnection();
             }
-        }
-
-        /// <summary>
-        ///     Runs an SQL query, returning the results as an IEnumerable collection
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">An SQL builder object representing the base SQL query and it's arguments</param>
-        /// <returns>An enumerable collection of result records</returns>
-        /// <remarks>
-        ///     For some DB providers, care should be taken to not start a new Query before finishing with
-        ///     and disposing the previous one. In cases where this is an issue, consider using Fetch which
-        ///     returns the results as a List rather than an IEnumerable.
-        /// </remarks>
-        public IEnumerable<T> Query<T>(Sql sql)
-        {
-            return Query<T>(sql.SQL, sql.Arguments);
         }
 
         #endregion

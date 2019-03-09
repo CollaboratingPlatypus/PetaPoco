@@ -16,7 +16,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
         /// </summary>
-        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandBehavior behavior);
+        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType);
         
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
@@ -26,7 +26,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
         /// </summary>
-        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandBehavior behavior, CancellationToken cancellationToken);
+        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
@@ -36,7 +36,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
         /// </summary>
-        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandBehavior behavior, string sql, params object[] args);
+        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, string sql, params object[] args);
         
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
@@ -46,7 +46,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
         /// </summary>
-        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandBehavior behavior, CancellationToken cancellationToken, string sql, params object[] args);
+        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
@@ -56,7 +56,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
         /// </summary>
-        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandBehavior behavior, Sql sql);
+        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, Sql sql);
         
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
@@ -66,7 +66,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
         /// </summary>
-        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandBehavior behavior, CancellationToken cancellationToken, Sql sql);
+        Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, Sql sql);
         
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}()" />.
