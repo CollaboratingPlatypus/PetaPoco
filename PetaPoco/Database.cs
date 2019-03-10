@@ -1112,51 +1112,57 @@ namespace PetaPoco
 #if ASYNC        
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback) =>
-            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty, new object[0]);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType) =>
-            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty, new object[0]);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken) =>
-            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty, new object[0]);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken) =>
-            ExecuteReaderAsync(receivePocoCallback, commandType, cancellationToken, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, commandType, cancellationToken, string.Empty, new object[0]);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, string sql, params object[] args) =>
-            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, string sql, params object[] args) => 
+            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, string sql, params object[] args) =>
-            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, sql, args);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, string sql, params object[] args) => 
+            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, string sql, params object[] args) =>
-            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, string sql, params object[] args) => 
+            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, string sql,
-            params object[] args) => ExecuteReaderAsync(receivePocoCallback, commandType, cancellationToken, sql, args);
+            params object[] args)
+        {
+            if (EnableAutoSelect)
+                sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
+            
+            return ExecuteReaderAsync(receivePocoCallback, commandType, cancellationToken, sql, args);
+        }
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, Sql sql) =>
-            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
+            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, Sql sql) =>
-            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, Sql sql) =>
-            ExecuteReaderAsync(receivePocoCallback, CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
+            QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
-            ExecuteReaderAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+            QueryAsync(receivePocoCallback, commandType, cancellationToken, sql.SQL, sql.Arguments);
 
         protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CommandType commandType, CancellationToken cancellationToken, string sql,
             object[] args)
