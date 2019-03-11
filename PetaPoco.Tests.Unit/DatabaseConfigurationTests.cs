@@ -437,5 +437,24 @@ namespace PetaPoco.Tests.Unit
             db.ConnectionString.ShouldBe(connString);
             db.Provider.ShouldBeOfType<FakeProvider>();
         }
+
+        [Fact]
+        public void UsingConnectionWithProviderName_AfterCreate_InstanceShouldBeValid()
+        {
+            DatabaseProvider.RegisterCustomProvider<FakeProvider>("fake");
+            try
+            {
+                var connString = "Data Source = foo";
+                var connection = new SqlConnection(connString);
+                var db = new Database(config.UsingConnection(connection).UsingProviderName("FakeProvider"));
+
+                db.ConnectionString.ShouldBe(connString);
+                db.Provider.ShouldBeOfType<FakeProvider>();
+            }
+            finally
+            {
+                DatabaseProvider.ClearCustomProviders();
+            }
+        }
     }
 }

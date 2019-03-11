@@ -94,7 +94,7 @@ namespace PetaPoco.Tests.Unit
                 }
                 catch (Exception e)
                 {
-                    e.Message.ShouldContain("Either a provider name or provider must be registered");
+                    e.Message.ShouldContain("Unable to locate a provider");
                     throw;
                 }
             });
