@@ -890,7 +890,111 @@ namespace PetaPoco
             SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
 
         /// <inheritdoc />
-        public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
+        public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) => 
+            SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
+
+#if ASYNC
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>() => 
+            FetchAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
+
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>(CommandType commandType) => 
+            FetchAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
+
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken) => 
+            FetchAsync<T>(CommandType.Text, cancellationToken, string.Empty);
+
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken) => 
+            FetchAsync<T>(commandType, cancellationToken, string.Empty);
+
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>(string sql, params object[] args) => 
+            FetchAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, string sql, params object[] args) => 
+            FetchAsync<T>(commandType, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) => 
+            FetchAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public async Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
+        {
+            var pocos = new List<T>();
+            await QueryAsync<T>(p => pocos.Add(p), commandType, cancellationToken, sql, args);
+            return pocos;
+        }
+
+        public Task<List<T>> FetchAsync<T>(Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, long page, long itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+#endif
 
         #endregion
 
@@ -909,11 +1013,9 @@ namespace PetaPoco
         /// <param name="sqlPage">Outputs the SQL statement to retrieve a single page of matching rows</param>
         private void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
         {
-            // Add auto select clause
             if (EnableAutoSelect)
                 sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
 
-            // Split the SQL
             SQLParts parts;
             if (!Provider.PagingUtility.SplitSQL(sql, out parts))
                 throw new Exception("Unable to parse SQL statement for paged query");
@@ -922,22 +1024,7 @@ namespace PetaPoco
             sqlCount = parts.SqlCount;
         }
 
-        /// <summary>
-        ///     Retrieves a page of records	and the total number of available records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <param name="sqlCount">The SQL to retrieve the total number of records</param>
-        /// <param name="countArgs">Arguments to any embedded parameters in the sqlCount statement</param>
-        /// <param name="sqlPage">The SQL To retrieve a single page of results</param>
-        /// <param name="pageArgs">Arguments to any embedded parameters in the sqlPage statement</param>
-        /// <returns>A Page of results</returns>
-        /// <remarks>
-        ///     This method allows separate SQL statements to be explicitly provided for the two parts of the page query.
-        ///     The page and itemsPerPage parameters are not used directly and are used simply to populate the returned Page
-        ///     object.
-        /// </remarks>
+        /// <inheritdoc />
         public Page<T> Page<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs)
         {
             // Save the one-time command time out and use it for both queries
@@ -952,143 +1039,48 @@ namespace PetaPoco
             };
             result.TotalPages = result.TotalItems / itemsPerPage;
 
-            if ((result.TotalItems % itemsPerPage) != 0)
+            if (result.TotalItems % itemsPerPage != 0)
                 result.TotalPages++;
 
             OneTimeCommandTimeout = saveTimeout;
 
-            // Get the records
             result.Items = Fetch<T>(sqlPage, pageArgs);
 
-            // Done
             return result;
         }
 
-        /// <summary>
-        ///     Retrieves a page of records	and the total number of available records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <returns>A Page of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify a default SELECT * statement to only retrieve the
-        ///     records for the specified page.  It will also execute a second query to retrieve the
-        ///     total number of records in the result set.
-        /// </remarks>
-        public Page<T> Page<T>(long page, long itemsPerPage) => Page<T>(page, itemsPerPage, String.Empty);
+        /// <inheritdoc />
+        public Page<T> Page<T>(long page, long itemsPerPage) => Page<T>(page, itemsPerPage, string.Empty);
 
-        /// <summary>
-        ///     Retrieves a page of records	and the total number of available records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <param name="sql">The base SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>A Page of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify the supplied SELECT statement to only retrieve the
-        ///     records for the specified page.  It will also execute a second query to retrieve the
-        ///     total number of records in the result set.
-        /// </remarks>
+        /// <inheritdoc />
         public Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args)
         {
-            string sqlCount, sqlPage;
-            BuildPageQueries<T>((page - 1) * itemsPerPage, itemsPerPage, sql, ref args, out sqlCount, out sqlPage);
+            BuildPageQueries<T>((page - 1) * itemsPerPage, itemsPerPage, sql, ref args, out var sqlCount, out var sqlPage);
             return Page<T>(page, itemsPerPage, sqlCount, args, sqlPage, args);
         }
 
-        /// <summary>
-        ///     Retrieves a page of records	and the total number of available records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <param name="sql">An SQL builder object representing the base SQL query and it's arguments</param>
-        /// <returns>A Page of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify the supplied SELECT statement to only retrieve the
-        ///     records for the specified page.  It will also execute a second query to retrieve the
-        ///     total number of records in the result set.
-        /// </remarks>
-        public Page<T> Page<T>(long page, long itemsPerPage, Sql sql)
-        {
-            return Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
-        }
+        /// <inheritdoc />
+        public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) => Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 
-        /// <summary>
-        ///     Retrieves a page of records	and the total number of available records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="page">The 1 based page number to retrieve</param>
-        /// <param name="itemsPerPage">The number of records per page</param>
-        /// <param name="sqlCount">An SQL builder object representing the SQL to retrieve the total number of records</param>
-        /// <param name="sqlPage">An SQL builder object representing the SQL to retrieve a single page of results</param>
-        /// <returns>A Page of results</returns>
-        /// <remarks>
-        ///     This method allows separate SQL statements to be explicitly provided for the two parts of the page query.
-        ///     The page and itemsPerPage parameters are not used directly and are used simply to populate the returned Page
-        ///     object.
-        /// </remarks>
-        public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
-        {
-            return Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
-        }
+        /// <inheritdoc />
+        public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) => Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
         #endregion
 
         #region operation: SkipTake
 
-        /// <summary>
-        ///     Retrieves a range of records from result set
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="skip">The number of rows at the start of the result set to skip over</param>
-        /// <param name="take">The number of rows to retrieve</param>
-        /// <returns>A List of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify a default SELECT * statement to only retrieve the
-        ///     records for the specified range.
-        /// </remarks>
-        public List<T> SkipTake<T>(long skip, long take) => SkipTake<T>(skip, take, String.Empty);
+        /// <inheritdoc />
+        public List<T> SkipTake<T>(long skip, long take) => SkipTake<T>(skip, take, string.Empty);
 
-        /// <summary>
-        ///     Retrieves a range of records from result set
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="skip">The number of rows at the start of the result set to skip over</param>
-        /// <param name="take">The number of rows to retrieve</param>
-        /// <param name="sql">The base SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>A List of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify the supplied SELECT statement to only retrieve the
-        ///     records for the specified range.
-        /// </remarks>
+        /// <inheritdoc />
         public List<T> SkipTake<T>(long skip, long take, string sql, params object[] args)
         {
-            string sqlCount, sqlPage;
-            BuildPageQueries<T>(skip, take, sql, ref args, out sqlCount, out sqlPage);
+            BuildPageQueries<T>(skip, take, sql, ref args, out var sqlCount, out var sqlPage);
             return Fetch<T>(sqlPage, args);
         }
 
-        /// <summary>
-        ///     Retrieves a range of records from result set
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="skip">The number of rows at the start of the result set to skip over</param>
-        /// <param name="take">The number of rows to retrieve</param>
-        /// <param name="sql">An SQL builder object representing the base SQL query and it's arguments</param>
-        /// <returns>A List of results</returns>
-        /// <remarks>
-        ///     PetaPoco will automatically modify the supplied SELECT statement to only retrieve the
-        ///     records for the specified range.
-        /// </remarks>
-        public List<T> SkipTake<T>(long skip, long take, Sql sql)
-        {
-            return SkipTake<T>(skip, take, sql.SQL, sql.Arguments);
-        }
+        /// <inheritdoc />
+        public List<T> SkipTake<T>(long skip, long take, Sql sql) => SkipTake<T>(skip, take, sql.SQL, sql.Arguments);
 
         #endregion
 
@@ -1112,19 +1104,19 @@ namespace PetaPoco
 #if ASYNC        
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType) =>
-            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken) =>
-            QueryAsync(receivePocoCallback, commandType, cancellationToken, string.Empty, new object[0]);
+            QueryAsync(receivePocoCallback, commandType, cancellationToken, string.Empty);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, string sql, params object[] args) => 
@@ -1234,8 +1226,102 @@ namespace PetaPoco
                 CloseSharedConnection();
             }
         }
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>() =>
+            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType) =>
+            QueryAsyncAdapted<T>(commandType, CancellationToken.None, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken) =>
+            QueryAsyncAdapted<T>(CommandType.Text, cancellationToken, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken) =>
+            QueryAsyncAdapted<T>(commandType, cancellationToken, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(string sql, params object[] args) => 
+            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, string sql, params object[] args) => 
+            QueryAsyncAdapted<T>(commandType, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, string sql, params object[] args) => 
+            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
+        {
+            if (EnableAutoSelect)
+                sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
+            
+            return ExecuteReaderAsyncAdapted<T>(commandType, cancellationToken, sql, args);
+        }
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(Sql sql) =>
+            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, Sql sql) =>
+            QueryAsyncAdapted<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, Sql sql) =>
+            QueryAsyncAdapted<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
+            QueryAsyncAdapted<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
+
+        protected virtual async Task<IEnumerableAsyncAdapter<T>> ExecuteReaderAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql,
+            object[] args)
+        {
+            await OpenSharedConnectionAsync(cancellationToken);
+            var cmd = CreateCommand(_sharedConnection, commandType, sql, args);
+            IDataReader reader = null;
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+
+            try
+            {
+                if (cmd is DbCommand cmdAsync)
+                    reader = await cmdAsync.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+                else
+                    reader = cmd.ExecuteReader();
+                
+                OnExecutedCommand(cmd);
+            }
+            catch (Exception e)
+            {
+                if (OnException(e))
+                    throw;
+                try
+                {
+                    cmd?.Dispose();
+                    reader?.Dispose();
+                }
+                catch
+                {
+                    // ignored
+                }
+                return EnumerableAsyncAdapter<T>.Empty();
+            }
+
+            var factory =
+                pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
+                    _defaultMapper) as Func<IDataReader, T>;
+
+            return new EnumerableAsyncAdapter<T>(this, cmd, reader, factory);
+        }
+
 #endif
-        
+
         protected virtual IEnumerable<T> ExecuteReader<T>(CommandType commandType, string sql, params object[] args)
         {
             OpenSharedConnection();
@@ -1597,7 +1683,7 @@ namespace PetaPoco
                             AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
                         }
 
-                        string outputClause = String.Empty;
+                        string outputClause = string.Empty;
                         if (autoIncrement)
                         {
                             outputClause = _provider.GetInsertOutputClause(primaryKeyName);
