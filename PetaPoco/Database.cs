@@ -1228,35 +1228,35 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>() =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>() =>
             QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType) =>
             QueryAsyncAdapted<T>(commandType, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken) =>
             QueryAsyncAdapted<T>(CommandType.Text, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken) =>
             QueryAsyncAdapted<T>(commandType, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(string sql, params object[] args) => 
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(string sql, params object[] args) => 
             QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, string sql, params object[] args) => 
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, string sql, params object[] args) => 
             QueryAsyncAdapted<T>(commandType, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, string sql, params object[] args) => 
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, string sql, params object[] args) => 
             QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
         {
             if (EnableAutoSelect)
                 sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
@@ -1265,22 +1265,22 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(Sql sql) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(Sql sql) =>
             QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, Sql sql) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, Sql sql) =>
             QueryAsyncAdapted<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, Sql sql) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, Sql sql) =>
             QueryAsyncAdapted<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
+        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
             QueryAsyncAdapted<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
 
-        protected virtual async Task<IEnumerableAsyncAdapter<T>> ExecuteReaderAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql,
+        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql,
             object[] args)
         {
             await OpenSharedConnectionAsync(cancellationToken);
@@ -1310,14 +1310,14 @@ namespace PetaPoco
                 {
                     // ignored
                 }
-                return EnumerableAsyncAdapter<T>.Empty();
+                return AsyncReader<T>.Empty();
             }
 
             var factory =
                 pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
                     _defaultMapper) as Func<IDataReader, T>;
 
-            return new EnumerableAsyncAdapter<T>(this, cmd, reader, factory);
+            return new AsyncReader<T>(this, cmd, reader, factory);
         }
 
 #endif

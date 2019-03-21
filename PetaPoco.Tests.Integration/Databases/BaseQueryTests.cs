@@ -356,9 +356,9 @@ namespace PetaPoco.Tests.Integration.Databases
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<dynamic>();
-            using(var asyncAdapter = await DB.QueryAsyncAdapted<dynamic>(sql, OrderStatus.Pending))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
+            using(var asyncReader = await DB.QueryAsyncAdapted<dynamic>(sql, OrderStatus.Pending))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
             results.Count.ShouldBe(3);
 
             var order = (IDictionary<string, object>) results.First();
@@ -383,9 +383,9 @@ namespace PetaPoco.Tests.Integration.Databases
                     OrderStatus.Pending);
 
             var results = new List<dynamic>();
-            using(var asyncAdapter = await DB.QueryAsyncAdapted<dynamic>(sql))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
+            using(var asyncReader = await DB.QueryAsyncAdapted<dynamic>(sql))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
             
             results.Count.ShouldBe(3);
 
@@ -407,9 +407,9 @@ namespace PetaPoco.Tests.Integration.Databases
             var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<Order>();
-            using(var asyncAdapter = await DB.QueryAsyncAdapted<Order>(sql, OrderStatus.Pending))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
+            using(var asyncReader = await DB.QueryAsyncAdapted<Order>(sql, OrderStatus.Pending))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
             
             results.Count.ShouldBe(3);
             results.ForEach(o =>
@@ -437,9 +437,9 @@ namespace PetaPoco.Tests.Integration.Databases
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
             var results = new List<Order>();
-            using(var asyncAdapter = await DB.QueryAsyncAdapted<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
+            using(var asyncReader = await DB.QueryAsyncAdapted<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
             
             results.Count.ShouldBe(3);
             results.ForEach(o =>
@@ -461,9 +461,9 @@ namespace PetaPoco.Tests.Integration.Databases
                 OrderStatus.Pending);
             
             var results = new List<Order>();
-            using(var asyncAdapter = await DB.QueryAsyncAdapted<Order>(sql))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
+            using(var asyncReader = await DB.QueryAsyncAdapted<Order>(sql))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
                 
             results.Count.ShouldBe(3);
 
@@ -487,10 +487,10 @@ namespace PetaPoco.Tests.Integration.Databases
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<string>();
-            using (var asyncAdapter = await DB.QueryAsyncAdapted<string>(sql, OrderStatus.Pending))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
-
+            using (var asyncReader = await DB.QueryAsyncAdapted<string>(sql, OrderStatus.Pending))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
+            
             results.Count.ShouldBe(3);
             results.ForEach(po => po.ShouldStartWith("PO"));
         }
@@ -506,9 +506,9 @@ namespace PetaPoco.Tests.Integration.Databases
                 OrderStatus.Pending);
 
             var results = new List<string>();
-            using(var asyncAdapter = await DB.QueryAsyncAdapted<string>(sql))
-                while (asyncAdapter.HasRecords)
-                    results.Add(await asyncAdapter.Pull());
+            using(var asyncReader = await DB.QueryAsyncAdapted<string>(sql))
+                while (await asyncReader.ReadAsync())
+                    results.Add(asyncReader.Poco);
             
             results.Count.ShouldBe(3);
             results.ForEach(po => po.ShouldStartWith("PO"));

@@ -71,62 +71,62 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>();
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>();
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}()" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(string sql, params object[] args);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(string sql, params object[] args);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, string sql, params object[] args);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, string sql, params object[] args);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, string sql, params object[] args);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, string sql, params object[] args);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(string, object[])" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(Sql sql);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(Sql sql);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, Sql sql);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, Sql sql);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, Sql sql);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, Sql sql);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Query{T}(Sql)" />.
         /// </summary>
-        Task<IEnumerableAsyncAdapter<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql);
+        Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}()" />.
