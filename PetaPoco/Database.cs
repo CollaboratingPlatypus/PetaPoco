@@ -198,7 +198,10 @@ namespace PetaPoco
             IProvider provider = null;
             DbConnection connection = null;
             string providerName = null;
-
+#if !NETSTANDARD
+            ConnectionStringSettings entry = null;
+#endif
+            
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
             settings.TryGetSetting<DbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
@@ -206,24 +209,17 @@ namespace PetaPoco
             if (connection != null)
             {
                 SetupFromConnection(connection);
-
-                if (provider != null)
-                    Initialise(provider, defaultMapper);
-                else
-                    Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
             }
             else
             {
                 settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs);
 
 #if !NETSTANDARD
-                ConnectionStringSettings entry = null;
-                string connectionStringName = null;
-
-                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
-
                 if (_connectionString == null)
                 {
+                    string connectionStringName = null;
+                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
+
                     if (connectionStringName != null)
                     {
                         entry = ConfigurationManager.ConnectionStrings[connectionStringName];
@@ -240,28 +236,25 @@ namespace PetaPoco
 
                     _connectionString = entry.ConnectionString;
                 }
-
-                if (entry != null)
-                    InitialiseFromEntry(entry, defaultMapper);
-                else
-                    InitialiseWithProviderOrName();
 #else
                 if (_connectionString == null)
                     throw new InvalidOperationException("A connection string is required.");
-
-                InitialiseWithProviderOrName();
 #endif
 
-                void InitialiseWithProviderOrName()
-                {
-                    if (provider != null)
-                        Initialise(provider, defaultMapper);
-                    else if (providerName != null)
-                        Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
-                    else
-                        throw new InvalidOperationException("Either a provider name or provider must be registered.");
-                }
             }
+            
+            if (provider != null)
+                Initialise(provider, defaultMapper);
+            else if (providerName != null)
+                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+#if !NETSTANDARD
+            else if (entry != null)
+                InitialiseFromEntry(entry, defaultMapper);
+#endif
+            else if (connection != null)
+                Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+            else
+                throw new InvalidOperationException("Unable to locate a provider.");
 
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
@@ -295,7 +288,7 @@ namespace PetaPoco
             _defaultMapper = mapper ?? new ConventionMapper();
         }
 
-        #endregion
+#endregion
 
         #region Internal operations
 
