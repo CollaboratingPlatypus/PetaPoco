@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Threading.Tasks;
 using PetaPoco.Core;
 
 namespace PetaPoco
@@ -138,6 +139,13 @@ namespace PetaPoco
         ///     Starts a transaction scope, see GetTransaction() for recommended usage
         /// </summary>
         void BeginTransaction();
+        
+#if ASYNC
+        /// <summary>
+        ///     Async version of <see cref="BeginTransaction" />.
+        /// </summary>
+        Task BeginTransactionAsync();
+#endif
 
         /// <summary>
         ///     Aborts the entire outer most transaction scope

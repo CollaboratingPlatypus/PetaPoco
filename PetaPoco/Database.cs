@@ -39,7 +39,7 @@ namespace PetaPoco
 
         #endregion
 
-        #region Constructors
+#region Constructors
 
 #if !NETSTANDARD
         /// <summary>
@@ -290,7 +290,7 @@ namespace PetaPoco
 
 #endregion
 
-        #region Internal operations
+#region Internal operations
 
         internal void DoPreExecute(IDbCommand cmd)
         {
@@ -306,9 +306,9 @@ namespace PetaPoco
             _lastArgs = cmd.Parameters.Cast<IDataParameter>().Select(parameter => parameter.Value).ToArray();
         }
 
-        #endregion
+#endregion
 
-        #region Connection Management
+#region Connection Management
 
         /// <summary>
         ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection" />
@@ -435,42 +435,18 @@ namespace PetaPoco
             CloseSharedConnection();
         }
 
-        #endregion
+#endregion
 
-        #region Transaction Management
+#region Transaction Management
 
-        /// <summary>
-        ///     Gets the current transaction instance.
-        /// </summary>
-        /// <returns>
-        ///     The current transaction instance; else, <c>null</c> if not transaction is in progress.
-        /// </returns>
+        /// <inheritdoc />
         IDbTransaction ITransactionAccessor.Transaction => _transaction;
 
-        // Helper to create a transaction scope
-
-        /// <summary>
-        ///     Starts or continues a transaction.
-        /// </summary>
-        /// <returns>An ITransaction reference that must be Completed or disposed</returns>
-        /// <remarks>
-        ///     This method makes management of calls to Begin/End/CompleteTransaction easier.
-        ///     The usage pattern for this should be:
-        ///     using (var tx = db.GetTransaction())
-        ///     {
-        ///     // Do stuff
-        ///     db.Update(...);
-        ///     // Mark the transaction as complete
-        ///     tx.Complete();
-        ///     }
-        ///     Transactions can be nested but they must all be completed otherwise the entire
-        ///     transaction is aborted.
-        /// </remarks>
+        /// <inheritdoc />
         public ITransaction GetTransaction() => new Transaction(this);
 
         /// <summary>
-        ///     Called when a transaction starts.  Overridden by the T4 template generated database
-        ///     classes to ensure the same DB instance is used throughout the transaction.
+        ///     Called when a transaction starts.
         /// </summary>
         public virtual void OnBeginTransaction()
         {
@@ -484,10 +460,8 @@ namespace PetaPoco
         {
             TransactionEnding?.Invoke(this, new DbTransactionEventArgs(_transaction));
         }
-
-        /// <summary>
-        ///     Starts a transaction scope, see GetTransaction() for recommended usage
-        /// </summary>
+        
+        /// <inheritdoc />
         public void BeginTransaction()
         {
             _transactionDepth++;
@@ -501,6 +475,22 @@ namespace PetaPoco
             }
         }
 
+#if ASYNC
+        /// <inheritdoc />
+        public async Task BeginTransactionAsync()
+        {
+            _transactionDepth++;
+
+            if (_transactionDepth == 1)
+            {
+                await OpenSharedConnectionAsync();
+                _transaction = !_isolationLevel.HasValue ? _sharedConnection.BeginTransaction() : _sharedConnection.BeginTransaction(_isolationLevel.Value);
+                _transactionCancelled = false;
+                OnBeginTransaction();
+            }
+        }
+#endif
+        
         /// <summary>
         ///     Internal helper to cleanup transaction
         /// </summary>
@@ -519,13 +509,7 @@ namespace PetaPoco
             CloseSharedConnection();
         }
 
-        /// <summary>
-        ///     Aborts the entire outer most transaction scope
-        /// </summary>
-        /// <remarks>
-        ///     Called automatically by Transaction.Dispose()
-        ///     if the transaction wasn't completed.
-        /// </remarks>
+        /// <inheritdoc />
         public void AbortTransaction()
         {
             _transactionCancelled = true;
@@ -533,16 +517,14 @@ namespace PetaPoco
                 CleanupTransaction();
         }
 
-        /// <summary>
-        ///     Marks the current transaction scope as complete.
-        /// </summary>
+        /// <inheritdoc />
         public void CompleteTransaction()
         {
             if ((--_transactionDepth) == 0)
                 CleanupTransaction();
         }
 
-        #endregion
+#endregion
 
 #region Command Management
 
@@ -570,16 +552,15 @@ namespace PetaPoco
                     idbParam.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 else if (idbParam.ParameterName?.StartsWith(_paramPrefix) != true)
                     idbParam.ParameterName = idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
+                
                 cmd.Parameters.Add(idbParam);
             }
             else
             {
-                // Create a new parameter
                 var p = cmd.CreateParameter();
                 p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 SetParameterProperties(p, value, pi);
 
-                // Add to the collection
                 cmd.Parameters.Add(p);
             }
         }
@@ -592,9 +573,7 @@ namespace PetaPoco
                 p.Value = DBNull.Value;
 
                 if (pi?.PropertyType.Name == "Byte[]")
-                {
                     p.DbType = DbType.Binary;
-                }
             }
             else
             {
@@ -692,7 +671,7 @@ namespace PetaPoco
 
 #endregion
 
-        #region Exception Reporting and Logging
+#region Exception Reporting and Logging
 
         /// <summary>
         ///     Called if an exception occurs during processing of a DB operation.  Override to provide custom logging/handling.
@@ -751,12 +730,12 @@ namespace PetaPoco
         ///     Called on completion of command execution
         /// </summary>
         /// <param name="cmd">The IDbCommand that finished executing</param>
-        public virtual void OnExecutedCommand(IDbCommand cmd)
+        public void OnExecutedCommand(IDbCommand cmd)
         {
             CommandExecuted?.Invoke(this, new DbCommandEventArgs(cmd));
         }
 
-        #endregion
+#endregion
 
 #region operation: Execute 
 
@@ -1067,7 +1046,7 @@ namespace PetaPoco
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <param name="sqlCount">Outputs the SQL statement to query for the total number of matching rows</param>
         /// <param name="sqlPage">Outputs the SQL statement to retrieve a single page of matching rows</param>
-        private void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
+        protected virtual void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
         {
             if (EnableAutoSelect)
                 sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
@@ -1123,6 +1102,7 @@ namespace PetaPoco
 
 #if ASYNC
 
+        /// <inheritdoc />
         public async Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs)
         {
             var saveTimeout = OneTimeCommandTimeout;
@@ -1145,50 +1125,36 @@ namespace PetaPoco
             return result;
         }
 
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sqlCount, countArgs, sqlPage, pageArgs);
 
-        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage) => PageAsync<T>(cancellationToken, page, itemsPerPage, string.Empty);
 
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, string.Empty);
 
+        /// <inheritdoc />
         public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            BuildPageQueries<T>((page - 1) * itemsPerPage, itemsPerPage, sql, ref args, out var sqlCount, out var sqlPage);
+            return PageAsync<T>(cancellationToken, page, itemsPerPage, sqlCount, args, sqlPage, args);
         }
 
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, params object[] args)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, params object[] args) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sql, args);
 
-        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql) => PageAsync<T>(cancellationToken, page, itemsPerPage, sql.SQL, sql.Arguments);
 
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sql.SQL, sql.Arguments);
 
-        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) => PageAsync<T>(cancellationToken, page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
 #endif
         

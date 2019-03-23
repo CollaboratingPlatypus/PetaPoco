@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Providers;
 using PetaPoco.Tests.Integration.Models;
@@ -49,6 +50,39 @@ namespace PetaPoco.Tests.Integration.Databases
             page.Items.All(p => p.Name.StartsWith("Peta")).ShouldBeTrue();
         }
 
+        [Fact]
+        public virtual async Task PageAsync_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        {
+            AddPeople(15, 5);
+            var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+            var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} LIKE @0";
+
+            var page = await DB.PageAsync<Person>(2, 3, sql, "Peta%");
+            page.CurrentPage.ShouldBe(2);
+            page.TotalPages.ShouldBe(5);
+            page.TotalItems.ShouldBe(15);
+            page.ItemsPerPage.ShouldBe(3);
+            page.Items.Count.ShouldBe(3);
+            page.Items.All(p => p.Name.StartsWith("Peta")).ShouldBeTrue();
+        }
+
+        [Fact]
+        public virtual async Task PageAsync_ForPocoSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        {
+            AddPeople(15, 5);
+            var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+            var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} LIKE @0 " +
+                      $"ORDER BY {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)}";
+
+            var page = await DB.PageAsync<Person>(2, 3, sql, "Peta%");
+            page.CurrentPage.ShouldBe(2);
+            page.TotalPages.ShouldBe(5);
+            page.TotalItems.ShouldBe(15);
+            page.ItemsPerPage.ShouldBe(3);
+            page.Items.Count.ShouldBe(3);
+            page.Items.All(p => p.Name.StartsWith("Peta")).ShouldBeTrue();
+        }
+        
         [Fact]
         public void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
