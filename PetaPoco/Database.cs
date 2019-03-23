@@ -551,7 +551,7 @@ namespace PetaPoco
 
         #endregion
 
-        #region Command Management
+#region Command Management
 
         /// <summary>
         ///     Add a parameter to a DB command
@@ -697,7 +697,7 @@ namespace PetaPoco
             return cmd;
         }
 
-        #endregion
+#endregion
 
         #region Exception Reporting and Logging
 
@@ -765,17 +765,15 @@ namespace PetaPoco
 
         #endregion
 
-        #region operation: Execute 
+#region operation: Execute 
 
-        /// <summary>
-        ///     Executes a non-query command
-        /// </summary>
-        /// <param name="sql">The SQL statement to execute</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of rows affected</returns>
+        /// <inheritdoc />
         public int Execute(string sql, params object[] args) => ExecuteInternal(CommandType.Text, sql, args);
 
-        protected int ExecuteInternal(CommandType commandType, string sql, params object[] args)
+        /// <inheritdoc />
+        public int Execute(Sql sql) => Execute(sql.SQL, sql.Arguments);
+
+        protected virtual int ExecuteInternal(CommandType commandType, string sql, params object[] args)
         {
             try
             {
@@ -784,9 +782,9 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
-                        var retv = cmd.ExecuteNonQuery();
+                        var rowsAffected = cmd.ExecuteNonQuery();
                         OnExecutedCommand(cmd);
-                        return retv;
+                        return rowsAffected;
                     }
                 }
                 finally
@@ -801,31 +799,58 @@ namespace PetaPoco
                 return -1;
             }
         }
+        
+#if ASYNC
 
-        /// <summary>
-        ///     Executes a non-query command
-        /// </summary>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>The number of rows affected</returns>
-        public int Execute(Sql sql)
+        public Task<int> ExecuteAsync(string sql, params object[] args) => ExecuteInternalAsync(CancellationToken.None, CommandType.Text, sql, args);
+
+        public Task<int> ExecuteAsync(CancellationToken cancellationToken, string sql, params object[] args) => ExecuteInternalAsync(cancellationToken, CommandType.Text, sql, args);
+
+        public Task<int> ExecuteAsync(Sql sql) => ExecuteInternalAsync(CancellationToken.None, CommandType.Text, sql.SQL, sql.Arguments);
+
+        public Task<int> ExecuteAsync(CancellationToken cancellationToken, Sql sql) => ExecuteInternalAsync(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
+
+        protected virtual async Task<int> ExecuteInternalAsync(CancellationToken cancellationToken, CommandType commandType, string sql, params object[] args)
         {
-            return Execute(sql.SQL, sql.Arguments);
+            try
+            {
+                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
+                    {
+                        var rowsAffected = cmd is DbCommand dbCommandAsync ? 
+                            await dbCommandAsync.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteNonQuery();
+                        OnExecutedCommand(cmd);
+                        return rowsAffected;
+                    }
+                }
+                finally
+                {
+                    CloseSharedConnection();
+                }
+            }
+            catch (Exception x)
+            {
+                if (OnException(x))
+                    throw;
+                return -1;
+            }
         }
+        
+#endif
 
-        #endregion
+#endregion
 
-        #region operation: ExecuteScalar
+#region operation: ExecuteScalar
 
-        /// <summary>
-        ///     Executes a query and return the first column of the first row in the result set.
-        /// </summary>
-        /// <typeparam name="T">The type that the result value should be cast to</typeparam>
-        /// <param name="sql">The SQL query to execute</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The scalar value cast to T</returns>
+        /// <inheritdoc />
         public T ExecuteScalar<T>(string sql, params object[] args) => ExecuteScalarInternal<T>(CommandType.Text, sql, args);
 
-        protected T ExecuteScalarInternal<T>(CommandType commandType, string sql, params object[] args)
+        /// <inheritdoc />
+        public T ExecuteScalar<T>(Sql sql) => ExecuteScalar<T>(sql.SQL, sql.Arguments);
+
+        protected virtual T ExecuteScalarInternal<T>(CommandType commandType, string sql, params object[] args)
         {
             try
             {
@@ -834,11 +859,11 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
-                        object val = cmd.ExecuteScalar();
+                        var val = cmd.ExecuteScalar();
                         OnExecutedCommand(cmd);
 
                         // Handle nullable types
-                        Type u = Nullable.GetUnderlyingType(typeof(T));
+                        var u = Nullable.GetUnderlyingType(typeof(T));
                         if (u != null && (val == null || val == DBNull.Value))
                             return default(T);
 
@@ -858,20 +883,58 @@ namespace PetaPoco
             }
         }
 
-        /// <summary>
-        ///     Executes a query and return the first column of the first row in the result set.
-        /// </summary>
-        /// <typeparam name="T">The type that the result value should be cast to</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>The scalar value cast to T</returns>
-        public T ExecuteScalar<T>(Sql sql)
+#if ASYNC
+        
+        /// <inheritdoc />
+        public Task<T> ExecuteScalarAsync<T>(string sql, params object[] args) => ExecuteScalarInternalAsync<T>(CancellationToken.None, CommandType.Text, sql, args);
+
+        /// <inheritdoc />
+        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) => ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql, args);
+
+        /// <inheritdoc />
+        public Task<T> ExecuteScalarAsync<T>(Sql sql) => ExecuteScalarInternalAsync<T>(CancellationToken.None, CommandType.Text, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql) => ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
+
+        protected virtual async Task<T> ExecuteScalarInternalAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql, params object[] args)
         {
-            return ExecuteScalar<T>(sql.SQL, sql.Arguments);
+            try
+            {
+                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
+                    {
+                        var val = cmd is DbCommand cmdAsync ? 
+                            await cmdAsync.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteScalar();
+                        OnExecutedCommand(cmd);
+
+                        var u = Nullable.GetUnderlyingType(typeof(T));
+                        if (u != null && (val == null || val == DBNull.Value))
+                            return default(T);
+
+                        return (T) Convert.ChangeType(val, u == null ? typeof(T) : u);
+                    }
+                }
+                finally
+                {
+                    CloseSharedConnection();
+                }
+            }
+            catch (Exception x)
+            {
+                if (OnException(x))
+                    throw;
+                return default(T);
+            }
         }
+        
+#endif
 
-        #endregion
+#endregion
 
-        #region operation: Fetch
+#region operation: Fetch
 
         /// <inheritdoc />
         public List<T> Fetch<T>() => Fetch<T>(string.Empty);
@@ -926,28 +989,28 @@ namespace PetaPoco
         public async Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
         {
             var pocos = new List<T>();
-            await QueryAsync<T>(p => pocos.Add(p), commandType, cancellationToken, sql, args);
+            await QueryAsync<T>(p => pocos.Add(p), commandType, cancellationToken, sql, args).ConfigureAwait(false);
             return pocos;
         }
 
         public Task<List<T>> FetchAsync<T>(Sql sql)
         {
-            throw new NotImplementedException();
+            return FetchAsync<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
         }
 
         public Task<List<T>> FetchAsync<T>(CommandType commandType, Sql sql)
         {
-            throw new NotImplementedException();
+            return FetchAsync<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
         }
 
         public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, Sql sql)
         {
-            throw new NotImplementedException();
+            return FetchAsync<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
         }
 
         public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql)
         {
-            throw new NotImplementedException();
+            return FetchAsync<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
         }
 
         public Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage)
@@ -996,9 +1059,9 @@ namespace PetaPoco
         }
 #endif
 
-        #endregion
+#endregion
 
-        #region operation: Page
+#region operation: Page
 
         /// <summary>
         ///     Starting with a regular SELECT statement, derives the SQL statements required to query a
@@ -1065,12 +1128,86 @@ namespace PetaPoco
         /// <inheritdoc />
         public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) => Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
-        #endregion
+#if ASYNC
 
-        #region operation: SkipTake
+        public async Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs)
+        {
+            var saveTimeout = OneTimeCommandTimeout;
+
+            var result = new Page<T>
+            {
+                CurrentPage = page,
+                ItemsPerPage = itemsPerPage,
+                TotalItems = await ExecuteScalarAsync<long>(cancellationToken, sqlCount, countArgs).ConfigureAwait(false)
+            };
+            result.TotalPages = result.TotalItems / itemsPerPage;
+
+            if (result.TotalItems % itemsPerPage != 0)
+                result.TotalPages++;
+
+            OneTimeCommandTimeout = saveTimeout;
+
+            result.Items = await FetchAsync<T>(cancellationToken, sqlPage, pageArgs).ConfigureAwait(false);
+
+            return result;
+        }
+
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
+        {
+            throw new NotImplementedException();
+        }
+
+#endif
+        
+#endregion
+
+#region operation: SkipTake
 
         /// <inheritdoc />
         public List<T> SkipTake<T>(long skip, long take) => SkipTake<T>(skip, take, string.Empty);
+
+        /// <inheritdoc />
+        public List<T> SkipTake<T>(long skip, long take, Sql sql) => SkipTake<T>(skip, take, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public List<T> SkipTake<T>(long skip, long take, string sql, params object[] args)
@@ -1079,12 +1216,43 @@ namespace PetaPoco
             return Fetch<T>(sqlPage, args);
         }
 
-        /// <inheritdoc />
-        public List<T> SkipTake<T>(long skip, long take, Sql sql) => SkipTake<T>(skip, take, sql.SQL, sql.Arguments);
+#if ASYNC
 
-        #endregion
+        public Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take)
+        {
+            throw new NotImplementedException();
+        }
 
-        #region operation: Query
+        public Task<List<T>> SkipTakeAsync<T>(long skip, long take)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+#endif
+        
+#endregion
+
+#region operation: Query
 
         /// <inheritdoc />
         public IEnumerable<T> Query<T>() => Query<T>(string.Empty);
@@ -1156,16 +1324,68 @@ namespace PetaPoco
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
             QueryAsync(receivePocoCallback, commandType, cancellationToken, sql.SQL, sql.Arguments);
 
-        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CommandType commandType, CancellationToken cancellationToken, string sql,
-            object[] args)
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>() =>
+            QueryAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType) =>
+            QueryAsync<T>(commandType, CancellationToken.None, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken) =>
+            QueryAsync<T>(CommandType.Text, cancellationToken, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken) =>
+            QueryAsync<T>(commandType, cancellationToken, string.Empty);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(string sql, params object[] args) => 
+            QueryAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, string sql, params object[] args) => 
+            QueryAsync<T>(commandType, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) => 
+            QueryAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
         {
-            await OpenSharedConnectionAsync(cancellationToken);
+            if (EnableAutoSelect)
+                sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
+            
+            return ExecuteReaderAsync<T>(commandType, cancellationToken, sql, args);
+        }
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(Sql sql) =>
+            QueryAsync<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, Sql sql) =>
+            QueryAsync<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, Sql sql) =>
+            QueryAsync<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
+            QueryAsync<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
+
+        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CommandType commandType, CancellationToken cancellationToken, string sql,
+                                                           object[] args)
+        {
+            await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                 {
                     IDataReader reader;
-                    DbDataReader readerAsync;
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
                     var cmdAsync = cmd as DbCommand;
 
@@ -1184,7 +1404,7 @@ namespace PetaPoco
                         return;
                     }
 
-                    readerAsync = reader as DbDataReader;
+                    var readerAsync = reader as DbDataReader;
                     var factory =
                         pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
                             _defaultMapper) as Func<IDataReader, T>;
@@ -1208,6 +1428,7 @@ namespace PetaPoco
                                 }
 
                                 poco = factory(reader);
+                                processPoco(poco);
                             }
                             catch (Exception e)
                             {
@@ -1215,8 +1436,6 @@ namespace PetaPoco
                                     throw;
                                 return;
                             }
-
-                            processPoco(poco);
                         }
                     }
                 }
@@ -1227,63 +1446,10 @@ namespace PetaPoco
             }
         }
 
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>() =>
-            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, string.Empty);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType) =>
-            QueryAsyncAdapted<T>(commandType, CancellationToken.None, string.Empty);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken) =>
-            QueryAsyncAdapted<T>(CommandType.Text, cancellationToken, string.Empty);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken) =>
-            QueryAsyncAdapted<T>(commandType, cancellationToken, string.Empty);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(string sql, params object[] args) => 
-            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql, args);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, string sql, params object[] args) => 
-            QueryAsyncAdapted<T>(commandType, CancellationToken.None, sql, args);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, string sql, params object[] args) => 
-            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql, args);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
-        {
-            if (EnableAutoSelect)
-                sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
-            
-            return ExecuteReaderAsyncAdapted<T>(commandType, cancellationToken, sql, args);
-        }
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(Sql sql) =>
-            QueryAsyncAdapted<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, Sql sql) =>
-            QueryAsyncAdapted<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CancellationToken cancellationToken, Sql sql) =>
-            QueryAsyncAdapted<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
-
-        /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
-            QueryAsyncAdapted<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
-
-        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsyncAdapted<T>(CommandType commandType, CancellationToken cancellationToken, string sql,
+        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsync<T>(CommandType commandType, CancellationToken cancellationToken, string sql,
             object[] args)
         {
-            await OpenSharedConnectionAsync(cancellationToken);
+            await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
             var cmd = CreateCommand(_sharedConnection, commandType, sql, args);
             IDataReader reader = null;
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
@@ -1374,7 +1540,7 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
         #region operation: Exists
 

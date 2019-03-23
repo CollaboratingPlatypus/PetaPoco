@@ -9,7 +9,7 @@ namespace PetaPoco
     /// </summary>
     public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection
 #if ASYNC
-        ,IQueryAsync
+        ,IQueryAsync, IExecuteAsync
 #endif
     {
         /// <summary>

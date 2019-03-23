@@ -58,8 +58,8 @@ namespace PetaPoco.Tests.Integration.Databases
                 $"SELECT * FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
-            var results = DB.Query<dynamic>(sql, OrderStatus.Pending);
-            results.Count().ShouldBe(3);
+            var results = DB.Query<dynamic>(sql, OrderStatus.Pending).ToArray();
+            results.Length.ShouldBe(3);
 
             var order = (IDictionary<string, object>) results.First();
             ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
@@ -82,8 +82,8 @@ namespace PetaPoco.Tests.Integration.Databases
                     $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
                     OrderStatus.Pending);
 
-            var results = DB.Query<dynamic>(sql);
-            results.Count().ShouldBe(3);
+            var results = DB.Query<dynamic>(sql).ToArray();
+            results.Length.ShouldBe(3);
 
             var order = (IDictionary<string, object>) results.First();
             ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
@@ -347,7 +347,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public async void QueryAsyncReader_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -356,7 +356,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<dynamic>();
-            using(var asyncReader = await DB.QueryAsyncAdapted<dynamic>(sql, OrderStatus.Pending))
+            using(var asyncReader = await DB.QueryAsync<dynamic>(sql, OrderStatus.Pending))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
             results.Count.ShouldBe(3);
@@ -372,7 +372,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public async void QueryAsyncReader_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -383,7 +383,7 @@ namespace PetaPoco.Tests.Integration.Databases
                     OrderStatus.Pending);
 
             var results = new List<dynamic>();
-            using(var asyncReader = await DB.QueryAsyncAdapted<dynamic>(sql))
+            using(var asyncReader = await DB.QueryAsync<dynamic>(sql))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
             
@@ -400,14 +400,14 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public async void QueryAsyncReader_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<Order>();
-            using(var asyncReader = await DB.QueryAsyncAdapted<Order>(sql, OrderStatus.Pending))
+            using(var asyncReader = await DB.QueryAsync<Order>(sql, OrderStatus.Pending))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
             
@@ -423,7 +423,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public async void QueryAsyncReader_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -437,7 +437,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
             var results = new List<Order>();
-            using(var asyncReader = await DB.QueryAsyncAdapted<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }))
+            using(var asyncReader = await DB.QueryAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
             
@@ -453,7 +453,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public async void QueryAsyncReader_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -461,7 +461,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 OrderStatus.Pending);
             
             var results = new List<Order>();
-            using(var asyncReader = await DB.QueryAsyncAdapted<Order>(sql))
+            using(var asyncReader = await DB.QueryAsync<Order>(sql))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
                 
@@ -478,7 +478,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public async void QueryAsyncReader_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -487,7 +487,7 @@ namespace PetaPoco.Tests.Integration.Databases
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<string>();
-            using (var asyncReader = await DB.QueryAsyncAdapted<string>(sql, OrderStatus.Pending))
+            using (var asyncReader = await DB.QueryAsync<string>(sql, OrderStatus.Pending))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
             
@@ -496,7 +496,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncAdapted_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public async void QueryAsyncReader_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -506,7 +506,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 OrderStatus.Pending);
 
             var results = new List<string>();
-            using(var asyncReader = await DB.QueryAsyncAdapted<string>(sql))
+            using(var asyncReader = await DB.QueryAsync<string>(sql))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
             
@@ -660,6 +660,152 @@ namespace PetaPoco.Tests.Integration.Databases
             results.ForEach(po => po.ShouldStartWith("PO"));
         }
 
+        [Fact]
+        public async void FetchAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql =
+                $"SELECT * FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
+                $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = await DB.FetchAsync<dynamic>(sql, OrderStatus.Pending);
+            results.Count.ShouldBe(3);
+
+            var order = (IDictionary<string, object>) results.First();
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
+                .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
+            order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
+            ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
+                .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+        }
+
+        [Fact]
+        public async void FetchAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql =
+                new Sql(
+                    $"SELECT * FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
+                    $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
+                    OrderStatus.Pending);
+
+            var results = await DB.FetchAsync<dynamic>(sql);
+            results.Count.ShouldBe(3);
+
+            var order = (IDictionary<string, object>) results.First();
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
+                .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
+            order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
+            ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
+                .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+        }
+
+        [Fact]
+        public async void FetchAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql =
+                $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @Status AND @NullableProperty IS NULL";
+
+            if (DB.Provider.GetType() == typeof(PostgreSQLDatabaseProvider))
+            {
+                sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS CHAR)");
+            }
+            else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
+            {
+                sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
+            }
+
+            var results = await DB.FetchAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            results.Count.ShouldBe(3);
+
+            results.ForEach(o =>
+            {
+                o.PoNumber.ShouldStartWith("PO");
+                o.Status.ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>().ToArray());
+                o.PersonId.ShouldNotBe(Guid.Empty);
+                o.CreatedOn.ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+                o.CreatedBy.ShouldStartWith("Harry");
+            });
+        }
+
+        [Fact]
+        public async void FetchAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = await DB.FetchAsync<Order>(sql, OrderStatus.Pending);
+            results.Count.ShouldBe(3);
+
+            results.ForEach(o =>
+            {
+                o.PoNumber.ShouldStartWith("PO");
+                o.Status.ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>().ToArray());
+                o.PersonId.ShouldNotBe(Guid.Empty);
+                o.CreatedOn.ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+                o.CreatedBy.ShouldStartWith("Harry");
+            });
+        }
+
+        [Fact]
+        public async void FetchAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
+                OrderStatus.Pending);
+
+            var results = await DB.FetchAsync<Order>(sql);
+            results.Count.ShouldBe(3);
+
+            results.ForEach(o =>
+            {
+                o.PoNumber.ShouldStartWith("PO");
+                o.Status.ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<OrderStatus>().ToArray());
+                o.PersonId.ShouldNotBe(Guid.Empty);
+                o.CreatedOn.ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+                o.CreatedBy.ShouldStartWith("Harry");
+            });
+        }
+
+        [Fact]
+        public async void FetchAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = await DB.FetchAsync<string>(sql, OrderStatus.Pending);
+            results.Count.ShouldBe(3);
+            results.ForEach(po => po.ShouldStartWith("PO"));
+        }
+
+        [Fact]
+        public async void FetchAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql($"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
+                              $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
+                OrderStatus.Pending);
+
+            var results = await DB.FetchAsync<string>(sql);
+            results.Count.ShouldBe(3);
+            results.ForEach(po => po.ShouldStartWith("PO"));
+        }
+        
         protected void AddPeople(int petasToAdd, int sallysToAdd)
         {
             var c = petasToAdd > sallysToAdd ? petasToAdd : sallysToAdd;
