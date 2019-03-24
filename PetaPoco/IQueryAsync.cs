@@ -298,6 +298,26 @@ namespace PetaPoco
         ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,Sql)" />.
         /// </summary>
         Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql);
+        
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Exists{T}(object)" />.
+        /// </summary>
+        Task<bool> ExistsAsync<T>(object primaryKey);
+        
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Exists{T}(object)" />.
+        /// </summary>
+        Task<bool> ExistsAsync<T>(CancellationToken cancellationToken, object primaryKey);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Exists{T}(string, object[])" />.
+        /// </summary>
+        Task<bool> ExistsAsync<T>(string sqlCondition, params object[] args);
+        
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Exists{T}(string, object[])" />.
+        /// </summary>
+        Task<bool> ExistsAsync<T>(CancellationToken cancellationToken, string sqlCondition, params object[] args);
     }
 #endif
 }

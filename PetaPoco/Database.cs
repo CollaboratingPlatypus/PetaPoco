@@ -1466,13 +1466,7 @@ namespace PetaPoco
 
 #region operation: Exists
 
-        /// <summary>
-        ///     Checks for the existence of a row matching the specified condition
-        /// </summary>
-        /// <typeparam name="T">The Type representing the table being queried</typeparam>
-        /// <param name="sqlCondition">The SQL expression to be tested for (ie: the WHERE expression)</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>True if a record matching the condition is found.</returns>
+        /// <inheritdoc />
         public bool Exists<T>(string sqlCondition, params object[] args)
         {
             var poco = PocoData.ForType(typeof(T), _defaultMapper).TableInfo;
@@ -1483,18 +1477,37 @@ namespace PetaPoco
             return ExecuteScalar<int>(string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args) != 0;
         }
 
-        /// <summary>
-        ///     Checks for the existence of a row with the specified primary key value.
-        /// </summary>
-        /// <typeparam name="T">The Type representing the table being queried</typeparam>
-        /// <param name="primaryKey">The primary key value to look for</param>
-        /// <returns>True if a record with the specified primary key value exists.</returns>
+        /// <inheritdoc />
         public bool Exists<T>(object primaryKey)
         {
             var poco = PocoData.ForType(typeof(T), _defaultMapper);
-            return Exists<T>(string.Format("{0}=@0", _provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)),
+            return Exists<T>($"{_provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)}=@0",
                 primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
         }
+        
+#if ASYNC
+        public Task<bool> ExistsAsync<T>(object primaryKey) => ExistsAsync<T>(CancellationToken.None, primaryKey);
+
+        public Task<bool> ExistsAsync<T>(CancellationToken cancellationToken, object primaryKey)
+        {
+            var poco = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExistsAsync<T>(cancellationToken, $"{_provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)}=@0",
+                primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
+        }
+
+        public Task<bool> ExistsAsync<T>(string sqlCondition, params object[] args) => ExistsAsync<T>(CancellationToken.None, sqlCondition, args);
+
+        public async Task<bool> ExistsAsync<T>(CancellationToken cancellationToken, string sqlCondition, params object[] args)
+        {
+            var poco = PocoData.ForType(typeof(T), _defaultMapper).TableInfo;
+
+            if (sqlCondition.TrimStart().StartsWith("where", StringComparison.OrdinalIgnoreCase))
+                sqlCondition = sqlCondition.TrimStart().Substring(5);
+
+            return await ExecuteScalarAsync<int>(cancellationToken, string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args) != 0;
+        }
+#endif
+        
 
 #endregion
 

@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -266,7 +260,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         /// <summary>
-        ///     Support the older syntax of starting witha WHERE clause.
+        ///     Support the older syntax of starting with a WHERE clause.
         /// </summary>
         [Fact]
         public void Exists_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
@@ -296,6 +290,52 @@ namespace PetaPoco.Tests.Integration.Databases
         public void Exists_GivenSqlStringMatchingNoRecord_ShouldBeFalse()
         {
             DB.Exists<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18).ShouldBeFalse();
+        }
+
+        [Fact]
+        public async void ExistsAsync_GivenPrimaryKeyMatchingOneRecord_ShouldBeTrue()
+        {
+            var pk = DB.Insert(_person);
+            (await DB.ExistsAsync<Person>(pk)).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async void ExistsAsync_GivenPrimaryKeyMatchingNoRecord_ShouldBeFalse()
+        {
+            (await DB.ExistsAsync<Person>(Guid.NewGuid())).ShouldBeFalse();
+        }
+
+        /// <summary>
+        ///     Support the older syntax of starting with a WHERE clause.
+        /// </summary>
+        [Fact]
+        public async void ExistsAsync_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
+        {
+            DB.Insert(_person);
+            (await DB.ExistsAsync<Person>($"{DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async void ExistsAsync_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
+        {
+            DB.Insert(_person);
+            (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async void ExistsAsync_GivenSqlStringMatchingMoreThanOneRecord_ShouldBeTrue()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeTrue();
+        }
+
+        [Fact]
+        public async void ExistsAsync_GivenSqlStringMatchingNoRecord_ShouldBeFalse()
+        {
+            (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeFalse();
         }
     }
 }
