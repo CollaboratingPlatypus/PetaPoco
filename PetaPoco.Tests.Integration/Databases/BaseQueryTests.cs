@@ -680,6 +680,21 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        public void Fetch_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql($"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
+                              $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
+                OrderStatus.Pending);
+
+            var results = DB.Fetch<string>(sql);
+            results.Count.ShouldBe(3);
+            results.ForEach(po => po.ShouldStartWith("PO"));
+        }
+        
+        [Fact]
         public void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -764,6 +779,20 @@ namespace PetaPoco.Tests.Integration.Databases
             results.Count.ShouldBe(1);
         }
 
+        [Fact]
+        public void FetchWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql($"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
+                              $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
+                OrderStatus.Pending);
+
+            var results = DB.Fetch<string>(2, 1, sql);
+            results.Count.ShouldBe(1);
+        }
+        
         [Fact]
         public async void FetchAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
@@ -992,6 +1021,20 @@ namespace PetaPoco.Tests.Integration.Databases
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = await DB.FetchAsync<string>(2, 1, sql, OrderStatus.Pending);
+            results.Count.ShouldBe(1);
+        }
+        
+        [Fact]
+        public async void FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql($"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
+                              $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0",
+                OrderStatus.Pending);
+
+            var results = await DB.FetchAsync<string>(2, 1, sql);
             results.Count.ShouldBe(1);
         }
         
