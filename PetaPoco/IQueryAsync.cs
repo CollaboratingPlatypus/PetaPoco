@@ -192,7 +192,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}(long, long)" />.
         /// </summary>
-        Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage);
+        Task<List<T>> FetchAsync<T>(long page, long itemsPerPage);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}(long, long)" />.
@@ -200,14 +200,9 @@ namespace PetaPoco
         Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Fetch{T}(long, long)" />.
-        /// </summary>
-        Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, long page, long itemsPerPage);
-
-        /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}(long, long, string, object[])" />.
         /// </summary>
-        Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage, string sql, params object[] args);
+        Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, string sql, params object[] args);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}(long, long, string, object[])" />.
@@ -217,12 +212,7 @@ namespace PetaPoco
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}(long, long, string, object[])" />.
         /// </summary>
-        Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args);
-
-        /// <summary>
-        ///     Async version of <see cref="IQuery.Fetch{T}(long, long, Sql)" />.
-        /// </summary>
-        Task<List<T>> FetchAsync<T>(CommandType commandType, long page, long itemsPerPage, Sql sql);
+        Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, Sql sql);
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Fetch{T}(long, long, string, object[])" />.
@@ -230,89 +220,84 @@ namespace PetaPoco
         Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Fetch{T}(long, long, string, object[])" />.
-        /// </summary>
-        Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql);
-
-        /// <summary>
-        ///     Async version of <see cref="IQuery.Page{T}(long,long,string,object[],string,object[])" />.
-        /// </summary>
-        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs);
-        
-        /// <summary>
         ///     Async version of <see cref="IQuery.Page{T}(long,long,string,object[],string,object[])" />.
         /// </summary>
         Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Page{T}(long,long)" />.
+        ///     Async version of <see cref="IQuery.Page{T}(long,long,string,object[],string,object[])" />.
         /// </summary>
-        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage);
-        
+        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Page{T}(long,long)" />.
         /// </summary>
         Task<Page<T>> PageAsync<T>(long page, long itemsPerPage);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Page{T}(long,long,string,object[])" />.
+        ///     Async version of <see cref="IQuery.Page{T}(long,long)" />.
         /// </summary>
-        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args);
-        
+        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Page{T}(long,long,string,object[])" />.
         /// </summary>
         Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, params object[] args);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Page{T}(long,long,Sql)" />.
+        ///     Async version of <see cref="IQuery.Page{T}(long,long,string,object[])" />.
         /// </summary>
-        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql);
-        
+        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Page{T}(long,long,Sql)" />.
         /// </summary>
         Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Page{T}(long,long,Sql,Sql)" />.
+        ///     Async version of <see cref="IQuery.Page{T}(long,long,Sql)" />.
         /// </summary>
-        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage);
-        
+        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Page{T}(long,long,Sql,Sql)" />.
         /// </summary>
         Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.SkipTake{T}(long,long)" />.
+        ///     Async version of <see cref="IQuery.Page{T}(long,long,Sql,Sql)" />.
         /// </summary>
-        Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take);
-        
+        Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.SkipTake{T}(long,long)" />.
         /// </summary>
         Task<List<T>> SkipTakeAsync<T>(long skip, long take);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,string,object[])" />.
+        ///     Async version of <see cref="IQuery.SkipTake{T}(long,long)" />.
         /// </summary>
-        Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, string sql, params object[] args);
-        
+        Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,string,object[])" />.
         /// </summary>
         Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, params object[] args);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,Sql)" />.
+        ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,string,object[])" />.
         /// </summary>
-        Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql);
-        
+        Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, string sql, params object[] args);
+
         /// <summary>
         ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,Sql)" />.
         /// </summary>
         Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,Sql)" />.
+        /// </summary>
+        Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql);
     }
 #endif
 }
