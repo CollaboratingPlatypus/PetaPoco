@@ -337,5 +337,216 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeFalse();
         }
+        
+        
+        [Fact]
+        public async void SingleAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
+        {
+            var pk = DB.Insert(_person);
+            (await DB.SingleAsync<Person>(pk)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void SingleAsync_GivenPrimaryKeyMatchingNoRecord_ShouldThrow()
+        {
+            Should.Throw<Exception>(DB.SingleAsync<Person>(Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async void SingleAsync_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void SingleAsync_GivenSqlStringMatchingTwoRecords_ShouldThrow()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            Should.Throw<Exception>(DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+        }
+
+        [Fact]
+        public void SingleAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
+        {
+            Should.Throw<Exception>(DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+        }
+
+        [Fact]
+        public async void SingleAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void SingleAsync_GivenSqlMatchingTwoRecords_ShouldThrow()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            Should.Throw<Exception>(DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+        }
+
+        [Fact]
+        public void SingleAsync_GivenSqlMatchingNoRecord_ShouldThrow()
+        {
+            Should.Throw<Exception>(DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+        }
+
+        [Fact]
+        public async void SingleOrDefaultAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
+        {
+            var pk = DB.Insert(_person);
+            (await DB.SingleOrDefaultAsync<Person>(pk)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void SingleOrDefaultAsync_GivenPrimaryKeyMatchingNoRecord_ShouldBeNull()
+        {
+            (await DB.SingleOrDefaultAsync<Person>(Guid.NewGuid())).ShouldBeNull();
+        }
+
+        [Fact]
+        public async void SingleOrDefaultAsync_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.SingleOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void SingleOrDefaultAsync_GivenSqlStringMatchingTwoRecords_ShouldThrow()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            Should.Throw<Exception>(DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+        }
+
+        [Fact]
+        public async void SingleOrDefaultAsync_GivenSqlStringMatchingNoRecord_ShouldBeNull()
+        {
+            (await DB.SingleOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeNull();
+        }
+
+        [Fact]
+        public async void SingleOrDefaultAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.SingleOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void SingleOrDefaultAsync_GivenSqlMatchingTwoRecords_ShouldThrow()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            Should.Throw<Exception>(DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+        }
+
+        [Fact]
+        public async void SingleOrDefaultAsync_GivenSqlMatchingNoRecord_ShouldBeNull()
+        {
+            (await DB.SingleOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldBeNull();
+        }
+
+        [Fact]
+        public async void FirstAsync_GivenSqlStringAndMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void FirstAsync_GivenSqlStringAndMatchingTwoRecords_ShouldReturnFirstRecord()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            (await DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public  void FirstAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
+        {
+            Should.Throw<Exception>(DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+        }
+
+        [Fact]
+        public async void FirstAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void FirstAsync_GivenSqlMatchingTwoRecords_ShouldReturnFirstPoco()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            (await DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void FirstAsync_GivenSqlMatchingNoRecord_ShouldThrow()
+        {
+            Should.Throw<Exception>(DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+        }
+
+        [Fact]
+        public async void FirstOrDefaultAsync_GivenSqlStringAndMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.FirstOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void FirstOrDefaultAsync_GivenSqlStringAndMatchingTwoRecords_ShouldReturnFirstRecord()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            (await DB.FirstOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void FirstOrDefaultAsync_GivenSqlStringMatchingNoRecord_ShouldBeNull()
+        {
+            (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldBeNull();
+        }
+
+        [Fact]
+        public async void FirstOrDefaultAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        {
+            DB.Insert(_person);
+            (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void FirstOrDefaultAsync_GivenSqlMatchingTwoRecords_ShouldReturnFirstPoco()
+        {
+            DB.Insert(_person);
+            _person.Id = Guid.NewGuid();
+            DB.Insert(_person);
+
+            (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async void FirstOrDefaultAsync_GivenSqlMatchingNoRecord_ShouldBeNull()
+        {
+            (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldBeNull();
+        }
     }
 }

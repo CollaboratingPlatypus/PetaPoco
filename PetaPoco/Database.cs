@@ -476,13 +476,16 @@ namespace PetaPoco
 
 #if ASYNC
         /// <inheritdoc />
-        public async Task BeginTransactionAsync()
+        public Task BeginTransactionAsync() => BeginTransactionAsync(CancellationToken.None);
+
+        /// <inheritdoc />
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken)
         {
             _transactionDepth++;
 
             if (_transactionDepth == 1)
             {
-                await OpenSharedConnectionAsync();
+                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
                 _transaction = !_isolationLevel.HasValue ? _sharedConnection.BeginTransaction() : _sharedConnection.BeginTransaction(_isolationLevel.Value);
                 _transactionCancelled = false;
                 OnBeginTransaction();
@@ -775,8 +778,8 @@ namespace PetaPoco
 
         public Task<int> ExecuteAsync(string sql, params object[] args) => ExecuteInternalAsync(CancellationToken.None, CommandType.Text, sql, args);
 
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken, string sql, params object[] args) =>
-            ExecuteInternalAsync(cancellationToken, CommandType.Text, sql, args);
+        public Task<int> ExecuteAsync(CancellationToken cancellationToken, string sql, params object[] args)
+            => ExecuteInternalAsync(cancellationToken, CommandType.Text, sql, args);
 
         public Task<int> ExecuteAsync(Sql sql) => ExecuteInternalAsync(CancellationToken.None, CommandType.Text, sql.SQL, sql.Arguments);
 
@@ -862,15 +865,15 @@ namespace PetaPoco
         public Task<T> ExecuteScalarAsync<T>(string sql, params object[] args) => ExecuteScalarInternalAsync<T>(CancellationToken.None, CommandType.Text, sql, args);
 
         /// <inheritdoc />
-        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) =>
-            ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql, args);
+        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+            => ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql, args);
 
         /// <inheritdoc />
         public Task<T> ExecuteScalarAsync<T>(Sql sql) => ExecuteScalarInternalAsync<T>(CancellationToken.None, CommandType.Text, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql) =>
-            ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
+        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql)
+            => ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
 
         protected virtual async Task<T> ExecuteScalarInternalAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql, params object[] args)
         {
@@ -923,41 +926,33 @@ namespace PetaPoco
         public List<T> Fetch<T>(long page, long itemsPerPage) => Fetch<T>(page, itemsPerPage, string.Empty);
 
         /// <inheritdoc />
-        public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) =>
-            SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
+        public List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql, args);
 
         /// <inheritdoc />
-        public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) =>
-            SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
+        public List<T> Fetch<T>(long page, long itemsPerPage, Sql sql) => SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
 
 #if ASYNC
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>() =>
-            FetchAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
+        public Task<List<T>> FetchAsync<T>() => FetchAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CommandType commandType) =>
-            FetchAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
+        public Task<List<T>> FetchAsync<T>(CommandType commandType) => FetchAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken) =>
-            FetchAsync<T>(CommandType.Text, cancellationToken, string.Empty);
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken) => FetchAsync<T>(CommandType.Text, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken) =>
-            FetchAsync<T>(commandType, cancellationToken, string.Empty);
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken) => FetchAsync<T>(commandType, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(string sql, params object[] args) =>
-            FetchAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+        public Task<List<T>> FetchAsync<T>(string sql, params object[] args) => FetchAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CommandType commandType, string sql, params object[] args) =>
-            FetchAsync<T>(commandType, CancellationToken.None, sql, args);
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, string sql, params object[] args) => FetchAsync<T>(commandType, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) =>
-            FetchAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+            => FetchAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
         public async Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
@@ -977,8 +972,8 @@ namespace PetaPoco
         public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, Sql sql) => FetchAsync<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
-            FetchAsync<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
+        public Task<List<T>> FetchAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql)
+            => FetchAsync<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage) => FetchAsync<T>(page, itemsPerPage, string.Empty);
@@ -990,15 +985,15 @@ namespace PetaPoco
         public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, string sql, params object[] args) => FetchAsync<T>(CancellationToken.None, page, itemsPerPage, sql, args);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args) =>
-            SkipTakeAsync<T>(cancellationToken, (page - 1) * itemsPerPage, itemsPerPage, sql, args);
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sql, params object[] args)
+            => SkipTakeAsync<T>(cancellationToken, (page - 1) * itemsPerPage, itemsPerPage, sql, args);
 
         /// <inheritdoc />
         public Task<List<T>> FetchAsync<T>(long page, long itemsPerPage, Sql sql) => FetchAsync<T>(CancellationToken.None, page, itemsPerPage, sql);
 
         /// <inheritdoc />
-        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql) =>
-            SkipTakeAsync<T>(cancellationToken, (page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
+        public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql)
+            => SkipTakeAsync<T>(cancellationToken, (page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
 
 #endif
 
@@ -1069,8 +1064,8 @@ namespace PetaPoco
         public Page<T> Page<T>(long page, long itemsPerPage, Sql sql) => Page<T>(page, itemsPerPage, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) =>
-            Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
+        public Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
+            => Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
 #if ASYNC
 
@@ -1099,8 +1094,8 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs) =>
-            PageAsync<T>(CancellationToken.None, page, itemsPerPage, sqlCount, countArgs, sqlPage, pageArgs);
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs)
+            => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sqlCount, countArgs, sqlPage, pageArgs);
 
         /// <inheritdoc />
         public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage) => PageAsync<T>(cancellationToken, page, itemsPerPage, string.Empty);
@@ -1119,19 +1114,19 @@ namespace PetaPoco
         public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, string sql, params object[] args) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sql, args);
 
         /// <inheritdoc />
-        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql) =>
-            PageAsync<T>(cancellationToken, page, itemsPerPage, sql.SQL, sql.Arguments);
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sql)
+            => PageAsync<T>(cancellationToken, page, itemsPerPage, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sql) => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) =>
-            PageAsync<T>(cancellationToken, page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
+        public Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
+            => PageAsync<T>(cancellationToken, page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
         /// <inheritdoc />
-        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage) =>
-            PageAsync<T>(CancellationToken.None, page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
+        public Task<Page<T>> PageAsync<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage)
+            => PageAsync<T>(CancellationToken.None, page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
 
 #endif
 
@@ -1171,8 +1166,8 @@ namespace PetaPoco
         public Task<List<T>> SkipTakeAsync<T>(long skip, long take, string sql, params object[] args) => SkipTakeAsync<T>(CancellationToken.None, skip, take, sql, args);
 
         /// <inheritdoc />
-        public Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql) =>
-            SkipTakeAsync<T>(cancellationToken, skip, take, sql.SQL, sql.Arguments);
+        public Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql)
+            => SkipTakeAsync<T>(cancellationToken, skip, take, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
         public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql) => SkipTakeAsync<T>(skip, take, sql.SQL, sql.Arguments);
@@ -1200,32 +1195,30 @@ namespace PetaPoco
 
 #if ASYNC
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback) => QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType) =>
-            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType) => QueryAsync(receivePocoCallback, commandType, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken)
+            => QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken) =>
-            QueryAsync(receivePocoCallback, commandType, cancellationToken, string.Empty);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken)
+            => QueryAsync(receivePocoCallback, commandType, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, string sql, params object[] args) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, string sql, params object[] args)
+            => QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, string sql, params object[] args) =>
-            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, sql, args);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, string sql, params object[] args)
+            => QueryAsync(receivePocoCallback, commandType, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, string sql, params object[] args) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, string sql, params object[] args)
+            => QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
         public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
@@ -1237,48 +1230,41 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, Sql sql) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, Sql sql) => QueryAsync(receivePocoCallback, CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, Sql sql) =>
-            QueryAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, Sql sql)
+            => QueryAsync(receivePocoCallback, commandType, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, Sql sql) =>
-            QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CancellationToken cancellationToken, Sql sql)
+            => QueryAsync(receivePocoCallback, CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
-            QueryAsync(receivePocoCallback, commandType, cancellationToken, sql.SQL, sql.Arguments);
+        public Task QueryAsync<T>(Action<T> receivePocoCallback, CommandType commandType, CancellationToken cancellationToken, Sql sql)
+            => QueryAsync(receivePocoCallback, commandType, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>() =>
-            QueryAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
+        public Task<IAsyncReader<T>> QueryAsync<T>() => QueryAsync<T>(CommandType.Text, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType) =>
-            QueryAsync<T>(commandType, CancellationToken.None, string.Empty);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType) => QueryAsync<T>(commandType, CancellationToken.None, string.Empty);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken) =>
-            QueryAsync<T>(CommandType.Text, cancellationToken, string.Empty);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken) => QueryAsync<T>(CommandType.Text, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken) =>
-            QueryAsync<T>(commandType, cancellationToken, string.Empty);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken) => QueryAsync<T>(commandType, cancellationToken, string.Empty);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(string sql, params object[] args) =>
-            QueryAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+        public Task<IAsyncReader<T>> QueryAsync<T>(string sql, params object[] args) => QueryAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, string sql, params object[] args) =>
-            QueryAsync<T>(commandType, CancellationToken.None, sql, args);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, string sql, params object[] args) => QueryAsync<T>(commandType, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) =>
-            QueryAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+            => QueryAsync<T>(CommandType.Text, CancellationToken.None, sql, args);
 
         /// <inheritdoc />
         public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken, string sql, params object[] args)
@@ -1290,20 +1276,17 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(Sql sql) =>
-            QueryAsync<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
+        public Task<IAsyncReader<T>> QueryAsync<T>(Sql sql) => QueryAsync<T>(CommandType.Text, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, Sql sql) =>
-            QueryAsync<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, Sql sql) => QueryAsync<T>(commandType, CancellationToken.None, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, Sql sql) =>
-            QueryAsync<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, Sql sql) => QueryAsync<T>(CommandType.Text, cancellationToken, sql.SQL, sql.Arguments);
 
         /// <inheritdoc />
-        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql) =>
-            QueryAsync<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
+        public Task<IAsyncReader<T>> QueryAsync<T>(CommandType commandType, CancellationToken cancellationToken, Sql sql)
+            => QueryAsync<T>(commandType, cancellationToken, sql.SQL, sql.Arguments);
 
         protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CommandType commandType, CancellationToken cancellationToken, string sql, object[] args)
         {
@@ -1484,7 +1467,7 @@ namespace PetaPoco
             return Exists<T>($"{_provider.EscapeSqlIdentifier(poco.TableInfo.PrimaryKey)}=@0",
                 primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
         }
-        
+
 #if ASYNC
         public Task<bool> ExistsAsync<T>(object primaryKey) => ExistsAsync<T>(CancellationToken.None, primaryKey);
 
@@ -1504,42 +1487,111 @@ namespace PetaPoco
             if (sqlCondition.TrimStart().StartsWith("where", StringComparison.OrdinalIgnoreCase))
                 sqlCondition = sqlCondition.TrimStart().Substring(5);
 
-            return await ExecuteScalarAsync<int>(cancellationToken, string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args) != 0;
+            return await ExecuteScalarAsync<int>(cancellationToken, string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args).ConfigureAwait(false) != 0;
         }
 #endif
-        
 
 #endregion
 
 #region operation: linq style (Exists, Single, SingleOrDefault etc...)
 
-        /// <summary>
-        ///     Returns the record with the specified primary key value
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="primaryKey">The primary key value of the record to fetch</param>
-        /// <returns>The single record matching the specified primary key value</returns>
-        /// <remarks>
-        ///     Throws an exception if there are zero or more than one record with the specified primary key value.
-        /// </remarks>
-        public T Single<T>(object primaryKey)
-        {
-            return Single<T>(GenerateSingleByKeySql<T>(primaryKey));
-        }
+        /// <inheritdoc />
+        public T Single<T>(object primaryKey) => Single<T>(GenerateSingleByKeySql<T>(primaryKey));
 
-        /// <summary>
-        ///     Returns the record with the specified primary key value, or the default value if not found
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="primaryKey">The primary key value of the record to fetch</param>
-        /// <returns>The single record matching the specified primary key value</returns>
-        /// <remarks>
-        ///     If there are no records with the specified primary key value, default(T) (typically null) is returned.
-        /// </remarks>
-        public T SingleOrDefault<T>(object primaryKey)
-        {
-            return SingleOrDefault<T>(GenerateSingleByKeySql<T>(primaryKey));
-        }
+        /// <inheritdoc />
+        public T SingleOrDefault<T>(object primaryKey) => SingleOrDefault<T>(GenerateSingleByKeySql<T>(primaryKey));
+
+        /// <inheritdoc />
+        public T Single<T>(string sql, params object[] args) => Query<T>(sql, args).Single();
+
+        /// <inheritdoc />
+        public T SingleOrDefault<T>(string sql, params object[] args) => Query<T>(sql, args).SingleOrDefault();
+
+        /// <inheritdoc />
+        public T First<T>(string sql, params object[] args) => Query<T>(sql, args).First();
+
+        /// <inheritdoc />
+        public T FirstOrDefault<T>(string sql, params object[] args) => Query<T>(sql, args).FirstOrDefault();
+
+        /// <inheritdoc />
+        public T Single<T>(Sql sql) => Query<T>(sql).Single();
+
+        /// <inheritdoc />
+        public T SingleOrDefault<T>(Sql sql) => Query<T>(sql).SingleOrDefault();
+
+        /// <inheritdoc />
+        public T First<T>(Sql sql) => Query<T>(sql).First();
+
+        /// <inheritdoc />
+        public T FirstOrDefault<T>(Sql sql) => Query<T>(sql).FirstOrDefault();
+
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task<T> SingleAsync<T>(object primaryKey) => SingleAsync<T>(CancellationToken.None, primaryKey);
+
+        /// <inheritdoc />
+        public Task<T> SingleAsync<T>(CancellationToken cancellationToken, object primaryKey) => SingleAsync<T>(cancellationToken, GenerateSingleByKeySql<T>(primaryKey));
+
+        /// <inheritdoc />
+        public Task<T> SingleAsync<T>(string sql, params object[] args) => SingleAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public async Task<T> SingleAsync<T>(CancellationToken cancellationToken, string sql, params object[] args) => (await FetchAsync<T>(cancellationToken, sql, args).ConfigureAwait(false)).Single();
+
+        /// <inheritdoc />
+        public Task<T> SingleAsync<T>(Sql sql) => SingleAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<T> SingleAsync<T>(CancellationToken cancellationToken, Sql sql) => SingleAsync<T>(cancellationToken, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<T> SingleOrDefaultAsync<T>(Sql sql) => SingleOrDefaultAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, Sql sql) => SingleOrDefaultAsync<T>(cancellationToken, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<T> SingleOrDefaultAsync<T>(object primaryKey) => SingleOrDefaultAsync<T>(CancellationToken.None, primaryKey);
+
+        /// <inheritdoc />
+        public Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, object primaryKey)
+            => SingleOrDefaultAsync<T>(cancellationToken, GenerateSingleByKeySql<T>(primaryKey));
+
+        /// <inheritdoc />
+        public Task<T> SingleOrDefaultAsync<T>(string sql, params object[] args) => SingleOrDefaultAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public async Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+            => (await FetchAsync<T>(cancellationToken, sql, args).ConfigureAwait(false)).SingleOrDefault();
+
+        /// <inheritdoc />
+        public Task<T> FirstAsync<T>(string sql, params object[] args) => FirstAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public async Task<T> FirstAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+            => (await FetchAsync<T>(cancellationToken, sql, args).ConfigureAwait(false)).First();
+
+        /// <inheritdoc />
+        public Task<T> FirstAsync<T>(Sql sql) => FirstAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<T> FirstAsync<T>(CancellationToken cancellationToken, Sql sql) => FirstAsync<T>(cancellationToken, sql.SQL, sql.Arguments);
+
+        /// <inheritdoc />
+        public Task<T> FirstOrDefaultAsync<T>(string sql, params object[] args) => FirstOrDefaultAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public async Task<T> FirstOrDefaultAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+            => (await FetchAsync<T>(cancellationToken, sql, args).ConfigureAwait(false)).FirstOrDefault();
+
+        /// <inheritdoc />
+        public Task<T> FirstOrDefaultAsync<T>(Sql sql) => FirstOrDefaultAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<T> FirstOrDefaultAsync<T>(CancellationToken cancellationToken, Sql sql) => FirstOrDefaultAsync<T>(cancellationToken, sql.SQL, sql.Arguments);
+
+#endif
 
         private Sql GenerateSingleByKeySql<T>(object primaryKey)
         {
@@ -1551,104 +1603,6 @@ namespace PetaPoco
                 sql = AutoSelectHelper.AddSelectClause<T>(_provider, sql, _defaultMapper);
 
             return new Sql(sql, primaryKey);
-        }
-
-        /// <summary>
-        ///     Runs a query that should always return a single row.
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The single record matching the specified primary key value</returns>
-        /// <remarks>
-        ///     Throws an exception if there are zero or more than one matching record
-        /// </remarks>
-        public T Single<T>(string sql, params object[] args)
-        {
-            return Query<T>(sql, args).Single();
-        }
-
-        /// <summary>
-        ///     Runs a query that should always return either a single row, or no rows
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The single record matching the specified primary key value, or default(T) if no matching rows</returns>
-        public T SingleOrDefault<T>(string sql, params object[] args)
-        {
-            return Query<T>(sql, args).SingleOrDefault();
-        }
-
-        /// <summary>
-        ///     Runs a query that should always return at least one return
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The first record in the result set</returns>
-        public T First<T>(string sql, params object[] args)
-        {
-            return Query<T>(sql, args).First();
-        }
-
-        /// <summary>
-        ///     Runs a query and returns the first record, or the default value if no matching records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">The SQL query</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement</param>
-        /// <returns>The first record in the result set, or default(T) if no matching rows</returns>
-        public T FirstOrDefault<T>(string sql, params object[] args)
-        {
-            return Query<T>(sql, args).FirstOrDefault();
-        }
-
-        /// <summary>
-        ///     Runs a query that should always return a single row.
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>The single record matching the specified primary key value</returns>
-        /// <remarks>
-        ///     Throws an exception if there are zero or more than one matching record
-        /// </remarks>
-        public T Single<T>(Sql sql)
-        {
-            return Query<T>(sql).Single();
-        }
-
-        /// <summary>
-        ///     Runs a query that should always return either a single row, or no rows
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>The single record matching the specified primary key value, or default(T) if no matching rows</returns>
-        public T SingleOrDefault<T>(Sql sql)
-        {
-            return Query<T>(sql).SingleOrDefault();
-        }
-
-        /// <summary>
-        ///     Runs a query that should always return at least one return
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>The first record in the result set</returns>
-        public T First<T>(Sql sql)
-        {
-            return Query<T>(sql).First();
-        }
-
-        /// <summary>
-        ///     Runs a query and returns the first record, or the default value if no matching records
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
-        /// <returns>The first record in the result set, or default(T) if no matching rows</returns>
-        public T FirstOrDefault<T>(Sql sql)
-        {
-            return Query<T>(sql).FirstOrDefault();
         }
 
 #endregion

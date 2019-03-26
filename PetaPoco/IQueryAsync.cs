@@ -298,12 +298,12 @@ namespace PetaPoco
         ///     Async version of <see cref="IQuery.SkipTake{T}(long,long,Sql)" />.
         /// </summary>
         Task<List<T>> SkipTakeAsync<T>(CancellationToken cancellationToken, long skip, long take, Sql sql);
-        
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Exists{T}(object)" />.
         /// </summary>
         Task<bool> ExistsAsync<T>(object primaryKey);
-        
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Exists{T}(object)" />.
         /// </summary>
@@ -313,11 +313,111 @@ namespace PetaPoco
         ///     Async version of <see cref="IQuery.Exists{T}(string, object[])" />.
         /// </summary>
         Task<bool> ExistsAsync<T>(string sqlCondition, params object[] args);
-        
+
         /// <summary>
         ///     Async version of <see cref="IQuery.Exists{T}(string, object[])" />.
         /// </summary>
         Task<bool> ExistsAsync<T>(CancellationToken cancellationToken, string sqlCondition, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Single{T}(object)" />.
+        /// </summary>
+        Task<T> SingleAsync<T>(object primaryKey);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Single{T}(object)" />.
+        /// </summary>
+        Task<T> SingleAsync<T>(CancellationToken cancellationToken, object primaryKey);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Single{T}(string, object[])" />.
+        /// </summary>
+        Task<T> SingleAsync<T>(string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Single{T}(string, object[])" />.
+        /// </summary>
+        Task<T> SingleAsync<T>(CancellationToken cancellationToken, string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Single{T}(Sql)" />.
+        /// </summary>        
+        Task<T> SingleAsync<T>(Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.Single{T}(CancellationToken, Sql)" />.
+        /// </summary>
+        Task<T> SingleAsync<T>(CancellationToken cancellationToken, Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(PetaPoco.Sql)" />.
+        /// </summary>
+        Task<T> SingleOrDefaultAsync<T>(Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(PetaPoco.Sql)" />.
+        /// </summary>
+        Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(object)" />.
+        /// </summary>
+        Task<T> SingleOrDefaultAsync<T>(object primaryKey);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(object)" />.
+        /// </summary>
+        Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, object primaryKey);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(string, object[])" />.
+        /// </summary>
+        Task<T> SingleOrDefaultAsync<T>(string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(string, object[])" />.
+        /// </summary>
+        Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.First{T}(string,object[])" />.
+        /// </summary>
+        Task<T> FirstAsync<T>(string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.First{T}(string,object[])" />.
+        /// </summary>
+        Task<T> FirstAsync<T>(CancellationToken cancellationToken, string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.First{T}(Sql)" />.
+        /// </summary>
+        Task<T> FirstAsync<T>(Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.First{T}(Sql)" />.
+        /// </summary>
+        Task<T> FirstAsync<T>(CancellationToken cancellationToken, Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.FirstOrDefault{T}(string,object[])" />.
+        /// </summary>
+        Task<T> FirstOrDefaultAsync<T>(string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.FirstOrDefault{T}(string,object[])" />.
+        /// </summary>
+        Task<T> FirstOrDefaultAsync<T>(CancellationToken cancellationToken, string sql, params object[] args);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.FirstOrDefault{T}(Sql)" />.
+        /// </summary>
+        Task<T> FirstOrDefaultAsync<T>(Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IQuery.FirstOrDefault{T}(Sql)" />.
+        /// </summary>
+        Task<T> FirstOrDefaultAsync<T>(CancellationToken cancellationToken, Sql sql);
     }
 #endif
 }
