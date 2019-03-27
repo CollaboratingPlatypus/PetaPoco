@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
@@ -193,8 +187,7 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void Append_GivenConsecutiveSets_ShouldBeValid()
         {
-            _sql = new Sql()
-                .Append("UPDATE blah");
+            _sql = new Sql().Append("UPDATE blah");
 
             _sql.Append("SET a = 1");
             _sql.Append("SET b = 2");
@@ -205,8 +198,7 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void Set_GivenConsecutiveSets_ShouldBeValid()
         {
-            _sql = new Sql()
-                .Append("UPDATE blah");
+            _sql = new Sql().Append("UPDATE blah");
 
             _sql.Set("a = 1");
             _sql.Set("b = 2");
@@ -217,8 +209,7 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void Append_GivenConsecutiveSetsAndWheres_ShouldBeValid()
         {
-            _sql = new Sql()
-                .Append("UPDATE blah");
+            _sql = new Sql().Append("UPDATE blah");
 
             _sql.Append("SET a = 1");
             _sql.Append("SET b = 2");
@@ -231,8 +222,7 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void Append_GivenConsecutiveWheres_ShouldBeValid()
         {
-            _sql = new Sql()
-                .Append("SELECT * FROM blah");
+            _sql = new Sql().Append("SELECT * FROM blah");
 
             _sql.Append("WHERE x");
             _sql.Append("WHERE y");
@@ -243,8 +233,7 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void Append_GivenConsecutiveOrderBys_ShouldBeValid()
         {
-            _sql = new Sql()
-                .Append("SELECT * FROM blah");
+            _sql = new Sql().Append("SELECT * FROM blah");
 
             _sql.Append("ORDER BY x");
             _sql.Append("ORDER BY y");
@@ -298,10 +287,7 @@ namespace PetaPoco.Tests.Unit.Core
         [Fact]
         public void Join_GivenTable_ShouldBeValid()
         {
-            _sql = Sql.Builder
-                .Select("*")
-                .From("articles")
-                .LeftJoin("comments").On("articles.article_id=comments.article_id");
+            _sql = Sql.Builder.Select("*").From("articles").LeftJoin("comments").On("articles.article_id=comments.article_id");
 
             _sql.SQL.ShouldBe("SELECT *\nFROM articles\nLEFT JOIN comments\nON articles.article_id=comments.article_id");
         }
@@ -329,26 +315,15 @@ namespace PetaPoco.Tests.Unit.Core
                 ResourceID = 99,
             };
 
-            _sql.Append("UPDATE [Resource] SET ")
-                .Append("[ResourceName] = @0", resource.ResourceName)
-                .Append(",[ResourceDescription] = @0", resource.ResourceDescription)
-                .Append(",[ResourceContent] = @0", resource.ResourceContent)
-                .Append(",[ResourceData] = @0", resource.ResourceData)
-                .Append(",[ResourceGUID] = @0", resource.ResourceGUID)
-                .Append(",[LaunchPath] = @0", resource.LaunchPath)
-                .Append(",[ResourceType] = @0", (int) resource.ResourceType)
-                .Append(",[ContentType] = @0", resource.ContentType)
-                .Append(",[SchoolID] = @0", resource.SchoolID)
-                .Append(",[DistrictID] = @0", resource.DistrictID)
-                .Append(",[IsActive] = @0", resource.IsActive)
-                .Append(",[UpdatedBy] = @0", resource.UpdatedBy)
-                .Append(",[UpdatedDate] = @0", resource.UpdatedDate)
+            _sql.Append("UPDATE [Resource] SET ").Append("[ResourceName] = @0", resource.ResourceName).Append(",[ResourceDescription] = @0", resource.ResourceDescription)
+                .Append(",[ResourceContent] = @0", resource.ResourceContent).Append(",[ResourceData] = @0", resource.ResourceData)
+                .Append(",[ResourceGUID] = @0", resource.ResourceGUID).Append(",[LaunchPath] = @0", resource.LaunchPath).Append(",[ResourceType] = @0", (int) resource.ResourceType)
+                .Append(",[ContentType] = @0", resource.ContentType).Append(",[SchoolID] = @0", resource.SchoolID).Append(",[DistrictID] = @0", resource.DistrictID)
+                .Append(",[IsActive] = @0", resource.IsActive).Append(",[UpdatedBy] = @0", resource.UpdatedBy).Append(",[UpdatedDate] = @0", resource.UpdatedDate)
                 .Append(",[Extension] = @0", resource.Extension).Append(" WHERE ResourceID=@0", resource.ResourceID);
 
-            _sql.SQL.Replace("\n", "")
-                .Replace("\r", "")
-                .ShouldBe(
-                    @"UPDATE [Resource] SET [ResourceName] = @0,[ResourceDescription] = @1,[ResourceContent] = @2,[ResourceData] = @3,[ResourceGUID] = @4,[LaunchPath] = @5,[ResourceType] = @6,[ContentType] = @7,[SchoolID] = @8,[DistrictID] = @9,[IsActive] = @10,[UpdatedBy] = @11,[UpdatedDate] = @12,[Extension] = @13 WHERE ResourceID=@14");
+            _sql.SQL.Replace("\n", "").Replace("\r", "").ShouldBe(
+                @"UPDATE [Resource] SET [ResourceName] = @0,[ResourceDescription] = @1,[ResourceContent] = @2,[ResourceData] = @3,[ResourceGUID] = @4,[LaunchPath] = @5,[ResourceType] = @6,[ContentType] = @7,[SchoolID] = @8,[DistrictID] = @9,[IsActive] = @10,[UpdatedBy] = @11,[UpdatedDate] = @12,[Extension] = @13 WHERE ResourceID=@14");
         }
 
         [Fact]

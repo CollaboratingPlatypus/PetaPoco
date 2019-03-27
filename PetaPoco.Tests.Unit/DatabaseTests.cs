@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Dynamic;
@@ -22,13 +21,16 @@ namespace PetaPoco.Tests.Unit
 
         private IDatabase DB { get; }
 
-        public DatabaseTests() => DB = new Database("cs", _provider);
+        public DatabaseTests()
+            => DB = new Database("cs", _provider);
 
         [Fact]
-        public void Construct_GivenWrappedFactory_ShouldNotThrow() => new Database("some connection string", new DbProviderWrapper());
+        public void Construct_GivenWrappedFactory_ShouldNotThrow()
+            => new Database("some connection string", new DbProviderWrapper());
 
         [Fact]
-        public void Construct_GivenUnwrappedFactory_ShouldNotThrow() => new Database("some connection string", SqlClientFactory.Instance);
+        public void Construct_GivenUnwrappedFactory_ShouldNotThrow()
+            => new Database("some connection string", SqlClientFactory.Instance);
 
         [Fact]
         public void Construct_GivenInvalidArguments_ShouldThrow()
@@ -55,7 +57,7 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentException>(() => new Database(null, _dbProviderFactory));
             Should.Throw<ArgumentNullException>(() => new Database("some connection string", (DbProviderFactory) null));
 
-            Should.Throw<ArgumentNullException>(() => new Database((IDatabaseBuildConfiguration)null));
+            Should.Throw<ArgumentNullException>(() => new Database((IDatabaseBuildConfiguration) null));
             Should.Throw<InvalidOperationException>(() =>
             {
                 try

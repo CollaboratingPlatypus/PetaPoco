@@ -1,23 +1,17 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     [Collection("Mssql")]
-    public class MssqlStoredProcTests: BaseStoredProcTests
+    public class MssqlStoredProcTests : BaseStoredProcTests
     {
+        protected override Type DataParameterType => typeof(SqlParameter);
+
         public MssqlStoredProcTests()
             : base(new MssqlDBTestProvider())
         {
         }
-
-        protected override Type DataParameterType => typeof(SqlParameter); 
     }
 }

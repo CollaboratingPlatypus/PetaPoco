@@ -83,8 +83,7 @@ namespace PetaPoco.Tests.Integration.Databases
         public void Construct_GivenConnectionStringName_ShouldBeValid()
         {
             var connectionString = DB.ConnectionString;
-            var entry = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>().FirstOrDefault(c =>
-                c.ConnectionString.Equals(connectionString));
+            var entry = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>().FirstOrDefault(c => c.ConnectionString.Equals(connectionString));
 
             using (var db = new Database(entry.Name))
             {

@@ -337,8 +337,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeFalse();
         }
-        
-        
+
         [Fact]
         public async void SingleAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
         {
@@ -475,7 +474,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public  void FirstAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
+        public void FirstAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
         {
             Should.Throw<Exception>(DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
         }
