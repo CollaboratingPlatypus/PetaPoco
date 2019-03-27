@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using PetaPoco.Core;
 
@@ -10,7 +11,7 @@ namespace PetaPoco
     /// </summary>
     public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection
 #if ASYNC
-        ,IQueryAsync, IExecuteAsync
+        ,IQueryAsync, IExecuteAsync, IStoredProcAsync
 #endif
     {
         /// <summary>
@@ -145,6 +146,11 @@ namespace PetaPoco
         ///     Async version of <see cref="BeginTransaction" />.
         /// </summary>
         Task BeginTransactionAsync();
+
+        /// <summary>
+        ///     Async version of <see cref="BeginTransaction" />.
+        /// </summary>
+        Task BeginTransactionAsync(CancellationToken cancellationToken);
 #endif
 
         /// <summary>
