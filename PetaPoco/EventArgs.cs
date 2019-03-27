@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
-using System.Data.Common;
 
 namespace PetaPoco
 {
-    public class DbTransactionEventArgs: EventArgs
+    public class DbTransactionEventArgs : EventArgs
     {
         public IDbTransaction Transaction { get; }
 
@@ -14,7 +13,7 @@ namespace PetaPoco
         }
     }
 
-    public class DbCommandEventArgs: EventArgs
+    public class DbCommandEventArgs : EventArgs
     {
         public IDbCommand Command { get; }
 
@@ -47,6 +46,7 @@ namespace PetaPoco
         /// </summary>
         public Exception Exception { get; }
 
-        public ExceptionEventArgs(Exception ex) => Exception = ex;
+        public ExceptionEventArgs(Exception ex)
+            => Exception = ex;
     }
 }

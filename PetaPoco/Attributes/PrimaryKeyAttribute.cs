@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/06/28</date>
-
-using System;
+﻿using System;
 
 namespace PetaPoco
 {
@@ -43,6 +37,7 @@ namespace PetaPoco
         ///     Constructs a new instance of the <seealso cref="PrimaryKeyAttribute" />.
         /// </summary>
         /// <param name="primaryKey">The name of the primary key column.</param>
-        public PrimaryKeyAttribute(string primaryKey) => Value = primaryKey;
+        public PrimaryKeyAttribute(string primaryKey)
+            => Value = primaryKey;
     }
 }

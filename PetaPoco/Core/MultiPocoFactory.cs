@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/28</date>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -51,8 +45,7 @@ namespace PetaPoco.Internal
                         if (!candidates.Any())
                             continue;
                         if (candidates.Length > 1)
-                            throw new InvalidOperationException(string.Format("Can't auto join {0} as {1} has more than one property of type {0}", types[i],
-                                types[j]));
+                            throw new InvalidOperationException(string.Format("Can't auto join {0} as {1} has more than one property of type {0}", types[i], types[j]));
 
                         // Generate code
                         il.Emit(OpCodes.Ldarg_S, j);
@@ -95,6 +88,7 @@ namespace PetaPoco.Internal
                 {
                     return pdThis.GetFactory(sql, connectionString, firstColumn, pos - firstColumn, r, defaultMapper);
                 }
+
                 usedColumns.Add(fieldName, true);
             }
 
@@ -150,8 +144,7 @@ namespace PetaPoco.Internal
         {
             var key = Tuple.Create(typeof(TRet), new ArrayKey<Type>(types), connectionString, sql);
 
-            return
-                (Func<IDataReader, object, TRet>) MultiPocoFactories.Get(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper));
+            return (Func<IDataReader, object, TRet>) MultiPocoFactories.Get(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper));
         }
     }
 }

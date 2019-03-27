@@ -341,7 +341,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Async version of <see cref="IQuery.Single{T}(Sql)" />.
-        /// </summary>        
+        /// </summary>
         Task<T> SingleAsync<T>(Sql sql);
 
         /// <summary>

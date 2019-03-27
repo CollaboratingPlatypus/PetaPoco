@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/28</date>
-
-using System;
+﻿using System;
 using System.ComponentModel;
 
 namespace PetaPoco
@@ -44,8 +38,8 @@ namespace PetaPoco
         /// </summary>
         /// <returns>The type of the object.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
-            Justification = "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
+            "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "GetType",
             Justification = "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio")]
         Type GetType();

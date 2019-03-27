@@ -1,14 +1,12 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/06/29</date>
-
-using System;
+﻿using System;
 
 namespace PetaPoco
 {
-    public enum IncludeInAutoSelect { No, Yes }
+    public enum IncludeInAutoSelect
+    {
+        No,
+        Yes
+    }
 
     /// <summary>
     ///     Represents an attribute which can decorate a poco property as a result only column. A result only column is a
@@ -23,7 +21,7 @@ namespace PetaPoco
         {
         }
 
-        public ResultColumnAttribute(string name) 
+        public ResultColumnAttribute(string name)
             : this(name, IncludeInAutoSelect.No)
         {
         }

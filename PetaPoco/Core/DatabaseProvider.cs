@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/06/28</date>
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
@@ -46,21 +40,24 @@ namespace PetaPoco.Core
         ///     POCO class.
         /// </param>
         /// <returns>The escaped table name</returns>
-        public virtual string EscapeTableName(string tableName) => tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
+        public virtual string EscapeTableName(string tableName)
+            => tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
 
         /// <summary>
         ///     Escape and arbitary SQL identifier into a format suitable for the associated database provider
         /// </summary>
         /// <param name="sqlIdentifier">The SQL identifier to be escaped</param>
         /// <returns>The escaped identifier</returns>
-        public virtual string EscapeSqlIdentifier(string sqlIdentifier) => $"[{sqlIdentifier}]";
+        public virtual string EscapeSqlIdentifier(string sqlIdentifier)
+            => $"[{sqlIdentifier}]";
 
         /// <summary>
         ///     Returns the prefix used to delimit parameters in SQL query strings.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
         /// <returns>The providers character for prefixing a query parameter.</returns>
-        public virtual string GetParameterPrefix(string connectionString) => "@";
+        public virtual string GetParameterPrefix(string connectionString)
+            => "@";
 
         /// <summary>
         ///     Converts a supplied C# object value into a value suitable for passing to the database
@@ -82,7 +79,6 @@ namespace PetaPoco.Core
         /// <param name="cmd"></param>
         public virtual void PreExecute(IDbCommand cmd)
         {
-
         }
 
         /// <summary>
@@ -104,7 +100,8 @@ namespace PetaPoco.Core
         ///     Returns an SQL Statement that can check for the existence of a row in the database.
         /// </summary>
         /// <returns></returns>
-        public virtual string GetExistsSql() => "SELECT COUNT(*) FROM {0} WHERE {1}";
+        public virtual string GetExistsSql()
+            => "SELECT COUNT(*) FROM {0} WHERE {1}";
 
         /// <summary>
         ///     Return an SQL expression that can be used to populate the primary key column of an auto-increment column.
@@ -112,7 +109,8 @@ namespace PetaPoco.Core
         /// <param name="tableInfo">Table info describing the table</param>
         /// <returns>An SQL expressions</returns>
         /// <remarks>See the Oracle database type for an example of how this method is used.</remarks>
-        public virtual string GetAutoIncrementExpression(TableInfo tableInfo) => null;
+        public virtual string GetAutoIncrementExpression(TableInfo tableInfo)
+            => null;
 
         /// <summary>
         ///     Returns an SQL expression that can be used to specify the return value of auto incremented columns.
@@ -179,8 +177,7 @@ namespace PetaPoco.Core
             IProvider provider;
             foreach (var initialString in _customProviders.Keys)
             {
-                if (name.IndexOf(initialString, StringComparison.InvariantCultureIgnoreCase) == 0
-                    && _customProviders.TryGetValue(initialString, out provider))
+                if (name.IndexOf(initialString, StringComparison.InvariantCultureIgnoreCase) == 0 && _customProviders.TryGetValue(initialString, out provider))
                 {
                     return provider;
                 }
@@ -229,9 +226,9 @@ namespace PetaPoco.Core
                 return Singleton<SqlServerDatabaseProvider>.Instance;
             if (typeName.StartsWith("FbConnection") || typeName.EndsWith("FirebirdClientFactory"))
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
-            if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
-                && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                    connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
+            if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0 &&
+                (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 ||
+                 connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
                 return Singleton<MsAccessDbDatabaseProvider>.Instance;
             }
@@ -267,8 +264,7 @@ namespace PetaPoco.Core
             if (providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("SqlCeConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerCEDatabaseProviders>.Instance;
-            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0
-                || providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
+            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0 || providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<OracleDatabaseProvider>.Instance;
@@ -277,9 +273,9 @@ namespace PetaPoco.Core
             if (providerName.IndexOf("Firebird", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("FbConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
-            if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0
-                && (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 ||
-                    connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
+            if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0 &&
+                (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 ||
+                 connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
             {
                 return Singleton<MsAccessDbDatabaseProvider>.Instance;
             }

@@ -8,30 +8,12 @@ namespace PetaPoco.Utilities
 #if ASYNC
     public class AsyncReader<T> : IAsyncReader<T>
     {
-        private IDatabase _db;
-        private IDbCommand _cmd;
-        private IDataReader _reader;
-        private readonly Func<IDataReader, T> _pocoFactory;
         private readonly bool _isAsync;
-        private DbDataReader Reader => (DbDataReader)_reader;
-        
-        public T Poco { get; private set; }
-
-        public async Task<Boolean> ReadAsync()
-        {
-            if (_reader == null)
-                return false;
-
-            Poco = default(T);
-            
-            var hasRecords = _isAsync ? await Reader.ReadAsync() : _reader.Read();
-
-            if (hasRecords)
-                Poco = _pocoFactory(_reader);
-            
-            return hasRecords;
-        }
-        
+        private readonly Func<IDataReader, T> _pocoFactory;
+        private IDbCommand _cmd;
+        private IDatabase _db;
+        private IDataReader _reader;
+        private DbDataReader Reader => (DbDataReader) _reader;
 
         private AsyncReader()
         {
@@ -46,6 +28,23 @@ namespace PetaPoco.Utilities
             _isAsync = reader is DbDataReader;
         }
 
+        public T Poco { get; private set; }
+
+        public async Task<Boolean> ReadAsync()
+        {
+            if (_reader == null)
+                return false;
+
+            Poco = default(T);
+
+            var hasRecords = _isAsync ? await Reader.ReadAsync() : _reader.Read();
+
+            if (hasRecords)
+                Poco = _pocoFactory(_reader);
+
+            return hasRecords;
+        }
+
         public void Dispose()
         {
             _reader?.Dispose();
@@ -58,7 +57,8 @@ namespace PetaPoco.Utilities
             _db = null;
         }
 
-        public static AsyncReader<T> Empty() => new AsyncReader<T>();
+        public static AsyncReader<T> Empty()
+            => new AsyncReader<T>();
     }
 #endif
 }

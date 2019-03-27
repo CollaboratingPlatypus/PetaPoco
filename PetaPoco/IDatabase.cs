@@ -11,7 +11,7 @@ namespace PetaPoco
     /// </summary>
     public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection
 #if ASYNC
-        ,IQueryAsync, IExecuteAsync, IStoredProcAsync
+                                 , IQueryAsync, IExecuteAsync, IStoredProcAsync
 #endif
     {
         /// <summary>
@@ -140,18 +140,6 @@ namespace PetaPoco
         ///     Starts a transaction scope, see GetTransaction() for recommended usage
         /// </summary>
         void BeginTransaction();
-        
-#if ASYNC
-        /// <summary>
-        ///     Async version of <see cref="BeginTransaction" />.
-        /// </summary>
-        Task BeginTransactionAsync();
-
-        /// <summary>
-        ///     Async version of <see cref="BeginTransaction" />.
-        /// </summary>
-        Task BeginTransactionAsync(CancellationToken cancellationToken);
-#endif
 
         /// <summary>
         ///     Aborts the entire outer most transaction scope
@@ -201,5 +189,17 @@ namespace PetaPoco
         ///     Occurs when a database exception has been thrown.
         /// </summary>
         event EventHandler<ExceptionEventArgs> ExceptionThrown;
+
+#if ASYNC
+        /// <summary>
+        ///     Async version of <see cref="BeginTransaction" />.
+        /// </summary>
+        Task BeginTransactionAsync();
+
+        /// <summary>
+        ///     Async version of <see cref="BeginTransaction" />.
+        /// </summary>
+        Task BeginTransactionAsync(CancellationToken cancellationToken);
+#endif
     }
 }

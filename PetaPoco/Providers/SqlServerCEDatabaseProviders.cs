@@ -1,10 +1,4 @@
-﻿// <copyright file="SqlServerCEDatabaseType.cs" company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
-
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Utilities;
@@ -23,7 +17,7 @@ namespace PetaPoco.Providers
             if (string.IsNullOrEmpty(parts.SqlOrderBy))
                 parts.Sql += " ORDER BY ABS(1)";
             var sqlPage = string.Format("{0}\nOFFSET @{1} ROWS FETCH NEXT @{2} ROWS ONLY", parts.Sql, args.Length, args.Length + 1);
-            args = args.Concat(new object[] {skip, take}).ToArray();
+            args = args.Concat(new object[] { skip, take }).ToArray();
             return sqlPage;
         }
 

@@ -1,10 +1,4 @@
-﻿// <copyright file="OracleDatabaseType.cs" company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
-
-using System;
+﻿using System;
 using System.Data;
 using System.Data.Common;
 using PetaPoco.Core;
@@ -40,7 +34,7 @@ namespace PetaPoco.Providers
             // "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" is for Oracle.ManagedDataAccess.dll
             // "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess" is for Oracle.DataAccess.dll
             return GetFactory("Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess, Culture=neutral, PublicKeyToken=89b483f429c47342",
-                              "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
+                "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
         }
 
         public override string EscapeSqlIdentifier(string sqlIdentifier)
