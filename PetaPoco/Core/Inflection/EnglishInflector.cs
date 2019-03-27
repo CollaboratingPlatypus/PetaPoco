@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/22</date>
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace PetaPoco.Core.Inflection
@@ -129,8 +123,7 @@ namespace PetaPoco.Core.Inflection
         /// <returns>The titleised word.</returns>
         public string Titleise(string word)
         {
-            return Regex.Replace(Humanise(Underscore(word)), @"\b([a-z])",
-                match => match.Captures[0].Value.ToUpper());
+            return Regex.Replace(Humanise(Underscore(word)), @"\b([a-z])", match => match.Captures[0].Value.ToUpper());
         }
 
         /// <summary>
@@ -162,8 +155,7 @@ namespace PetaPoco.Core.Inflection
         /// <returns>The pascalied word.</returns>
         public string Pascalise(string lowercaseAndUnderscoredWord)
         {
-            return Regex.Replace(lowercaseAndUnderscoredWord, "(?:^|_)(.)",
-                match => match.Groups[1].Value.ToUpper());
+            return Regex.Replace(lowercaseAndUnderscoredWord, "(?:^|_)(.)", match => match.Groups[1].Value.ToUpper());
         }
 
         /// <summary>
@@ -195,10 +187,7 @@ namespace PetaPoco.Core.Inflection
         /// <returns>The underscored word.</returns>
         public string Underscore(string pascalCasedWord)
         {
-            return Regex.Replace(
-                Regex.Replace(
-                    Regex.Replace(pascalCasedWord, @"([A-Z]+)([A-Z][a-z])", "$1_$2"), @"([a-z\d])([A-Z])",
-                    "$1_$2"), @"[-\s]", "_").ToLower();
+            return Regex.Replace(Regex.Replace(Regex.Replace(pascalCasedWord, @"([A-Z]+)([A-Z][a-z])", "$1_$2"), @"([a-z\d])([A-Z])", "$1_$2"), @"[-\s]", "_").ToLower();
         }
 
         /// <summary>
@@ -332,14 +321,14 @@ namespace PetaPoco.Core.Inflection
 
         private static string Ordanise(int number, string numberString)
         {
-            var nMod100 = number%100;
+            var nMod100 = number % 100;
 
             if (nMod100 >= 11 && nMod100 <= 13)
             {
                 return numberString + "th";
             }
 
-            switch (number%10)
+            switch (number % 10)
             {
                 case 1:
                     return numberString + "st";

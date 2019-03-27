@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
+﻿using PetaPoco.Internal;
 using Shouldly;
-using PetaPoco.Internal;
+using Xunit;
 
 namespace PetaPoco.Tests.Unit.Utilities
 {
@@ -33,7 +28,7 @@ namespace PetaPoco.Tests.Unit.Utilities
 
         [Theory]
         [InlineData(":")]
-        [InlineData("^")]        
+        [InlineData("^")]
         public void ReplaceParamPrefix_ShouldWork(string prefix)
         {
             var input = "This @foo is @bar";

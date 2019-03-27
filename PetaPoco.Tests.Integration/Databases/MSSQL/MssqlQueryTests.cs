@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using PetaPoco.Core;
@@ -14,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
-    [Collection("MssqlTests")]
+    [Collection("Mssql")]
     public class MssqlQueryTests : BaseQueryTests
     {
         public MssqlQueryTests()
@@ -84,8 +78,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
-            var sql = "DECLARE @@v INT;" +
-                      "SET @@v = 1;" +
+            var sql = "DECLARE @@v INT;" + "SET @@v = 1;" +
                       $"SELECT * FROM [{pd.TableInfo.TableName}] WHERE [{pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName}] = @0";
 
             var results = DB.Query<Order>(sql, OrderStatus.Pending).ToList();
@@ -114,8 +107,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
                                       )
                                       SELECT *
                                       FROM [{0}_CTE]
-                                      WHERE [{2}] = @0;", pd.TableInfo.TableName, columns,
-                pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName);
+                                      WHERE [{2}] = @0;", pd.TableInfo.TableName, columns, pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName);
 
             var results = DB.Query<Order>(sql, OrderStatus.Pending).ToList();
             results.Count.ShouldBe(3);

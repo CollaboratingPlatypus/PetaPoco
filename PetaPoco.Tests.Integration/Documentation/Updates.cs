@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Databases;
@@ -143,8 +137,9 @@ namespace PetaPoco.Tests.Integration.Documentation
             var sql1 = $"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
                        $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0";
             DB.Update<Note>(sql1, note4.Id, note4.Text);
-            var sql2 = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
-                               $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0", note5.Id, note5.Text);
+            var sql2 = new Sql(
+                $"SET {DB.Provider.EscapeSqlIdentifier(pocoData.GetColumnName(nameof(Note.Text)))} = @1 " +
+                $"WHERE {DB.Provider.EscapeSqlIdentifier(pocoData.TableInfo.PrimaryKey)} = @0", note5.Id, note5.Text);
             DB.Update<Note>(sql2);
 
             // Just to be sure

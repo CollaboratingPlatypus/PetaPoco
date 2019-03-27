@@ -1,21 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using Shouldly;
-using PetaPoco.Providers;
-using System.Data.SqlClient;
-using System.Data.Common;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.Linq;
+using Shouldly;
+using Xunit;
 
 namespace PetaPoco.Tests.Unit
 {
-    public class CreateCommandTests: IDisposable
+    public class CreateCommandTests : IDisposable
     {
-        public readonly Database _db = new Database("foo", "System.Data.SqlClient");
         public readonly DbConnection _conn = new SqlConnection();
+        public readonly Database _db = new Database("foo", "System.Data.SqlClient");
+
+        public static IEnumerable<object[]> QueryParamData
+            => new[]
+            {
+                new object[]
+                {
+                    "select * from foo where bar=@0",
+                    new object[] { "baz" },
+                    new (string, object)[] { ("@0", "baz") }
+                },
+                new object[]
+                {
+                    "select * from MyTable where bar=@0 and baz=@1",
+                    new object[] { 3, 7 },
+                    new (string, object)[] { ("@0", 3), ("@1", 7) }
+                },
+                new object[]
+                {
+                    "select * from foo",
+                    new object[0],
+                    new (string, object)[0]
+                },
+            };
+
+        public static IEnumerable<object[]> ProcParamData
+            => new[]
+            {
+                new object[]
+                {
+                    "AnonymousType",
+                    new object[] { new { Foo = "Bar", Baz = 3 } },
+                    new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
+                },
+                new object[]
+                {
+                    "TwoAnonymousTypes",
+                    new object[] { new { Foo = "Bar" }, new { Baz = 3 } },
+                    new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
+                },
+                new object[]
+                {
+                    "SqlParameter",
+                    new object[] { new SqlParameter("@Foo", "Bar") },
+                    new (string, object)[] { ("@Foo", "Bar") }
+                },
+                new object[]
+                {
+                    "NoArgs",
+                    new object[0],
+                    new (string, object)[0]
+                },
+                new object[]
+                {
+                    "Array",
+                    new object[] { new object[] { new { Foo = "Bar" }, new { Baz = 3 } } },
+                    new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
+                },
+            };
 
         public void Dispose()
         {
@@ -33,25 +88,6 @@ namespace PetaPoco.Tests.Unit
             }
         }
 
-        public static IEnumerable<object[]> QueryParamData => new[]
-        {
-            new object[] {
-                "select * from foo where bar=@0",
-                new object[] { "baz" },
-                new (string, object)[] { ("@0", "baz") }
-            },
-            new object[] {
-                "select * from MyTable where bar=@0 and baz=@1",
-                new object[] { 3, 7 },
-                new (string, object)[] { ("@0", 3), ("@1", 7) }
-            },
-            new object[] {
-                "select * from foo",
-                new object[0],
-                new (string, object)[0]
-            },
-        };
-
         [Theory]
         [MemberData(nameof(QueryParamData))]
         public void QueryWithParams_Should_Match(string sql, object[] args, (string, object)[] expected)
@@ -59,7 +95,7 @@ namespace PetaPoco.Tests.Unit
             var output = _db.CreateCommand(_conn, sql, args);
             output.CommandType.ShouldBe(CommandType.Text);
             output.CommandText.ShouldBe(sql);
-            Compare(output, expected);            
+            Compare(output, expected);
         }
 
         [Fact]
@@ -89,35 +125,6 @@ namespace PetaPoco.Tests.Unit
             var expected = new (string, object)[] { ("@0", "thing1"), ("@1", 4) };
             Compare(output, expected);
         }
-
-        public static IEnumerable<object[]> ProcParamData => new[]
-        {
-            new object[] {
-                "AnonymousType",
-                new object[] { new { Foo = "Bar", Baz = 3 } },
-                new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
-            },
-            new object[] {
-                "TwoAnonymousTypes",
-                new object[] { new { Foo = "Bar" }, new { Baz = 3 } },
-                new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
-            },
-            new object[] {
-                "SqlParameter",
-                new object[] { new SqlParameter("@Foo", "Bar") },
-                new (string, object)[] { ("@Foo", "Bar") }
-            },
-            new object[] {
-                "NoArgs",
-                new object[0],
-                new (string, object)[0]
-            },
-            new object[] {
-                "Array",
-                new object[] { new object[] { new { Foo = "Bar" }, new { Baz = 3 } } },
-                new (string, object)[] { ("@Foo", "Bar"), ("@Baz", 3) }
-            },
-        };
 
         [Theory]
         [MemberData(nameof(ProcParamData))]

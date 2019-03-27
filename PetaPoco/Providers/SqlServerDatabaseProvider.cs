@@ -1,13 +1,6 @@
-﻿// <copyright file="SqlServerDatabaseType.cs" company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
-
-using System;
+﻿using System;
 using System.Data.Common;
 using System.Linq;
-using System.Text.RegularExpressions;
 using PetaPoco.Core;
 using PetaPoco.Utilities;
 
@@ -22,7 +15,7 @@ namespace PetaPoco.Providers
 
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
-            var helper = (PagingHelper)PagingUtility;
+            var helper = (PagingHelper) PagingUtility;
             // when the query does not contain an "order by", it is very slow
             if (helper.SimpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
             {
@@ -33,11 +26,14 @@ namespace PetaPoco.Providers
                     parts.SqlSelectRemoved = parts.SqlSelectRemoved.Substring(0, g.Index);
                 }
             }
+
             if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
             {
                 parts.SqlSelectRemoved = "peta_inner.* FROM (SELECT " + parts.SqlSelectRemoved + ") peta_inner";
             }
-            var sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn > @{2} AND peta_rn <= @{3}", parts.SqlOrderBy ?? "ORDER BY (SELECT NULL)", parts.SqlSelectRemoved, args.Length, args.Length + 1);
+
+            var sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn > @{2} AND peta_rn <= @{3}",
+                parts.SqlOrderBy ?? "ORDER BY (SELECT NULL)", parts.SqlSelectRemoved, args.Length, args.Length + 1);
             args = args.Concat(new object[] { skip, skip + take }).ToArray();
             return sqlPage;
         }

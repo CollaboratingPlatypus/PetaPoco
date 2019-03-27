@@ -1,9 +1,3 @@
-// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
 using System;
 using System.Linq;
 using PetaPoco.Core;
@@ -212,8 +206,9 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
-            var sql = new Sql($"SET {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} = @1 " +
-                              $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey)} = @0", _person.Id, "Feta's Order");
+            var sql = new Sql(
+                $"SET {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName)} = @1 " +
+                $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.TableInfo.PrimaryKey)} = @0", _person.Id, "Feta's Order");
 
             DB.Update<Person>(sql);
             var personOther = DB.Single<Person>(_person.Id);
@@ -235,8 +230,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
 
-            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })
-                .ShouldBe(1);
+            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }).ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -247,8 +241,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
 
-            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id)
-                .ShouldBe(1);
+            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id).ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);

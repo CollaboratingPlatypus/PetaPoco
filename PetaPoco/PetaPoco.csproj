@@ -14,6 +14,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2Nuget.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>PetaPoco.Compiled</PackageId>
+    <DefineConstants Condition="'$(TargetFramework)' != 'net40'">ASYNC</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">

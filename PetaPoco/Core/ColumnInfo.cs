@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/06/28</date>
-
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace PetaPoco
 {
@@ -29,7 +23,7 @@ namespace PetaPoco
         public bool ResultColumn { get; set; }
 
         /// <summary>
-        /// True if this is a result column but should be included in auto select queries.
+        ///     True if this is a result column but should be included in auto select queries.
         /// </summary>
         public bool AutoSelectedResultColumn { get; set; }
 
@@ -63,8 +57,7 @@ namespace PetaPoco
         public static ColumnInfo FromProperty(PropertyInfo propertyInfo)
         {
             // Check if declaring poco has [Explicit] attribute
-            var explicitColumns =
-                propertyInfo.DeclaringType.GetCustomAttributes(typeof(ExplicitColumnsAttribute), true).Length > 0;
+            var explicitColumns = propertyInfo.DeclaringType.GetCustomAttributes(typeof(ExplicitColumnsAttribute), true).Length > 0;
 
             // Check for [Column]/[Ignore] Attributes
             var colAttrs = propertyInfo.GetCustomAttributes(typeof(ColumnAttribute), true);
