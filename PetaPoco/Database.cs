@@ -77,12 +77,11 @@ namespace PetaPoco
         public Database(IMapper defaultMapper = null)
         {
             if (ConfigurationManager.ConnectionStrings.Count == 0)
-                throw new InvalidOperationException("One or more connection strings must be registered to use the no paramater constructor");
+                throw new InvalidOperationException("One or more connection strings must be registered to use the no-parameter constructor");
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
-            var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+            InitialiseFromEntry(entry, defaultMapper);
         }
 
         /// <summary>
@@ -104,9 +103,15 @@ namespace PetaPoco
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
+            InitialiseFromEntry(entry, defaultMapper);
+        }
+
+        private void InitialiseFromEntry(ConnectionStringSettings entry, IMapper defaultMapper)
+        {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
             Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
+
 #endif
 
         /// <summary>
@@ -121,13 +126,20 @@ namespace PetaPoco
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
         public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
-            _sharedConnection = connection ?? throw new ArgumentNullException(nameof(connection));
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
+
+            SetupFromConnection(connection);
+            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+        }
+
+        private void SetupFromConnection(IDbConnection connection)
+        {
+            _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
 
             // Prevent closing external connection
             _sharedConnectionDepth = 2;
-
-            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -143,10 +155,12 @@ namespace PetaPoco
         public Database(string connectionString, string providerName, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
-                throw new ArgumentException("Connection string cannot be null or empty", nameof(connectionString));
+                throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
+            if (string.IsNullOrEmpty(providerName))
+                throw new ArgumentException("Provider name must not be null or empty", nameof(providerName));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(providerName, true, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
         }
 
         /// <summary>
@@ -209,48 +223,68 @@ namespace PetaPoco
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
+
+            IProvider provider = null;
+            IDbConnection connection = null;
+            string providerName = null;
 #if !NETSTANDARD
             ConnectionStringSettings entry = null;
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () =>
-            {
-                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, cn =>
-                {
-                    entry = ConfigurationManager.ConnectionStrings[cn];
-
-                    if (entry == null)
-                        throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", cn));
-                }, () =>
-                {
-                    if (ConfigurationManager.ConnectionStrings.Count == 0)
-                        throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
-
-                    entry = ConfigurationManager.ConnectionStrings[0];
-                });
-
-                // ReSharper disable once PossibleNullReferenceException
-                _connectionString = entry.ConnectionString;
-            });
-
-
-            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
-            {
-                if (entry == null)
-                    throw new InvalidOperationException("Both a connection string and provider are required or neither.");
-
-                var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
-            });
-#else
-            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs, () => throw new InvalidOperationException("A connection string is required."));
-            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, v => Initialise(v, defaultMapper), () =>
-                {
-                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName,
-                        v => Initialise(DatabaseProvider.Resolve(v, false, _connectionString), defaultMapper),
-                        () => throw new InvalidOperationException("Either a provider name or provider must be registered."));
-                });
 #endif
 
-            
+            settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
+            settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+            settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
+
+
+            if (connection != null)
+            {
+                SetupFromConnection(connection);                
+            }
+            else
+            {
+                settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionString, cs => _connectionString = cs);
+
+#if !NETSTANDARD
+                if (_connectionString == null)
+                {
+                    string connectionStringName = null;
+                    settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ConnectionStringName, n => connectionStringName = n);
+
+                    if (connectionStringName != null)
+                    {
+                        entry = ConfigurationManager.ConnectionStrings[connectionStringName];
+                        if (entry == null)
+                            throw new InvalidOperationException($"Can't find a connection string with the name '{connectionStringName}'");
+                    }
+                    else
+                    {
+                        if (ConfigurationManager.ConnectionStrings.Count == 0)
+                            throw new InvalidOperationException("One or more connection strings must be registered, when not providing a connection string");
+
+                        entry = ConfigurationManager.ConnectionStrings[0];
+                    }
+
+                    _connectionString = entry.ConnectionString;
+                }                
+#else
+                if (_connectionString == null)
+                    throw new InvalidOperationException("A connection string is required.");                
+#endif
+            }
+
+            if (provider != null)
+                Initialise(provider, defaultMapper);
+            else if (providerName != null)
+                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+#if !NETSTANDARD
+            else if (entry != null)
+                InitialiseFromEntry(entry, defaultMapper);
+#endif
+            else if (connection != null)
+                Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+            else
+                throw new InvalidOperationException("Unable to locate a provider.");
+
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableNamedParams, v => EnableNamedParams = v);
             settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.EnableAutoSelect, v => EnableAutoSelect = v);
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
@@ -283,9 +317,9 @@ namespace PetaPoco
             _defaultMapper = mapper ?? new ConventionMapper();
         }
 
-        #endregion
+#endregion
 
-        #region Connection Management
+#region Connection Management
 
         /// <summary>
         ///     When set to true the first opened connection is kept alive until this object is disposed
@@ -342,9 +376,9 @@ namespace PetaPoco
         /// </summary>
         public IDbConnection Connection => _sharedConnection;
 
-        #endregion
+#endregion
 
-        #region Transaction Management
+#region Transaction Management
 
         /// <summary>
         ///     Gets the current transaction instance.
@@ -449,9 +483,9 @@ namespace PetaPoco
                 CleanupTransaction();
         }
 
-        #endregion
+#endregion
 
-        #region Command Management
+#region Command Management
 
         /// <summary>
         ///     Add a parameter to a DB command
@@ -606,9 +640,9 @@ namespace PetaPoco
             return cmd;
         }
 
-        #endregion
+#endregion
 
-        #region Exception Reporting and Logging
+#region Exception Reporting and Logging
 
         /// <summary>
         ///     Called if an exception occurs during processing of a DB operation.  Override to provide custom logging/handling.
@@ -672,9 +706,9 @@ namespace PetaPoco
             CommandExecuted?.Invoke(this, new DbCommandEventArgs(cmd));
         }
 
-        #endregion
+#endregion
 
-        #region operation: Execute 
+#region operation: Execute 
 
         /// <summary>
         ///     Executes a non-query command
@@ -721,9 +755,9 @@ namespace PetaPoco
             return Execute(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: ExecuteScalar
+#region operation: ExecuteScalar
 
         /// <summary>
         ///     Executes a query and return the first column of the first row in the result set.
@@ -778,9 +812,9 @@ namespace PetaPoco
             return ExecuteScalar<T>(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Fetch
+#region operation: Fetch
 
         /// <summary>
         ///     Runs a SELECT * query and returns the result set as a typed list
@@ -812,9 +846,9 @@ namespace PetaPoco
             return Fetch<T>(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Page
+#region operation: Page
 
         /// <summary>
         ///     Starting with a regular SELECT statement, derives the SQL statements required to query a
@@ -956,9 +990,9 @@ namespace PetaPoco
             return Page<T>(page, itemsPerPage, sqlCount.SQL, sqlCount.Arguments, sqlPage.SQL, sqlPage.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Fetch (page)
+#region operation: Fetch (page)
 
         /// <summary>
         ///     Retrieves a page of records (without the total count)
@@ -1008,9 +1042,9 @@ namespace PetaPoco
             return SkipTake<T>((page - 1) * itemsPerPage, itemsPerPage, sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: SkipTake
+#region operation: SkipTake
 
         /// <summary>
         ///     Retrieves a range of records from result set
@@ -1062,9 +1096,9 @@ namespace PetaPoco
             return SkipTake<T>(skip, take, sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Query
+#region operation: Query
 
         /// <summary>
         ///     Runs a SELECT * query, returning the results as an IEnumerable collection
@@ -1166,9 +1200,9 @@ namespace PetaPoco
             return Query<T>(sql.SQL, sql.Arguments);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Exists
+#region operation: Exists
 
         /// <summary>
         ///     Checks for the existence of a row matching the specified condition
@@ -1200,9 +1234,9 @@ namespace PetaPoco
                 primaryKey is T ? poco.Columns[poco.TableInfo.PrimaryKey].GetValue(primaryKey) : primaryKey);
         }
 
-        #endregion
+#endregion
 
-        #region operation: linq style (Exists, Single, SingleOrDefault etc...)
+#region operation: linq style (Exists, Single, SingleOrDefault etc...)
 
         /// <summary>
         ///     Returns the record with the specified primary key value
@@ -1342,9 +1376,9 @@ namespace PetaPoco
             return Query<T>(sql).FirstOrDefault();
         }
 
-        #endregion
+#endregion
 
-        #region operation: Insert
+#region operation: Insert
 
         /// <summary>
         ///     Performs an SQL Insert
@@ -1529,9 +1563,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region operation: Update
+#region operation: Update
 
         /// <summary>
         ///     Performs an SQL update
@@ -1789,9 +1823,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region operation: Delete
+#region operation: Delete
 
         /// <summary>
         ///     Performs and SQL Delete
@@ -1902,9 +1936,9 @@ namespace PetaPoco
             return Execute(new Sql(string.Format("DELETE FROM {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
         }
 
-        #endregion
+#endregion
 
-        #region operation: IsNew
+#region operation: IsNew
 
         /// <summary>
         ///     Check if a poco represents a new row
@@ -1990,9 +2024,9 @@ namespace PetaPoco
             return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Save
+#region operation: Save
 
         /// <summary>
         ///     Saves a POCO by either performing either an SQL Insert or SQL Update
@@ -2022,9 +2056,9 @@ namespace PetaPoco
             Save(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
 
-        #endregion
+#endregion
 
-        #region operation: Multi-Poco Query/Fetch
+#region operation: Multi-Poco Query/Fetch
 
         /// <summary>
         ///     Perform a multi-poco fetch
@@ -2580,9 +2614,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region operation: Multi-Result Set
+#region operation: Multi-Result Set
 
         /// <summary>
         ///     Perform a multi-results set query
@@ -2622,9 +2656,9 @@ namespace PetaPoco
             return result;
         }
 
-        #endregion
+#endregion
 
-        #region operation: StoredProc
+#region operation: StoredProc
 
         /// <summary>
         /// Runs a stored procedure, returning the results as an IEnumerable collection
@@ -2690,9 +2724,9 @@ namespace PetaPoco
             return ExecuteInternal(CommandType.StoredProcedure, storedProcedureName, args);
         }
 
-        #endregion
+#endregion
 
-        #region Last Command
+#region Last Command
 
         /// <summary>
         ///     Retrieves the SQL of the last executed statement
@@ -2709,9 +2743,9 @@ namespace PetaPoco
         /// </summary>
         public string LastCommand => FormatCommand(_lastSql, _lastArgs);
 
-        #endregion
+#endregion
 
-        #region FormatCommand
+#region FormatCommand
 
         /// <summary>
         ///     Formats the contents of a DB command for display
@@ -2749,9 +2783,9 @@ namespace PetaPoco
             return sb.ToString();
         }
 
-        #endregion
+#endregion
 
-        #region Public Properties
+#region Public Properties
 
         /// <summary>
         ///     Gets the default mapper.
@@ -2813,9 +2847,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region Member Fields
+#region Member Fields
 
         // Member variables
         private IMapper _defaultMapper;
@@ -2832,9 +2866,9 @@ namespace PetaPoco
         private DbProviderFactory _factory;
         private IsolationLevel? _isolationLevel;
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
         /// <summary>
         /// Occurs when a new transaction has started.
         /// </summary>
@@ -2863,7 +2897,7 @@ namespace PetaPoco
         /// Occurs when a database exception has been thrown.
         /// </summary>
         public event EventHandler<ExceptionEventArgs> ExceptionThrown;
-        #endregion
+#endregion
     }
 
     public class Database<TDatabaseProvider> : Database where TDatabaseProvider : IProvider
