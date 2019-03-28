@@ -1553,7 +1553,7 @@ namespace PetaPoco
 
 #endregion
 
-#region operation: linq style (Exists, Single, SingleOrDefault etc...)
+#region operation: Linq style (Exists, Single, SingleOrDefault etc...)
 
         /// <inheritdoc />
         public T Single<T>(object primaryKey)
@@ -1695,12 +1695,7 @@ namespace PetaPoco
 
 #region operation: Insert
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        /// <inheritdoc />
         public object Insert(string tableName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1714,13 +1709,7 @@ namespace PetaPoco
             return ExecuteInsert(tableName, pd == null ? null : pd.TableInfo.PrimaryKey, pd != null && pd.TableInfo.AutoIncrement, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        /// <inheritdoc />
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1740,19 +1729,7 @@ namespace PetaPoco
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
-        /// <remarks>
-        ///     Inserts a poco into a table.  If the poco has a property with the same name
-        ///     as the primary key the id of the new record is assigned to it.  Either way,
-        ///     the new id is returned.
-        /// </remarks>
+        /// <inheritdoc />
         public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1767,15 +1744,7 @@ namespace PetaPoco
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
-        /// <remarks>
-        ///     The name of the table, it's primary key and whether it's an auto-allocated primary key are retrieved
-        ///     from the POCO's attributes
-        /// </remarks>
+        /// <inheritdoc />
         public object Insert(object poco)
         {
             if (poco == null)
@@ -1792,7 +1761,7 @@ namespace PetaPoco
                 OpenSharedConnection();
                 try
                 {
-                    using (var cmd = CreateCommand(_sharedConnection, ""))
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
                     {
                         var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
                         var names = new List<string>();
@@ -1805,10 +1774,10 @@ namespace PetaPoco
                                 continue;
 
                             // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-                            if (autoIncrement && primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true) == 0)
+                            if (autoIncrement && primaryKeyName != null && String.Compare(i.Key, primaryKeyName, StringComparison.OrdinalIgnoreCase) == 0)
                             {
                                 // Setup auto increment expression
-                                string autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
+                                var autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
                                 if (autoIncExpression != null)
                                 {
                                     names.Add(i.Key);
@@ -1823,14 +1792,12 @@ namespace PetaPoco
                             AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
                         }
 
-                        string outputClause = string.Empty;
+                        var outputClause = string.Empty;
                         if (autoIncrement)
-                        {
                             outputClause = _provider.GetInsertOutputClause(primaryKeyName);
-                        }
 
-                        cmd.CommandText = string.Format("INSERT INTO {0} ({1}){2} VALUES ({3})", _provider.EscapeTableName(tableName), string.Join(",", names.ToArray()),
-                            outputClause, string.Join(",", values.ToArray()));
+                        cmd.CommandText =
+                            $"INSERT INTO {_provider.EscapeTableName(tableName)} ({string.Join(",", names.ToArray())}){outputClause} VALUES ({string.Join(",", values.ToArray())})";
 
                         if (!autoIncrement)
                         {
@@ -1845,16 +1812,14 @@ namespace PetaPoco
                                 return null;
                         }
 
-                        object id = _provider.ExecuteInsert(this, cmd, primaryKeyName);
+                        var id = _provider.ExecuteInsert(this, cmd, primaryKeyName);
 
                         // Assign the ID back to the primary key property
                         if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
                         {
                             PocoColumn pc;
                             if (pd.Columns.TryGetValue(primaryKeyName, out pc))
-                            {
                                 pc.SetValue(poco, pc.ChangeType(id));
-                            }
                         }
 
                         return id;
@@ -1873,18 +1838,39 @@ namespace PetaPoco
             }
         }
 
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task<object> InsertAsync(string tableName, object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<object> InsertAsync(string tableName, string primaryKeyName, bool autoIncrement, object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<object> InsertAsync(object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+#endif
+
 #endregion
 
 #region operation: Update
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected records</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1899,15 +1885,7 @@ namespace PetaPoco
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1922,26 +1900,11 @@ namespace PetaPoco
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco)
-        {
-            return Update(tableName, primaryKeyName, poco, null);
-        }
+            => Update(tableName, primaryKeyName, poco, null);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1956,45 +1919,19 @@ namespace PetaPoco
             return ExecuteUpdate(tableName, primaryKeyName, poco, null, columns);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco, IEnumerable<string> columns)
-        {
-            return Update(poco, null, columns);
-        }
+            => Update(poco, null, columns);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco)
-        {
-            return Update(poco, null, null);
-        }
+            => Update(poco, null, null);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco, object primaryKeyValue)
-        {
-            return Update(poco, primaryKeyValue, null);
-        }
+            => Update(poco, primaryKeyValue, null);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (poco == null)
@@ -2004,38 +1941,24 @@ namespace PetaPoco
             return ExecuteUpdate(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update<T>(string sql, params object[] args)
         {
             if (string.IsNullOrEmpty(sql))
                 throw new ArgumentNullException(nameof(sql));
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(string.Format("UPDATE {0} {1}", _provider.EscapeTableName(pd.TableInfo.TableName), sql), args);
+            return Execute($"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE
-        ///     tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update<T>(Sql sql)
         {
             if (sql == null)
                 throw new ArgumentNullException(nameof(sql));
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(new Sql(string.Format("UPDATE {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+            return Execute(new Sql($"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
         }
 
         private int ExecuteUpdate(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
@@ -2045,7 +1968,7 @@ namespace PetaPoco
                 OpenSharedConnection();
                 try
                 {
-                    using (var cmd = CreateCommand(_sharedConnection, ""))
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
                     {
                         var sb = new StringBuilder();
                         var index = 0;
@@ -2055,7 +1978,7 @@ namespace PetaPoco
                             foreach (var i in pd.Columns)
                             {
                                 // Don't update the primary key, but grab the value if we don't have it
-                                if (string.Compare(i.Key, primaryKeyName, true) == 0)
+                                if (string.Compare(i.Key, primaryKeyName, StringComparison.OrdinalIgnoreCase) == 0)
                                 {
                                     if (primaryKeyValue == null)
                                         primaryKeyValue = i.Value.GetValue(poco);
@@ -2106,8 +2029,8 @@ namespace PetaPoco
                             pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
                         }
 
-                        cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}", _provider.EscapeTableName(tableName), sb.ToString(),
-                            _provider.EscapeSqlIdentifier(primaryKeyName), _paramPrefix, index++);
+                        cmd.CommandText =
+                            $"UPDATE {_provider.EscapeTableName(tableName)} SET {sb} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)} = {_paramPrefix}{index++}";
                         AddParam(cmd, primaryKeyValue, pkpi);
 
                         DoPreExecute(cmd);
@@ -2131,36 +2054,79 @@ namespace PetaPoco
             }
         }
 
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco, IEnumerable<string> columns)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco, object primaryKeyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco, object primaryKeyValue, IEnumerable<string> columns)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync<T>(string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync<T>(Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+#endif
+
 #endregion
 
 #region operation: Delete
 
-        /// <summary>
-        ///     Performs and SQL Delete
-        /// </summary>
-        /// <param name="tableName">The name of the table to delete from</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
-        /// <returns>The number of rows affected</returns>
+        /// <inheritdoc />
         public int Delete(string tableName, string primaryKeyName, object poco)
-        {
-            return Delete(tableName, primaryKeyName, poco, null);
-        }
+            => Delete(tableName, primaryKeyName, poco, null);
 
-        /// <summary>
-        ///     Performs and SQL Delete
-        /// </summary>
-        /// <param name="tableName">The name of the table to delete from</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">
-        ///     The POCO object whose primary key value will be used to delete the row (or null to use the supplied
-        ///     primary key value)
-        /// </param>
-        /// <param name="primaryKeyValue">
-        ///     The value of the primary key identifing the record to be deleted (or null, or get this
-        ///     value from the POCO instance)
-        /// </param>
-        /// <returns>The number of rows affected</returns>
+        /// <inheritdoc />
         public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
             // If primary key value not specified, pick it up from the object
@@ -2169,33 +2135,22 @@ namespace PetaPoco
                 var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
                 PocoColumn pc;
                 if (pd.Columns.TryGetValue(primaryKeyName, out pc))
-                {
                     primaryKeyValue = pc.GetValue(poco);
-                }
             }
 
             // Do it
-            var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", _provider.EscapeTableName(tableName), _provider.EscapeSqlIdentifier(primaryKeyName));
+            var sql = $"DELETE FROM {_provider.EscapeTableName(tableName)} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)}=@0";
             return Execute(sql, primaryKeyValue);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <param name="poco">The POCO object specifying the table name and primary key value of the row to be deleted</param>
-        /// <returns>The number of rows affected</returns>
+        /// <inheritdoc />
         public int Delete(object poco)
         {
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
-        /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public int Delete<T>(object pocoOrPrimaryKey)
         {
             if (pocoOrPrimaryKey.GetType() == typeof(T))
@@ -2208,7 +2163,7 @@ namespace PetaPoco
                 var pi = pocoOrPrimaryKey.GetType().GetProperty(pd.TableInfo.PrimaryKey);
 
                 if (pi == null)
-                    throw new InvalidOperationException(string.Format("Anonymous type does not contain an id for PK column `{0}`.", pd.TableInfo.PrimaryKey));
+                    throw new InvalidOperationException($"Anonymous type does not contain an id for PK column `{pd.TableInfo.PrimaryKey}`.");
 
                 pocoOrPrimaryKey = pi.GetValue(pocoOrPrimaryKey, new object[0]);
             }
@@ -2216,45 +2171,65 @@ namespace PetaPoco
             return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
-        /// <param name="sql">The SQL condition clause identifying the row to delete (ie: everything after "DELETE FROM tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Delete<T>(string sql, params object[] args)
         {
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(string.Format("DELETE FROM {0} {1}", _provider.EscapeTableName(pd.TableInfo.TableName), sql), args);
+            return Execute($"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL condition clause identifying the row to delete (ie:
-        ///     everything after "UPDATE tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Delete<T>(Sql sql)
         {
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(new Sql(string.Format("DELETE FROM {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+            return Execute(new Sql($"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
         }
+
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(string tableName, string primaryKeyName, object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(object poco)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(object pocoOrPrimaryKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(string sql, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(Sql sql)
+        {
+            throw new NotImplementedException();
+        }
+
+#endif
 
 #endregion
 
 #region operation: IsNew
 
-        /// <summary>
-        ///     Check if a poco represents a new row
-        /// </summary>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
+        /// <inheritdoc />
         public bool IsNew(string primaryKeyName, object poco)
         {
             if (poco == null)
@@ -2264,6 +2239,16 @@ namespace PetaPoco
                 throw new ArgumentException("primaryKeyName");
 
             return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName, _defaultMapper), poco);
+        }
+
+        /// <inheritdoc />
+        public bool IsNew(object poco)
+        {
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
         }
 
         protected virtual bool IsNew(string primaryKeyName, PocoData pd, object poco)
@@ -2317,52 +2302,45 @@ namespace PetaPoco
             return pk == Activator.CreateInstance(pk.GetType());
         }
 
-        /// <summary>
-        ///     Check if a poco represents a new row
-        /// </summary>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
-        public bool IsNew(object poco)
-        {
-            if (poco == null)
-                throw new ArgumentNullException(nameof(poco));
-
-            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
-            return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
-        }
-
 #endregion
 
 #region operation: Save
 
-        /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
-        /// </summary>
-        /// <param name="tableName">The name of the table to be updated</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object to be saved</param>
+        /// <inheritdoc />
         public void Save(string tableName, string primaryKeyName, object poco)
         {
             if (IsNew(primaryKeyName, poco))
-            {
                 Insert(tableName, primaryKeyName, true, poco);
-            }
             else
-            {
                 Update(tableName, primaryKeyName, poco);
-            }
         }
 
-        /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
-        /// </summary>
-        /// <param name="poco">The POCO object to be saved</param>
+        /// <inheritdoc />
         public void Save(object poco)
         {
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             Save(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
+
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task SaveAsync(string tableName, string primaryKeyName, object poco)
+        {
+            if (IsNew(primaryKeyName, poco))
+                return InsertAsync(tableName, primaryKeyName, true, poco);
+
+            return UpdateAsync(tableName, primaryKeyName, poco);
+        }
+
+        /// <inheritdoc />
+        public Task SaveAsync(object poco)
+        {
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return SaveAsync(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
+        }
+
+#endif
 
 #endregion
 
