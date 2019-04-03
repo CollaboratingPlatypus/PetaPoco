@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetaPoco
@@ -11,9 +12,19 @@ namespace PetaPoco
         Task<object> InsertAsync(string tableName, object poco);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Insert(string, object)" />.
+        /// </summary>
+        Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, object poco);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Insert(string, string, object)" />.
         /// </summary>
         Task<object> InsertAsync(string tableName, string primaryKeyName, object poco);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Insert(string, string, object)" />.
+        /// </summary>
+        Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Insert(string, string, bool, object)" />.
@@ -21,9 +32,19 @@ namespace PetaPoco
         Task<object> InsertAsync(string tableName, string primaryKeyName, bool autoIncrement, object poco);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Insert(string, string, bool, object)" />.
+        /// </summary>
+        Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, bool autoIncrement, object poco);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Insert(object)" />.
         /// </summary>
         Task<object> InsertAsync(object poco);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Insert(object)" />.
+        /// </summary>
+        Task<object> InsertAsync(CancellationToken cancellationToken, object poco);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(string, string, object, object)" />.

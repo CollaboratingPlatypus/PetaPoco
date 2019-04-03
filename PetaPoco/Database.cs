@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
+
 #if !NETSTANDARD
 using System.Configuration;
 
@@ -888,7 +889,8 @@ namespace PetaPoco
         public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql)
             => ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
 
-        protected virtual async Task<T> ExecuteScalarInternalAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql, params object[] args)
+        protected virtual async Task<T> ExecuteScalarInternalAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql,
+                                                                      params object[] args)
         {
             try
             {
@@ -1104,8 +1106,8 @@ namespace PetaPoco
 #if ASYNC
 
         /// <inheritdoc />
-        public async Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage,
-                                                object[] pageArgs)
+        public async Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs,
+                                                string sqlPage, object[] pageArgs)
         {
             var saveTimeout = OneTimeCommandTimeout;
 
@@ -1345,7 +1347,8 @@ namespace PetaPoco
         public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, CommandType commandType, Sql sql)
             => QueryAsync<T>(cancellationToken, commandType, sql.SQL, sql.Arguments);
 
-        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CancellationToken cancellationToken, CommandType commandType, string sql, object[] args)
+        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CancellationToken cancellationToken, CommandType commandType, string sql,
+                                                           object[] args)
         {
             await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
             try
@@ -1372,7 +1375,9 @@ namespace PetaPoco
                     }
 
                     var readerAsync = reader as DbDataReader;
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
+                    var factory =
+                        pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
+                            _defaultMapper) as Func<IDataReader, T>;
 
                     using (reader)
                     {
@@ -1411,7 +1416,8 @@ namespace PetaPoco
             }
         }
 
-        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql, object[] args)
+        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql,
+                                                                            object[] args)
         {
             await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
             var cmd = CreateCommand(_sharedConnection, commandType, sql, args);
@@ -1444,7 +1450,8 @@ namespace PetaPoco
                 return AsyncReader<T>.Empty();
             }
 
-            var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
+            var factory =
+                pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
 
             return new AsyncReader<T>(this, cmd, reader, factory);
         }
@@ -1472,7 +1479,8 @@ namespace PetaPoco
                         yield break;
                     }
 
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r, _defaultMapper) as Func<IDataReader, T>;
+                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r,
+                        _defaultMapper) as Func<IDataReader, T>;
                     using (r)
                     {
                         while (true)
@@ -1546,8 +1554,8 @@ namespace PetaPoco
             if (sqlCondition.TrimStart().StartsWith("where", StringComparison.OrdinalIgnoreCase))
                 sqlCondition = sqlCondition.TrimStart().Substring(5);
 
-            return await ExecuteScalarAsync<int>(cancellationToken, string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args)
-                       .ConfigureAwait(false) != 0;
+            return await ExecuteScalarAsync<int>(cancellationToken,
+                       string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args).ConfigureAwait(false) != 0;
         }
 #endif
 
@@ -1723,8 +1731,8 @@ namespace PetaPoco
 
             var t = poco.GetType();
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
-            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement ||
-                                t.Name.Contains("AnonymousType") && !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement || t.Name.Contains("AnonymousType") &&
+                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
 
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
@@ -1766,38 +1774,8 @@ namespace PetaPoco
                         var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
                         var names = new List<string>();
                         var values = new List<string>();
-                        var index = 0;
-                        foreach (var i in pd.Columns)
-                        {
-                            // Don't insert result columns
-                            if (i.Value.ResultColumn)
-                                continue;
 
-                            // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-                            if (autoIncrement && primaryKeyName != null && String.Compare(i.Key, primaryKeyName, StringComparison.OrdinalIgnoreCase) == 0)
-                            {
-                                // Setup auto increment expression
-                                var autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
-                                if (autoIncExpression != null)
-                                {
-                                    names.Add(i.Key);
-                                    values.Add(autoIncExpression);
-                                }
-
-                                continue;
-                            }
-
-                            names.Add(_provider.EscapeSqlIdentifier(i.Key));
-                            values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
-                            AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
-                        }
-
-                        var outputClause = string.Empty;
-                        if (autoIncrement)
-                            outputClause = _provider.GetInsertOutputClause(primaryKeyName);
-
-                        cmd.CommandText =
-                            $"INSERT INTO {_provider.EscapeTableName(tableName)} ({string.Join(",", names.ToArray())}){outputClause} VALUES ({string.Join(",", values.ToArray())})";
+                        PrepareExecuteInsert(tableName, primaryKeyName, autoIncrement, poco, pd, names, values, cmd);
 
                         if (!autoIncrement)
                         {
@@ -1805,8 +1783,7 @@ namespace PetaPoco
                             cmd.ExecuteNonQuery();
                             OnExecutedCommand(cmd);
 
-                            PocoColumn pkColumn;
-                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out pkColumn))
+                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out var pkColumn))
                                 return pkColumn.GetValue(poco);
                             else
                                 return null;
@@ -1816,11 +1793,8 @@ namespace PetaPoco
 
                         // Assign the ID back to the primary key property
                         if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
-                        {
-                            PocoColumn pc;
-                            if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+                            if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
                                 pc.SetValue(poco, pc.ChangeType(id));
-                        }
 
                         return id;
                     }
@@ -1838,30 +1812,160 @@ namespace PetaPoco
             }
         }
 
+        private void PrepareExecuteInsert(string tableName, string primaryKeyName, bool autoIncrement, object poco, PocoData pd, List<string> names,
+                                          List<string> values, IDbCommand cmd)
+        {
+            var index = 0;
+            foreach (var i in pd.Columns)
+            {
+                // Don't insert result columns
+                if (i.Value.ResultColumn)
+                    continue;
+
+                // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
+                if (autoIncrement && primaryKeyName != null && string.Compare(i.Key, primaryKeyName, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    // Setup auto increment expression
+                    var autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
+                    if (autoIncExpression != null)
+                    {
+                        names.Add(i.Key);
+                        values.Add(autoIncExpression);
+                    }
+
+                    continue;
+                }
+
+                names.Add(_provider.EscapeSqlIdentifier(i.Key));
+                values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
+                AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+            }
+
+            var outputClause = string.Empty;
+            if (autoIncrement)
+                outputClause = _provider.GetInsertOutputClause(primaryKeyName);
+
+            cmd.CommandText =
+                $"INSERT INTO {_provider.EscapeTableName(tableName)} ({string.Join(",", names.ToArray())}){outputClause} VALUES ({string.Join(",", values.ToArray())})";
+        }
+
 #if ASYNC
 
-        /// <inheritdoc />
         public Task<object> InsertAsync(string tableName, object poco)
+            => InsertAsync(CancellationToken.None, tableName, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, object poco)
         {
-            throw new NotImplementedException();
+            if (tableName == null)
+                throw new ArgumentNullException(nameof(tableName));
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return ExecuteInsertAsync(cancellationToken, tableName, pd?.TableInfo.PrimaryKey, pd != null && pd.TableInfo.AutoIncrement, poco);
         }
 
-        /// <inheritdoc />
         public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco)
+            => InsertAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
         {
-            throw new NotImplementedException();
+            if (tableName == null)
+                throw new ArgumentNullException(nameof(tableName));
+            if (primaryKeyName == null)
+                throw new ArgumentNullException(nameof(primaryKeyName));
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var t = poco.GetType();
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement || t.Name.Contains("AnonymousType") &&
+                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+
+            return ExecuteInsertAsync(cancellationToken, tableName, primaryKeyName, autoIncrement, poco);
         }
 
-        /// <inheritdoc />
         public Task<object> InsertAsync(string tableName, string primaryKeyName, bool autoIncrement, object poco)
+            => InsertAsync(CancellationToken.None, tableName, primaryKeyName, autoIncrement, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
-            throw new NotImplementedException();
+            if (tableName == null)
+                throw new ArgumentNullException(nameof(tableName));
+            if (primaryKeyName == null)
+                throw new ArgumentNullException(nameof(primaryKeyName));
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            return ExecuteInsertAsync(cancellationToken, tableName, primaryKeyName, autoIncrement, poco);
         }
 
-        /// <inheritdoc />
         public Task<object> InsertAsync(object poco)
+            => InsertAsync(CancellationToken.None, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, object poco)
         {
-            throw new NotImplementedException();
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return ExecuteInsertAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
+        }
+
+        private async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, bool autoIncrement,
+                                                      object poco)
+        {
+            try
+            {
+                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
+                    {
+                        var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+                        var names = new List<string>();
+                        var values = new List<string>();
+
+                        PrepareExecuteInsert(tableName, primaryKeyName, autoIncrement, poco, pd, names, values, cmd);
+
+                        if (!autoIncrement)
+                        {
+                            DoPreExecute(cmd);
+
+                            if (cmd is DbCommand dbCmd)
+                                await dbCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                            else
+                                cmd.ExecuteNonQuery();
+
+                            OnExecutedCommand(cmd);
+
+                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out var pkColumn))
+                                return pkColumn.GetValue(poco);
+                            else
+                                return null;
+                        }
+
+                        var id = await _provider.ExecuteInsertAsync(cancellationToken, this, cmd, primaryKeyName).ConfigureAwait(false);
+
+                        // Assign the ID back to the primary key property
+                        if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
+                            if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
+                                pc.SetValue(poco, pc.ChangeType(id));
+
+                        return id;
+                    }
+                }
+                finally
+                {
+                    CloseSharedConnection();
+                }
+            }
+            catch (Exception x)
+            {
+                if (OnException(x))
+                    throw;
+                return null;
+            }
         }
 
 #endif
@@ -2026,7 +2130,9 @@ namespace PetaPoco
                         if (primaryKeyName != null)
                         {
                             PocoColumn col;
-                            pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
+                            pkpi = pd.Columns.TryGetValue(primaryKeyName, out col)
+                                ? col.PropertyInfo
+                                : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
                         }
 
                         cmd.CommandText =

@@ -4,20 +4,22 @@ using System.Data.Common;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
+#if ASYNC
+using System.Threading;
+using System.Threading.Tasks;
+#endif
 
 namespace PetaPoco.Providers
 {
     public class OracleDatabaseProvider : DatabaseProvider
     {
         public override string GetParameterPrefix(string connectionString)
-        {
-            return ":";
-        }
+            => ":";
 
         public override void PreExecute(IDbCommand cmd)
         {
-            cmd.GetType().GetProperty("BindByName").SetValue(cmd, true, null);
-            cmd.GetType().GetProperty("InitialLONGFetchSize").SetValue(cmd, -1, null);
+            cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
+            cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
         }
 
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
@@ -38,37 +40,48 @@ namespace PetaPoco.Providers
         }
 
         public override string EscapeSqlIdentifier(string sqlIdentifier)
-        {
-            return string.Format("\"{0}\"", sqlIdentifier.ToUpperInvariant());
-        }
+            => $"\"{sqlIdentifier.ToUpperInvariant()}\"";
 
         public override string GetAutoIncrementExpression(TableInfo ti)
-        {
-            if (!string.IsNullOrEmpty(ti.SequenceName))
-                return string.Format("{0}.nextval", ti.SequenceName);
-
-            return null;
-        }
+            => !string.IsNullOrEmpty(ti.SequenceName) ? $"{ti.SequenceName}.nextval" : null;
 
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
             {
-                cmd.CommandText += string.Format(" returning {0} into :newid", EscapeSqlIdentifier(primaryKeyName));
-                var param = cmd.CreateParameter();
-                param.ParameterName = ":newid";
-                param.Value = DBNull.Value;
-                param.Direction = ParameterDirection.ReturnValue;
-                param.DbType = DbType.Int64;
-                cmd.Parameters.Add(param);
+                var param = PrepareInsert(cmd, primaryKeyName);
                 ExecuteNonQueryHelper(db, cmd);
                 return param.Value;
             }
-            else
-            {
-                ExecuteNonQueryHelper(db, cmd);
-                return -1;
-            }
+
+            ExecuteNonQueryHelper(db, cmd);
+            return -1;
         }
+
+        private IDbDataParameter PrepareInsert(IDbCommand cmd, string primaryKeyName)
+        {
+            cmd.CommandText += $" returning {EscapeSqlIdentifier(primaryKeyName)} into :newid";
+            var param = cmd.CreateParameter();
+            param.ParameterName = ":newid";
+            param.Value = DBNull.Value;
+            param.Direction = ParameterDirection.ReturnValue;
+            param.DbType = DbType.Int64;
+            cmd.Parameters.Add(param);
+            return param;
+        }
+#if ASYNC
+        public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
+        {
+            if (primaryKeyName != null)
+            {
+                var param = PrepareInsert(cmd, primaryKeyName);
+                await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd).ConfigureAwait(false);
+                return param.Value;
+            }
+
+            await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd).ConfigureAwait(false);
+            return -1;
+        }
+#endif
     }
 }
