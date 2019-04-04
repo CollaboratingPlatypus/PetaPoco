@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -80,7 +81,9 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
-            var personOther = DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var personOther =
+                DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _person.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -95,10 +98,15 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             DB.Insert("SpecificOrderLines", "Id", _orderLine);
 
-            var personOther = DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
-            var orderOther = DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
-            var orderLineOther = DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                _orderLine.Id);
+            var personOther =
+                DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _person.Id);
+            var orderOther =
+                DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _order.Id);
+            var orderLineOther =
+                DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -220,6 +228,200 @@ namespace PetaPoco.Tests.Integration.Databases
             var id = DB.Insert("People", "Id", person);
 
             var otherPerson = DB.Single<Person>(id);
+
+            id.ShouldNotBeNull();
+            otherPerson.Id.ShouldBe(person.Id);
+            otherPerson.Age.ShouldBe(person.Age);
+            otherPerson.Dob.ShouldBe(person.Dob);
+            otherPerson.Height.ShouldBe(person.Height);
+            otherPerson.Name.ShouldBe(person.FullName);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenPoco_ShouldBeValid()
+        {
+            var id = await DB.InsertAsync(_person);
+
+            var personOther = await DB.SingleAsync<Person>(_person.Id);
+
+            _person.Id.ShouldBe(id);
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+        }
+
+        [Fact]
+        public async Task InsertAsync_WhenInsertingRelatedPocosAndGivenPoco_ShouldInsertPocos()
+        {
+            await DB.InsertAsync(_person);
+            _order.PersonId = _person.Id;
+            await DB.InsertAsync(_order);
+            _orderLine.OrderId = _order.Id;
+            await DB.InsertAsync(_orderLine);
+
+            var personOther = await DB.SingleAsync<Person>(_person.Id);
+            var orderOther = await DB.SingleAsync<Order>(_order.Id);
+            var orderLineOther = await DB.SingleAsync<OrderLine>(_orderLine.Id);
+
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+            orderOther.ShouldNotBeNull();
+            orderOther.ShouldBe(_order);
+            orderLineOther.ShouldNotBeNull();
+            orderLineOther.ShouldBe(_orderLine);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenPocoTableNameAndColumnName_ShouldInsertPoco()
+        {
+            await DB.InsertAsync("SpecificPeople", "Id", false, _person);
+
+            var personOther =
+                await DB.SingleAsync<Person>(
+                    $"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+        }
+
+        [Fact]
+        public async Task InsertAsync_WhenInsertingRelatedPocosGivenPocoTableNameAndColumnName_ShouldInsertPocos()
+        {
+            await DB.InsertAsync("SpecificPeople", "Id", false, _person);
+            _order.PersonId = _person.Id;
+            await DB.InsertAsync("SpecificOrders", "Id", _order);
+            _orderLine.OrderId = _order.Id;
+            await DB.InsertAsync("SpecificOrderLines", "Id", _orderLine);
+
+            var personOther =
+                await DB.SingleAsync<Person>(
+                    $"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var orderOther =
+                await DB.SingleAsync<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                    _order.Id);
+            var orderLineOther =
+                await DB.SingleAsync<OrderLine>(
+                    $"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
+
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+            orderOther.ShouldNotBeNull();
+            orderOther.ShouldBe(_order);
+            orderLineOther.ShouldNotBeNull();
+            orderLineOther.ShouldBe(_orderLine);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenTableNameAndAnonymousType_ShouldInsertPoco()
+        {
+            var log = new { Description = "Test log", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+
+            var logId = await DB.InsertAsync("TransactionLogs", log);
+            var otherLog = await DB.SingleAsync<TransactionLog>($"SELECT * FROM {DB.Provider.EscapeTableName("TransactionLogs")}");
+
+            logId.ShouldBeNull();
+            otherLog.Description.ShouldBe(log.Description);
+            otherLog.CreatedOn.ShouldBe(log.CreatedOn);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenNullByteArray_ShouldNotThrow()
+        {
+            await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[]) null });
+            (await DB.ExecuteScalarAsync<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenNonNullByteArray_ShouldNotThrow()
+        {
+            await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
+            (await DB.ExecuteScalarAsync<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenPocoWithNullDateTime_ShouldNotThrow()
+        {
+            _person.Dob = null;
+            var id = await DB.InsertAsync(_person);
+
+            var personOther = await DB.SingleAsync<Person>(_person.Id);
+
+            _person.Id.ShouldBe(id);
+            personOther.ShouldNotBeNull();
+            personOther.ShouldBe(_person);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenConventionalPocoWithTable_ShouldInsertPoco()
+        {
+            var id = await DB.InsertAsync("People", _person);
+
+            var otherPerson = await DB.SingleAsync<Person>(id);
+
+            _person.Id.ShouldBe(id);
+            otherPerson.ShouldNotBeNull();
+            otherPerson.ShouldBe(_person);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenConventionalPocoWithTableAndPrimaryKey_ShouldInsertPoco()
+        {
+            var id = await DB.InsertAsync("People", "Id", _person);
+
+            var otherPerson = await DB.SingleAsync<Person>(id);
+
+            _person.Id.ShouldBe(id);
+            otherPerson.ShouldNotBeNull();
+            otherPerson.ShouldBe(_person);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenPocoWithPrimaryNullableValueType_ShouldBeValid()
+        {
+            var note = new NoteNullablePrimary { Text = _note.Text, CreatedOn = _note.CreatedOn };
+
+            var id = await DB.InsertAsync(note);
+
+            var noteOther = await DB.SingleAsync<NoteNullablePrimary>(note.Id);
+
+            note.Id.ShouldBe(id);
+            noteOther.ShouldNotBeNull();
+            noteOther.ShouldBe(note);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldInsertPoco()
+        {
+            var note = new { Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+
+            var id = await DB.InsertAsync("Note", "Id", note);
+
+            var otherNote = await DB.SingleAsync<Note>(id);
+
+            otherNote.Text.ShouldBe(note.Text);
+            otherNote.CreatedOn.ShouldBe(note.CreatedOn);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithNullablePrimaryKey_ShouldInsertPoco()
+        {
+            var note = new { Id = (int?) null, Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+
+            var id = await DB.InsertAsync("Note", "Id", note);
+            var otherNote = await DB.SingleAsync<Note>(id);
+
+            id.ShouldNotBeNull();
+            otherNote.Text.ShouldBe(note.Text);
+            otherNote.CreatedOn.ShouldBe(note.CreatedOn);
+        }
+
+        [Fact]
+        public async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithStaticPrimaryKey_ShouldInsertPoco()
+        {
+            var person = new { Id = Guid.NewGuid(), Age = 18, Dob = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 180, FullName = "Peta" };
+
+            var id = await DB.InsertAsync("People", "Id", person);
+
+            var otherPerson = await DB.SingleAsync<Person>(id);
 
             id.ShouldNotBeNull();
             otherPerson.Id.ShouldBe(person.Id);

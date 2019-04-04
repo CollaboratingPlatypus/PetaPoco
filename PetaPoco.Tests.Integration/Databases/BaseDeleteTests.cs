@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -156,6 +157,119 @@ namespace PetaPoco.Tests.Integration.Databases
 
             _person = DB.SingleOrDefault<Person>(_person.Id);
             _note = DB.SingleOrDefault<Note>(_note.Id);
+
+            _person.ShouldBeNull();
+            _note.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_GivenPoco_ShouldDeletePoco()
+        {
+            // Arrange
+            await DB.InsertAsync(_person);
+            _order.PersonId = _person.Id;
+            await DB.InsertAsync(_order);
+            _orderLine.OrderId = _order.Id;
+            await DB.InsertAsync(_orderLine);
+            await DB.InsertAsync(_note);
+
+            // Act
+            await DB.DeleteAsync(_orderLine);
+            await DB.DeleteAsync(_order);
+            await DB.DeleteAsync(_person);
+            await DB.DeleteAsync(_note);
+
+            _person = await DB.SingleOrDefaultAsync<Person>(_person.Id);
+            _order = await DB.SingleOrDefaultAsync<Order>(_order.Id);
+            _orderLine = await DB.SingleOrDefaultAsync<OrderLine>(_orderLine.Id);
+            _note = await DB.SingleOrDefaultAsync<Note>(_note.Id);
+
+            // Assert
+            _person.ShouldBeNull();
+            _order.ShouldBeNull();
+            _orderLine.ShouldBeNull();
+            _note.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_GivenPocoOrPrimaryKey_ShouldDeletePoco()
+        {
+            await DB.InsertAsync(_note);
+            await DB.InsertAsync(_note2);
+            await DB.InsertAsync(_person);
+
+            (await DB.DeleteAsync<Person>(_person.Id)).ShouldBe(1);
+            (await DB.DeleteAsync<Note>(_note)).ShouldBe(1);
+            (await DB.DeleteAsync<Note>(new { _note2.Id })).ShouldBe(1);
+
+            _person = await DB.SingleOrDefaultAsync<Person>(_person.Id);
+            _note = await DB.SingleOrDefaultAsync<Note>(_note.Id);
+            _note2 = await DB.SingleOrDefaultAsync<Note>(_note2.Id);
+
+            _person.ShouldBeNull();
+            _note.ShouldBeNull();
+            _note2.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_GivenTableNamePrimaryKeyNameAndPoco_ShouldDeletePoco()
+        {
+            await DB.InsertAsync(_person);
+            await DB.InsertAsync(_note);
+
+            (await DB.DeleteAsync("People", "Id", _person)).ShouldBe(1);
+            (await DB.DeleteAsync("Note", "Id", _note)).ShouldBe(1);
+
+            _person = await DB.SingleOrDefaultAsync<Person>(_person.Id);
+            _note = await DB.SingleOrDefaultAsync<Note>(_note.Id);
+
+            _person.ShouldBeNull();
+            _note.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldDeletePoco()
+        {
+            await DB.InsertAsync(_person);
+            await DB.InsertAsync(_note);
+
+            (await DB.DeleteAsync("People", "Id", _person, _person.Id)).ShouldBe(1);
+            (await DB.DeleteAsync("Note", "Id", _note, _note.Id)).ShouldBe(1);
+
+            _person = await DB.SingleOrDefaultAsync<Person>(_person.Id);
+            _note = await DB.SingleOrDefaultAsync<Note>(_note.Id);
+
+            _person.ShouldBeNull();
+            _note.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_GivenSqlAndArgs_ShouldDeletePoco()
+        {
+            await DB.InsertAsync(_note);
+            await DB.InsertAsync(_person);
+
+            (await DB.DeleteAsync<Note>($"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _note.Id)).ShouldBe(1);
+            (await DB.DeleteAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id)).ShouldBe(1);
+
+            _person = await DB.SingleOrDefaultAsync<Person>(_person.Id);
+            _note = await DB.SingleOrDefaultAsync<Note>(_note.Id);
+
+            _person.ShouldBeNull();
+            _note.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_GivenSql_ShouldDeletePoco()
+        {
+            await DB.InsertAsync(_note);
+            await DB.InsertAsync(_person);
+
+            (await DB.DeleteAsync<Note>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _note.Id))).ShouldBe(1);
+            (await DB.DeleteAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id))).ShouldBe(1);
+
+            _person = await DB.SingleOrDefaultAsync<Person>(_person.Id);
+            _note = await DB.SingleOrDefaultAsync<Note>(_note.Id);
 
             _person.ShouldBeNull();
             _note.ShouldBeNull();

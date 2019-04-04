@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using PetaPoco.Core;
 
 namespace PetaPoco.Providers
@@ -6,26 +7,19 @@ namespace PetaPoco.Providers
     public class MySqlDatabaseProvider : DatabaseProvider
     {
         public override DbProviderFactory GetFactory()
-        {
-            return GetFactory("MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Culture=neutral, PublicKeyToken=c5687fc88969c44d");
-        }
+            => GetFactory("MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Culture=neutral, PublicKeyToken=c5687fc88969c44d");
 
         public override string GetParameterPrefix(string connectionString)
         {
-            if (connectionString != null && connectionString.IndexOf("Allow User Variables=true") >= 0)
+            if (connectionString != null && connectionString.IndexOf("Allow User Variables=true", StringComparison.Ordinal) >= 0)
                 return "?";
-            else
-                return "@";
+            return "@";
         }
 
         public override string EscapeSqlIdentifier(string sqlIdentifier)
-        {
-            return string.Format("`{0}`", sqlIdentifier);
-        }
+            => $"`{sqlIdentifier}`";
 
         public override string GetExistsSql()
-        {
-            return "SELECT EXISTS (SELECT 1 FROM {0} WHERE {1})";
-        }
+            => "SELECT EXISTS (SELECT 1 FROM {0} WHERE {1})";
     }
 }

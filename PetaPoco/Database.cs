@@ -888,7 +888,8 @@ namespace PetaPoco
         public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql)
             => ExecuteScalarInternalAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
 
-        protected virtual async Task<T> ExecuteScalarInternalAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql, params object[] args)
+        protected virtual async Task<T> ExecuteScalarInternalAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql,
+                                                                      params object[] args)
         {
             try
             {
@@ -1104,8 +1105,8 @@ namespace PetaPoco
 #if ASYNC
 
         /// <inheritdoc />
-        public async Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage,
-                                                object[] pageArgs)
+        public async Task<Page<T>> PageAsync<T>(CancellationToken cancellationToken, long page, long itemsPerPage, string sqlCount, object[] countArgs,
+                                                string sqlPage, object[] pageArgs)
         {
             var saveTimeout = OneTimeCommandTimeout;
 
@@ -1345,7 +1346,8 @@ namespace PetaPoco
         public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, CommandType commandType, Sql sql)
             => QueryAsync<T>(cancellationToken, commandType, sql.SQL, sql.Arguments);
 
-        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CancellationToken cancellationToken, CommandType commandType, string sql, object[] args)
+        protected virtual async Task ExecuteReaderAsync<T>(Action<T> processPoco, CancellationToken cancellationToken, CommandType commandType, string sql,
+                                                           object[] args)
         {
             await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
             try
@@ -1372,7 +1374,9 @@ namespace PetaPoco
                     }
 
                     var readerAsync = reader as DbDataReader;
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
+                    var factory =
+                        pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
+                            _defaultMapper) as Func<IDataReader, T>;
 
                     using (reader)
                     {
@@ -1411,7 +1415,8 @@ namespace PetaPoco
             }
         }
 
-        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql, object[] args)
+        protected virtual async Task<IAsyncReader<T>> ExecuteReaderAsync<T>(CancellationToken cancellationToken, CommandType commandType, string sql,
+                                                                            object[] args)
         {
             await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
             var cmd = CreateCommand(_sharedConnection, commandType, sql, args);
@@ -1444,7 +1449,8 @@ namespace PetaPoco
                 return AsyncReader<T>.Empty();
             }
 
-            var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
+            var factory =
+                pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
 
             return new AsyncReader<T>(this, cmd, reader, factory);
         }
@@ -1472,7 +1478,8 @@ namespace PetaPoco
                         yield break;
                     }
 
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r, _defaultMapper) as Func<IDataReader, T>;
+                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r,
+                        _defaultMapper) as Func<IDataReader, T>;
                     using (r)
                     {
                         while (true)
@@ -1546,14 +1553,14 @@ namespace PetaPoco
             if (sqlCondition.TrimStart().StartsWith("where", StringComparison.OrdinalIgnoreCase))
                 sqlCondition = sqlCondition.TrimStart().Substring(5);
 
-            return await ExecuteScalarAsync<int>(cancellationToken, string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args)
-                       .ConfigureAwait(false) != 0;
+            return await ExecuteScalarAsync<int>(cancellationToken,
+                       string.Format(_provider.GetExistsSql(), Provider.EscapeTableName(poco.TableName), sqlCondition), args).ConfigureAwait(false) != 0;
         }
 #endif
 
 #endregion
 
-#region operation: linq style (Exists, Single, SingleOrDefault etc...)
+#region operation: Linq style (Exists, Single, SingleOrDefault etc...)
 
         /// <inheritdoc />
         public T Single<T>(object primaryKey)
@@ -1695,12 +1702,7 @@ namespace PetaPoco
 
 #region operation: Insert
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        /// <inheritdoc />
         public object Insert(string tableName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1714,13 +1716,7 @@ namespace PetaPoco
             return ExecuteInsert(tableName, pd == null ? null : pd.TableInfo.PrimaryKey, pd != null && pd.TableInfo.AutoIncrement, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
+        /// <inheritdoc />
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1734,25 +1730,13 @@ namespace PetaPoco
 
             var t = poco.GetType();
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
-            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement ||
-                                t.Name.Contains("AnonymousType") && !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement || t.Name.Contains("AnonymousType") &&
+                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
 
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
-        /// <remarks>
-        ///     Inserts a poco into a table.  If the poco has a property with the same name
-        ///     as the primary key the id of the new record is assigned to it.  Either way,
-        ///     the new id is returned.
-        /// </remarks>
+        /// <inheritdoc />
         public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1767,15 +1751,7 @@ namespace PetaPoco
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Insert
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables</returns>
-        /// <remarks>
-        ///     The name of the table, it's primary key and whether it's an auto-allocated primary key are retrieved
-        ///     from the POCO's attributes
-        /// </remarks>
+        /// <inheritdoc />
         public object Insert(object poco)
         {
             if (poco == null)
@@ -1792,45 +1768,13 @@ namespace PetaPoco
                 OpenSharedConnection();
                 try
                 {
-                    using (var cmd = CreateCommand(_sharedConnection, ""))
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
                     {
                         var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
                         var names = new List<string>();
                         var values = new List<string>();
-                        var index = 0;
-                        foreach (var i in pd.Columns)
-                        {
-                            // Don't insert result columns
-                            if (i.Value.ResultColumn)
-                                continue;
 
-                            // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
-                            if (autoIncrement && primaryKeyName != null && string.Compare(i.Key, primaryKeyName, true) == 0)
-                            {
-                                // Setup auto increment expression
-                                string autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
-                                if (autoIncExpression != null)
-                                {
-                                    names.Add(i.Key);
-                                    values.Add(autoIncExpression);
-                                }
-
-                                continue;
-                            }
-
-                            names.Add(_provider.EscapeSqlIdentifier(i.Key));
-                            values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
-                            AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
-                        }
-
-                        string outputClause = string.Empty;
-                        if (autoIncrement)
-                        {
-                            outputClause = _provider.GetInsertOutputClause(primaryKeyName);
-                        }
-
-                        cmd.CommandText = string.Format("INSERT INTO {0} ({1}){2} VALUES ({3})", _provider.EscapeTableName(tableName), string.Join(",", names.ToArray()),
-                            outputClause, string.Join(",", values.ToArray()));
+                        PrepareExecuteInsert(tableName, primaryKeyName, autoIncrement, poco, pd, names, values, cmd);
 
                         if (!autoIncrement)
                         {
@@ -1838,24 +1782,18 @@ namespace PetaPoco
                             cmd.ExecuteNonQuery();
                             OnExecutedCommand(cmd);
 
-                            PocoColumn pkColumn;
-                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out pkColumn))
+                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out var pkColumn))
                                 return pkColumn.GetValue(poco);
                             else
                                 return null;
                         }
 
-                        object id = _provider.ExecuteInsert(this, cmd, primaryKeyName);
+                        var id = _provider.ExecuteInsert(this, cmd, primaryKeyName);
 
                         // Assign the ID back to the primary key property
                         if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
-                        {
-                            PocoColumn pc;
-                            if (pd.Columns.TryGetValue(primaryKeyName, out pc))
-                            {
+                            if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
                                 pc.SetValue(poco, pc.ChangeType(id));
-                            }
-                        }
 
                         return id;
                     }
@@ -1873,18 +1811,169 @@ namespace PetaPoco
             }
         }
 
+        private void PrepareExecuteInsert(string tableName, string primaryKeyName, bool autoIncrement, object poco, PocoData pd, List<string> names,
+                                          List<string> values, IDbCommand cmd)
+        {
+            var index = 0;
+            foreach (var i in pd.Columns)
+            {
+                // Don't insert result columns
+                if (i.Value.ResultColumn)
+                    continue;
+
+                // Don't insert the primary key (except under oracle where we need bring in the next sequence value)
+                if (autoIncrement && primaryKeyName != null && string.Compare(i.Key, primaryKeyName, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    // Setup auto increment expression
+                    var autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
+                    if (autoIncExpression != null)
+                    {
+                        names.Add(i.Key);
+                        values.Add(autoIncExpression);
+                    }
+
+                    continue;
+                }
+
+                names.Add(_provider.EscapeSqlIdentifier(i.Key));
+                values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
+                AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+            }
+
+            var outputClause = string.Empty;
+            if (autoIncrement)
+                outputClause = _provider.GetInsertOutputClause(primaryKeyName);
+
+            cmd.CommandText =
+                $"INSERT INTO {_provider.EscapeTableName(tableName)} ({string.Join(",", names.ToArray())}){outputClause} VALUES ({string.Join(",", values.ToArray())})";
+        }
+
+#if ASYNC
+
+        public Task<object> InsertAsync(string tableName, object poco)
+            => InsertAsync(CancellationToken.None, tableName, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, object poco)
+        {
+            if (tableName == null)
+                throw new ArgumentNullException(nameof(tableName));
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return ExecuteInsertAsync(cancellationToken, tableName, pd?.TableInfo.PrimaryKey, pd != null && pd.TableInfo.AutoIncrement, poco);
+        }
+
+        public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco)
+            => InsertAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
+        {
+            if (tableName == null)
+                throw new ArgumentNullException(nameof(tableName));
+            if (primaryKeyName == null)
+                throw new ArgumentNullException(nameof(primaryKeyName));
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var t = poco.GetType();
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            var autoIncrement = pd == null || pd.TableInfo.AutoIncrement || t.Name.Contains("AnonymousType") &&
+                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+
+            return ExecuteInsertAsync(cancellationToken, tableName, primaryKeyName, autoIncrement, poco);
+        }
+
+        public Task<object> InsertAsync(string tableName, string primaryKeyName, bool autoIncrement, object poco)
+            => InsertAsync(CancellationToken.None, tableName, primaryKeyName, autoIncrement, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, bool autoIncrement, object poco)
+        {
+            if (tableName == null)
+                throw new ArgumentNullException(nameof(tableName));
+            if (primaryKeyName == null)
+                throw new ArgumentNullException(nameof(primaryKeyName));
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            return ExecuteInsertAsync(cancellationToken, tableName, primaryKeyName, autoIncrement, poco);
+        }
+
+        public Task<object> InsertAsync(object poco)
+            => InsertAsync(CancellationToken.None, poco);
+
+        public Task<object> InsertAsync(CancellationToken cancellationToken, object poco)
+        {
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return ExecuteInsertAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, pd.TableInfo.AutoIncrement, poco);
+        }
+
+        private async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, bool autoIncrement,
+                                                      object poco)
+        {
+            try
+            {
+                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
+                    {
+                        var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+                        var names = new List<string>();
+                        var values = new List<string>();
+
+                        PrepareExecuteInsert(tableName, primaryKeyName, autoIncrement, poco, pd, names, values, cmd);
+
+                        if (!autoIncrement)
+                        {
+                            DoPreExecute(cmd);
+
+                            if (cmd is DbCommand dbCmd)
+                                await dbCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                            else
+                                cmd.ExecuteNonQuery();
+
+                            OnExecutedCommand(cmd);
+
+                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out var pkColumn))
+                                return pkColumn.GetValue(poco);
+                            else
+                                return null;
+                        }
+
+                        var id = await _provider.ExecuteInsertAsync(cancellationToken, this, cmd, primaryKeyName).ConfigureAwait(false);
+
+                        // Assign the ID back to the primary key property
+                        if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
+                            if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
+                                pc.SetValue(poco, pc.ChangeType(id));
+
+                        return id;
+                    }
+                }
+                finally
+                {
+                    CloseSharedConnection();
+                }
+            }
+            catch (Exception x)
+            {
+                if (OnException(x))
+                    throw;
+                return null;
+            }
+        }
+
+#endif
+
 #endregion
 
 #region operation: Update
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected records</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1899,15 +1988,7 @@ namespace PetaPoco
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1922,26 +2003,11 @@ namespace PetaPoco
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco)
-        {
-            return Update(tableName, primaryKeyName, poco, null);
-        }
+            => Update(tableName, primaryKeyName, poco, null);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1956,45 +2022,19 @@ namespace PetaPoco
             return ExecuteUpdate(tableName, primaryKeyName, poco, null, columns);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco, IEnumerable<string> columns)
-        {
-            return Update(poco, null, columns);
-        }
+            => Update(poco, null, columns);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco)
-        {
-            return Update(poco, null, null);
-        }
+            => Update(poco, null, null);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco, object primaryKeyValue)
-        {
-            return Update(poco, primaryKeyValue, null);
-        }
+            => Update(poco, primaryKeyValue, null);
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update(object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (poco == null)
@@ -2004,38 +2044,24 @@ namespace PetaPoco
             return ExecuteUpdate(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update<T>(string sql, params object[] args)
         {
             if (string.IsNullOrEmpty(sql))
                 throw new ArgumentNullException(nameof(sql));
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(string.Format("UPDATE {0} {1}", _provider.EscapeTableName(pd.TableInfo.TableName), sql), args);
+            return Execute($"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
         }
 
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE
-        ///     tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Update<T>(Sql sql)
         {
             if (sql == null)
                 throw new ArgumentNullException(nameof(sql));
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(new Sql(string.Format("UPDATE {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+            return Execute(new Sql($"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
         }
 
         private int ExecuteUpdate(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
@@ -2045,77 +2071,13 @@ namespace PetaPoco
                 OpenSharedConnection();
                 try
                 {
-                    using (var cmd = CreateCommand(_sharedConnection, ""))
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
                     {
-                        var sb = new StringBuilder();
-                        var index = 0;
-                        var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
-                        if (columns == null)
-                        {
-                            foreach (var i in pd.Columns)
-                            {
-                                // Don't update the primary key, but grab the value if we don't have it
-                                if (string.Compare(i.Key, primaryKeyName, true) == 0)
-                                {
-                                    if (primaryKeyValue == null)
-                                        primaryKeyValue = i.Value.GetValue(poco);
-                                    continue;
-                                }
-
-                                // Dont update result only columns
-                                if (i.Value.ResultColumn)
-                                    continue;
-
-                                // Build the sql
-                                if (index > 0)
-                                    sb.Append(", ");
-                                sb.AppendFormat(i.Value.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
-
-                                // Store the parameter in the command
-                                AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
-                            }
-                        }
-                        else
-                        {
-                            foreach (var colname in columns)
-                            {
-                                var pc = pd.Columns[colname];
-
-                                // Build the sql
-                                if (index > 0)
-                                    sb.Append(", ");
-                                sb.AppendFormat(pc.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(colname), _paramPrefix, index++);
-
-                                // Store the parameter in the command
-                                AddParam(cmd, pc.GetValue(poco), pc.PropertyInfo);
-                            }
-
-                            // Grab primary key value
-                            if (primaryKeyValue == null)
-                            {
-                                var pc = pd.Columns[primaryKeyName];
-                                primaryKeyValue = pc.GetValue(poco);
-                            }
-                        }
-
-                        // Find the property info for the primary key
-                        PropertyInfo pkpi = null;
-                        if (primaryKeyName != null)
-                        {
-                            PocoColumn col;
-                            pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
-                        }
-
-                        cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2} = {3}{4}", _provider.EscapeTableName(tableName), sb.ToString(),
-                            _provider.EscapeSqlIdentifier(primaryKeyName), _paramPrefix, index++);
-                        AddParam(cmd, primaryKeyValue, pkpi);
-
+                        PreExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns, cmd);
                         DoPreExecute(cmd);
-
-                        // Do it
-                        var retv = cmd.ExecuteNonQuery();
+                        var result = cmd.ExecuteNonQuery();
                         OnExecutedCommand(cmd);
-                        return retv;
+                        return result;
                     }
                 }
                 finally
@@ -2131,71 +2093,270 @@ namespace PetaPoco
             }
         }
 
-#endregion
-
-#region operation: Delete
-
-        /// <summary>
-        ///     Performs and SQL Delete
-        /// </summary>
-        /// <param name="tableName">The name of the table to delete from</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
-        /// <returns>The number of rows affected</returns>
-        public int Delete(string tableName, string primaryKeyName, object poco)
+        private void PreExecuteUpdate(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns, IDbCommand cmd)
         {
-            return Delete(tableName, primaryKeyName, poco, null);
-        }
-
-        /// <summary>
-        ///     Performs and SQL Delete
-        /// </summary>
-        /// <param name="tableName">The name of the table to delete from</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">
-        ///     The POCO object whose primary key value will be used to delete the row (or null to use the supplied
-        ///     primary key value)
-        /// </param>
-        /// <param name="primaryKeyValue">
-        ///     The value of the primary key identifing the record to be deleted (or null, or get this
-        ///     value from the POCO instance)
-        /// </param>
-        /// <returns>The number of rows affected</returns>
-        public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
-        {
-            // If primary key value not specified, pick it up from the object
-            if (primaryKeyValue == null)
+            var sb = new StringBuilder();
+            var index = 0;
+            var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+            if (columns == null)
             {
-                var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
-                PocoColumn pc;
-                if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+                foreach (var i in pd.Columns)
                 {
+                    // Don't update the primary key, but grab the value if we don't have it
+                    if (string.Compare(i.Key, primaryKeyName, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        if (primaryKeyValue == null)
+                            primaryKeyValue = i.Value.GetValue(poco);
+                        continue;
+                    }
+
+                    // Dont update result only columns
+                    if (i.Value.ResultColumn)
+                        continue;
+
+                    // Build the sql
+                    if (index > 0)
+                        sb.Append(", ");
+                    sb.AppendFormat(i.Value.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
+
+                    // Store the parameter in the command
+                    AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+                }
+            }
+            else
+            {
+                foreach (var colname in columns)
+                {
+                    var pc = pd.Columns[colname];
+
+                    // Build the sql
+                    if (index > 0)
+                        sb.Append(", ");
+                    sb.AppendFormat(pc.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(colname), _paramPrefix, index++);
+
+                    // Store the parameter in the command
+                    AddParam(cmd, pc.GetValue(poco), pc.PropertyInfo);
+                }
+
+                // Grab primary key value
+                if (primaryKeyValue == null)
+                {
+                    var pc = pd.Columns[primaryKeyName];
                     primaryKeyValue = pc.GetValue(poco);
                 }
             }
 
-            // Do it
-            var sql = string.Format("DELETE FROM {0} WHERE {1}=@0", _provider.EscapeTableName(tableName), _provider.EscapeSqlIdentifier(primaryKeyName));
+            // Find the property info for the primary key
+            PropertyInfo pkpi = null;
+            if (primaryKeyName != null)
+            {
+                PocoColumn col;
+                pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
+            }
+
+            cmd.CommandText =
+                $"UPDATE {_provider.EscapeTableName(tableName)} SET {sb} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)} = {_paramPrefix}{index++}";
+            AddParam(cmd, primaryKeyValue, pkpi);
+        }
+
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+            => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException(nameof(tableName));
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException(nameof(primaryKeyName));
+
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            return ExecuteUpdateAsync(cancellationToken, tableName, primaryKeyName, poco, primaryKeyValue, null);
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+            => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue, columns);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue,
+                                     IEnumerable<string> columns)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException(nameof(tableName));
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException(nameof(primaryKeyName));
+
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            return ExecuteUpdateAsync(cancellationToken, tableName, primaryKeyName, poco, primaryKeyValue, columns);
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco)
+            => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
+            => UpdateAsync(cancellationToken, tableName, primaryKeyName, poco, null);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
+            => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, columns);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
+        {
+            if (string.IsNullOrEmpty(tableName))
+                throw new ArgumentNullException(nameof(tableName));
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+                throw new ArgumentNullException(nameof(primaryKeyName));
+
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            return ExecuteUpdateAsync(cancellationToken, tableName, primaryKeyName, poco, null, columns);
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco, IEnumerable<string> columns)
+            => UpdateAsync(CancellationToken.None, poco, columns);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, IEnumerable<string> columns)
+            => UpdateAsync(cancellationToken, poco, null, columns);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco)
+            => UpdateAsync(CancellationToken.None, poco);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco)
+            => UpdateAsync(cancellationToken, poco, null, null);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco, object primaryKeyValue)
+            => UpdateAsync(CancellationToken.None, poco, primaryKeyValue);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, object primaryKeyValue)
+            => UpdateAsync(cancellationToken, poco, primaryKeyValue, null);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(object poco, object primaryKeyValue, IEnumerable<string> columns)
+            => UpdateAsync(CancellationToken.None, poco, primaryKeyValue, columns);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, object primaryKeyValue, IEnumerable<string> columns)
+        {
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return ExecuteUpdateAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync<T>(string sql, params object[] args)
+            => UpdateAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+        {
+            if (string.IsNullOrEmpty(sql))
+                throw new ArgumentNullException(nameof(sql));
+
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExecuteAsync(cancellationToken, $"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
+        }
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync<T>(Sql sql)
+            => UpdateAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<int> UpdateAsync<T>(CancellationToken cancellationToken, Sql sql)
+        {
+            if (sql == null)
+                throw new ArgumentNullException(nameof(sql));
+
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExecuteAsync(cancellationToken, new Sql($"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
+        }
+
+        private async Task<int> ExecuteUpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco,
+                                                   object primaryKeyValue, IEnumerable<string> columns)
+        {
+            try
+            {
+                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    using (var cmd = CreateCommand(_sharedConnection, string.Empty))
+                    {
+                        PreExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns, cmd);
+                        DoPreExecute(cmd);
+                        var result = cmd is DbCommand dbCommand
+                            ? await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false)
+                            : cmd.ExecuteNonQuery();
+                        OnExecutedCommand(cmd);
+                        return result;
+                    }
+                }
+                finally
+                {
+                    CloseSharedConnection();
+                }
+            }
+            catch (Exception x)
+            {
+                if (OnException(x))
+                    throw;
+                return -1;
+            }
+        }
+
+#endif
+
+#endregion
+
+#region operation: Delete
+
+        /// <inheritdoc />
+        public int Delete(string tableName, string primaryKeyName, object poco)
+            => Delete(tableName, primaryKeyName, poco, null);
+
+        /// <inheritdoc />
+        public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+        {
+            if (primaryKeyValue == null)
+            {
+                var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+                if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
+                    primaryKeyValue = pc.GetValue(poco);
+            }
+
+            var sql = $"DELETE FROM {_provider.EscapeTableName(tableName)} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)}=@0";
             return Execute(sql, primaryKeyValue);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <param name="poco">The POCO object specifying the table name and primary key value of the row to be deleted</param>
-        /// <returns>The number of rows affected</returns>
+        /// <inheritdoc />
         public int Delete(object poco)
         {
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
-        /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public int Delete<T>(object pocoOrPrimaryKey)
         {
             if (pocoOrPrimaryKey.GetType() == typeof(T))
@@ -2208,7 +2369,7 @@ namespace PetaPoco
                 var pi = pocoOrPrimaryKey.GetType().GetProperty(pd.TableInfo.PrimaryKey);
 
                 if (pi == null)
-                    throw new InvalidOperationException(string.Format("Anonymous type does not contain an id for PK column `{0}`.", pd.TableInfo.PrimaryKey));
+                    throw new InvalidOperationException($"Anonymous type does not contain an id for PK column `{pd.TableInfo.PrimaryKey}`.");
 
                 pocoOrPrimaryKey = pi.GetValue(pocoOrPrimaryKey, new object[0]);
             }
@@ -2216,45 +2377,113 @@ namespace PetaPoco
             return Delete(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
-        /// <param name="sql">The SQL condition clause identifying the row to delete (ie: everything after "DELETE FROM tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Delete<T>(string sql, params object[] args)
         {
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(string.Format("DELETE FROM {0} {1}", _provider.EscapeTableName(pd.TableInfo.TableName), sql), args);
+            return Execute($"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
         }
 
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL condition clause identifying the row to delete (ie:
-        ///     everything after "UPDATE tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc />
         public int Delete<T>(Sql sql)
         {
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
-            return Execute(new Sql(string.Format("DELETE FROM {0}", _provider.EscapeTableName(pd.TableInfo.TableName))).Append(sql));
+            return Execute(new Sql($"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
         }
+
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(string tableName, string primaryKeyName, object poco)
+            => DeleteAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
+            => DeleteAsync(cancellationToken, tableName, primaryKeyName, poco, null);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+            => DeleteAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+        {
+            if (primaryKeyValue == null)
+            {
+                var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+                if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
+                    primaryKeyValue = pc.GetValue(poco);
+            }
+
+            var sql = $"DELETE FROM {_provider.EscapeTableName(tableName)} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)}=@0";
+            return ExecuteAsync(cancellationToken, sql, primaryKeyValue);
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(object poco)
+            => DeleteAsync(CancellationToken.None, poco);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(CancellationToken cancellationToken, object poco)
+        {
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return DeleteAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(object pocoOrPrimaryKey)
+            => DeleteAsync<T>(CancellationToken.None, pocoOrPrimaryKey);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(CancellationToken cancellationToken, object pocoOrPrimaryKey)
+        {
+            if (pocoOrPrimaryKey.GetType() == typeof(T))
+                return DeleteAsync(cancellationToken, pocoOrPrimaryKey);
+
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+
+            if (pocoOrPrimaryKey.GetType().Name.Contains("AnonymousType"))
+            {
+                var pi = pocoOrPrimaryKey.GetType().GetProperty(pd.TableInfo.PrimaryKey);
+
+                if (pi == null)
+                    throw new InvalidOperationException($"Anonymous type does not contain an id for PK column `{pd.TableInfo.PrimaryKey}`.");
+
+                pocoOrPrimaryKey = pi.GetValue(pocoOrPrimaryKey, new object[0]);
+            }
+
+            return DeleteAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(string sql, params object[] args)
+            => DeleteAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
+        {
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExecuteAsync(cancellationToken, $"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
+        }
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(Sql sql)
+            => DeleteAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(CancellationToken cancellationToken, Sql sql)
+        {
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExecuteAsync(cancellationToken, new Sql($"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
+        }
+
+#endif
 
 #endregion
 
 #region operation: IsNew
 
-        /// <summary>
-        ///     Check if a poco represents a new row
-        /// </summary>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
+        /// <inheritdoc />
         public bool IsNew(string primaryKeyName, object poco)
         {
             if (poco == null)
@@ -2264,6 +2493,16 @@ namespace PetaPoco
                 throw new ArgumentException("primaryKeyName");
 
             return IsNew(primaryKeyName, PocoData.ForObject(poco, primaryKeyName, _defaultMapper), poco);
+        }
+
+        /// <inheritdoc />
+        public bool IsNew(object poco)
+        {
+            if (poco == null)
+                throw new ArgumentNullException(nameof(poco));
+
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
         }
 
         protected virtual bool IsNew(string primaryKeyName, PocoData pd, object poco)
@@ -2317,52 +2556,53 @@ namespace PetaPoco
             return pk == Activator.CreateInstance(pk.GetType());
         }
 
-        /// <summary>
-        ///     Check if a poco represents a new row
-        /// </summary>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
-        public bool IsNew(object poco)
-        {
-            if (poco == null)
-                throw new ArgumentNullException(nameof(poco));
-
-            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
-            return IsNew(pd.TableInfo.PrimaryKey, pd, poco);
-        }
-
 #endregion
 
 #region operation: Save
 
-        /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
-        /// </summary>
-        /// <param name="tableName">The name of the table to be updated</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object to be saved</param>
+        /// <inheritdoc />
         public void Save(string tableName, string primaryKeyName, object poco)
         {
             if (IsNew(primaryKeyName, poco))
-            {
                 Insert(tableName, primaryKeyName, true, poco);
-            }
             else
-            {
                 Update(tableName, primaryKeyName, poco);
-            }
         }
 
-        /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
-        /// </summary>
-        /// <param name="poco">The POCO object to be saved</param>
+        /// <inheritdoc />
         public void Save(object poco)
         {
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             Save(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
+
+#if ASYNC
+
+        /// <inheritdoc />
+        public Task SaveAsync(string tableName, string primaryKeyName, object poco)
+            => SaveAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        /// <inheritdoc />
+        public Task SaveAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
+        {
+            if (IsNew(primaryKeyName, poco))
+                return InsertAsync(cancellationToken, tableName, primaryKeyName, true, poco);
+
+            return UpdateAsync(cancellationToken, tableName, primaryKeyName, poco);
+        }
+
+        /// <inheritdoc />
+        public Task SaveAsync(object poco)
+            => SaveAsync(CancellationToken.None, poco);
+
+        /// <inheritdoc />
+        public Task SaveAsync(CancellationToken cancellationToken, object poco)
+        {
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return SaveAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
+        }
+
+#endif
 
 #endregion
 

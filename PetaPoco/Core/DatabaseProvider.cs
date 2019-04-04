@@ -3,6 +3,10 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+#if ASYNC
+using System.Threading;
+using System.Threading.Tasks;
+#endif
 using PetaPoco.Internal;
 using PetaPoco.Providers;
 using PetaPoco.Utilities;
@@ -14,56 +18,30 @@ namespace PetaPoco.Core
     /// </summary>
     public abstract class DatabaseProvider : IProvider
     {
-        private static readonly ConcurrentDictionary<string, IProvider> _customProviders = new ConcurrentDictionary<string, IProvider>();
+        private static readonly ConcurrentDictionary<string, IProvider> customProviders = new ConcurrentDictionary<string, IProvider>();
 
-        /// <summary>
-        ///     Gets the DbProviderFactory for this database provider.
-        /// </summary>
-        /// <returns>The provider factory.</returns>
+        /// <inheritdoc />
         public abstract DbProviderFactory GetFactory();
 
-        /// <summary>
-        ///     Gets a flag for whether the DB has native support for GUID/UUID.
-        /// </summary>
+        /// <inheritdoc />
         public virtual bool HasNativeGuidSupport => false;
 
-        /// <summary>
-        ///     Gets the <seealso cref="IPagingHelper" /> this provider supplies.
-        /// </summary>
+        /// <inheritdoc />
         public virtual IPagingHelper PagingUtility => PagingHelper.Instance;
 
-        /// <summary>
-        ///     Escape a tablename into a suitable format for the associated database provider.
-        /// </summary>
-        /// <param name="tableName">
-        ///     The name of the table (as specified by the client program, or as attributes on the associated
-        ///     POCO class.
-        /// </param>
-        /// <returns>The escaped table name</returns>
+        /// <inheritdoc />
         public virtual string EscapeTableName(string tableName)
             => tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
 
-        /// <summary>
-        ///     Escape and arbitary SQL identifier into a format suitable for the associated database provider
-        /// </summary>
-        /// <param name="sqlIdentifier">The SQL identifier to be escaped</param>
-        /// <returns>The escaped identifier</returns>
+        /// <inheritdoc />
         public virtual string EscapeSqlIdentifier(string sqlIdentifier)
             => $"[{sqlIdentifier}]";
 
-        /// <summary>
-        ///     Returns the prefix used to delimit parameters in SQL query strings.
-        /// </summary>
-        /// <param name="connectionString">The connection string.</param>
-        /// <returns>The providers character for prefixing a query parameter.</returns>
+        /// <inheritdoc />
         public virtual string GetParameterPrefix(string connectionString)
             => "@";
 
-        /// <summary>
-        ///     Converts a supplied C# object value into a value suitable for passing to the database
-        /// </summary>
-        /// <param name="value">The value to convert</param>
-        /// <returns>The converted value</returns>
+        /// <inheritdoc />
         public virtual object MapParameterValue(object value)
         {
             if (value is bool b)
@@ -72,23 +50,12 @@ namespace PetaPoco.Core
             return value;
         }
 
-        /// <summary>
-        ///     Called immediately before a command is executed, allowing for modification of the IDbCommand before it's passed to
-        ///     the database provider
-        /// </summary>
-        /// <param name="cmd"></param>
+        /// <inheritdoc />
         public virtual void PreExecute(IDbCommand cmd)
         {
         }
 
-        /// <summary>
-        ///     Builds an SQL query suitable for performing page based queries to the database
-        /// </summary>
-        /// <param name="skip">The number of rows that should be skipped by the query</param>
-        /// <param name="take">The number of rows that should be retruend by the query</param>
-        /// <param name="parts">The original SQL query after being parsed into it's component parts</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL query</param>
-        /// <returns>The final SQL query that should be executed.</returns>
+        /// <inheritdoc />
         public virtual string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var sql = $"{parts.Sql}\nLIMIT @{args.Length} OFFSET @{args.Length + 1}";
@@ -96,45 +63,32 @@ namespace PetaPoco.Core
             return sql;
         }
 
-        /// <summary>
-        ///     Returns an SQL Statement that can check for the existence of a row in the database.
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual string GetExistsSql()
             => "SELECT COUNT(*) FROM {0} WHERE {1}";
 
-        /// <summary>
-        ///     Return an SQL expression that can be used to populate the primary key column of an auto-increment column.
-        /// </summary>
-        /// <param name="tableInfo">Table info describing the table</param>
-        /// <returns>An SQL expressions</returns>
-        /// <remarks>See the Oracle database type for an example of how this method is used.</remarks>
+        /// <inheritdoc />
         public virtual string GetAutoIncrementExpression(TableInfo tableInfo)
             => null;
 
-        /// <summary>
-        ///     Returns an SQL expression that can be used to specify the return value of auto incremented columns.
-        /// </summary>
-        /// <param name="primaryKeyName">The primary key of the row being inserted.</param>
-        /// <returns>An expression describing how to return the new primary key value</returns>
-        /// <remarks>See the SQLServer database provider for an example of how this method is used.</remarks>
+        /// <inheritdoc />
         public virtual string GetInsertOutputClause(string primaryKeyName)
-        {
-            return string.Empty;
-        }
+            => string.Empty;
 
-        /// <summary>
-        ///     Performs an Insert operation
-        /// </summary>
-        /// <param name="database">The calling Database object</param>
-        /// <param name="cmd">The insert command to be executed</param>
-        /// <param name="primaryKeyName">The primary key of the table being inserted into</param>
-        /// <returns>The ID of the newly inserted record</returns>
+        /// <inheritdoc />
         public virtual object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
         {
             cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
             return ExecuteScalarHelper(database, cmd);
         }
+
+#if ASYNC
+        public virtual Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName)
+        {
+            cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
+            return ExecuteScalarHelperAsync(cancellationToken, database, cmd);
+        }
+#endif
 
         /// <summary>
         ///     Returns the .net standard conforming DbProviderFactory.
@@ -153,7 +107,7 @@ namespace PetaPoco.Core
             }
 
             if (ft == null)
-                throw new ArgumentException("Could not load the " + GetType().Name + " DbProviderFactory.");
+                throw new ArgumentException($"Could not load the {GetType().Name} DbProviderFactory.");
 
             return (DbProviderFactory) ft.GetField("Instance").GetValue(null);
         }
@@ -167,29 +121,23 @@ namespace PetaPoco.Core
         public static void RegisterCustomProvider<T>(string initialString) where T : IProvider, new()
         {
             if (String.IsNullOrWhiteSpace(initialString))
-                throw new ArgumentException("Initial string must not be null or empty", "initialString");
+                throw new ArgumentException("Initial string must not be null or empty", nameof(initialString));
 
-            _customProviders[initialString] = Singleton<T>.Instance;
+            customProviders[initialString] = Singleton<T>.Instance;
         }
 
         private static IProvider GetCustomProvider(string name)
         {
             IProvider provider;
-            foreach (var initialString in _customProviders.Keys)
-            {
-                if (name.IndexOf(initialString, StringComparison.InvariantCultureIgnoreCase) == 0 && _customProviders.TryGetValue(initialString, out provider))
-                {
+            foreach (var initialString in customProviders.Keys)
+                if (name.IndexOf(initialString, StringComparison.InvariantCultureIgnoreCase) == 0 && customProviders.TryGetValue(initialString, out provider))
                     return provider;
-                }
-            }
 
             return null;
         }
 
         internal static void ClearCustomProviders()
-        {
-            _customProviders.Clear();
-        }
+            => customProviders.Clear();
 
         /// <summary>
         ///     Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
@@ -234,7 +182,7 @@ namespace PetaPoco.Core
             }
 
             if (!allowDefault)
-                throw new ArgumentException("Could not match `" + type.FullName + "` to a provider.", "type");
+                throw new ArgumentException($"Could not match `{type.FullName}` to a provider.", nameof(type));
 
             // Assume SQL Server
             return Singleton<SqlServerDatabaseProvider>.Instance;
@@ -285,7 +233,7 @@ namespace PetaPoco.Core
                 return Singleton<SqlServerDatabaseProvider>.Instance;
 
             if (!allowDefault)
-                throw new ArgumentException("Could not match `" + providerName + "` to a provider.", "providerName");
+                throw new ArgumentException($"Could not match `{providerName}` to a provider.", nameof(providerName));
 
             // Assume SQL Server
             return Singleton<SqlServerDatabaseProvider>.Instance;
@@ -298,15 +246,12 @@ namespace PetaPoco.Core
         /// <returns>The unwrapped factory or the original factory if no wrapping occurred.</returns>
         internal static DbProviderFactory Unwrap(DbProviderFactory factory)
         {
-            var sp = factory as IServiceProvider;
-
-            if (sp == null)
+            if (!(factory is IServiceProvider sp))
                 return factory;
 
             try
             {
-                var unwrapped = sp.GetService(factory.GetType()) as DbProviderFactory;
-                return unwrapped == null ? factory : Unwrap(unwrapped);
+                return !(sp.GetService(factory.GetType()) is DbProviderFactory unwrapped) ? factory : Unwrap(unwrapped);
             }
             catch (Exception)
             {
@@ -324,9 +269,28 @@ namespace PetaPoco.Core
         protected object ExecuteScalarHelper(Database db, IDbCommand cmd)
         {
             db.DoPreExecute(cmd);
-            object r = cmd.ExecuteScalar();
+            var r = cmd.ExecuteScalar();
             db.OnExecutedCommand(cmd);
             return r;
         }
+#if ASYNC
+        protected async Task ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
+        {
+            db.DoPreExecute(cmd);
+            if (cmd is DbCommand dbCommand)
+                await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            else
+                cmd.ExecuteNonQuery();
+            db.OnExecutedCommand(cmd);
+        }
+
+        protected async Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
+        {
+            db.DoPreExecute(cmd);
+            var r = cmd is DbCommand dbCommand ? await dbCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteScalar();
+            db.OnExecutedCommand(cmd);
+            return r;
+        }
+#endif
     }
 }
