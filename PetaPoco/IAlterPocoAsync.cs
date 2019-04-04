@@ -52,9 +52,20 @@ namespace PetaPoco
         Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(string, string, object, object)" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(string, string, object, object, IEnumerable{string})" />.
         /// </summary>
         Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(string, string, object, object, IEnumerable{string})" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue,
+                              IEnumerable<string> columns);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(string, string, object)" />.
@@ -62,9 +73,19 @@ namespace PetaPoco
         Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(string, string, object)" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(string, string, object, IEnumerable{string})" />.
         /// </summary>
         Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(string, string, object, IEnumerable{string})" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, IEnumerable<string> columns);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(object, IEnumerable{string})" />.
@@ -72,9 +93,19 @@ namespace PetaPoco
         Task<int> UpdateAsync(object poco, IEnumerable<string> columns);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(object, IEnumerable{string})" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, IEnumerable<string> columns);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(object)" />.
         /// </summary>
         Task<int> UpdateAsync(object poco);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(object)" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, object poco);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(object, object)" />.
@@ -82,9 +113,19 @@ namespace PetaPoco
         Task<int> UpdateAsync(object poco, object primaryKeyValue);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(object, object)" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, object primaryKeyValue);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update(object, object, IEnumerable{string})" />.
         /// </summary>
         Task<int> UpdateAsync(object poco, object primaryKeyValue, IEnumerable<string> columns);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update(object, object, IEnumerable{string})" />.
+        /// </summary>
+        Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, object primaryKeyValue, IEnumerable<string> columns);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update{t}(string, object[])" />.
@@ -92,9 +133,19 @@ namespace PetaPoco
         Task<int> UpdateAsync<T>(string sql, params object[] args);
 
         /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update{t}(string, object[])" />.
+        /// </summary>
+        Task<int> UpdateAsync<T>(CancellationToken cancellationToken, string sql, params object[] args);
+
+        /// <summary>
         ///     Async version of <see cref="IAlterPoco.Update{t}(Sql)" />.
         /// </summary>
         Task<int> UpdateAsync<T>(Sql sql);
+
+        /// <summary>
+        ///     Async version of <see cref="IAlterPoco.Update{t}(Sql)" />.
+        /// </summary>
+        Task<int> UpdateAsync<T>(CancellationToken cancellationToken, Sql sql);
 
         /// <summary>
         ///     Async version of <see cref="IAlterPoco.Delete(string, string, object)" />.
