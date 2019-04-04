@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
-
 #if !NETSTANDARD
 using System.Configuration;
 
@@ -2155,15 +2154,18 @@ namespace PetaPoco
                 pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
             }
 
-            cmd.CommandText = $"UPDATE {_provider.EscapeTableName(tableName)} SET {sb} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)} = {_paramPrefix}{index++}";
+            cmd.CommandText =
+                $"UPDATE {_provider.EscapeTableName(tableName)} SET {sb} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)} = {_paramPrefix}{index++}";
             AddParam(cmd, primaryKeyValue, pkpi);
         }
 
 #if ASYNC
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -2178,10 +2180,13 @@ namespace PetaPoco
             return ExecuteUpdateAsync(cancellationToken, tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue, columns);
 
-        public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+        /// <inheritdoc />
+        public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue,
+                                     IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException(nameof(tableName));
@@ -2195,15 +2200,19 @@ namespace PetaPoco
             return ExecuteUpdateAsync(cancellationToken, tableName, primaryKeyName, poco, primaryKeyValue, columns);
         }
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
             => UpdateAsync(cancellationToken, tableName, primaryKeyName, poco, null);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, columns);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -2218,27 +2227,35 @@ namespace PetaPoco
             return ExecuteUpdateAsync(cancellationToken, tableName, primaryKeyName, poco, null, columns);
         }
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(object poco, IEnumerable<string> columns)
             => UpdateAsync(CancellationToken.None, poco, columns);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, IEnumerable<string> columns)
             => UpdateAsync(cancellationToken, poco, null, columns);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(object poco)
             => UpdateAsync(CancellationToken.None, poco);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco)
             => UpdateAsync(cancellationToken, poco, null, null);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(object poco, object primaryKeyValue)
             => UpdateAsync(CancellationToken.None, poco, primaryKeyValue);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, object primaryKeyValue)
             => UpdateAsync(cancellationToken, poco, primaryKeyValue, null);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(object poco, object primaryKeyValue, IEnumerable<string> columns)
             => UpdateAsync(CancellationToken.None, poco, primaryKeyValue, columns);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync(CancellationToken cancellationToken, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (poco == null)
@@ -2248,9 +2265,11 @@ namespace PetaPoco
             return ExecuteUpdateAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
         }
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync<T>(string sql, params object[] args)
             => UpdateAsync<T>(CancellationToken.None, sql, args);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
         {
             if (string.IsNullOrEmpty(sql))
@@ -2260,9 +2279,11 @@ namespace PetaPoco
             return ExecuteAsync(cancellationToken, $"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
         }
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync<T>(Sql sql)
             => UpdateAsync<T>(CancellationToken.None, sql);
 
+        /// <inheritdoc />
         public Task<int> UpdateAsync<T>(CancellationToken cancellationToken, Sql sql)
         {
             if (sql == null)
@@ -2272,7 +2293,8 @@ namespace PetaPoco
             return ExecuteAsync(cancellationToken, new Sql($"UPDATE {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
         }
 
-        private async Task<int> ExecuteUpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
+        private async Task<int> ExecuteUpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco,
+                                                   object primaryKeyValue, IEnumerable<string> columns)
         {
             try
             {
@@ -2283,7 +2305,9 @@ namespace PetaPoco
                     {
                         PreExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns, cmd);
                         DoPreExecute(cmd);
-                        var result = cmd is DbCommand dbCommand ? await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteNonQuery();
+                        var result = cmd is DbCommand dbCommand
+                            ? await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false)
+                            : cmd.ExecuteNonQuery();
                         OnExecutedCommand(cmd);
                         return result;
                     }
@@ -2314,16 +2338,13 @@ namespace PetaPoco
         /// <inheritdoc />
         public int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
-            // If primary key value not specified, pick it up from the object
             if (primaryKeyValue == null)
             {
                 var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
-                PocoColumn pc;
-                if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+                if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
                     primaryKeyValue = pc.GetValue(poco);
             }
 
-            // Do it
             var sql = $"DELETE FROM {_provider.EscapeTableName(tableName)} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)}=@0";
             return Execute(sql, primaryKeyValue);
         }
@@ -2374,38 +2395,86 @@ namespace PetaPoco
 
         /// <inheritdoc />
         public Task<int> DeleteAsync(string tableName, string primaryKeyName, object poco)
-        {
-            throw new NotImplementedException();
-        }
+            => DeleteAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
+            => DeleteAsync(cancellationToken, tableName, primaryKeyName, poco, null);
 
         /// <inheritdoc />
         public Task<int> DeleteAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
+            => DeleteAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
-            throw new NotImplementedException();
+            if (primaryKeyValue == null)
+            {
+                var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+                if (pd.Columns.TryGetValue(primaryKeyName, out var pc))
+                    primaryKeyValue = pc.GetValue(poco);
+            }
+
+            var sql = $"DELETE FROM {_provider.EscapeTableName(tableName)} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)}=@0";
+            return ExecuteAsync(cancellationToken, sql, primaryKeyValue);
         }
 
         /// <inheritdoc />
         public Task<int> DeleteAsync(object poco)
+            => DeleteAsync(CancellationToken.None, poco);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync(CancellationToken cancellationToken, object poco)
         {
-            throw new NotImplementedException();
+            var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            return DeleteAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
 
         /// <inheritdoc />
         public Task<int> DeleteAsync<T>(object pocoOrPrimaryKey)
+            => DeleteAsync<T>(CancellationToken.None, pocoOrPrimaryKey);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(CancellationToken cancellationToken, object pocoOrPrimaryKey)
         {
-            throw new NotImplementedException();
+            if (pocoOrPrimaryKey.GetType() == typeof(T))
+                return DeleteAsync(cancellationToken, pocoOrPrimaryKey);
+
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+
+            if (pocoOrPrimaryKey.GetType().Name.Contains("AnonymousType"))
+            {
+                var pi = pocoOrPrimaryKey.GetType().GetProperty(pd.TableInfo.PrimaryKey);
+
+                if (pi == null)
+                    throw new InvalidOperationException($"Anonymous type does not contain an id for PK column `{pd.TableInfo.PrimaryKey}`.");
+
+                pocoOrPrimaryKey = pi.GetValue(pocoOrPrimaryKey, new object[0]);
+            }
+
+            return DeleteAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, null, pocoOrPrimaryKey);
         }
 
         /// <inheritdoc />
         public Task<int> DeleteAsync<T>(string sql, params object[] args)
+            => DeleteAsync<T>(CancellationToken.None, sql, args);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
         {
-            throw new NotImplementedException();
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExecuteAsync(cancellationToken, $"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)} {sql}", args);
         }
 
         /// <inheritdoc />
         public Task<int> DeleteAsync<T>(Sql sql)
+            => DeleteAsync<T>(CancellationToken.None, sql);
+
+        /// <inheritdoc />
+        public Task<int> DeleteAsync<T>(CancellationToken cancellationToken, Sql sql)
         {
-            throw new NotImplementedException();
+            var pd = PocoData.ForType(typeof(T), _defaultMapper);
+            return ExecuteAsync(cancellationToken, new Sql($"DELETE FROM {_provider.EscapeTableName(pd.TableInfo.TableName)}").Append(sql));
         }
 
 #endif
@@ -2511,18 +2580,26 @@ namespace PetaPoco
 
         /// <inheritdoc />
         public Task SaveAsync(string tableName, string primaryKeyName, object poco)
+            => SaveAsync(CancellationToken.None, tableName, primaryKeyName, poco);
+
+        /// <inheritdoc />
+        public Task SaveAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
         {
             if (IsNew(primaryKeyName, poco))
-                return InsertAsync(tableName, primaryKeyName, true, poco);
+                return InsertAsync(cancellationToken, tableName, primaryKeyName, true, poco);
 
-            return UpdateAsync(tableName, primaryKeyName, poco);
+            return UpdateAsync(cancellationToken, tableName, primaryKeyName, poco);
         }
 
         /// <inheritdoc />
         public Task SaveAsync(object poco)
+            => SaveAsync(CancellationToken.None, poco);
+
+        /// <inheritdoc />
+        public Task SaveAsync(CancellationToken cancellationToken, object poco)
         {
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
-            return SaveAsync(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
+            return SaveAsync(cancellationToken, pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco);
         }
 
 #endif
