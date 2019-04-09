@@ -1,30 +1,45 @@
-### Version 6 - Netstandard 2.0, 4.0, 4.5+
-
-Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
-
-|Master|Development|Nuget|
-|:-----|:----------|:----|
-|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development)|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco.Compiled)](https://www.nuget.org/packages/PetaPoco.Compiled/)|
-
-### Version 5 - Legacy
-
-|Nuget (Single file)|Nuget Core (+t4 templates)|Nuget Core Compiled (dll)|
-|:----|:---------|:------------------|
-|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco)](https://www.nuget.org/packages/PetaPoco/)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core)](https://www.nuget.org/packages/PetaPoco.Core)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core.Compiled)](https://www.nuget.org/packages/PetaPoco.Core.Compiled)|
-
 <img align="right" alt="PetaPoco Logo" width="128" src="https://raw.githubusercontent.com/CollaboratingPlatypus/PetaPoco/master/Media/Logo2/PetaPocoLogo2_256.png">
 
 # Welcome to the official PetaPoco repository
 
 Originally the brainchild of [Brad Robinson],
 
+## Version 6 - Netstandard 2.0, 4.0, 4.5+
+
+Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
+
+PetaPoco is available from:
+
+* **NuGet Peta Complied** - <https://www.nuget.org/packages/PetaPoco.Compiled> - A compiled version which your project references.
+
+|Master|Development|Nuget|
+|:-----|:----------|:----|
+|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/master?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/master)|[![Build status](https://ci.appveyor.com/api/projects/status/1vodaox1reremsvj/branch/development?svg=true)](https://ci.appveyor.com/project/collaboratingplatypus/petapoco/branch/development)|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco.Compiled)](https://www.nuget.org/packages/PetaPoco.Compiled/)|
+
+### Documentation
+
+For configuration, code examples and other general information [See the docs]
+
+### Add-ons
+
+* [PetaPoco.SqlKata](//github.com/asherber/PetaPoco.SqlKata) lets you use the powerful query builder [SqlKata](//sqlkata.com)  to [build SQL queries](//github.com/CollaboratingPlatypus/PetaPoco/wiki/Building-SQL-Queries) for PetaPoco.
+* [StaTypPocoQueries.PetaPoco](//github.com/asherber/StaTypPocoQueries.PetaPoco) provides the ability to use some simple, strongly typed, Intellisensed LINQ expressions in your queries.
+
+## Version 5 - Legacy
+
+|Nuget (Single file)|Nuget Core (+t4 templates)|Nuget Core Compiled (dll)|
+|:----|:---------|:------------------|
+|[![Nuget Downloads](https://buildstats.info/nuget/PetaPoco)](https://www.nuget.org/packages/PetaPoco/)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core)](https://www.nuget.org/packages/PetaPoco.Core)|[![Nuget Downloads core](https://buildstats.info/nuget/PetaPoco.Core.Compiled)](https://www.nuget.org/packages/PetaPoco.Core.Compiled)|
+
+---
+
 ## PetaPoco is a tiny & fast micro-ORM for .NET
 
 * Like [Dapper], it's fast because it uses dynamic method generation (MSIL) to assign column values to properties
-* Like [Massive] it's available as single file that you easily add to any project or complied. (V5 only)
 * Like [Massive], it now also supports dynamic Expandos too
 * Like [ActiveRecord], it supports a close relationship between object and database table
 * Like [SubSonic], it supports generation of poco classes with T4 templates (V5 only)
+* Like [Massive] it's available as single file that you easily add to any project or complied. (V5 only)
 
 ## Features at a Glance
 
@@ -71,15 +86,6 @@ Delete an entity
 
 Plus much much [more](https://github.com/CollaboratingPlatypus/PetaPoco/wiki).
 
-## Documentation
-
-For configuration, code examples and other general information [See the docs]
-
-## Download
-
-PetaPoco is available from:
-
-* **NuGet Peta Complied** - <https://www.nuget.org/packages/PetaPoco.Compiled> - A compiled version which your project references.
 
 [Brad Robinson]:http://www.toptensoftware.com/
 [Massive]:https://github.com/FransBouma/Massive
@@ -95,10 +101,6 @@ PetaPoco is available from:
 [we have a special place to honour them]:./honourRoll.md
 [fluent configuration]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki/Fluent-Configuration
 
-## Add-ons
-
-* [PetaPoco.SqlKata](//github.com/asherber/PetaPoco.SqlKata) lets you use the powerful query builder [SqlKata](//sqlkata.com)  to [build SQL queries](//github.com/CollaboratingPlatypus/PetaPoco/wiki/Building-SQL-Queries) for PetaPoco.
-* [StaTypPocoQueries.PetaPoco](//github.com/asherber/StaTypPocoQueries.PetaPoco) provides the ability to use some simple, strongly typed, Intellisensed LINQ expressions in your queries.
 
 
 ## Contributing
