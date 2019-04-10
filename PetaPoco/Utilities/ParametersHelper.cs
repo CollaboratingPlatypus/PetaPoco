@@ -1,10 +1,4 @@
-﻿// <copyright file="ParametersHelper.cs" company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/05</date>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -24,7 +18,8 @@ namespace PetaPoco.Internal
             return ParamPrefixRegex.Replace(sql, m => paramPrefix + m.Value.Substring(1));
         }
 
-        public static string EnsureParamPrefix(this int input, string paramPrefix) => $"{paramPrefix}{input}";
+        public static string EnsureParamPrefix(this int input, string paramPrefix)
+            => $"{paramPrefix}{input}";
 
         public static string EnsureParamPrefix(this string input, string paramPrefix)
         {
@@ -36,7 +31,7 @@ namespace PetaPoco.Internal
 
         // Helper to handle named parameters from object properties
         public static string ProcessQueryParams(string sql, object[] args_src, List<object> args_dest)
-        {   
+        {
             return ParamPrefixRegex.Replace(sql, m =>
             {
                 string param = m.Value.Substring(1);
@@ -48,8 +43,8 @@ namespace PetaPoco.Internal
                 {
                     // Numbered parameter
                     if (paramIndex < 0 || paramIndex >= args_src.Length)
-                        throw new ArgumentOutOfRangeException(string.Format("Parameter '@{0}' specified but only {1} parameters supplied (in `{2}`)", paramIndex,
-                            args_src.Length, sql));
+                        throw new ArgumentOutOfRangeException(string.Format("Parameter '@{0}' specified but only {1} parameters supplied (in `{2}`)", paramIndex, args_src.Length,
+                            sql));
                     arg_val = args_src[paramIndex];
                 }
                 else
@@ -69,8 +64,8 @@ namespace PetaPoco.Internal
                     }
 
                     if (!found)
-                        throw new ArgumentException(
-                            string.Format("Parameter '@{0}' specified but none of the passed arguments have a property with this name (in '{1}')", param, sql));
+                        throw new ArgumentException(string.Format("Parameter '@{0}' specified but none of the passed arguments have a property with this name (in '{1}')", param,
+                            sql));
                 }
 
                 // Expand collections to parameter lists
@@ -82,6 +77,7 @@ namespace PetaPoco.Internal
                         sb.Append((sb.Length == 0 ? "@" : ",@") + args_dest.Count.ToString());
                         args_dest.Add(i);
                     }
+
                     return sb.ToString();
                 }
                 else
@@ -89,15 +85,12 @@ namespace PetaPoco.Internal
                     args_dest.Add(arg_val);
                     return "@" + (args_dest.Count - 1).ToString();
                 }
-            }
-                );
+            });
         }
 
         private static bool IsEnumerable(this object input)
         {
-            return (input as System.Collections.IEnumerable) != null &&
-                    (input as string) == null &&
-                    (input as byte[]) == null;
+            return (input as System.Collections.IEnumerable) != null && (input as string) == null && (input as byte[]) == null;
         }
 
         public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PropertyInfo> setParameterProperties)
@@ -115,7 +108,7 @@ namespace PetaPoco.Internal
                     }
                 }
                 else if (arg is IDbDataParameter)
-                    result.Add((IDbDataParameter)arg);
+                    result.Add((IDbDataParameter) arg);
                 else
                 {
                     var type = arg.GetType();

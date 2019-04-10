@@ -1,9 +1,3 @@
-// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
 using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
@@ -25,16 +19,14 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
             var codeBase = typeof(SqlCeConnection).Assembly.CodeBase;
             var uri = new UriBuilder(codeBase);
             var dllPath = Path.GetDirectoryName(Uri.UnescapeDataString(uri.Path));
-            var nativeBinaryPath = Path.GetFullPath(Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            var nativeBinaryPath = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 $".nuget\\packages\\microsoft.sqlserver.compact\\4.0.8876.1\\NativeBinaries\\{(Environment.Is64BitProcess ? "amd64" : "x86")}"));
-            Directory.GetFiles(nativeBinaryPath, "*", SearchOption.AllDirectories).ToList()
-                .ForEach(f =>
-                {
-                    var destFilePath = Path.Combine(dllPath, Path.GetFileName(f));
-                    if (!File.Exists(destFilePath))
-                        File.Copy(f, destFilePath);
-                });
+            Directory.GetFiles(nativeBinaryPath, "*", SearchOption.AllDirectories).ToList().ForEach(f =>
+            {
+                var destFilePath = Path.Combine(dllPath, Path.GetFileName(f));
+                if (!File.Exists(destFilePath))
+                    File.Copy(f, destFilePath);
+            });
             // ReSharper restore AssignNullToNotNullAttribute
         }
 

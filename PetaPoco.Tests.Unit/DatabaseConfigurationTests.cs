@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/07/02</date>
-
-using System;
+﻿using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -87,10 +81,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingCreate_GivenMinimalConfiguration_ShouldNotAffectPetaPocoDefaults()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().Create();
 
             db.CommandTimeout.ShouldBe(0);
             db.Provider.ShouldBeOfType<SqlServerDatabaseProvider>();
@@ -110,11 +101,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingCommandTimeout_GivenTimeoutAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingCommandTimeout(50)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingCommandTimeout(50).Create();
 
             db.CommandTimeout.ShouldBe(50);
         }
@@ -122,11 +109,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void WithNamedParams_AfterCreate_ShouldBeSetOnPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .WithNamedParams()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().WithNamedParams().Create();
 
             db.EnableNamedParams.ShouldBeTrue();
         }
@@ -134,11 +117,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void WithoutNamedParams_AfterCreate_ShouldNotBeSetOnPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .WithoutNamedParams()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().WithoutNamedParams().Create();
 
             db.EnableNamedParams.ShouldBeFalse();
         }
@@ -146,11 +125,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void WithAutoSelect_AfterCreate_ShouldBeSetOnPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .WithAutoSelect()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().WithAutoSelect().Create();
 
             db.EnableNamedParams.ShouldBeTrue();
         }
@@ -158,11 +133,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void WithoutAutoSelect_AfterCreate_ShouldNotBeSetOnPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .WithoutAutoSelect()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().WithoutAutoSelect().Create();
 
             db.EnableAutoSelect.ShouldBeFalse();
         }
@@ -177,11 +148,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingProvider_Overrides_UsingProviderName()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<FakeProvider>()
-                .UsingProviderName("OracleDatabaseProvider")
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<FakeProvider>().UsingProviderName("OracleDatabaseProvider").Create();
 
             db.Provider.ShouldBeOfType<FakeProvider>();
         }
@@ -202,10 +169,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingConnectionString_GivenTimeoutAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().Create();
 
             db.ConnectionString.ShouldBe("cs");
         }
@@ -236,17 +200,9 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingDefaultMapper_GivenMapperOrType_ShouldBeSameAsPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingDefaultMapper(new StandardMapper())
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingDefaultMapper(new StandardMapper()).Create();
 
-            var db1 = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingDefaultMapper<StandardMapper>()
-                .Create();
+            var db1 = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingDefaultMapper<StandardMapper>().Create();
 
             db.DefaultMapper.ShouldBeOfType<StandardMapper>();
             db1.DefaultMapper.ShouldBeOfType<StandardMapper>();
@@ -256,18 +212,10 @@ namespace PetaPoco.Tests.Unit
         public void UsingDefaultMapper_GivenMapperOrTypeAndConfigurationCallback_ShouldBeSameAsPetaPocoInstanceAndCallback()
         {
             var dbCalled = false;
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingDefaultMapper(new StandardMapper(), sm => dbCalled = true)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingDefaultMapper(new StandardMapper(), sm => dbCalled = true).Create();
 
             var db1Called = false;
-            var db1 = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingDefaultMapper<StandardMapper>(sm => db1Called = true)
-                .Create();
+            var db1 = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingDefaultMapper<StandardMapper>(sm => db1Called = true).Create();
 
             dbCalled.ShouldBeTrue();
             db.DefaultMapper.ShouldBeOfType<StandardMapper>();
@@ -278,11 +226,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void UsingIsolationLevel_GivenIsolationLevelAndAfterCreate_ShouldBeSameAsPetaPocoInstance()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingIsolationLevel(IsolationLevel.Chaos)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingIsolationLevel(IsolationLevel.Chaos).Create();
 
             db.IsolationLevel.ShouldBe(IsolationLevel.Chaos);
         }
@@ -290,10 +234,7 @@ namespace PetaPoco.Tests.Unit
         [Fact]
         public void NotUsingIsolationLevel_AfterCreate_PetaPocoInstanceShouldBeNull()
         {
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().Create();
 
             db.IsolationLevel.ShouldBeNull();
         }
@@ -304,11 +245,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbCommandEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingCommandExecuting(handler)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingCommandExecuting(handler).Create();
 
             // Can't inspect the event directly, so we have to get it to fire
             (db as Database).OnExecutingCommand(null);
@@ -320,12 +257,8 @@ namespace PetaPoco.Tests.Unit
         {
             bool eventFired = false;
             EventHandler<DbCommandEventArgs> handler = (sender, args) => eventFired = true;
-            
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingCommandExecuted(handler)
-                .Create();
+
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingCommandExecuted(handler).Create();
 
             (db as Database).OnExecutedCommand(null);
             eventFired.ShouldBeTrue();
@@ -337,11 +270,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbConnectionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingConnectionClosing(handler)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingConnectionClosing(handler).Create();
 
             (db as Database).OnConnectionClosing(null);
             eventFired.ShouldBeTrue();
@@ -353,11 +282,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbConnectionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingConnectionOpened(handler)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingConnectionOpened(handler).Create();
 
             (db as Database).OnConnectionOpened(null);
             eventFired.ShouldBeTrue();
@@ -369,11 +294,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbTransactionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingTransactionStarted(handler)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingTransactionStarted(handler).Create();
 
             (db as Database).OnBeginTransaction();
             eventFired.ShouldBeTrue();
@@ -385,11 +306,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbTransactionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingTransactionEnding(handler)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingTransactionEnding(handler).Create();
 
             (db as Database).OnEndTransaction();
             eventFired.ShouldBeTrue();
@@ -401,11 +318,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<ExceptionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config
-                .UsingConnectionString("cs")
-                .UsingProvider<SqlServerDatabaseProvider>()
-                .UsingExceptionThrown(handler)
-                .Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingExceptionThrown(handler).Create();
 
             (db as Database).OnException(new Exception());
             eventFired.ShouldBeTrue();
@@ -424,7 +337,8 @@ namespace PetaPoco.Tests.Unit
 
         public class FakeProvider : DatabaseProvider
         {
-            public override DbProviderFactory GetFactory() => null;
+            public override DbProviderFactory GetFactory()
+                => null;
         }
 
         [Fact]

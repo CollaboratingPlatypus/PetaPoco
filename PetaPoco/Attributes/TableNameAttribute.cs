@@ -1,10 +1,4 @@
-﻿// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2018/06/29</date>
-
-using System;
+﻿using System;
 
 namespace PetaPoco
 {
@@ -26,6 +20,7 @@ namespace PetaPoco
         ///     Constructs a new instance of the <seealso cref="TableNameAttribute" />.
         /// </summary>
         /// <param name="tableName">The table nane of the database that this entity maps to.</param>
-        public TableNameAttribute(string tableName) => Value = tableName;
+        public TableNameAttribute(string tableName)
+            => Value = tableName;
     }
 }

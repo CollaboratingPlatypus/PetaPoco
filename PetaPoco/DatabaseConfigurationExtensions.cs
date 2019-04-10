@@ -1,9 +1,3 @@
-// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/28</date>
-
 using System;
 using System.Data;
 using PetaPoco.Core;
@@ -36,8 +30,6 @@ namespace PetaPoco
         internal const string ConnectionClosing = "ConnectionClosing";
         internal const string ExceptionThrown = "ExceptionThrown";
         internal const string Connection = "Connection";
-
-
 
         private static void SetSetting(this IDatabaseBuildConfiguration source, string key, object value)
         {
@@ -83,14 +75,13 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
-        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="provider">The provider to use.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="provider" /> is null.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, T provider)
-            where T : class, IProvider
+        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, T provider) where T : class, IProvider
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
@@ -100,7 +91,7 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
-        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="configure">The configure provider callback.</param>
@@ -108,8 +99,7 @@ namespace PetaPoco
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="provider" /> is null.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, T provider, Action<T> configure)
-            where T : class, IProvider
+        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, T provider, Action<T> configure) where T : class, IProvider
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
@@ -122,13 +112,12 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
-        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <typeparam name="T">The provider type.</typeparam>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source)
-            where T : class, IProvider, new()
+        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source) where T : class, IProvider, new()
         {
             source.SetSetting(Provider, new T());
             return source;
@@ -136,15 +125,14 @@ namespace PetaPoco
 
         /// <summary>
         ///     Specifies the provider to be used. - see <see cref="IDatabase.Provider" />.
-        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)"/>.
+        ///     This takes precedence over <see cref="UsingProviderName(IDatabaseBuildConfiguration, string)" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="configure">The configure provider callback.</param>
         /// <typeparam name="T">The provider type.</typeparam>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, Action<T> configure)
-            where T : class, IProvider, new()
+        public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, Action<T> configure) where T : class, IProvider, new()
         {
             if (configure == null)
                 throw new ArgumentNullException(nameof(configure));
@@ -221,10 +209,10 @@ namespace PetaPoco
                 throw new ArgumentException("Argument is null or empty", nameof(providerName));
             source.SetSetting(ProviderName, providerName);
             return source;
-        }        
+        }
 
         /// <summary>
-        ///    Specifies a <see cref="IDbConnection"/> to use.
+        ///     Specifies a <see cref="IDbConnection" /> to use.
         /// </summary>
         /// <param name="source">The configuration source</param>
         /// <param name="connection">The connection to use.</param>
@@ -237,8 +225,7 @@ namespace PetaPoco
             source.SetSetting(Connection, connection);
             return source;
         }
-        
-        
+
         /// <summary>
         ///     Specifies the default mapper to use when no specific mapper has been registered.
         /// </summary>
@@ -246,8 +233,7 @@ namespace PetaPoco
         /// <param name="mapper">The mapper to use as the default.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="mapper" /> is null.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, T mapper)
-            where T : class, IMapper
+        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, T mapper) where T : class, IMapper
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));
@@ -264,8 +250,7 @@ namespace PetaPoco
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="mapper" /> is null.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, T mapper, Action<T> configure)
-            where T : class, IMapper
+        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, T mapper, Action<T> configure) where T : class, IMapper
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));
@@ -282,8 +267,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <typeparam name="T">The mapper type.</typeparam>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source)
-            where T : class, IMapper, new()
+        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source) where T : class, IMapper, new()
         {
             source.SetSetting(DefaultMapper, new T());
             return source;
@@ -297,8 +281,7 @@ namespace PetaPoco
         /// <typeparam name="T">The mapper type.</typeparam>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
         /// <returns>The configuration source to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, Action<T> configure)
-            where T : class, IMapper, new()
+        public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, Action<T> configure) where T : class, IMapper, new()
         {
             if (configure == null)
                 throw new ArgumentNullException(nameof(configure));
@@ -322,7 +305,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a new transaction has been started.
+        ///     Specifies an event handler to use when a new transaction has been started.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -334,7 +317,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a transaction is about to be rolled back or committed.
+        ///     Specifies an event handler to use when a transaction is about to be rolled back or committed.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -346,7 +329,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a database command is about to be executed.
+        ///     Specifies an event handler to use when a database command is about to be executed.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -358,7 +341,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a database command has been executed.
+        ///     Specifies an event handler to use when a database command has been executed.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -370,7 +353,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a database connection has been opened.
+        ///     Specifies an event handler to use when a database connection has been opened.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -382,7 +365,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a database connection is about to be closed.
+        ///     Specifies an event handler to use when a database connection is about to be closed.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -394,7 +377,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Specifies an event handler to use when a database exception has been thrown.
+        ///     Specifies an event handler to use when a database exception has been thrown.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
@@ -404,8 +387,6 @@ namespace PetaPoco
             source.SetSetting(ExceptionThrown, handler);
             return source;
         }
-
-
 
         /// <summary>
         ///     Creates an instance of PetaPoco using the specified <paramref name="source" />.

@@ -1,11 +1,9 @@
-// <copyright company="PetaPoco - CollaboratingPlatypus">
-//      Apache License, Version 2.0 https://github.com/CollaboratingPlatypus/PetaPoco/blob/master/LICENSE.txt
-// </copyright>
-// <author>PetaPoco - CollaboratingPlatypus</author>
-// <date>2015/12/14</date>
-
 using System.Data;
 using System.Data.Common;
+#if ASYNC
+using System.Threading;
+using System.Threading.Tasks;
+#endif
 using PetaPoco.Utilities;
 
 namespace PetaPoco.Core
@@ -80,6 +78,15 @@ namespace PetaPoco.Core
         /// <param name="primaryKeyName">The primary key of the table being inserted into</param>
         /// <returns>The ID of the newly inserted record</returns>
         object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName);
+
+#if ASYNC
+
+        /// <summary>
+        ///     Async version of <see cref="ExecuteInsertAsync(Database, IDbCommand, string)" />.
+        /// </summary>
+        Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName);
+
+#endif
 
         /// <summary>
         ///     Returns an SQL expression that can be used to specify the return value of auto incremented columns.
