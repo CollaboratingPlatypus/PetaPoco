@@ -6,11 +6,9 @@ Originally the brainchild of [Brad Robinson],
 
 ## Version 6 - Netstandard 2.0, 4.0, 4.5+
 
-Read more about this [update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
+Read more about the [v6 update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
 
-PetaPoco is available from:
-
-* **NuGet Peta Complied** - <https://www.nuget.org/packages/PetaPoco.Compiled> - A compiled version which your project references.
+PetaPoco is available from: **NuGet [PetaPoco.Complied](https://www.nuget.org/packages/PetaPoco.Compiled)** - A compiled version which your project references.
 
 |Master|Development|Nuget|
 |:-----|:----------|:----|
@@ -44,6 +42,7 @@ For configuration, code examples and other general information [See the docs]
 ## Features at a Glance
 
 * Tiny, and absolutely no dependencies!
+* Asychronise or synchronise, the choice is yours. (Aka Async) (V6)
 * Works with strictly undecorated POCOs, or attributed almost-POCOs.
 * Easy to configure and includes [fluent configuration] out of the box.
 * Helper methods for Insert/Delete/Update/Save and IsNew
@@ -86,7 +85,6 @@ Delete an entity
 
 Plus much much [more](https://github.com/CollaboratingPlatypus/PetaPoco/wiki).
 
-
 [Brad Robinson]:http://www.toptensoftware.com/
 [Massive]:https://github.com/FransBouma/Massive
 [Dapper]:https://github.com/StackExchange/dapper-dot-net
@@ -100,8 +98,6 @@ Plus much much [more](https://github.com/CollaboratingPlatypus/PetaPoco/wiki).
 [Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
 [we have a special place to honour them]:./honourRoll.md
 [fluent configuration]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki/Fluent-Configuration
-
-
 
 ## Contributing
 
