@@ -2,13 +2,13 @@
 
 # Welcome to the official PetaPoco repository
 
-Originally the brainchild of [Brad Robinson],
+Originally the brainchild of [Brad Robinson]
 
-## Version 6 - Netstandard 2.0, 4.0, 4.5+
+## Version 6 - Netstandard 2.0+, 4.0, 4.5+
 
 Read more about the [v6 update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
 
-PetaPoco is available from: **NuGet [PetaPoco.Complied](https://www.nuget.org/packages/PetaPoco.Compiled)** - A compiled version which your project references.
+PetaPoco is available from: **NuGet [PetaPoco.Complied](https://www.nuget.org/packages/PetaPoco.Compiled)**
 
 |Master|Development|Nuget|
 |:-----|:----------|:----|
@@ -42,7 +42,7 @@ For configuration, code examples and other general information [See the docs]
 ## Features at a Glance
 
 * Tiny, and absolutely no dependencies!
-* Asychronise or synchronise, the choice is yours. (Aka Async) (V6)
+* Asychronise or synchronise, the choice is yours. (aka async) (V6)
 * Works with strictly undecorated POCOs, or attributed almost-POCOs.
 * Easy to configure and includes [fluent configuration] out of the box.
 * Helper methods for Insert/Delete/Update/Save and IsNew
