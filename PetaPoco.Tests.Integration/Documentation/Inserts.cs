@@ -3,6 +3,7 @@ using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Databases;
 using PetaPoco.Tests.Integration.Databases.MSSQL;
+using PetaPoco.Tests.Integration.Documentation.Pocos;
 using Shouldly;
 using Xunit;
 
@@ -252,121 +253,5 @@ namespace PetaPoco.Tests.Integration.Documentation
             id.ShouldBe((int) clone.Id);
             ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }
-    }
-
-    public class UnconventionalPoco
-    {
-        public int PrimaryKey { get; set; }
-
-        public string Text { get; set; }
-
-        public void ShouldBe(UnconventionalPoco other)
-        {
-            PrimaryKey.ShouldBe(other.PrimaryKey);
-            Text.ShouldBe(other.Text);
-        }
-    }
-
-    [TableName("People")]
-    [PrimaryKey("Id", AutoIncrement = false)]
-    public class Person
-    {
-        [Column]
-        public Guid Id { get; set; }
-
-        [Column(Name = "FullName")]
-        public string Name { get; set; }
-
-        [Column]
-        public long Age { get; set; }
-
-        [Column]
-        public int Height { get; set; }
-
-        [Column]
-        public DateTime? Dob { get; set; }
-
-        [Ignore]
-        public string NameAndAge => $"{Name} is of {Age}";
-
-        public void ShouldBe(Person other)
-        {
-            Id.ShouldBe(other.Id);
-            Name.ShouldBe(other.Name);
-            Age.ShouldBe(other.Age);
-            Height.ShouldBe(other.Height);
-            Dob.ShouldBe(other.Dob);
-        }
-    }
-
-    public class Note
-    {
-        public int Id { get; set; }
-
-        public DateTime CreatedOn { get; set; }
-
-        public string Text { get; set; }
-    }
-
-    [ExplicitColumns]
-    [TableName("Orders")]
-    [PrimaryKey("Id")]
-    public class Order
-    {
-        [Column]
-        public int Id { get; set; }
-
-        [Column]
-        public Guid PersonId { get; set; }
-
-        [Column]
-        public string PoNumber { get; set; }
-
-        [Column]
-        public DateTime CreatedOn { get; set; }
-
-        [Column]
-        public string CreatedBy { get; set; }
-
-        [Column("OrderStatus")]
-        public OrderStatus Status { get; set; }
-
-        public void ShouldBe(Order other)
-        {
-            Id.ShouldBe(other.Id);
-            PersonId.ShouldBe(other.PersonId);
-            PoNumber.ShouldBe(other.PoNumber);
-            Status.ShouldBe(other.Status);
-            CreatedOn.ShouldBe(other.CreatedOn);
-            CreatedBy.ShouldBe(other.CreatedBy);
-        }
-    }
-
-    public enum OrderStatus
-    {
-        Pending,
-        Accepted,
-        Rejected,
-        Deleted
-    }
-
-    [TableName("OrderLines")]
-    [PrimaryKey("Id")]
-    public class OrderLine
-    {
-        [Column]
-        public int Id { get; set; }
-
-        [Column]
-        public int OrderId { get; set; }
-
-        [Column(Name = "Qty")]
-        public short Quantity { get; set; }
-
-        [Column]
-        public decimal SellPrice { get; set; }
-
-        [ResultColumn]
-        public decimal Total { get; set; }
     }
 }
