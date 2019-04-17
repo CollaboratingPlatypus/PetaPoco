@@ -20,7 +20,7 @@ CREATE TABLE dbo.[People] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
-	[Dob] DATETIME NULL
+	[Dob] DATETIME2 NULL
 )
 
 CREATE TABLE dbo.[Orders] (
@@ -28,7 +28,7 @@ CREATE TABLE dbo.[Orders] (
 	[PersonId] UNIQUEIDENTIFIER FOREIGN KEY REFERENCES dbo.[People](Id),
 	[PoNumber] NVARCHAR(15) NOT NULL,
 	[OrderStatus] INT NOT NULL,
-	[CreatedOn] DATETIME NOT NULL,
+	[CreatedOn] DATETIME2 NOT NULL,
 	[CreatedBy] NVARCHAR(255) NOT NULL
 )
 
@@ -45,7 +45,7 @@ CREATE TABLE dbo.[SpecificPeople] (
 	[FullName] NVARCHAR(255),
 	[Age] BIGINT NOT NULL,
 	[Height] INT NOT NULL,
-	[Dob] DATETIME NULL
+	[Dob] DATETIME2 NULL
 )
 
 CREATE TABLE dbo.[SpecificOrders] (
@@ -53,7 +53,7 @@ CREATE TABLE dbo.[SpecificOrders] (
 	[PersonId] UNIQUEIDENTIFIER FOREIGN KEY REFERENCES dbo.[SpecificPeople](Id),
 	[PoNumber] NVARCHAR(15) NOT NULL,
 	[OrderStatus] INT NOT NULL,
-	[CreatedOn] DATETIME NOT NULL,
+	[CreatedOn] DATETIME2 NOT NULL,
 	[CreatedBy] NVARCHAR(255) NOT NULL
 )
 
@@ -67,13 +67,13 @@ CREATE TABLE dbo.[SpecificOrderLines] (
 
 CREATE TABLE dbo.[TransactionLogs] (
 	[Description] NTEXT,
-	[CreatedOn] DATETIME NOT NULL
+	[CreatedOn] DATETIME2 NOT NULL
 )
 
 CREATE TABLE dbo.[Note] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[Text] NTEXT NOT NULL,
-	[CreatedOn] DATETIME NOT NULL
+	[CreatedOn] DATETIME2 NOT NULL
 )
 
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'store')
