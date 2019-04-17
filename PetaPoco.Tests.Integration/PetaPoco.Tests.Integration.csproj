@@ -9,6 +9,10 @@
     <Copyright>Collaborating Platypus</Copyright>
     <OutputType>Library</OutputType>
   </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <Compile Remove="Databases\MSAccess\**" />
