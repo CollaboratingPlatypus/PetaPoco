@@ -3,8 +3,9 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents an attribute which can decorate a Poco property conver value from database type to property type and
-    ///     conversely.
+    ///     Represents an attribute which can decorate a POCO property to provide
+    ///     functions to convert a value from database type to property type and
+    ///     vice versa.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public abstract class ValueConverterAttribute : Attribute

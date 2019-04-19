@@ -17,7 +17,7 @@ namespace PetaPoco
         /// </summary>
         /// <typeparam name="T1">The first POCO type</typeparam>
         /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <returns>A collection of POCO's as an IEnumerable</returns>
+        /// <returns>A collection of POCOs as an IEnumerable</returns>
         IEnumerable<T1> Read<T1, T2>();
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace PetaPoco
         /// <typeparam name="T1">The first POCO type</typeparam>
         /// <typeparam name="T2">The second POCO type</typeparam>
         /// <typeparam name="T3">The third POCO type</typeparam>
-        /// <returns>A collection of POCO's as an IEnumerable</returns>
+        /// <returns>A collection of POCOs as an IEnumerable</returns>
         IEnumerable<T1> Read<T1, T2, T3>();
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace PetaPoco
         /// <typeparam name="T2">The second POCO type</typeparam>
         /// <typeparam name="T3">The third POCO type</typeparam>
         /// <typeparam name="T4">The forth POCO type</typeparam>
-        /// <returns>A collection of POCO's as an IEnumerable</returns>
+        /// <returns>A collection of POCOs as an IEnumerable</returns>
         IEnumerable<T1> Read<T1, T2, T3, T4>();
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace PetaPoco
         /// <typeparam name="T2">The second POCO type</typeparam>
         /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
         /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCO's as an IEnumerable</returns>
+        /// <returns>A collection of POCOs as an IEnumerable</returns>
         IEnumerable<TRet> Read<T1, T2, TRet>(Func<T1, T2, TRet> cb);
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace PetaPoco
         /// <typeparam name="T3">The third POCO type</typeparam>
         /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
         /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCO's as an IEnumerable</returns>
+        /// <returns>A collection of POCOs as an IEnumerable</returns>
         IEnumerable<TRet> Read<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb);
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace PetaPoco
         /// <typeparam name="T4">The forth POCO type</typeparam>
         /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
         /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCO's as an IEnumerable</returns>
+        /// <returns>A collection of POCOs as an IEnumerable</returns>
         IEnumerable<TRet> Read<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb);
     }
 }

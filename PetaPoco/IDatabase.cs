@@ -39,7 +39,7 @@ namespace PetaPoco
         object[] LastArgs { get; }
 
         /// <summary>
-        ///     Gets a formatted string describing the last executed SQL statement and it's argument values
+        ///     Gets a formatted string describing the last executed SQL statement and its argument values
         /// </summary>
         /// <returns>
         ///     The formatted string.
@@ -54,7 +54,7 @@ namespace PetaPoco
         ///     is found to require them.
         /// </remarks>
         /// <returns>
-        ///     True, if auto select is enabled; Else, false.
+        ///     True, if auto select is enabled; else, false.
         /// </returns>
         bool EnableAutoSelect { get; set; }
 
@@ -62,10 +62,10 @@ namespace PetaPoco
         ///     Gets the flag for whether named params are enabled. (Default is True)
         /// </summary>
         /// <remarks>
-        ///     When set to true, parameters can be named ?myparam and populated from properties of the passed in argument values.
+        ///     When set to true, parameters can be named ?myparam and populated from properties of the passed-in argument values.
         /// </remarks>
         /// <returns>
-        ///     True, if named parameters are enabled; Else, false.
+        ///     True, if named parameters are enabled; else, false.
         /// </returns>
         bool EnableNamedParams { get; set; }
 
@@ -74,8 +74,8 @@ namespace PetaPoco
         ///     (Default is 0)
         /// </summary>
         /// <remarks>
-        ///     If the current value is zero PetaPoco will not set the command timeout, and therefor, the .net default (30 seconds)
-        ///     will be in affect.
+        ///     If the current value is zero PetaPoco will not set the command timeout, and therefore the .NET default (30 seconds)
+        ///     will be in effect.
         /// </remarks>
         /// <returns>
         ///     The current command timeout.
@@ -113,7 +113,7 @@ namespace PetaPoco
         ///     Gets or sets the transaction isolation level.
         /// </summary>
         /// <remarks>
-        ///     When value is null, the underlying providers default isolation level is used.
+        ///     When value is null, the underlying provider's default isolation level is used.
         /// </remarks>
         IsolationLevel? IsolationLevel { get; set; }
 
@@ -142,7 +142,7 @@ namespace PetaPoco
         void BeginTransaction();
 
         /// <summary>
-        ///     Aborts the entire outer most transaction scope
+        ///     Aborts the entire outermost transaction scope
         /// </summary>
         /// <remarks>
         ///     Called automatically by Transaction.Dispose()

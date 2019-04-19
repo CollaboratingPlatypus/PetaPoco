@@ -91,7 +91,7 @@ namespace PetaPoco.Core
 #endif
 
         /// <summary>
-        ///     Returns the .net standard conforming DbProviderFactory.
+        ///     Returns the DbProviderFactory.
         /// </summary>
         /// <param name="assemblyQualifiedNames">The assembly qualified name of the provider factory.</param>
         /// <returns>The db provider factory.</returns>
@@ -113,7 +113,7 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        ///     Registers a custom IProvider with a string that will the beginning of the name
+        ///     Registers a custom IProvider with a string that will match the beginning of the name
         ///     of the provider, DbConnection, or DbProviderFactory.
         /// </summary>
         /// <typeparam name="T">Type of IProvider to be registered.</typeparam>
@@ -140,7 +140,7 @@ namespace PetaPoco.Core
             => customProviders.Clear();
 
         /// <summary>
-        ///     Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
+        ///     Look at the type and provider name being used and instantiate a suitable IProvider instance.
         /// </summary>
         /// <param name="type">The type name.</param>
         /// <param name="allowDefault">
@@ -189,7 +189,7 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        ///     Look at the type and provider name being used and instantiate a suitable DatabaseType instance.
+        ///     Look at the type and provider name being used and instantiate a suitable IProvider instance.
         /// </summary>
         /// <param name="providerName">The provider name.</param>
         /// <param name="allowDefault">

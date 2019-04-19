@@ -24,7 +24,7 @@ namespace PetaPoco.Core
         bool HasNativeGuidSupport { get; }
 
         /// <summary>
-        ///     Escape a tablename into a suitable format for the associated database provider.
+        ///     Escape a table name into a suitable format for the associated database provider.
         /// </summary>
         /// <param name="tableName">
         ///     The name of the table (as specified by the client program, or as attributes on the associated
@@ -34,18 +34,18 @@ namespace PetaPoco.Core
         string EscapeTableName(string tableName);
 
         /// <summary>
-        ///     Escape and arbitary SQL identifier into a format suitable for the associated database provider
+        ///     Escape an arbitary SQL identifier into a format suitable for the associated database provider
         /// </summary>
         /// <param name="sqlIdentifier">The SQL identifier to be escaped</param>
         /// <returns>The escaped identifier</returns>
         string EscapeSqlIdentifier(string sqlIdentifier);
 
         /// <summary>
-        ///     Builds an SQL query suitable for performing page based queries to the database
+        ///     Builds an SQL query suitable for performing page-based queries to the database
         /// </summary>
         /// <param name="skip">The number of rows that should be skipped by the query</param>
         /// <param name="take">The number of rows that should be retruend by the query</param>
-        /// <param name="parts">The original SQL query after being parsed into it's component parts</param>
+        /// <param name="parts">The original SQL query after being parsed into its component parts</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL query</param>
         /// <returns>The final SQL query that should be executed.</returns>
         string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args);
@@ -65,7 +65,7 @@ namespace PetaPoco.Core
         void PreExecute(IDbCommand cmd);
 
         /// <summary>
-        ///     Returns an SQL Statement that can check for the existence of a row in the database.
+        ///     Returns an SQL statement that can check for the existence of a row in the database.
         /// </summary>
         /// <returns></returns>
         string GetExistsSql();
@@ -100,7 +100,7 @@ namespace PetaPoco.Core
         ///     Returns the prefix used to delimit parameters in SQL query strings.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
-        /// <returns>The providers character for prefixing a query parameter.</returns>
+        /// <returns>The provider's character for prefixing a query parameter.</returns>
         string GetParameterPrefix(string connectionString);
 
         /// <summary>
