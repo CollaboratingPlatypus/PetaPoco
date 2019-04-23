@@ -220,7 +220,7 @@ namespace PetaPoco
         /// <param name="sourceProperty">The property to be converted</param>
         /// <returns>A Func that can do the conversion</returns>
         /// <remarks>
-        ///     This conversion is only used for converting values from POCO's that are
+        ///     This conversion is only used for converting values from POCOs that are
         ///     being Inserted or Updated.
         ///     Conversion is not available for parameter values passed directly to queries.
         /// </remarks>

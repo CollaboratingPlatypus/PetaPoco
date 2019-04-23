@@ -82,7 +82,7 @@
         string Camelise(string lowercaseAndUnderscoredWord);
 
         /// <summary>
-        ///     Underscores the word.
+        ///     Underscores and lowercases the word.
         /// </summary>
         /// <example>
         ///     inflect.Underscore("SomeTitle").ShouldBe("some_title");

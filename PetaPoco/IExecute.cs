@@ -13,7 +13,7 @@
         /// <summary>
         ///     Executes a non-query command
         /// </summary>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+        /// <param name="sql">An SQL builder object representing the query and its arguments</param>
         /// <returns>The number of rows affected</returns>
         int Execute(Sql sql);
 
@@ -30,7 +30,7 @@
         ///     Executes a query and return the first column of the first row in the result set.
         /// </summary>
         /// <typeparam name="T">The type that the result value should be cast to</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and it's arguments</param>
+        /// <param name="sql">An SQL builder object representing the query and its arguments</param>
         /// <returns>The scalar value cast to T</returns>
         T ExecuteScalar<T>(Sql sql);
     }

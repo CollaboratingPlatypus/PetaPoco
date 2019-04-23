@@ -175,7 +175,7 @@ namespace PetaPoco.Core.Inflection
         }
 
         /// <summary>
-        ///     Underscores the word.
+        ///     Underscores and lowercases the word.
         /// </summary>
         /// <example>
         ///     inflect.Underscore("SomeTitle").ShouldBe("some_title");

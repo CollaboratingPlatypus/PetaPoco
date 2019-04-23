@@ -66,7 +66,7 @@ namespace PetaPoco.Internal
             });
         }
 
-        // Find the split point in a result set for two different pocos and return the poco factory for the first
+        // Find the split point in a result set for two different POCOs and return the POCO factory for the first
         private static Delegate FindSplitPoint(Type typeThis, Type typeNext, string connectionString, string sql, IDataReader r, ref int pos, IMapper defaultMapper)
         {
             // Last?
