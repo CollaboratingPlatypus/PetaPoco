@@ -3,7 +3,7 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents an attribute, which when applied to a Poco class, specifies the the DB table name which it maps to
+    ///     Represents an attribute, which when applied to a POCO class, specifies the the DB table name which it maps to
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class TableNameAttribute : Attribute

@@ -9,7 +9,7 @@ using PetaPoco.Internal;
 namespace PetaPoco
 {
     /// <summary>
-    ///     This static manages registation of IMapper instances with PetaPoco
+    ///     This static class manages registation of IMapper instances with PetaPoco
     /// </summary>
     public static class Mappers
     {
@@ -94,7 +94,7 @@ namespace PetaPoco
         ///     Retrieve the IMapper implementation to be used for a specified POCO type.
         /// </summary>
         /// <param name="entityType">The entity type to get the mapper for.</param>
-        /// <param name="defaultMapper">The default mapper to use when non is registered for the type.</param>
+        /// <param name="defaultMapper">The default mapper to use when none is registered for the type.</param>
         /// <returns>The mapper for the given type.</returns>
         public static IMapper GetMapper(Type entityType, IMapper defaultMapper)
         {

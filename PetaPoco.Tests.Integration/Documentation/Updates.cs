@@ -3,6 +3,7 @@ using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Databases;
 using PetaPoco.Tests.Integration.Databases.MSSQL;
+using PetaPoco.Tests.Integration.Documentation.Pocos;
 using Shouldly;
 using Xunit;
 

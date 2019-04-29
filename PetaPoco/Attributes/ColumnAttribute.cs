@@ -3,7 +3,7 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents an attribute which can decorate a Poco property to mark the property as a column. It may also optionally
+    ///     Represents an attribute which can decorate a POCO property to mark the property as a column. It may also optionally
     ///     supply the DB column name.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
@@ -22,14 +22,14 @@ namespace PetaPoco
         public bool ForceToUtc { get; set; }
 
         /// <summary>
-        ///     The insert template. If not null, this template is used for generating the insert section instead of the deafult
+        ///     The insert template. If not null, this template is used for generating the insert section instead of the default
         ///     string.Format("{0}{1}", paramPrefix, index"). Setting this allows DB related interactions, such as "CAST({0}{1} AS
         ///     json)"
         /// </summary>
         public string InsertTemplate { get; set; }
 
         /// <summary>
-        ///     The update template. If not null, this template is used for generating the update section instead of the deafult
+        ///     The update template. If not null, this template is used for generating the update section instead of the default
         ///     string.Format("{0} = {1}{2}", colName, paramPrefix, index"). Setting this allows DB related interactions, such as
         ///     "{0} = CAST({1}{2} AS
         ///     json)"

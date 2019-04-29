@@ -3,7 +3,7 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Is an attribute, which when applied to a Poco class, specifies primary key column. Additionally, specifies whether
+    ///     Is an attribute, which when applied to a POCO class, specifies primary key column. Additionally, specifies whether
     ///     the column is auto incrementing and the optional sequence name for Oracle sequence columns.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]

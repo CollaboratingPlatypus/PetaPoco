@@ -30,7 +30,7 @@ namespace PetaPoco
         /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
         /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
         /// <remarks>
-        ///     Inserts a poco into a table. If the poco has a property with the same name
+        ///     Inserts a POCO into a table. If the POCO has a property with the same name
         ///     as the primary key, the id of the new record is assigned to it. Either way,
         ///     the new id is returned.
         /// </remarks>
@@ -42,7 +42,7 @@ namespace PetaPoco
         /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
         /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
         /// <remarks>
-        ///     The name of the table, it's primary key and whether it's an auto-allocated primary key are retrieved
+        ///     The name of the table, its primary key and whether it's an auto-allocated primary key are retrieved
         ///     from the POCO's attributes
         /// </remarks>
         object Insert(object poco);
@@ -122,7 +122,7 @@ namespace PetaPoco
         /// <summary>
         ///     Performs an SQL update
         /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
+        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to update</typeparam>
         /// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <returns>The number of affected rows</returns>
@@ -131,7 +131,7 @@ namespace PetaPoco
         /// <summary>
         ///     Performs an SQL update
         /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to update</typeparam>
+        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to update</typeparam>
         /// <param name="sql">
         ///     An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE
         ///     tablename"
@@ -140,7 +140,7 @@ namespace PetaPoco
         int Update<T>(Sql sql);
 
         /// <summary>
-        ///     Performs and SQL Delete
+        ///     Performs an SQL Delete
         /// </summary>
         /// <param name="tableName">The name of the table to delete from</param>
         /// <param name="primaryKeyName">The name of the primary key column</param>
@@ -149,7 +149,7 @@ namespace PetaPoco
         int Delete(string tableName, string primaryKeyName, object poco);
 
         /// <summary>
-        ///     Performs and SQL Delete
+        ///     Performs an SQL Delete
         /// </summary>
         /// <param name="tableName">The name of the table to delete from</param>
         /// <param name="primaryKeyName">The name of the primary key column</param>
@@ -182,7 +182,7 @@ namespace PetaPoco
         /// <summary>
         ///     Performs an SQL Delete
         /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
+        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to delete from</typeparam>
         /// <param name="sql">The SQL condition clause identifying the row to delete (ie: everything after "DELETE FROM tablename"</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL</param>
         /// <returns>The number of affected rows</returns>
@@ -191,7 +191,7 @@ namespace PetaPoco
         /// <summary>
         ///     Performs an SQL Delete
         /// </summary>
-        /// <typeparam name="T">The POCO class who's attributes specify the name of the table to delete from</typeparam>
+        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to delete from</typeparam>
         /// <param name="sql">
         ///     An SQL builder object representing the SQL condition clause identifying the row to delete (ie:
         ///     everything after "UPDATE tablename"
@@ -205,7 +205,7 @@ namespace PetaPoco
         /// <param name="primaryKeyName">The name of the primary key column</param>
         /// <param name="poco">The object instance whose "newness" is to be tested</param>
         /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
+        /// <remarks>This method simply tests if the POCO's primary key column property has a non-default value.</remarks>
         bool IsNew(string primaryKeyName, object poco);
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="poco">The object instance whose "newness" is to be tested</param>
         /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
+        /// <remarks>This method simply tests if the POCO's primary key column property has a non-default value.</remarks>
         bool IsNew(object poco);
 
         /// <summary>

@@ -114,7 +114,7 @@ namespace PetaPoco
         ///     the responsibility of the caller.
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
-        public Database(DbConnection connection, IMapper defaultMapper = null)
+        public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
@@ -123,7 +123,7 @@ namespace PetaPoco
             Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
-        private void SetupFromConnection(DbConnection connection)
+        private void SetupFromConnection(IDbConnection connection)
         {
             _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
@@ -157,7 +157,7 @@ namespace PetaPoco
         ///     Constructs an instance using the supplied connection string and DbProviderFactory.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
-        /// <param name="factory">The DbProviderFactory to use for instantiating IDbConnection's.</param>
+        /// <param name="factory">The DbProviderFactory to use for instantiating IDbConnections.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="factory" /> is null.</exception>
@@ -214,14 +214,14 @@ namespace PetaPoco
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
             IProvider provider = null;
-            DbConnection connection = null;
+            IDbConnection connection = null;
             string providerName = null;
 #if !NETSTANDARD
             ConnectionStringSettings entry = null;
 #endif
 
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
-            settings.TryGetSetting<DbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+            settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
 
             if (connection != null)
@@ -426,7 +426,7 @@ namespace PetaPoco
         ///     Alias for <see cref="CloseSharedConnection" />.
         /// </summary>
         /// <remarks>
-        ///     Only useful when making use of the .net `using` language feature.
+        ///     Called implicitly when making use of the .NET `using` language feature.
         /// </remarks>
         public void Dispose()
         {
@@ -697,7 +697,7 @@ namespace PetaPoco
         /// <summary>
         ///     Called when DB connection opened
         /// </summary>
-        /// <param name="conn">The newly opened IDbConnection</param>
+        /// <param name="conn">The newly-opened IDbConnection</param>
         /// <returns>The same or a replacement IDbConnection</returns>
         /// <remarks>
         ///     Override this method to provide custom logging of opening connection, or
@@ -713,7 +713,7 @@ namespace PetaPoco
         /// <summary>
         ///     Called when DB connection closed
         /// </summary>
-        /// <param name="conn">The soon to be closed IDBConnection</param>
+        /// <param name="conn">The soon-to-be-closed IDBConnection</param>
         public virtual void OnConnectionClosing(IDbConnection conn)
         {
             ConnectionClosing?.Invoke(this, new DbConnectionEventArgs(conn));
@@ -2909,7 +2909,7 @@ namespace PetaPoco
         public object[] LastArgs => _lastArgs;
 
         /// <summary>
-        ///     Returns a formatted string describing the last executed SQL statement and it's argument values
+        ///     Returns a formatted string describing the last executed SQL statement and its argument values
         /// </summary>
         public string LastCommand => FormatCommand(_lastSql, _lastArgs);
 
@@ -2928,7 +2928,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Formats an SQL query and it's arguments for display
+        ///     Formats an SQL query and its arguments for display
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="args"></param>
@@ -2969,7 +2969,7 @@ namespace PetaPoco
         public bool EnableAutoSelect { get; set; }
 
         /// <summary>
-        ///     When set to true, parameters can be named ?myparam and populated from properties of the passed in argument values.
+        ///     When set to true, parameters can be named ?myparam and populated from properties of the passed-in argument values.
         /// </summary>
         public bool EnableNamedParams { get; set; }
 

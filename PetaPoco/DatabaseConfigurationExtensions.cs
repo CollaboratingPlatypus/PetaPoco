@@ -42,7 +42,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <param name="seconds">The timeout in seconds.</param>
         /// <exception cref="ArgumentException">Thrown when seconds is less than 1.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingCommandTimeout(this IDatabaseBuildConfiguration source, int seconds)
         {
             if (seconds < 1)
@@ -55,7 +55,7 @@ namespace PetaPoco
         ///     Enables named params - see <see cref="IDatabase.EnableNamedParams" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration WithNamedParams(this IDatabaseBuildConfiguration source)
         {
             source.SetSetting(EnableNamedParams, true);
@@ -66,7 +66,7 @@ namespace PetaPoco
         ///     Disables named params - see <see cref="IDatabase.EnableNamedParams" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration WithoutNamedParams(this IDatabaseBuildConfiguration source)
         {
             source.SetSetting(EnableNamedParams, false);
@@ -80,7 +80,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <param name="provider">The provider to use.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="provider" /> is null.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, T provider) where T : class, IProvider
         {
             if (provider == null)
@@ -98,7 +98,7 @@ namespace PetaPoco
         /// <param name="provider">The provider to use.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="provider" /> is null.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, T provider, Action<T> configure) where T : class, IProvider
         {
             if (provider == null)
@@ -116,7 +116,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <typeparam name="T">The provider type.</typeparam>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source) where T : class, IProvider, new()
         {
             source.SetSetting(Provider, new T());
@@ -131,7 +131,7 @@ namespace PetaPoco
         /// <param name="configure">The configure provider callback.</param>
         /// <typeparam name="T">The provider type.</typeparam>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingProvider<T>(this IDatabaseBuildConfiguration source, Action<T> configure) where T : class, IProvider, new()
         {
             if (configure == null)
@@ -146,7 +146,7 @@ namespace PetaPoco
         ///     Enables auto select - see <see cref="IDatabase.EnableAutoSelect" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration WithAutoSelect(this IDatabaseBuildConfiguration source)
         {
             source.SetSetting(EnableAutoSelect, true);
@@ -157,7 +157,7 @@ namespace PetaPoco
         ///     Disables auto select - see <see cref="IDatabase.EnableAutoSelect" />.
         /// </summary>
         /// <param name="source">The configuration source.</param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration WithoutAutoSelect(this IDatabaseBuildConfiguration source)
         {
             source.SetSetting(EnableAutoSelect, false);
@@ -170,7 +170,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingConnectionString(this IDatabaseBuildConfiguration source, string connectionString)
         {
             if (string.IsNullOrEmpty(connectionString))
@@ -186,7 +186,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <param name="connectionStringName">The connection string name.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingConnectionStringName(this IDatabaseBuildConfiguration source, string connectionStringName)
         {
             if (string.IsNullOrEmpty(connectionStringName))
@@ -202,7 +202,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <param name="providerName">The provider name.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="providerName" /> is null or empty.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingProviderName(this IDatabaseBuildConfiguration source, string providerName)
         {
             if (string.IsNullOrEmpty(providerName))
@@ -232,7 +232,7 @@ namespace PetaPoco
         /// <param name="source">The configuration source.</param>
         /// <param name="mapper">The mapper to use as the default.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="mapper" /> is null.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, T mapper) where T : class, IMapper
         {
             if (mapper == null)
@@ -249,7 +249,7 @@ namespace PetaPoco
         /// <param name="configure">The configure mapper callback.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="mapper" /> is null.</exception>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, T mapper, Action<T> configure) where T : class, IMapper
         {
             if (mapper == null)
@@ -266,7 +266,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <typeparam name="T">The mapper type.</typeparam>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source) where T : class, IMapper, new()
         {
             source.SetSetting(DefaultMapper, new T());
@@ -280,7 +280,7 @@ namespace PetaPoco
         /// <param name="configure">The configure mapper callback.</param>
         /// <typeparam name="T">The mapper type.</typeparam>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configure" /> is null.</exception>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingDefaultMapper<T>(this IDatabaseBuildConfiguration source, Action<T> configure) where T : class, IMapper, new()
         {
             if (configure == null)
@@ -297,7 +297,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="isolationLevel"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingIsolationLevel(this IDatabaseBuildConfiguration source, IsolationLevel isolationLevel)
         {
             source.SetSetting(IsolationLevel, isolationLevel);
@@ -309,7 +309,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingTransactionStarted(this IDatabaseBuildConfiguration source, EventHandler<DbTransactionEventArgs> handler)
         {
             source.SetSetting(TransactionStarted, handler);
@@ -321,7 +321,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingTransactionEnding(this IDatabaseBuildConfiguration source, EventHandler<DbTransactionEventArgs> handler)
         {
             source.SetSetting(TransactionEnding, handler);
@@ -333,7 +333,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingCommandExecuting(this IDatabaseBuildConfiguration source, EventHandler<DbCommandEventArgs> handler)
         {
             source.SetSetting(CommandExecuting, handler);
@@ -345,7 +345,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingCommandExecuted(this IDatabaseBuildConfiguration source, EventHandler<DbCommandEventArgs> handler)
         {
             source.SetSetting(CommandExecuted, handler);
@@ -357,7 +357,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingConnectionOpened(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
         {
             source.SetSetting(ConnectionOpened, handler);
@@ -369,7 +369,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingConnectionClosing(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
         {
             source.SetSetting(ConnectionClosing, handler);
@@ -381,7 +381,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
-        /// <returns>The configuration source to form a fluent interface.</returns>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration UsingExceptionThrown(this IDatabaseBuildConfiguration source, EventHandler<ExceptionEventArgs> handler)
         {
             source.SetSetting(ExceptionThrown, handler);

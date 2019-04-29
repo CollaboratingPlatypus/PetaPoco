@@ -7,7 +7,7 @@ using PetaPoco.Internal;
 namespace PetaPoco
 {
     /// <summary>
-    ///     A simple helper class for build SQL statements
+    ///     A simple helper class for building SQL statements
     /// </summary>
     public class Sql
     {
