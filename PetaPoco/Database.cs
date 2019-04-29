@@ -114,7 +114,7 @@ namespace PetaPoco
         ///     the responsibility of the caller.
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
-        public Database(DbConnection connection, IMapper defaultMapper = null)
+        public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
@@ -123,7 +123,7 @@ namespace PetaPoco
             Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
         }
 
-        private void SetupFromConnection(DbConnection connection)
+        private void SetupFromConnection(IDbConnection connection)
         {
             _sharedConnection = connection;
             _connectionString = connection.ConnectionString;
@@ -214,14 +214,14 @@ namespace PetaPoco
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
 
             IProvider provider = null;
-            DbConnection connection = null;
+            IDbConnection connection = null;
             string providerName = null;
 #if !NETSTANDARD
             ConnectionStringSettings entry = null;
 #endif
 
             settings.TryGetSetting<IProvider>(DatabaseConfigurationExtensions.Provider, p => provider = p);
-            settings.TryGetSetting<DbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
+            settings.TryGetSetting<IDbConnection>(DatabaseConfigurationExtensions.Connection, c => connection = c);
             settings.TryGetSetting<string>(DatabaseConfigurationExtensions.ProviderName, pn => providerName = pn);
 
             if (connection != null)
