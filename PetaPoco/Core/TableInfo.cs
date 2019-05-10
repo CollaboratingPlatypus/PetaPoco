@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace PetaPoco
 {
@@ -35,39 +36,47 @@ namespace PetaPoco
         /// <returns>A TableInfo instance</returns>
         public static TableInfo FromPoco(Type t)
         {
-            TableInfo ti = new TableInfo();
+            var ti = new TableInfo();
+            PopulateTableNameFromPoco(t, ref ti, out _);
+            PopulatePrimaryKeyFromPoco(t, ref ti, out _, out _);
+            return ti;
+        }
 
-            // Get the table name
-            var a = t.GetCustomAttributes(typeof(TableNameAttribute), true);
-            ti.TableName = a.Length == 0 ? t.Name : (a[0] as TableNameAttribute).Value;
 
-            // Get the primary key
-            a = t.GetCustomAttributes(typeof(PrimaryKeyAttribute), true);
-            ti.PrimaryKey = a.Length == 0 ? null : (a[0] as PrimaryKeyAttribute).Value;
-            ti.SequenceName = a.Length == 0 ? null : (a[0] as PrimaryKeyAttribute).SequenceName;
-            ti.AutoIncrement = a.Length == 0 ? false : (a[0] as PrimaryKeyAttribute).AutoIncrement;
+        internal static void PopulateTableNameFromPoco(Type t, ref TableInfo ti, out TableNameAttribute tblAttr)
+        {
+            ti = ti ?? new TableInfo();
+            tblAttr = t.GetCustomAttributes(typeof(TableNameAttribute), true).FirstOrDefault() as TableNameAttribute;
+            ti.TableName = tblAttr?.Value ?? t.Name;
+        }
 
-            if (string.IsNullOrEmpty(ti.PrimaryKey))
+        internal static void PopulatePrimaryKeyFromPoco(Type t, ref TableInfo ti, out PrimaryKeyAttribute pkAttr, out PropertyInfo idProp)
+        {
+            ti = ti ?? new TableInfo();
+            pkAttr = t.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).FirstOrDefault() as PrimaryKeyAttribute;
+            idProp = null;
+
+            ti.PrimaryKey = pkAttr?.Value;
+            ti.SequenceName = pkAttr?.SequenceName;
+            ti.AutoIncrement = pkAttr?.AutoIncrement ?? false;
+            
+            if (String.IsNullOrWhiteSpace(ti.PrimaryKey))
             {
-                var prop = t.GetProperties().FirstOrDefault(p =>
+                bool isIdProp(PropertyInfo p)
                 {
-                    if (p.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    if (p.Name.Equals(t.Name + "id", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    if (p.Name.Equals(t.Name + "_id", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    return false;
-                });
+                    bool hasName(string name) => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase);
+                    return hasName("id")
+                        || hasName(t.Name + "id")
+                        || hasName(t.Name + "_id");
+                }
 
-                if (prop != null)
+                idProp = t.GetProperties().FirstOrDefault(isIdProp) as PropertyInfo;
+                if (idProp != null)
                 {
-                    ti.PrimaryKey = prop.Name;
-                    ti.AutoIncrement = prop.PropertyType.IsValueType;
+                    ti.PrimaryKey = idProp.Name;
+                    ti.AutoIncrement = idProp.PropertyType.IsValueType;
                 }
             }
-
-            return ti;
         }
     }
 }
