@@ -69,40 +69,31 @@ namespace PetaPoco
             InflectTableName = (inflect, tn) => tn;
             MapPrimaryKey = (ti, t) =>
             {
-                var primaryKey = t.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).FirstOrDefault() as PrimaryKeyAttribute;
+                TableInfo.PopulatePrimaryKeyFromPoco(t, ref ti, out var pkAttr, out var idProp);
 
-                if (primaryKey != null)
+                if (pkAttr == null && idProp == null)
+                    return false;
+                else
                 {
-                    ti.PrimaryKey = primaryKey.Value;
-                    ti.SequenceName = primaryKey.SequenceName;
-                    ti.AutoIncrement = primaryKey.AutoIncrement;
+                    // If there's no pkAttr, then there's extra processing
+                    if (pkAttr == null)
+                    {
+                        ti.PrimaryKey = InflectColumnName(Inflector.Instance, idProp.Name);
+                        ti.AutoIncrement = IsPrimaryKeyAutoIncrement(idProp.PropertyType);
+                        ti.SequenceName = GetSequenceName(t, idProp);
+                    }
+
                     return true;
                 }
-
-                var prop = t.GetProperties().FirstOrDefault(p =>
-                {
-                    if (p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    if (p.Name.Equals(t.Name + "Id", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    if (p.Name.Equals(t.Name + "_Id", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                    return false;
-                });
-
-                if (prop == null)
-                    return false;
-
-                ti.PrimaryKey = InflectColumnName(Inflector.Instance, prop.Name);
-                ti.AutoIncrement = IsPrimaryKeyAutoIncrement(prop.PropertyType);
-                ti.SequenceName = GetSequenceName(t, prop);
-                return true;
             };
             MapTable = (ti, t) =>
             {
-                var tableName = t.GetCustomAttributes(typeof(TableNameAttribute), true).FirstOrDefault() as TableNameAttribute;
-                ti.TableName = tableName != null ? tableName.Value : InflectTableName(Inflector.Instance, t.Name);
+                TableInfo.PopulateTableNameFromPoco(t, ref ti, out var tblAttr);
+                if (tblAttr == null)
+                    ti.TableName = InflectTableName(Inflector.Instance, t.Name);
+
                 MapPrimaryKey(ti, t);
+
                 return true;
             };
             IsPrimaryKeyAutoIncrement = t =>
@@ -121,34 +112,19 @@ namespace PetaPoco
             };
             MapColumn = (ci, t, pi) =>
             {
-                // Check if declaring poco has [Explicit] attribute
-                var isExplicit = t.GetCustomAttributes(typeof(ExplicitColumnsAttribute), true).Any();
-
-                // Check for [Column]/[Ignore] Attributes
-                var column = pi.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
-
-                if (isExplicit && column == null)
+                ColumnInfo.PopulateFromProperty(pi, ref ci, out var columnAttr);
+                
+                if (ci == null)
                     return false;
-
-                if (pi.GetCustomAttributes(typeof(IgnoreAttribute), true).Any())
-                    return false;
-
-                // Read attribute
-                if (column != null)
-                {
-                    ci.ColumnName = column.Name ?? InflectColumnName(Inflector.Instance, pi.Name);
-                    ci.ForceToUtc = column.ForceToUtc;
-                    ci.ResultColumn = (column as ResultColumnAttribute) != null;
-                    ci.AutoSelectedResultColumn = (column as ResultColumnAttribute)?.IncludeInAutoSelect == IncludeInAutoSelect.Yes;
-                    ci.InsertTemplate = column.InsertTemplate;
-                    ci.UpdateTemplate = column.UpdateTemplate;
-                }
                 else
                 {
-                    ci.ColumnName = InflectColumnName(Inflector.Instance, pi.Name);
-                }
+                    // If there's no colAttr.Name, then we got the name 
+                    // from pi, so inflect it
+                    if (columnAttr?.Name == null)
+                        ci.ColumnName = InflectColumnName(Inflector.Instance, pi.Name);
 
-                return true;
+                    return true;
+                }
             };
             FromDbConverter = (pi, t) =>
             {
