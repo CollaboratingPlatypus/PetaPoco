@@ -7,11 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     public class FirebirdDBTestProvider : DBTestProvider
     {
-        private string _connectionName = "Firebird";
-
-        protected override IDatabase Database => LoadFromConnectionName(_connectionName);
-
-        public override string ProviderName => GetProviderName(_connectionName);
+        protected override string ConnectionName => "Firebird";
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.FirebirdDbBuildDatabase.sql";
 

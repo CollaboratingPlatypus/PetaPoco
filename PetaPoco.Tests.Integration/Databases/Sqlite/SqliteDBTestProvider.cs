@@ -5,10 +5,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
 {
     public class SqliteDBTestProvider : DBTestProvider
     {
-        private string _connectionName = "sqlite";
-        protected override IDatabase Database => LoadFromConnectionName(_connectionName);
-
-        public override string ProviderName => GetProviderName(_connectionName);
+        protected override string ConnectionName => "sqlite";
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqliteBuildDatabase.sql";
 

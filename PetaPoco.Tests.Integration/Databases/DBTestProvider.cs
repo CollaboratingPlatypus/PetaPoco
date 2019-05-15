@@ -11,9 +11,11 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class DBTestProvider : IDisposable
     {
-        public abstract string ProviderName { get; }
+        protected abstract string ConnectionName { get; }
 
-        protected abstract IDatabase Database { get; }
+        public string ProviderName => GetProviderName(ConnectionName);
+
+        protected IDatabase Database => LoadFromConnectionName(ConnectionName);
 
         protected abstract string ScriptResourceName { get; }
 
