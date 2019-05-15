@@ -8,7 +8,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     public class MssqlCeDBTestProvider : DBTestProvider
     {
-        protected override IDatabase Database => LoadFromConnectionName("mssqlce");
+        private string _connectionName = "mssqlce";
+
+        protected override IDatabase Database => LoadFromConnectionName(_connectionName);
+
+        public override string ProviderName => GetProviderName(_connectionName);
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLCeBuildDatabase.sql";
 

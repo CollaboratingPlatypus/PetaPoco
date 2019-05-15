@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.IO;
 using System.Text;
 
@@ -10,6 +11,8 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class DBTestProvider : IDisposable
     {
+        public abstract string ProviderName { get; }
+
         protected abstract IDatabase Database { get; }
 
         protected abstract string ScriptResourceName { get; }
@@ -40,11 +43,9 @@ namespace PetaPoco.Tests.Integration.Databases
         protected virtual IDatabaseBuildConfiguration BuildFromConnectionName(string name)
         {
 #if NETCOREAPP
-            var appSettings = AppSetting.Load();
-
             return DatabaseConfiguration.Build()
-                .UsingConnectionString(appSettings.ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ConnectionString)
-                .UsingProviderName(appSettings.ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ProviderName);
+                .UsingConnectionString(AppSetting.Instance.ConnectionStringFor(name).ConnectionString)
+                .UsingProviderName(AppSetting.Instance.ConnectionStringFor(name).ProviderName);
 #else
             return DatabaseConfiguration.Build().UsingConnectionStringName(name);
 #endif
@@ -53,6 +54,18 @@ namespace PetaPoco.Tests.Integration.Databases
         protected virtual IDatabase LoadFromConnectionName(string name)
         {
             return BuildFromConnectionName(name).Create();
+        }
+
+        
+
+        public string GetProviderName(string name)
+        {
+#if NETCOREAPP
+            return AppSetting.Instance.ConnectionStringFor(name).ProviderName;
+#else
+            return ConfigurationManager.ConnectionStrings[name].ProviderName;
+#endif
+
         }
     }
 }

@@ -11,6 +11,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
 
+        public override string ProviderName => GetProviderName("mssql");
+
         public override IDatabase Execute()
         {
             EnsureDatabaseExists();
