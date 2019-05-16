@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 
 namespace PetaPoco
 {
@@ -49,6 +51,36 @@ namespace PetaPoco
         /// </summary>
         public string UpdateTemplate { get; set; }
 
+        internal static void PopulateFromProperty(PropertyInfo pi, ref ColumnInfo ci, out ColumnAttribute columnAttr)
+        {
+            // Check if declaring poco has [Explicit] attribute
+            var isExplicit = pi.DeclaringType.GetCustomAttributes(typeof(ExplicitColumnsAttribute), true).Any();
+
+            // Check for [Column]/[Ignore] Attributes
+            columnAttr = pi.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
+            var isIgnore = pi.GetCustomAttributes(typeof(IgnoreAttribute), true).Any();
+
+            if (isIgnore || (isExplicit && columnAttr == null))
+            {
+                ci = null;
+            }
+            else
+            {
+                ci = ci ?? new ColumnInfo();
+
+                ci.ColumnName = columnAttr?.Name ?? pi.Name;
+                ci.ForceToUtc = columnAttr?.ForceToUtc == true;
+                ci.InsertTemplate = columnAttr?.InsertTemplate;
+                ci.UpdateTemplate = columnAttr?.UpdateTemplate;
+
+                if (columnAttr is ResultColumnAttribute resAttr)
+                {
+                    ci.ResultColumn = true;
+                    ci.AutoSelectedResultColumn = resAttr.IncludeInAutoSelect == IncludeInAutoSelect.Yes;
+                }                
+            }
+        }
+
         /// <summary>
         ///     Creates and populates a ColumnInfo from the attributes of a POCO property.
         /// </summary>
@@ -56,42 +88,8 @@ namespace PetaPoco
         /// <returns>A ColumnInfo instance</returns>
         public static ColumnInfo FromProperty(PropertyInfo propertyInfo)
         {
-            // Check if declaring poco has [Explicit] attribute
-            var explicitColumns = propertyInfo.DeclaringType.GetCustomAttributes(typeof(ExplicitColumnsAttribute), true).Length > 0;
-
-            // Check for [Column]/[Ignore] Attributes
-            var colAttrs = propertyInfo.GetCustomAttributes(typeof(ColumnAttribute), true);
-            if (explicitColumns)
-            {
-                if (colAttrs.Length == 0)
-                    return null;
-            }
-            else
-            {
-                if (propertyInfo.GetCustomAttributes(typeof(IgnoreAttribute), true).Length != 0)
-                    return null;
-            }
-
             var ci = new ColumnInfo();
-
-            // Read attribute
-            if (colAttrs.Length > 0)
-            {
-                var colattr = (ColumnAttribute) colAttrs[0];
-                ci.InsertTemplate = colattr.InsertTemplate;
-                ci.UpdateTemplate = colattr.UpdateTemplate;
-                ci.ColumnName = colattr.Name ?? propertyInfo.Name;
-                ci.ForceToUtc = colattr.ForceToUtc;
-                if ((colattr as ResultColumnAttribute) != null)
-                    ci.ResultColumn = true;
-            }
-            else
-            {
-                ci.ColumnName = propertyInfo.Name;
-                ci.ForceToUtc = false;
-                ci.ResultColumn = false;
-            }
-
+            PopulateFromProperty(propertyInfo, ref ci, out _);
             return ci;
         }
     }

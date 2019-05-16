@@ -6,8 +6,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
     public class MssqlDBTestProvider : DBTestProvider
     {
         private string _connectionName = "mssql";
-
-        protected override IDatabase Database => LoadFromConnectionName(_connectionName);
+        protected override string ConnectionName => _connectionName;
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
 
