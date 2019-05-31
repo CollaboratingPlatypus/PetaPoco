@@ -1,10 +1,10 @@
-﻿using System;
+﻿using PetaPoco.Core;
+using PetaPoco.Internal;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using PetaPoco.Core;
-using PetaPoco.Internal;
 
 namespace PetaPoco
 {
@@ -13,64 +13,49 @@ namespace PetaPoco
     /// </summary>
     public static class Mappers
     {
-        private static Dictionary<object, IMapper> _mappers = new Dictionary<object, IMapper>();
-        private static ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private static ConcurrentDictionary<object, Lazy<IMapper>> _mappers = new ConcurrentDictionary<object, Lazy<IMapper>>();
 
         /// <summary>
         ///     Registers a mapper for all types in a specific assembly
         /// </summary>
         /// <param name="assembly">The assembly whose types are to be managed by this mapper</param>
         /// <param name="mapper">The IMapper implementation</param>
-        public static void Register(Assembly assembly, IMapper mapper)
-        {
-            RegisterInternal(assembly, mapper);
-        }
+        public static bool Register(Assembly assembly, IMapper mapper) => RegisterInternal(assembly, mapper);
 
         /// <summary>
         ///     Registers a mapper for a single POCO type
         /// </summary>
         /// <param name="type">The type to be managed by this mapper</param>
         /// <param name="mapper">The IMapper implementation</param>
-        public static void Register(Type type, IMapper mapper)
-        {
-            RegisterInternal(type, mapper);
-        }
+        public static bool Register(Type type, IMapper mapper) => RegisterInternal(type, mapper);
 
         /// <summary>
         ///     Remove all mappers for all types in a specific assembly
         /// </summary>
         /// <param name="assembly">The assembly whose mappers are to be revoked</param>
-        public static void Revoke(Assembly assembly)
-        {
-            RevokeInternal(assembly);
-        }
+        public static bool Revoke(Assembly assembly) => RevokeInternal(assembly);
 
         /// <summary>
         ///     Remove the mapper for a specific type
         /// </summary>
         /// <param name="type">The type whose mapper is to be removed</param>
-        public static void Revoke(Type type)
-        {
-            RevokeInternal(type);
-        }
+        public static bool Revoke(Type type) => RevokeInternal(type);
 
         /// <summary>
         ///     Revoke an instance of a mapper
         /// </summary>
         /// <param name="mapper">The IMapper to be revkoed</param>
-        public static void Revoke(IMapper mapper)
+        public static bool Revoke(IMapper mapper)
         {
-            _lock.EnterWriteLock();
-            try
+            var ret = false;
+            var m = _mappers.FirstOrDefault(v => v.Value.Value == mapper);
+            var key = m.Equals(default(KeyValuePair<object, Lazy<IMapper>>)) ? null : m.Key;
+            if (key != null)
             {
-                foreach (var i in _mappers.Where(kvp => kvp.Value == mapper).ToList())
-                    _mappers.Remove(i.Key);
+                ret = _mappers.TryRemove(key, out var _);
+                if (ret) FlushCaches();
             }
-            finally
-            {
-                _lock.ExitWriteLock();
-                FlushCaches();
-            }
+            return ret;
         }
 
         /// <summary>
@@ -78,16 +63,8 @@ namespace PetaPoco
         /// </summary>
         public static void RevokeAll()
         {
-            _lock.EnterWriteLock();
-            try
-            {
-                _mappers.Clear();
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-                FlushCaches();
-            }
+            _mappers.Clear();
+            FlushCaches();
         }
 
         /// <summary>
@@ -96,51 +73,20 @@ namespace PetaPoco
         /// <param name="entityType">The entity type to get the mapper for.</param>
         /// <param name="defaultMapper">The default mapper to use when none is registered for the type.</param>
         /// <returns>The mapper for the given type.</returns>
-        public static IMapper GetMapper(Type entityType, IMapper defaultMapper)
-        {
-            _lock.EnterReadLock();
-            try
-            {
-                IMapper val;
-                if (_mappers.TryGetValue(entityType, out val))
-                    return val;
-                if (_mappers.TryGetValue(entityType.Assembly, out val))
-                    return val;
+        public static IMapper GetMapper(Type entityType, IMapper defaultMapper) => _mappers.TryGetValue(entityType, out var m) ? m.Value : defaultMapper;
 
-                return defaultMapper;
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
+        private static bool RegisterInternal(object typeOrAssembly, IMapper mapper)
+        {
+            var ret = _mappers.TryAdd(typeOrAssembly, new Lazy<IMapper>(() => mapper));
+            if (ret) FlushCaches();
+            return ret;
         }
 
-        private static void RegisterInternal(object typeOrAssembly, IMapper mapper)
+        private static bool RevokeInternal(object typeOrAssembly)
         {
-            _lock.EnterWriteLock();
-            try
-            {
-                _mappers.Add(typeOrAssembly, mapper);
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-                FlushCaches();
-            }
-        }
-
-        private static void RevokeInternal(object typeOrAssembly)
-        {
-            _lock.EnterWriteLock();
-            try
-            {
-                _mappers.Remove(typeOrAssembly);
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-                FlushCaches();
-            }
+            var ret = _mappers.TryRemove(typeOrAssembly, out var _);
+            if (ret) FlushCaches();
+            return ret;
         }
 
         private static void FlushCaches()
