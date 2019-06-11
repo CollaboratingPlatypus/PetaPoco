@@ -17,6 +17,10 @@ namespace PetaPoco.Utilities
         public Regex SimpleRegexOrderBy = new Regex(@"\bORDER\s+BY\s+",
             RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
+        public Regex RegexGroupBy = new Regex(@"\bGROUP\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:)?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:)?)*",
+                                              RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
+
         public static IPagingHelper Instance { get; private set; }
 
         static PagingHelper()
@@ -34,30 +38,33 @@ namespace PetaPoco.Utilities
         {
             parts.Sql = sql;
             parts.SqlSelectRemoved = null;
-            parts.SqlCount = null;
+            parts.SqlCount = sql;
             parts.SqlOrderBy = null;
 
             // Extract the columns from "SELECT <whatever> FROM"
-            var m = RegexColumns.Match(sql);
-            if (!m.Success)
+            var columnsMatch = RegexColumns.Match(sql);
+            if (!columnsMatch.Success)
                 return false;
 
-            // Save column list and replace with COUNT(*)
-            var g = m.Groups[1];
-            parts.SqlSelectRemoved = sql.Substring(g.Index);
-
-            if (RegexDistinct.IsMatch(parts.SqlSelectRemoved))
-                parts.SqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
-            else
-                parts.SqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
-
             // Look for the last "ORDER BY <whatever>" clause not part of a ROW_NUMBER expression
-            m = SimpleRegexOrderBy.Match(parts.SqlCount);
-            if (m.Success)
+            var orderByMatch = RegexOrderBy.Match(sql);
+            if (orderByMatch.Success)
             {
-                g = m.Groups[0];
-                parts.SqlOrderBy = g + parts.SqlCount.Substring(g.Index + g.Length);
-                parts.SqlCount = parts.SqlCount.Substring(0, g.Index);
+                parts.SqlOrderBy = orderByMatch.Value;
+                parts.SqlCount = sql.Replace(orderByMatch.Value, string.Empty);
+            }
+
+            // Save column list and replace with COUNT(*)
+            var columnsGroup = columnsMatch.Groups[1];
+            parts.SqlSelectRemoved = sql.Substring(columnsGroup.Index);
+
+            if (RegexDistinct.IsMatch(parts.SqlSelectRemoved) || RegexGroupBy.IsMatch(parts.SqlSelectRemoved))
+            {
+                parts.SqlCount = sql.Substring(0, columnsGroup.Index) + "COUNT(*) FROM (" + parts.SqlCount + ") countAlias";
+            }
+            else
+            {
+                parts.SqlCount = sql.Substring(0, columnsGroup.Index) + "COUNT(*) " + parts.SqlCount.Substring(columnsGroup.Index + columnsGroup.Length);
             }
 
             return true;
