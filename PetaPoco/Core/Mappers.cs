@@ -73,7 +73,15 @@ namespace PetaPoco
         /// <param name="entityType">The entity type to get the mapper for.</param>
         /// <param name="defaultMapper">The default mapper to use when none is registered for the type.</param>
         /// <returns>The mapper for the given type.</returns>
-        public static IMapper GetMapper(Type entityType, IMapper defaultMapper) => _mappers.TryGetValue(entityType, out var m) ? m.Value : defaultMapper;
+        public static IMapper GetMapper(Type entityType, IMapper defaultMapper)
+        {
+            if (_mappers.TryGetValue(entityType, out Lazy<IMapper> val))
+                return val.Value;
+            if (_mappers.TryGetValue(entityType.Assembly, out val))
+                return val.Value;
+
+            return defaultMapper;
+        }
 
         private static bool RegisterInternal(object typeOrAssembly, IMapper mapper)
         {
