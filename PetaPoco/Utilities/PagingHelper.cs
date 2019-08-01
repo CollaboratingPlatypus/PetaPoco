@@ -17,8 +17,11 @@ namespace PetaPoco.Utilities
         public Regex SimpleRegexOrderBy = new Regex(@"\bORDER\s+BY\s+",
             RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public Regex RegexGroupBy = new Regex(@"\bGROUP\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:)?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:)?)*",
+        public Regex RegexGroupBy = new Regex(@"\bGROUP\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?)*",
                                               RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        public Regex SimpleRegexGroupBy = new Regex(@"\bGROUP\s+BY\s+",
+                                                    RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
 
         public static IPagingHelper Instance { get; private set; }
@@ -58,7 +61,7 @@ namespace PetaPoco.Utilities
             var columnsGroup = columnsMatch.Groups[1];
             parts.SqlSelectRemoved = sql.Substring(columnsGroup.Index);
 
-            if (RegexDistinct.IsMatch(parts.SqlSelectRemoved) || RegexGroupBy.IsMatch(parts.SqlSelectRemoved))
+            if (RegexDistinct.IsMatch(parts.SqlSelectRemoved) || SimpleRegexGroupBy.IsMatch(parts.SqlSelectRemoved))
             {
                 parts.SqlCount = sql.Substring(0, columnsGroup.Index) + "COUNT(*) FROM (" + parts.SqlCount + ") countAlias";
             }
