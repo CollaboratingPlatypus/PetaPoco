@@ -1,6 +1,8 @@
 ﻿#if NETCOREAPP
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace PetaPoco.Tests.Integration
@@ -9,7 +11,11 @@ namespace PetaPoco.Tests.Integration
     {
         public List<ConnectionStringSetting> ConnectionStrings { get; } = new List<ConnectionStringSetting>();
 
-        public static AppSetting Load()
+        private static AppSetting _instance;
+
+        public static AppSetting Instance => _instance;
+
+        static AppSetting()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -19,7 +25,12 @@ namespace PetaPoco.Tests.Integration
                 
             var app = new AppSetting();
             config.GetSection("App").Bind(app);
-            return app;
+            _instance = app;
+        }
+
+        public ConnectionStringSetting ConnectionStringFor(string name)
+        {
+            return ConnectionStrings.First(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public class ConnectionStringSetting

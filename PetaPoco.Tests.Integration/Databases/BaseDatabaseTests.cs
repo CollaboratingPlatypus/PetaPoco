@@ -49,7 +49,7 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public void Construct_GivenConnectionStringAndProviderName_ShouldBeValid()
         {
-            var providerName = DB.Provider.GetFactory().CreateConnection().GetType().Name;
+            var providerName = ProviderName;
             var connectionString = DB.ConnectionString;
 
             using (var db = new Database(connectionString, providerName))

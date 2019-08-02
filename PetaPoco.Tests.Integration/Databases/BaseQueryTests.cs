@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Providers;
 using PetaPoco.Tests.Integration.Models;
+using PetaPoco.Utilities;
 using Shouldly;
 using Xunit;
 
@@ -15,6 +16,37 @@ namespace PetaPoco.Tests.Integration.Databases
         protected BaseQueryTests(DBTestProvider provider)
             : base(provider)
         {
+        }
+
+        [Fact]
+        public virtual void Page_SqlCountStatmentNotWoksCorrectlyWithGroupBy()
+        {
+            // Add duplicate names
+            AddPeople(15, 5);
+            AddPeople(5, 3);
+
+            var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+            var columnName = DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName);
+            var tableName = DB.Provider.EscapeSqlIdentifier(pd.TableInfo.TableName);
+            var sql = Sql.Builder
+                    .Select(columnName)
+                    .From(tableName)
+                    .Where($"{columnName} = @0", "Peta1")
+                    .GroupBy(columnName)
+                    .OrderBy(columnName);
+
+            // Obtain items
+            var fetchResult = DB.Fetch<string>(sql);
+
+            PagingHelper.Instance.SplitSQL(sql.SQL, out var sqlParts);
+
+            var correctSyntax = $"SELECT COUNT(*) FROM (SELECT {sqlParts.SqlSelectRemoved.Replace(sqlParts.SqlOrderBy, string.Empty)}) countAlias";
+
+            var correctNumberOfTotalItems = DB.Single<int>(correctSyntax, sql.Arguments);
+            var page = DB.Page<Person>(2, 3, sql);
+
+            fetchResult.Count.ShouldBe(correctNumberOfTotalItems);
+            page.TotalItems.ShouldBe(fetchResult.Count, $"Statment {sqlParts.SqlCount} is not correct. Correct syntax is {correctSyntax}");
         }
 
         [Fact]
