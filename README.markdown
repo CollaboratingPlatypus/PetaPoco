@@ -22,6 +22,7 @@ For configuration, code examples and other general information [See the docs]
 
 * [PetaPoco.SqlKata](//github.com/asherber/PetaPoco.SqlKata) lets you use the powerful query builder [SqlKata](//sqlkata.com)  to [build SQL queries](//github.com/CollaboratingPlatypus/PetaPoco/wiki/Building-SQL-Queries) for PetaPoco.
 * [StaTypPocoQueries.PetaPoco](//github.com/asherber/StaTypPocoQueries.PetaPoco) provides the ability to use some simple, strongly typed, Intellisensed LINQ expressions in your queries.
+* [PetaPoco.DBEntityGenerator](//hippasus/PetaPoco.DBEntityGenerator) lets you generate Pocos from your DB (T4 template replacement).
 
 ## Version 5 - Legacy
 
