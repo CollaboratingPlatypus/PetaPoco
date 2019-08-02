@@ -2528,11 +2528,10 @@ namespace PetaPoco
 
             var type = pk != null ? pk.GetType() : pi.PropertyType;
 
+            if (type == typeof(string))
+                return string.IsNullOrEmpty((string)pk);
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) || !type.IsValueType)
                 return pk == null;
-
-            if (type == typeof(string))
-                return string.IsNullOrEmpty((string) pk);
             if (!pi.PropertyType.IsValueType)
                 return pk == null;
             if (type == typeof(long))
