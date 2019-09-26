@@ -145,6 +145,23 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        public void Update_GivenPocoAndEmptyColumns_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            var personOther = DB.Single<Person>(_person.Id);
+            UpdateProperties(personOther);
+            DB.Update(personOther, new string[0]).ShouldBe(0);
+            personOther = DB.Single<Person>(_person.Id);
+
+            personOther.Id.ShouldBe(_person.Id);
+            personOther.Age.ShouldBe(_person.Age);
+            personOther.Dob.ShouldBe(_person.Dob);
+            personOther.Name.ShouldBe(_person.Name);
+            personOther.Height.ShouldBe(_person.Height);
+        }
+
+        [Fact]
         public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
@@ -185,6 +202,23 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Dob.ShouldBe(_person.Dob);
             personOther.Name.ShouldNotBe(_person.Name);
             personOther.Height.ShouldNotBe(_person.Height);
+        }
+
+        [Fact]
+        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
+        {
+            DB.Insert("SpecificPeople", "Id", false, _person);
+
+            var personOther = SinglePersonOther(_person.Id);
+            UpdateProperties(personOther);
+            DB.Update("SpecificPeople", "Id", personOther, _person.Id, new string[0]).ShouldBe(0);
+            personOther = SinglePersonOther(_person.Id);
+
+            personOther.Id.ShouldBe(_person.Id);
+            personOther.Age.ShouldBe(_person.Age);
+            personOther.Dob.ShouldBe(_person.Dob);
+            personOther.Name.ShouldBe(_person.Name);
+            personOther.Height.ShouldBe(_person.Height);
         }
 
         [Fact]
@@ -354,6 +388,22 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Name.ShouldNotBe(_person.Name);
             personOther.Height.ShouldNotBe(_person.Height);
         }
+        [Fact]
+        public async Task UpdateAsync_GivenPocoAndEmptyColumns_ShouldBeValid()
+        {
+            await DB.InsertAsync(_person);
+
+            var personOther = await DB.SingleAsync<Person>(_person.Id);
+            UpdateProperties(personOther);
+            (await DB.UpdateAsync(personOther, new string[0])).ShouldBe(0);
+            personOther = await DB.SingleAsync<Person>(_person.Id);
+
+            personOther.Id.ShouldBe(_person.Id);
+            personOther.Age.ShouldBe(_person.Age);
+            personOther.Dob.ShouldBe(_person.Dob);
+            personOther.Name.ShouldBe(_person.Name);
+            personOther.Height.ShouldBe(_person.Height);
+        }
 
         [Fact]
         public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
@@ -396,6 +446,23 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Dob.ShouldBe(_person.Dob);
             personOther.Name.ShouldNotBe(_person.Name);
             personOther.Height.ShouldNotBe(_person.Height);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
+        {
+            await DB.InsertAsync("SpecificPeople", "Id", false, _person);
+
+            var personOther = await SinglePersonOtherAsync(_person.Id);
+            UpdateProperties(personOther);
+            (await DB.UpdateAsync("SpecificPeople", "Id", personOther, _person.Id, new string[0])).ShouldBe(0);
+            personOther = await SinglePersonOtherAsync(_person.Id);
+
+            personOther.Id.ShouldBe(_person.Id);
+            personOther.Age.ShouldBe(_person.Age);
+            personOther.Dob.ShouldBe(_person.Dob);
+            personOther.Name.ShouldBe(_person.Name);
+            personOther.Height.ShouldBe(_person.Height);
         }
 
         [Fact]
