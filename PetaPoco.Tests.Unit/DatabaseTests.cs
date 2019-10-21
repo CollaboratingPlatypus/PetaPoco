@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Dynamic;
@@ -119,6 +120,26 @@ namespace PetaPoco.Tests.Unit
             Should.Throw<ArgumentNullException>(() => DB.Update<Person>((string) null));
 
             Should.Throw<ArgumentNullException>(() => DB.Update<Person>((Sql) null));
+        }
+
+        [Fact]
+        public void Update_GivenPocoAndEmptyColumns_ShouldReturn_Zero()
+        {
+            var person = new Person() { Id = Guid.NewGuid() };
+            var columns = new List<string>();
+
+            var output = DB.Update(person, columns);
+            output.ShouldBe(0);
+        }
+
+        [Fact]
+        public void Update_GivenTableNameAndEmptyColumns_ShouldReturn_Zero()
+        {
+            var person = new Person() { Id = Guid.NewGuid() };
+            var columns = new List<string>();
+
+            var output = DB.Update("person", "id", person, columns);
+            output.ShouldBe(0);
         }
 
         [Fact]
