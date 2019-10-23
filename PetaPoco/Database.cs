@@ -607,9 +607,18 @@ namespace PetaPoco
                 }
                 else if (t == typeof(AnsiString))
                 {
+                    var asValue = value as AnsiString;
+                    if (asValue.Value == null)
+                    {
+                        p.Size = 0;
+                        p.Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        p.Size = Math.Max(asValue.Value.Length + 1, 4000);
+                        p.Value = asValue.Value;
+                    }
                     // Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
-                    p.Size = Math.Max((value as AnsiString).Value.Length + 1, 4000);
-                    p.Value = (value as AnsiString).Value;
                     p.DbType = DbType.AnsiString;
                 }
                 else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
