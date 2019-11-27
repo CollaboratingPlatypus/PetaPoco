@@ -144,5 +144,17 @@ namespace PetaPoco.Tests.Unit
             Action act = () => _db.CreateCommand(_conn, CommandType.StoredProcedure, "procname", arg);
             act.ShouldThrow<ArgumentException>();
         }
+
+        [Fact]
+        public void ByteArray_Should_Map_To_Binary()
+        {
+            var sql = Sql.Builder.Select("*").From("SomeTable");
+            sql.Where("foo=@0", new byte[] { 1, 2, 3 });
+            var output = _db.CreateCommand(_conn, sql.SQL, sql.Arguments);
+
+            output.Parameters.Count.ShouldBe(1);
+            var parm = output.Parameters[0] as IDataParameter;
+            parm.DbType.ShouldBe(DbType.Binary);
+        }
     }
 }
