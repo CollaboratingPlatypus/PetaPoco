@@ -31,6 +31,7 @@ namespace PetaPoco
                 OneTimeCommandTimeout = 0;
             }
 
+            _provider.PreExecute(cmd);
             OnExecutingCommand(cmd);
 
             _lastSql = cmd.CommandText;
@@ -676,8 +677,6 @@ namespace PetaPoco
             foreach (var item in args)
                 AddParam(cmd, item, null);
 
-            _provider.PreExecute(cmd);
-
             if (!string.IsNullOrEmpty(sql))
                 DoPreExecute(cmd);
 
@@ -771,6 +770,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
+                        DoPreExecute(cmd);
                         var rowsAffected = cmd.ExecuteNonQuery();
                         OnExecutedCommand(cmd);
                         return rowsAffected;
@@ -812,6 +812,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
+                        DoPreExecute(cmd);
                         var rowsAffected = cmd is DbCommand dbCommandAsync
                             ? await dbCommandAsync.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false)
                             : cmd.ExecuteNonQuery();
@@ -855,6 +856,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
+                        DoPreExecute(cmd);
                         var val = cmd.ExecuteScalar();
                         OnExecutedCommand(cmd);
 
@@ -907,6 +909,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
+                        DoPreExecute(cmd);
                         var val = cmd is DbCommand cmdAsync ? await cmdAsync.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteScalar();
                         OnExecutedCommand(cmd);
 
@@ -1369,6 +1372,7 @@ namespace PetaPoco
 
                     try
                     {
+                        DoPreExecute(cmd);
                         if (cmdAsync != null)
                             reader = await cmdAsync.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
                         else
@@ -1434,6 +1438,7 @@ namespace PetaPoco
 
             try
             {
+                DoPreExecute(cmd);
                 if (cmd is DbCommand cmdAsync)
                     reader = await cmdAsync.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
                 else
@@ -1477,6 +1482,7 @@ namespace PetaPoco
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
                     try
                     {
+                        DoPreExecute(cmd);
                         r = cmd.ExecuteReader();
                         OnExecutedCommand(cmd);
                     }
@@ -2720,6 +2726,7 @@ namespace PetaPoco
                     IDataReader r;
                     try
                     {
+                        DoPreExecute(cmd);
                         r = cmd.ExecuteReader();
                         OnExecutedCommand(cmd);
                     }
@@ -2792,7 +2799,9 @@ namespace PetaPoco
 
             try
             {
+                DoPreExecute(cmd);
                 var reader = cmd.ExecuteReader();
+                OnExecutedCommand(cmd);
                 result = new GridReader(this, cmd, reader, _defaultMapper);
             }
             catch (Exception x)
