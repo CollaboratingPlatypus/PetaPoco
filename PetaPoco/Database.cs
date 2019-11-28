@@ -677,9 +677,6 @@ namespace PetaPoco
             foreach (var item in args)
                 AddParam(cmd, item, null);
 
-            if (!string.IsNullOrEmpty(sql))
-                DoPreExecute(cmd);
-
             return cmd;
         }
 
@@ -770,10 +767,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
-                        DoPreExecute(cmd);
-                        var rowsAffected = cmd.ExecuteNonQuery();
-                        OnExecutedCommand(cmd);
-                        return rowsAffected;
+                        return ExecuteNonQueryHelper(cmd);
                     }
                 }
                 finally
@@ -812,12 +806,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
-                        DoPreExecute(cmd);
-                        var rowsAffected = cmd is DbCommand dbCommandAsync
-                            ? await dbCommandAsync.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false)
-                            : cmd.ExecuteNonQuery();
-                        OnExecutedCommand(cmd);
-                        return rowsAffected;
+                        return await ExecuteNonQueryHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
                     }
                 }
                 finally
@@ -856,9 +845,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
-                        DoPreExecute(cmd);
-                        var val = cmd.ExecuteScalar();
-                        OnExecutedCommand(cmd);
+                        var val = ExecuteScalarHelper(cmd);
 
                         // Handle nullable types
                         var u = Nullable.GetUnderlyingType(typeof(T));
@@ -909,9 +896,7 @@ namespace PetaPoco
                 {
                     using (var cmd = CreateCommand(_sharedConnection, commandType, sql, args))
                     {
-                        DoPreExecute(cmd);
-                        var val = cmd is DbCommand cmdAsync ? await cmdAsync.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteScalar();
-                        OnExecutedCommand(cmd);
+                        var val = await ExecuteScalarHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
 
                         var u = Nullable.GetUnderlyingType(typeof(T));
                         if (u != null && (val == null || val == DBNull.Value))
@@ -1368,16 +1353,10 @@ namespace PetaPoco
                 {
                     IDataReader reader;
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
-                    var cmdAsync = cmd as DbCommand;
-
+                    
                     try
                     {
-                        DoPreExecute(cmd);
-                        if (cmdAsync != null)
-                            reader = await cmdAsync.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-                        else
-                            reader = cmd.ExecuteReader();
-                        OnExecutedCommand(cmd);
+                        reader = await ExecuteReaderHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
                     }
                     catch (Exception e)
                     {
@@ -1438,13 +1417,7 @@ namespace PetaPoco
 
             try
             {
-                DoPreExecute(cmd);
-                if (cmd is DbCommand cmdAsync)
-                    reader = await cmdAsync.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-                else
-                    reader = cmd.ExecuteReader();
-
-                OnExecutedCommand(cmd);
+                reader = await ExecuteReaderHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -1482,9 +1455,7 @@ namespace PetaPoco
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
                     try
                     {
-                        DoPreExecute(cmd);
-                        r = cmd.ExecuteReader();
-                        OnExecutedCommand(cmd);
+                        r = ExecuteReaderHelper(cmd);
                     }
                     catch (Exception x)
                     {
@@ -1793,9 +1764,7 @@ namespace PetaPoco
 
                         if (!autoIncrement)
                         {
-                            DoPreExecute(cmd);
-                            cmd.ExecuteNonQuery();
-                            OnExecutedCommand(cmd);
+                            ExecuteNonQueryHelper(cmd);
 
                             if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out var pkColumn))
                                 return pkColumn.GetValue(poco);
@@ -1944,14 +1913,7 @@ namespace PetaPoco
 
                         if (!autoIncrement)
                         {
-                            DoPreExecute(cmd);
-
-                            if (cmd is DbCommand dbCmd)
-                                await dbCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-                            else
-                                cmd.ExecuteNonQuery();
-
-                            OnExecutedCommand(cmd);
+                            await ExecuteNonQueryHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
 
                             if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out var pkColumn))
                                 return pkColumn.GetValue(poco);
@@ -2073,10 +2035,7 @@ namespace PetaPoco
                     using (var cmd = CreateCommand(_sharedConnection, string.Empty))
                     {
                         PreExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns, cmd);
-                        DoPreExecute(cmd);
-                        var result = cmd.ExecuteNonQuery();
-                        OnExecutedCommand(cmd);
-                        return result;
+                        return ExecuteNonQueryHelper(cmd);
                     }
                 }
                 finally
@@ -2287,12 +2246,7 @@ namespace PetaPoco
                     using (var cmd = CreateCommand(_sharedConnection, string.Empty))
                     {
                         PreExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns, cmd);
-                        DoPreExecute(cmd);
-                        var result = cmd is DbCommand dbCommand
-                            ? await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false)
-                            : cmd.ExecuteNonQuery();
-                        OnExecutedCommand(cmd);
-                        return result;
+                        return await ExecuteNonQueryHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
                     }
                 }
                 finally
@@ -2726,9 +2680,7 @@ namespace PetaPoco
                     IDataReader r;
                     try
                     {
-                        DoPreExecute(cmd);
-                        r = cmd.ExecuteReader();
-                        OnExecutedCommand(cmd);
+                        r = ExecuteReaderHelper(cmd);
                     }
                     catch (Exception x)
                     {
@@ -2799,9 +2751,7 @@ namespace PetaPoco
 
             try
             {
-                DoPreExecute(cmd);
-                var reader = cmd.ExecuteReader();
-                OnExecutedCommand(cmd);
+                var reader = ExecuteReaderHelper(cmd);
                 result = new GridReader(this, cmd, reader, _defaultMapper);
             }
             catch (Exception x)
@@ -3002,9 +2952,72 @@ namespace PetaPoco
             }
         }
 
-#endregion
+        #endregion
 
-#region Events
+        #region Helpers
+        internal protected IDataReader ExecuteReaderHelper(IDbCommand cmd)
+        {
+            DoPreExecute(cmd);
+            var r = cmd.ExecuteReader();
+            OnExecutedCommand(cmd);
+            return r;
+        }
+
+        internal protected int ExecuteNonQueryHelper(IDbCommand cmd)
+        {
+            DoPreExecute(cmd);
+            var r = cmd.ExecuteNonQuery();
+            OnExecutedCommand(cmd);
+            return r;
+        }
+
+        internal protected object ExecuteScalarHelper(IDbCommand cmd)
+        {
+            DoPreExecute(cmd);
+            var r = cmd.ExecuteScalar();
+            OnExecutedCommand(cmd);
+            return r;
+        }
+
+#if ASYNC
+        internal protected async Task<IDataReader> ExecuteReaderHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
+        {
+            DoPreExecute(cmd);
+            IDataReader result;
+            if (cmd is DbCommand dbCommand)
+                result = await dbCommand.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+            else
+                result = cmd.ExecuteReader();
+            OnExecutedCommand(cmd);
+            return result;
+        }
+        internal protected async Task<int> ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
+        {
+            DoPreExecute(cmd);
+            int result;
+            if (cmd is DbCommand dbCommand)
+                result = await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+            else
+                result = cmd.ExecuteNonQuery();
+            OnExecutedCommand(cmd);
+            return result;
+        }
+
+        internal protected async Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
+        {
+            DoPreExecute(cmd);
+            object result;
+            if (cmd is DbCommand dbCommand)
+                result = await dbCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+            else
+                result = cmd.ExecuteScalar();
+            OnExecutedCommand(cmd);
+            return result;
+        }
+#endif
+        #endregion
+
+        #region Events
 
         /// <summary>
         ///     Occurs when a new transaction has started.
