@@ -2957,62 +2957,68 @@ namespace PetaPoco
         #region Helpers
         internal protected IDataReader ExecuteReaderHelper(IDbCommand cmd)
         {
-            DoPreExecute(cmd);
-            var r = cmd.ExecuteReader();
-            OnExecutedCommand(cmd);
-            return r;
+            return (IDataReader)CommandHelper(cmd, c => c.ExecuteReader());
         }
 
         internal protected int ExecuteNonQueryHelper(IDbCommand cmd)
         {
-            DoPreExecute(cmd);
-            var r = cmd.ExecuteNonQuery();
-            OnExecutedCommand(cmd);
-            return r;
+            return (int)CommandHelper(cmd, c => c.ExecuteNonQuery());
         }
 
         internal protected object ExecuteScalarHelper(IDbCommand cmd)
         {
+            return CommandHelper(cmd, c => c.ExecuteScalar());
+        }
+
+        private object CommandHelper(IDbCommand cmd, Func<IDbCommand, object> cmdFunc)
+        {            
             DoPreExecute(cmd);
-            var r = cmd.ExecuteScalar();
+            var result = cmdFunc(cmd);
             OnExecutedCommand(cmd);
-            return r;
+            return result;
         }
 
 #if ASYNC
         internal protected async Task<IDataReader> ExecuteReaderHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
         {
-            DoPreExecute(cmd);
-            IDataReader result;
             if (cmd is DbCommand dbCommand)
-                result = await dbCommand.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+            {
+                var task = CommandHelper(cancellationToken, dbCommand, 
+                    async (t, c) => await c.ExecuteReaderAsync(t).ConfigureAwait(false));
+                return (IDataReader)await task.ConfigureAwait(false);
+            }
             else
-                result = cmd.ExecuteReader();
-            OnExecutedCommand(cmd);
-            return result;
-        }
-        internal protected async Task<int> ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
-        {
-            DoPreExecute(cmd);
-            int result;
-            if (cmd is DbCommand dbCommand)
-                result = await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            else
-                result = cmd.ExecuteNonQuery();
-            OnExecutedCommand(cmd);
-            return result;
+                return ExecuteReaderHelper(cmd);
         }
 
-        internal protected async Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
+        internal protected async Task<int> ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
+        {
+            if (cmd is DbCommand dbCommand)
+            {
+                var task = CommandHelper(cancellationToken, dbCommand, 
+                    async (t, c) => await c.ExecuteNonQueryAsync(t).ConfigureAwait(false));
+                return (int)await task.ConfigureAwait(false);
+            }
+            else
+                return ExecuteNonQueryHelper(cmd);
+        }
+
+        internal protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
+        {
+            if (cmd is DbCommand dbCommand)
+                return CommandHelper(cancellationToken, dbCommand, 
+                    async (t, c) => await c.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false));                
+            else
+                return Task.FromResult(ExecuteScalarHelper(cmd));
+        }
+
+        private async Task<object> CommandHelper(CancellationToken cancellationToken, DbCommand cmd, 
+            Func<CancellationToken, DbCommand, Task<object>> cmdFunc)
         {
             DoPreExecute(cmd);
-            object result;
-            if (cmd is DbCommand dbCommand)
-                result = await dbCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-            else
-                result = cmd.ExecuteScalar();
+            var result = await cmdFunc(cancellationToken, cmd).ConfigureAwait(false);
             OnExecutedCommand(cmd);
-            return result;
+            return result;            
         }
 #endif
         #endregion

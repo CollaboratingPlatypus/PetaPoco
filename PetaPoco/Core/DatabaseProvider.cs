@@ -264,10 +264,10 @@ namespace PetaPoco.Core
         protected object ExecuteScalarHelper(Database db, IDbCommand cmd) => db.ExecuteScalarHelper(cmd);
 
 #if ASYNC
-        protected async Task ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
+        protected Task ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
             => db.ExecuteNonQueryHelperAsync(cancellationToken, cmd);
 
-        protected async Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
+        protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
             => db.ExecuteScalarHelperAsync(cancellationToken, cmd);
 #endif
     }
