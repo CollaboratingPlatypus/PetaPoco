@@ -1067,7 +1067,11 @@ namespace PetaPoco
         /// </remarks>
         public T Single<T>(params object[] primaryKey)
         {
-            return Single<T>("WHERE " + BuildMultiPartLogic(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey), primaryKey);
+            string[] primaryKeyNames = PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey;
+            if (primaryKeyNames.Length != primaryKey.Length)
+                throw new ArgumentException("The length of primaryKey does not match with the count of primary key");
+
+            return Single<T>("WHERE " + BuildMultiPartLogic(primaryKeyNames), primaryKey);
             //return Single<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
@@ -1082,7 +1086,11 @@ namespace PetaPoco
         /// </remarks>
         public T SingleOrDefault<T>(params object[] primaryKey)
         {
-            return SingleOrDefault<T>("WHERE " + BuildMultiPartLogic(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey), primaryKey);
+            string[] primaryKeyNames = PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey;
+            if (primaryKeyNames.Length != primaryKey.Length)
+                throw new ArgumentException("The length of primaryKey does not match with the count of primary key");
+
+            return SingleOrDefault<T>("WHERE " + BuildMultiPartLogic(primaryKeyNames), primaryKey);
             //return SingleOrDefault<T>(string.Format("WHERE {0}=@0", _provider.EscapeSqlIdentifier(PocoData.ForType(typeof(T), _defaultMapper).TableInfo.PrimaryKey)), primaryKey);
         }
 
@@ -1260,7 +1268,7 @@ namespace PetaPoco
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException("tableName");
 
-            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(string.Empty))
                 throw new ArgumentNullException("primaryKeyName");
 
             if (poco == null)
@@ -1503,11 +1511,14 @@ namespace PetaPoco
             if (string.IsNullOrEmpty(tableName))
                 throw new ArgumentNullException("tableName");
 
-            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(String.Empty))
+            if (primaryKeyName.Length == 0 || primaryKeyName.Contains(string.Empty))
                 throw new ArgumentNullException("primaryKeyName");
 
             if (poco == null)
                 throw new ArgumentNullException("poco");
+
+            if (primaryKeyValue.Length != primaryKeyName.Length)
+                throw new ArgumentException("The length of primaryKeyValue does not match with primaryKeyName");
 
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, null);
         }
@@ -1555,6 +1566,9 @@ namespace PetaPoco
 
             if (poco == null)
                 throw new ArgumentNullException("poco");
+
+            if (primaryKeyValue.Length != primaryKeyName.Length)
+                throw new ArgumentException("The length of primaryKeyValue does not match with primaryKeyName");
 
             return ExecuteUpdate(tableName, primaryKeyName, poco, primaryKeyValue, columns);
         }
@@ -1688,6 +1702,9 @@ namespace PetaPoco
                 throw new ArgumentNullException("poco");
 
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
+            if (primaryKeyValue != null && primaryKeyValue.Length != pd.TableInfo.PrimaryKey.Length)
+                throw new ArgumentException("The length of primaryKeyValue does not match with the count of primary key");
+
             return ExecuteUpdate(pd.TableInfo.TableName, pd.TableInfo.PrimaryKey, poco, primaryKeyValue, columns);
         }
 
@@ -1934,6 +1951,11 @@ namespace PetaPoco
                         primaryKeyValue[i] = pc.GetValue(poco);
                     }
                 }
+            }
+            else
+            {
+                if (primaryKeyValue.Length != primaryKeyName.Length)
+                    throw new ArgumentException("The length of primaryKeyValue does not match with primaryKeyName");
             }
 
             // Do it

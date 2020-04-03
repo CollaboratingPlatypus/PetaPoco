@@ -368,6 +368,14 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.ShouldNotBe(_person, true);
         }
 
+        [Fact]
+        public void Update_CompositeKeyCountNotMatch_ShouldThrow()
+        {
+            Should.Throw<ArgumentException>(() => DB.Update("Item", new string[] { "UserId", "Index" }, _item, _item.UserId));
+            Should.Throw<ArgumentException>(() => DB.Update("Item", new string[] { "UserId", "Index" }, _item, null, _item.UserId));
+            Should.Throw<ArgumentException>(() => DB.Update(_item, null, _item.UserId));
+        }
+
         private Person SinglePersonOther(Guid id)
         {
             return DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);

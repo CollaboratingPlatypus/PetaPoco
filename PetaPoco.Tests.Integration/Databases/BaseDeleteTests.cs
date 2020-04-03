@@ -190,5 +190,11 @@ namespace PetaPoco.Tests.Integration.Databases
             _person.ShouldBeNull();
             _note.ShouldBeNull();
         }
+
+        [Fact]
+        public void Delete_CompositeKeyNotMatch_ShouldThrow()
+        {
+            Should.Throw<ArgumentException>(() => DB.Delete("Item", new string[] { "UserId", "Index" }, _item, _item.UserId));
+        }
     }
 }

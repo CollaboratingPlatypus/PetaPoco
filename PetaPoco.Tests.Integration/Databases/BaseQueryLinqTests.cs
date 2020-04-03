@@ -317,5 +317,17 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Exists<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18).ShouldBeFalse();
         }
+
+        [Fact]
+        public void Single_CompositeKeyCountNotMatch_ShouldThrow()
+        {
+            Should.Throw<ArgumentException>(() => DB.Single<Item>(0));
+        }
+
+        [Fact]
+        public void SingleOrDefault_CompositeKeyCountNotMatch_ShouldThrow()
+        {
+            Should.Throw<ArgumentException>(() => DB.SingleOrDefault<Item>(0));
+        }
     }
 }
