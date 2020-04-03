@@ -1089,11 +1089,11 @@ namespace PetaPoco
         private string BuildMultiPartLogic(string[] primaryKey, int index = 0)
         {
             StringBuilder output = new StringBuilder();
-            foreach(var pk in primaryKey)
+            for (int i = 0; i < primaryKey.Length; ++i)
             {
-                if (index > 0)
+                if (i > 0)
                     output.Append("AND ");
-                output.AppendFormat("{0}=@{1} ", _provider.EscapeSqlIdentifier(pk), index);
+                output.AppendFormat("{0}=@{1} ", _provider.EscapeSqlIdentifier(primaryKey[i]), index);
 
                 index++;
             }
@@ -1270,7 +1270,7 @@ namespace PetaPoco
             var pd = PocoData.ForType(poco.GetType(), _defaultMapper);
             var autoIncrement = pd == null || pd.TableInfo.AutoIncrement ||
                                 t.Name.Contains("AnonymousType") &&
-                                !t.GetProperties().Any(p => p.Name.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase));
+                                !t.GetProperties().Any(p => primaryKeyName.Any(pk => p.Name.Equals(pk, StringComparison.OrdinalIgnoreCase)));
 
             return ExecuteInsert(tableName, primaryKeyName, autoIncrement, poco);
         }
@@ -1403,11 +1403,34 @@ namespace PetaPoco
                             cmd.ExecuteNonQuery();
                             OnExecutedCommand(cmd);
 
-                            PocoColumn pkColumn;
-                            if (primaryKeyName != null && pd.Columns.TryGetValue(primaryKeyName, out pkColumn))
-                                return pkColumn.GetValue(poco);
+                            if (primaryKeyName != null && primaryKeyName.Length > 0)
+                            {
+                                if (primaryKeyName.Length == 1)
+                                {
+                                    PocoColumn pkColumn;
+                                    if (pd.Columns.TryGetValue(primaryKeyName[0], out pkColumn))
+                                        return pkColumn.GetValue(poco);
+                                    else
+                                        return null;
+                                }
+                                else
+                                {
+                                    var primaryKeyValue = new object[primaryKeyName.Length];
+
+                                    for (int i = 0; i < primaryKeyName.Length; ++i)
+                                    {
+                                        PocoColumn pkColumn;
+                                        if (pd.Columns.TryGetValue(primaryKeyName[i], out pkColumn))
+                                            primaryKeyValue[i] = pkColumn.GetValue(poco);
+                                    }
+
+                                    return primaryKeyValue;
+                                }
+                            }
                             else
+                            {
                                 return null;
+                            }
                         }
 
                         object id = _provider.ExecuteInsert(this, cmd, primaryKeyName);
@@ -1416,7 +1439,7 @@ namespace PetaPoco
                         if (primaryKeyName != null && !poco.GetType().Name.Contains("AnonymousType"))
                         {
                             PocoColumn pc;
-                            if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+                            if (pd.Columns.TryGetValue(primaryKeyName[0], out pc))
                             {
                                 pc.SetValue(poco, pc.ChangeType(id));
                             }
@@ -1630,7 +1653,7 @@ namespace PetaPoco
         /// <returns>The number of affected rows</returns>
         public int Update(object poco, params object[] primaryKeyValue)
         {
-            return Update(poco, primaryKeyValue, null);
+            return Update(poco, null, primaryKeyValue);
         }
 
         /// <summary>
@@ -1711,17 +1734,34 @@ namespace PetaPoco
                         var sb = new StringBuilder();
                         var index = 0;
                         var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
+
+                        if (primaryKeyValue == null)
+                            primaryKeyValue = new object[primaryKeyName.Length];
+
                         if (columns == null)
                         {
+                            for (int i = 0; i < primaryKeyName.Length; ++i)
+                            {
+                                if (primaryKeyValue[i] != null)
+                                    continue;
+
+                                foreach (var pair in pd.Columns)
+                                {
+                                    // Grab the value if we don't have it
+                                    if (string.Compare(pair.Key, primaryKeyName[i], true) == 0)
+                                    {
+                                        primaryKeyValue[i] = pair.Value.GetValue(poco);
+
+                                        break;
+                                    }
+                                }
+                            }
+
                             foreach (var i in pd.Columns)
                             {
-                                // Don't update the primary key, but grab the value if we don't have it
-                                if (string.Compare(i.Key, primaryKeyName, true) == 0)
-                                {
-                                    if (primaryKeyValue == null)
-                                        primaryKeyValue = i.Value.GetValue(poco);
+                                // Don't update the primary key
+                                if (primaryKeyName.Any(pk => string.Compare(pk, i.Key, true) == 0))
                                     continue;
-                                }
 
                                 // Dont update result only columns
                                 if (i.Value.ResultColumn)
@@ -1752,28 +1792,31 @@ namespace PetaPoco
                             }
 
                             // Grab primary key value
-                            if (primaryKeyValue == null)
+                            for (int i = 0; i < primaryKeyName.Length; ++i)
                             {
-                                var pc = pd.Columns[primaryKeyName];
-                                primaryKeyValue = pc.GetValue(poco);
-                            }
-                        }
+                                if (primaryKeyValue[i] != null)
+                                    continue;
 
-                        // Find the property info for the primary key
-                        PropertyInfo pkpi = null;
-                        if (primaryKeyName != null)
-                        {
-                            PocoColumn col;
-                            pkpi = pd.Columns.TryGetValue(primaryKeyName, out col)
-                                ? col.PropertyInfo
-                                : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
+                                var pc = pd.Columns[primaryKeyName[i]];
+                                primaryKeyValue[i] = pc.GetValue(poco);
+                            }
                         }
 
                         cmd.CommandText = string.Format("UPDATE {0} SET {1} WHERE {2}",
                             _provider.EscapeTableName(tableName), sb.ToString(), BuildMultiPartLogic(primaryKeyName, index++));
-                        foreach (var value in primaryKeyValue)
+                        for (int i = 0; i < primaryKeyName.Length; ++i)
                         {
-                            AddParam(cmd, value, pkpi);
+                            // Find the property info for the primary key
+                            PropertyInfo pkpi = null;
+                            if (primaryKeyName != null)
+                            {
+                                PocoColumn col;
+                                pkpi = pd.Columns.TryGetValue(primaryKeyName[i], out col)
+                                    ? col.PropertyInfo
+                                    : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
+                            }
+
+                            AddParam(cmd, primaryKeyValue[i], pkpi);
                         }
 
                         DoPreExecute(cmd);
@@ -1877,10 +1920,16 @@ namespace PetaPoco
             if (primaryKeyValue == null)
             {
                 var pd = PocoData.ForObject(poco, primaryKeyName, _defaultMapper);
-                PocoColumn pc;
-                if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+
+                primaryKeyValue = new object[primaryKeyName.Length];
+
+                for (int i = 0; i < primaryKeyName.Length; ++i)
                 {
-                    primaryKeyValue = pc.GetValue(poco);
+                    PocoColumn pc;
+                    if (pd.Columns.TryGetValue(primaryKeyName[i], out pc))
+                    {
+                        primaryKeyValue[i] = pc.GetValue(poco);
+                    }
                 }
             }
 
@@ -1915,17 +1964,18 @@ namespace PetaPoco
 
             // First element may be a anonymous object.  If so convert it to an array of values.
 
-            if (pocoOrPrimaryKey.GetType().Name.Contains("AnonymousType"))
+            if (pocoOrPrimaryKey.First().GetType().Name.Contains("AnonymousType"))
             {
                 List<object> newObject = new List<object>();
 
-                foreach(var pk in pd.TableInfo.PrimaryKey) { 
-                    var pi = pocoOrPrimaryKey.GetType().GetProperty(pk);
+                var poco = pocoOrPrimaryKey.First();
+                foreach (var pk in pd.TableInfo.PrimaryKey) { 
+                    var pi = poco.GetType().GetProperty(pk);
 
                     if (pi == null)
                         throw new InvalidOperationException(string.Format("Anonymous type does not contain an id for PK column `{0}`.", pd.TableInfo.PrimaryKey));
 
-                    newObject.Add(pi.GetValue(pocoOrPrimaryKey, new object[0]));
+                    newObject.Add(pi.GetValue(poco, new object[0]));
                 }
                 pocoOrPrimaryKey = newObject.ToArray();
             }
@@ -2053,22 +2103,22 @@ namespace PetaPoco
 
         protected virtual bool IsNew(string[] primaryKeyName, PocoData pd, object poco)
         {
-            if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
+            if (primaryKeyName == null || primaryKeyName.Length != 1 || string.IsNullOrEmpty(primaryKeyName[0]) || poco is ExpandoObject)
                 throw new InvalidOperationException("IsNew() and Save() are only supported on tables with identity (inc auto-increment) primary key columns");
 
             object pk;
             PocoColumn pc;
             PropertyInfo pi;
-            if (pd.Columns.TryGetValue(primaryKeyName, out pc))
+            if (pd.Columns.TryGetValue(primaryKeyName[0], out pc))
             {
                 pk = pc.GetValue(poco);
                 pi = pc.PropertyInfo;
             }
             else
             {
-                pi = poco.GetType().GetProperty(primaryKeyName);
+                pi = poco.GetType().GetProperty(primaryKeyName[0]);
                 if (pi == null)
-                    throw new ArgumentException(string.Format("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName));
+                    throw new ArgumentException(string.Format("The object doesn't have a property matching the primary key column name '{0}'", primaryKeyName[0]));
                 pk = pi.GetValue(poco, null);
             }
 

@@ -99,7 +99,7 @@ namespace PetaPoco
                 if (prop == null)
                     return false;
 
-                ti.PrimaryKey = InflectColumnName(Inflector.Instance, prop.Name);
+                ti.PrimaryKey = new string[] { InflectColumnName(Inflector.Instance, prop.Name) };
                 ti.AutoIncrement = IsPrimaryKeyAutoIncrement(prop.PropertyType);
                 ti.SequenceName = GetSequenceName(t, prop);
                 return true;

@@ -53,7 +53,7 @@ namespace PetaPoco
             ti.SequenceName = a.Length == 0 ? null : (a[0] as PrimaryKeyAttribute).SequenceName;
             ti.AutoIncrement = a.Length == 0 ? false : (a[0] as PrimaryKeyAttribute).AutoIncrement;
 
-            if (ti.PrimaryKey.Length == 0 || string.IsNullOrEmpty(ti.PrimaryKey.First()))
+            if (ti.PrimaryKey == null || ti.PrimaryKey.Length == 0 || string.IsNullOrEmpty(ti.PrimaryKey.First()))
             {
                 var prop = t.GetProperties().FirstOrDefault(p =>
                 {

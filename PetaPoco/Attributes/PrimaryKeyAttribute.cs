@@ -37,7 +37,23 @@ namespace PetaPoco
         /// <returns>
         ///     True if the primary key is auto incrementing; else, False.
         /// </returns>
-        public bool AutoIncrement { get; set; }
+        public bool AutoIncrement
+        {
+            get
+            {
+                return autoIncrement;
+            }
+
+            set
+            {
+                if (value && Value.Length > 1)
+                    throw new InvalidOperationException("Cannot set AutoIncrement to true when the primary key is a Composite Key");
+
+                autoIncrement = value;
+            }
+        }
+
+        private bool autoIncrement;
 
         /// <summary>
         ///     Constructs a new instance of the <seealso cref="PrimaryKeyAttribute" />.
@@ -46,7 +62,9 @@ namespace PetaPoco
         public PrimaryKeyAttribute(params string[] primaryKey)
         {
             Value = primaryKey;
-            AutoIncrement = true;
+
+            if (primaryKey.Length == 1)
+                AutoIncrement = true;
         }
     }
 }

@@ -89,7 +89,7 @@ namespace PetaPoco.Tests.Unit
         public void Update_GivenInvalidArguments_ShouldThrow()
         {
             Should.Throw<ArgumentNullException>(() => DB.Update(null, "primaryKeyName", new Person(), 1));
-            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", (System.Collections.Generic.IEnumerable<string>)null, new Person(), 1));
+            Should.Throw<ArgumentNullException>(() => DB.Update("tableName", (string)null, new Person(), 1));
             Should.Throw<ArgumentNullException>(() => DB.Update("tableName", "primaryKeyName", null, 1));
 
             Should.Throw<ArgumentNullException>(() => DB.Update(null, "primaryKeyName", new Person(), 1, null));
