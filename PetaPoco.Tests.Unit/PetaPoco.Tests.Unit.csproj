@@ -74,11 +74,13 @@
     <Compile Include="Core\ConventionMapperTests.cs" />
     <Compile Include="Core\Inflection\EnglishInflectorTests.cs" />
     <Compile Include="Core\Inflection\InflectorTests.cs" />
+    <Compile Include="Core\PrimaryKeyAttributeTests.cs" />
     <Compile Include="Core\StandardMapperTests.cs" />
     <Compile Include="Core\PocoDataTests.cs" />
     <Compile Include="Core\SqlTests.cs" />
     <Compile Include="DatabaseConfigurationTests.cs" />
     <Compile Include="DatabaseTests.cs" />
+    <Compile Include="Models\Item.cs" />
     <Compile Include="Providers\SqlServerDatabaseProviderTests.cs" />
     <Compile Include="DescriptionAttribute.cs" />
     <Compile Include="Models\Note.cs" />

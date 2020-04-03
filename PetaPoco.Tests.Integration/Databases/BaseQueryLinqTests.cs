@@ -37,6 +37,14 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
+        private Item _item = new Item
+        {
+            UserId = 1,
+            Index = 10,
+            Type = 20,
+            Content = "abc"
+        };
+
         protected BaseQueryLinqTests(DBTestProvider provider)
             : base(provider)
         {
@@ -47,12 +55,16 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             var pk = DB.Insert(_person);
             DB.Single<Person>(pk).ShouldNotBeNull();
+
+            var pk1 = (object[])DB.Insert(_item);
+            DB.Single<Item>(pk1[0], pk1[1]).ShouldNotBeNull();
         }
 
         [Fact]
         public void Single_GivenPrimaryKeyMatchingNoRecord_ShouldThrow()
         {
             Should.Throw<Exception>(() => DB.Single<Person>(Guid.NewGuid()));
+            Should.Throw<Exception>(() => DB.Single<Item>(0, 0));
         }
 
         [Fact]
@@ -106,12 +118,16 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             var pk = DB.Insert(_person);
             DB.SingleOrDefault<Person>(pk).ShouldNotBeNull();
+
+            var pk1 = (object[])DB.Insert(_item);
+            DB.SingleOrDefault<Item>(pk1[0], pk1[1]).ShouldNotBeNull();
         }
 
         [Fact]
         public void SingleOrDefault_GivenPrimaryKeyMatchingNoRecord_ShouldBeNull()
         {
             DB.SingleOrDefault<Person>(Guid.NewGuid()).ShouldBeNull();
+            DB.SingleOrDefault<Item>(0, 0).ShouldBeNull();
         }
 
         [Fact]
@@ -257,12 +273,16 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             var pk = DB.Insert(_person);
             DB.Exists<Person>(pk).ShouldBeTrue();
+
+            var pk1 = (object[])DB.Insert(_item);
+            DB.Exists<Item>(pk1[0], pk1[1]).ShouldBeTrue();
         }
 
         [Fact]
         public void Exists_GivenPrimaryKeyMatchingNoRecord_ShouldBeFalse()
         {
             DB.Exists<Person>(Guid.NewGuid()).ShouldBeFalse();
+            DB.Exists<Item>(0, 0).ShouldBeFalse();
         }
 
         /// <summary>

@@ -40,6 +40,14 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
+        private readonly Item _item = new Item
+        {
+            UserId = 1,
+            Index = 10,
+            Type = 20,
+            Content = "abc"
+        };
+
         protected BaseUpdateTests(DBTestProvider provider)
             : base(provider)
         {
@@ -54,6 +62,7 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(_order);
             _orderLine.OrderId = _order.Id;
             DB.Insert(_orderLine);
+            DB.Insert(_item);
 
             // Act
             var personOther = DB.Single<Person>(_person.Id);
@@ -71,10 +80,16 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Update(orderLineOther).ShouldBe(1);
             orderLineOther = DB.Single<OrderLine>(_orderLine.Id);
 
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            DB.Update(itemOther);
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+
             // Assert
             personOther.ShouldNotBe(_person, true);
             orderOther.ShouldNotBe(_order, true);
             orderLineOther.ShouldNotBe(_orderLine, true);
+            itemOther.Type.ShouldBe(111);
         }
 
         [Fact]
@@ -88,6 +103,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+
+            DB.Insert(_item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update(itemOther, (System.Collections.Generic.IEnumerable<string>)null).ShouldBe(1);
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe("xyz");
         }
 
         [Fact]
@@ -105,6 +131,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Dob.ShouldBe(_person.Dob);
             personOther.Name.ShouldNotBe(_person.Name);
             personOther.Height.ShouldNotBe(_person.Height);
+
+            DB.Insert(_item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update(itemOther, new string[] { "Type" }.AsEnumerable()).ShouldBe(1);
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe(_item.Content);
         }
 
         [Fact]
@@ -118,6 +155,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+
+            DB.Insert(_item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update(itemOther, itemOther.UserId, itemOther.Index).ShouldBe(1);
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe("xyz");
         }
 
         [Fact]
@@ -131,6 +179,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+
+            DB.Insert(_item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update(itemOther, null, _item.UserId, _item.Index).ShouldBe(1);
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe("xyz");
         }
 
         [Fact]
@@ -148,6 +207,19 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Dob.ShouldBe(_person.Dob);
             personOther.Name.ShouldNotBe(_person.Name);
             personOther.Height.ShouldNotBe(_person.Height);
+
+            DB.Insert(_item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update(itemOther, new string[] { "Type" }, _item.UserId, _item.Index).ShouldBe(1);
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+
+            itemOther.UserId.ShouldBe(_item.UserId);
+            itemOther.Index.ShouldBe(_item.Index);
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe(_item.Content);
         }
 
         [Fact]
@@ -161,6 +233,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther = SinglePersonOther(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+
+            DB.Insert("Item", new string[] { "UserId", "Index" }, false, _item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update("Item", new string[] { "UserId", "Index" }, itemOther, itemOther.UserId, itemOther.Index).ShouldBe(1);
+
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe("xyz");
         }
 
         [Fact]
@@ -174,6 +257,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther = SinglePersonOther(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+
+            DB.Insert("Item", new string[] { "UserId", "Index" }, false, _item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update("Item", new string[] { "UserId", "Index" }, itemOther, null, itemOther.UserId, itemOther.Index).ShouldBe(1);
+
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe("xyz");
         }
 
         [Fact]
@@ -191,6 +285,17 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Dob.ShouldBe(_person.Dob);
             personOther.Name.ShouldNotBe(_person.Name);
             personOther.Height.ShouldNotBe(_person.Height);
+
+            DB.Insert("Item", new string[] { "UserId", "Index" }, false, _item);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type = 111;
+            itemOther.Content = "xyz";
+            DB.Update("Item", new string[] { "UserId", "Index" }, itemOther, new string[] { "Type" }, itemOther.UserId, itemOther.Index).ShouldBe(1);
+
+            itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe(_item.Content);
         }
 
         [Fact]
@@ -241,6 +346,14 @@ namespace PetaPoco.Tests.Integration.Databases
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+
+            DB.Insert(_item);
+
+            DB.Update("Item", new string[] { "UserId", "Index" }, new { _item.UserId, _item.Index, Type = 111, Content = "xyz" }).ShouldBe(1);
+
+            var itemOther = DB.Single<Item>(_item.UserId, _item.Index);
+            itemOther.Type.ShouldBe(111);
+            itemOther.Content.ShouldBe("xyz");
         }
 
         [Fact]

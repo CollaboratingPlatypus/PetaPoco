@@ -49,6 +49,14 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
+        private Item _item = new Item
+        {
+            UserId = 1,
+            Index = 10,
+            Type = 20,
+            Content = "abc"
+        };
+
         protected BaseDeleteTests(DBTestProvider provider)
             : base(provider)
         {
@@ -64,23 +72,27 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             DB.Insert(_orderLine);
             DB.Insert(_note);
+            DB.Insert(_item);
 
             // Act
             DB.Delete(_orderLine);
             DB.Delete(_order);
             DB.Delete(_person);
             DB.Delete(_note);
+            DB.Delete(_item);
 
             _person = DB.SingleOrDefault<Person>(_person.Id);
             _order = DB.SingleOrDefault<Order>(_order.Id);
             _orderLine = DB.SingleOrDefault<OrderLine>(_orderLine.Id);
             _note = DB.SingleOrDefault<Note>(_note.Id);
+            _item = DB.SingleOrDefault<Item>(_item.UserId, _item.Index);
 
             // Assert
             _person.ShouldBeNull();
             _order.ShouldBeNull();
             _orderLine.ShouldBeNull();
             _note.ShouldBeNull();
+            _item.ShouldBeNull();
         }
 
         [Fact]
@@ -89,18 +101,22 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(_note);
             DB.Insert(_note2);
             DB.Insert(_person);
+            DB.Insert(_item);
 
             DB.Delete<Person>(_person.Id).ShouldBe(1);
             DB.Delete<Note>(_note).ShouldBe(1);
             DB.Delete<Note>(new { _note2.Id }).ShouldBe(1);
+            DB.Delete<Item>(_item.UserId, _item.Index).ShouldBe(1);
 
             _person = DB.SingleOrDefault<Person>(_person.Id);
             _note = DB.SingleOrDefault<Note>(_note.Id);
             _note2 = DB.SingleOrDefault<Note>(_note2.Id);
+            _item = DB.SingleOrDefault<Item>(_item.UserId, _item.Index);
 
             _person.ShouldBeNull();
             _note.ShouldBeNull();
             _note2.ShouldBeNull();
+            _item.ShouldBeNull();
         }
 
         [Fact]
@@ -108,15 +124,19 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
             DB.Insert(_note);
+            DB.Insert(_item);
 
             DB.Delete("People", "Id", _person).ShouldBe(1);
             DB.Delete("Note", "Id", _note).ShouldBe(1);
+            DB.Delete("Item", new string[] { "UserId", "Type" }, _item).ShouldBe(1);
 
             _person = DB.SingleOrDefault<Person>(_person.Id);
             _note = DB.SingleOrDefault<Note>(_note.Id);
+            _item = DB.SingleOrDefault<Item>(_item.UserId, _item.Index);
 
             _person.ShouldBeNull();
             _note.ShouldBeNull();
+            _item.ShouldBeNull();
         }
 
         [Fact]
@@ -124,15 +144,19 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
             DB.Insert(_note);
+            DB.Insert(_item);
 
             DB.Delete("People", "Id", _person, _person.Id).ShouldBe(1);
             DB.Delete("Note", "Id", _note, _note.Id).ShouldBe(1);
+            DB.Delete("Item", new string[] { "UserId", "Index" }, _item, _item.UserId, _item.Index).ShouldBe(1);
 
             _person = DB.SingleOrDefault<Person>(_person.Id);
             _note = DB.SingleOrDefault<Note>(_note.Id);
+            _item = DB.SingleOrDefault<Item>(_item.UserId, _item.Index);
 
             _person.ShouldBeNull();
             _note.ShouldBeNull();
+            _item.ShouldBeNull();
         }
 
         [Fact]

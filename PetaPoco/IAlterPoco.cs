@@ -313,16 +313,6 @@ namespace PetaPoco
         /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
         bool IsNew(string primaryKeyName, object poco);
 
-
-        /// <summary>
-        ///     Check if a poco represents a new row
-        /// </summary>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has been set to something non-zero.</remarks>
-        bool IsNew(string[] primaryKeyName, object poco);
-
         /// <summary>
         ///     Check if a poco represents a new row
         /// </summary>
@@ -338,14 +328,6 @@ namespace PetaPoco
         /// <param name="primaryKeyName">The name of the primary key column</param>
         /// <param name="poco">The POCO object to be saved</param>
         void Save(string tableName, string primaryKeyName, object poco);
-
-        /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
-        /// </summary>
-        /// <param name="tableName">The name of the table to be updated</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object to be saved</param>
-        void Save(string tableName, string[] primaryKeyName, object poco);
 
         /// <summary>
         ///     Saves a POCO by either performing either an SQL Insert or SQL Update

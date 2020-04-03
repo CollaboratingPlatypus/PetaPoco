@@ -96,6 +96,9 @@
     <Compile Include="..\PetaPoco.Tests.Integration\Databases\DBTestProvider.cs">
       <Link>Databases\DBTestProvider.cs</Link>
     </Compile>
+    <Compile Include="..\PetaPoco.Tests.Integration\Models\Item.cs">
+      <Link>Models\Item.cs</Link>
+    </Compile>
     <Compile Include="..\PetaPoco.Tests.Integration\Models\Note.cs">
       <Link>Models\Note.cs</Link>
     </Compile>

@@ -43,6 +43,14 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
+        private readonly Item _item = new Item
+        {
+            UserId = 1,
+            Index = 10,
+            Type = 20,
+            Content = "abc"
+        };
+
         protected BaseInsertTests(DBTestProvider provider)
             : base(provider)
         {
@@ -92,6 +100,15 @@ namespace PetaPoco.Tests.Integration.Databases
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
+
+            DB.Insert("Item", new string[] { "UserId", "Index" }, false, _item);
+
+            var otherItem =
+                DB.Single<Item>($"SELECT * From {DB.Provider.EscapeTableName("Item")} WHERE {DB.Provider.EscapeSqlIdentifier("UserId")} = @0 AND {DB.Provider.EscapeSqlIdentifier("Index")} = @1",
+                    _item.UserId, _item.Index);
+
+            otherItem.ShouldNotBeNull();
+            otherItem.ShouldBe(_item);
         }
 
         [Fact]
@@ -182,6 +199,17 @@ namespace PetaPoco.Tests.Integration.Databases
             _person.Id.ShouldBe(id);
             otherPerson.ShouldNotBeNull();
             otherPerson.ShouldBe(_person);
+
+            var ids = DB.Insert("Item", new string[] { "UserId", "Index" }, _item);
+            ids.ShouldBeOfType(typeof(object[]));
+
+            var arr = (object[])ids;
+            arr.Length.ShouldBe(2);
+
+            var otherItem = DB.Single<Item>(arr[0], arr[1]);
+
+            otherItem.ShouldNotBeNull();
+            otherItem.ShouldBe(_item);
         }
 
         [Fact]
@@ -239,6 +267,12 @@ namespace PetaPoco.Tests.Integration.Databases
             otherPerson.Dob.ShouldBe(person.Dob);
             otherPerson.Height.ShouldBe(person.Height);
             otherPerson.Name.ShouldBe(person.FullName);
+        }
+
+        [Fact]
+        public void Insert_CompositeKeyWithAutoIncrement_ShouldThrow()
+        {
+            Should.Throw<ArgumentException>(() => DB.Insert("Item", new string[] { "UserId", "Index" }, true, _item));
         }
     }
 }
