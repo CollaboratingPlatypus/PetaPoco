@@ -259,38 +259,16 @@ namespace PetaPoco.Core
             }
         }
 
-        protected void ExecuteNonQueryHelper(Database db, IDbCommand cmd)
-        {
-            db.DoPreExecute(cmd);
-            cmd.ExecuteNonQuery();
-            db.OnExecutedCommand(cmd);
-        }
+        protected void ExecuteNonQueryHelper(Database db, IDbCommand cmd) => db.ExecuteNonQueryHelper(cmd);
 
-        protected object ExecuteScalarHelper(Database db, IDbCommand cmd)
-        {
-            db.DoPreExecute(cmd);
-            var r = cmd.ExecuteScalar();
-            db.OnExecutedCommand(cmd);
-            return r;
-        }
+        protected object ExecuteScalarHelper(Database db, IDbCommand cmd) => db.ExecuteScalarHelper(cmd);
+
 #if ASYNC
-        protected async Task ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
-        {
-            db.DoPreExecute(cmd);
-            if (cmd is DbCommand dbCommand)
-                await dbCommand.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            else
-                cmd.ExecuteNonQuery();
-            db.OnExecutedCommand(cmd);
-        }
+        protected Task ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
+            => db.ExecuteNonQueryHelperAsync(cancellationToken, cmd);
 
-        protected async Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
-        {
-            db.DoPreExecute(cmd);
-            var r = cmd is DbCommand dbCommand ? await dbCommand.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false) : cmd.ExecuteScalar();
-            db.OnExecutedCommand(cmd);
-            return r;
-        }
+        protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
+            => db.ExecuteScalarHelperAsync(cancellationToken, cmd);
 #endif
     }
 }

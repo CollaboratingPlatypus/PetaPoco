@@ -5,9 +5,9 @@
     /// </summary>
     public class Transaction : ITransaction
     {
-        private Database _db;
+        private IDatabase _db;
 
-        public Transaction(Database db)
+        public Transaction(IDatabase db)
         {
             _db = db;
             _db.BeginTransaction();

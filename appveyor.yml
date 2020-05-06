@@ -9,7 +9,7 @@ image: Visual Studio 2017
 configuration: Release
 environment:
   NUGET_API_KEY:
-    secure: YPGdPLnY9FEYDZz3zZFV/+BKreynP4W2/DoURr0XlBjS8eLkkSypvEkI0BQSfRur
+    secure: CyBw6is7V/vUqMgcZ0wozOYlF/q0Yl6M6f/OKrpSBzlvg9Fp5tllMw2ac2Tl9AAD
 build: off    
 build_script:
 - ps: >-
