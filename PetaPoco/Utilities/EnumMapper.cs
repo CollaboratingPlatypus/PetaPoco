@@ -23,7 +23,15 @@ namespace PetaPoco.Internal
                 return newmap;
             });
 
-            return map[value];
+            try
+            {
+                return map[value];
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Can not convert value `{0}` into {1}-Enum", value, enumType.Name));
+            }
         }
     }
 }
