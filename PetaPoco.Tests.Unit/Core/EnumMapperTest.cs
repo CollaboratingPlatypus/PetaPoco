@@ -1,7 +1,7 @@
 ﻿using PetaPoco.Internal;
 using Shouldly;
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Xunit;
 
 namespace PetaPoco.Tests.Unit.Core
@@ -30,7 +30,7 @@ namespace PetaPoco.Tests.Unit.Core
             {
                 EnumMapper.EnumFromString(enumType, nonExistentName);
             }
-            catch (InvalidOperationException ex)
+            catch (KeyNotFoundException ex)
             {
                 var message = ex.Message;
                 message.ShouldContain(nonExistentName, "missing value to convert");

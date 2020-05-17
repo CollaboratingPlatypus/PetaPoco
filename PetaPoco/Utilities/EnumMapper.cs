@@ -27,10 +27,11 @@ namespace PetaPoco.Internal
             {
                 return map[value];
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException inner)
             {
-                throw new InvalidOperationException(
-                    string.Format("Can not convert value `{0}` into {1}-Enum", value, enumType.Name));
+                throw new KeyNotFoundException(
+                    $"Requested value '{value}' was not found in enum {enumType.Name}.",
+                    inner);
             }
         }
     }
