@@ -394,10 +394,8 @@ namespace PetaPoco.Core
             return default(T);
         }
 
-        internal static void FlushCaches()
-        {
-            _pocoDatas.Flush();
-        }
+        public static void FlushCaches()
+            => _pocoDatas.Flush();
 
         public string GetColumnName(string propertyName)
         {
