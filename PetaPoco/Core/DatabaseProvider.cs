@@ -158,22 +158,37 @@ namespace PetaPoco.Core
             if (custom != null)
                 return custom;
 
-            if (typeName.StartsWith("MySql"))
-                return Singleton<MySqlDatabaseProvider>.Instance;
-            if (typeName.StartsWith("MariaDb"))
-                return Singleton<MariaDbDatabaseProvider>.Instance;
-            if (typeName.StartsWith("SqlCe"))
-                return Singleton<SqlServerCEDatabaseProviders>.Instance;
-            if (typeName.StartsWith("Npgsql") || typeName.StartsWith("PgSql"))
-                return Singleton<PostgreSQLDatabaseProvider>.Instance;
-            if (typeName.StartsWith("Oracle"))
-                return Singleton<OracleDatabaseProvider>.Instance;
-            if (typeName.StartsWith("SQLite") || typeName.StartsWith("Sqlite"))
-                return Singleton<SQLiteDatabaseProvider>.Instance;
+            if (type.Namespace != null)
+            {
+                if (typeName.Equals("SqlConnection") && type.Namespace.StartsWith("Microsoft.Data") ||
+                    type.Namespace.StartsWith("Microsoft.Data") && typeName.Equals("SqlClientFactory"))
+                    return Singleton<SqlSererSqlClientDatabaseProvider>.Instance;
+            }
+
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
                 return Singleton<SqlServerDatabaseProvider>.Instance;
+
+            if (typeName.StartsWith("MySql"))
+                return Singleton<MySqlDatabaseProvider>.Instance;
+
+            if (typeName.StartsWith("MariaDb"))
+                return Singleton<MariaDbDatabaseProvider>.Instance;
+
+            if (typeName.StartsWith("SqlCe"))
+                return Singleton<SqlServerCEDatabaseProviders>.Instance;
+
+            if (typeName.StartsWith("Npgsql") || typeName.StartsWith("PgSql"))
+                return Singleton<PostgreSQLDatabaseProvider>.Instance;
+
+            if (typeName.StartsWith("Oracle"))
+                return Singleton<OracleDatabaseProvider>.Instance;
+
+            if (typeName.StartsWith("SQLite") || typeName.StartsWith("Sqlite"))
+                return Singleton<SQLiteDatabaseProvider>.Instance;
+
             if (typeName.StartsWith("FbConnection") || typeName.EndsWith("FirebirdClientFactory"))
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
+
             if (typeName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0 &&
                 (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 ||
                  connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
@@ -205,22 +220,36 @@ namespace PetaPoco.Core
             if (custom != null)
                 return custom;
 
+            if (providerName.IndexOf("Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                return Singleton<SqlSererSqlClientDatabaseProvider>.Instance;
+
+            if (providerName.IndexOf("SqlServer", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
+                providerName.IndexOf("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                return Singleton<SqlServerDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<MySqlDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("MariaDb", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<MariaDbDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("SqlServerCe", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("SqlCeConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerCEDatabaseProviders>.Instance;
+
             if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0 || providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<OracleDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("SQLite", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SQLiteDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("Firebird", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("FbConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<FirebirdDbDatabaseProvider>.Instance;
+
             if (providerName.IndexOf("OleDb", StringComparison.InvariantCultureIgnoreCase) >= 0 &&
                 (connectionString.IndexOf("Jet.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0 ||
                  connectionString.IndexOf("ACE.OLEDB", StringComparison.InvariantCultureIgnoreCase) > 0))
@@ -228,9 +257,7 @@ namespace PetaPoco.Core
                 return Singleton<MsAccessDbDatabaseProvider>.Instance;
             }
 
-            if (providerName.IndexOf("SqlServer", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
-                providerName.IndexOf("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
-                return Singleton<SqlServerDatabaseProvider>.Instance;
+
 
             if (!allowDefault)
                 throw new ArgumentException($"Could not match `{providerName}` to a provider.", nameof(providerName));
