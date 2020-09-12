@@ -162,7 +162,7 @@ namespace PetaPoco.Core
             {
                 if (typeName.Equals("SqlConnection") && type.Namespace.StartsWith("Microsoft.Data") ||
                     type.Namespace.StartsWith("Microsoft.Data") && typeName.Equals("SqlClientFactory"))
-                    return Singleton<SqlSererSqlClientDatabaseProvider>.Instance;
+                    return Singleton<SqlSererMsDataDatabaseProvider>.Instance;
             }
 
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
@@ -221,7 +221,7 @@ namespace PetaPoco.Core
                 return custom;
 
             if (providerName.IndexOf("Microsoft.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
-                return Singleton<SqlSererSqlClientDatabaseProvider>.Instance;
+                return Singleton<SqlSererMsDataDatabaseProvider>.Instance;
 
             if (providerName.IndexOf("SqlServer", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
