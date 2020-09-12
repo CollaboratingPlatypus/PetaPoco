@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLSqlClient
+namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
-    public class MssqlSqlClientDBTestProvider : DBTestProvider
+    public class MssqlMsDataDBTestProvider : DBTestProvider
     {
-        private string _connectionName = "mssqlsqlclient";
+        private string _connectionName = "mssqlmsdata";
         protected override string ConnectionName => _connectionName;
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
@@ -23,9 +23,9 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLSqlClient
 
         private void EnsureDatabaseExists()
         {
-            _connectionName = "mssqlsqlclient_builder";
-            Database.Execute("IF(db_id(N'PetaPoco2') IS NULL) BEGIN CREATE DATABASE [PetaPoco2] END");
-            _connectionName = "mssqlsqlclient";
+            _connectionName = "mssqlmsdata_builder";
+            Database.Execute("IF(db_id(N'PetaPocoMsData') IS NULL) BEGIN CREATE DATABASE [PetaPocoMsData] END");
+            _connectionName = "mssqlmsdata";
         }
     }
 }

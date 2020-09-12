@@ -2,10 +2,10 @@
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLSqlClient
+namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
-    [Collection("MssqlSqlClient")]
-    public class MssqlSqlClientQueryLinqTests : BaseQueryLinqTests
+    [Collection("MssqlMsData")]
+    public class MssqlMsDataQueryLinqTests : BaseQueryLinqTests
     {
         private readonly StorePerson _storePerson = new StorePerson
         {
@@ -14,8 +14,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLSqlClient
             Name = "Peta"
         };
 
-        public MssqlSqlClientQueryLinqTests()
-            : base(new MssqlSqlClientDBTestProvider())
+        public MssqlMsDataQueryLinqTests()
+            : base(new MssqlMsDataDBTestProvider())
         {
         }
 
