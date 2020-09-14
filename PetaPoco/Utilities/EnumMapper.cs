@@ -23,7 +23,16 @@ namespace PetaPoco.Internal
                 return newmap;
             });
 
-            return map[value];
+            try
+            {
+                return map[value];
+            }
+            catch (KeyNotFoundException inner)
+            {
+                throw new KeyNotFoundException(
+                    $"Requested value '{value}' was not found in enum {enumType.Name}.",
+                    inner);
+            }
         }
     }
 }
