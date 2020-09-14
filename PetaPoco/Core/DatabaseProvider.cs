@@ -168,6 +168,9 @@ namespace PetaPoco.Core
             if (typeName.Equals("SqlConnection") || typeName.Equals("SqlClientFactory"))
                 return Singleton<SqlServerDatabaseProvider>.Instance;
 
+            if (typeName.StartsWith("MySqlConnector"))
+                return Singleton<MySqlConnectorDatabaseProvider>.Instance;
+
             if (typeName.StartsWith("MySql"))
                 return Singleton<MySqlDatabaseProvider>.Instance;
 
@@ -226,6 +229,9 @@ namespace PetaPoco.Core
             if (providerName.IndexOf("SqlServer", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
                 providerName.IndexOf("System.Data.SqlClient", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerDatabaseProvider>.Instance;
+
+            if (providerName.IndexOf("MySqlConnector", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                return Singleton<MySqlConnectorDatabaseProvider>.Instance;
 
             if (providerName.IndexOf("MySql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<MySqlDatabaseProvider>.Instance;
