@@ -2,7 +2,9 @@
 
 # Welcome to the official PetaPoco repository
 
-Originally the brainchild of [Brad Robinson]
+Originally the brainchild of [Brad Robinson]. 
+
+PetaPoco is currently maintained and exteneded by Wade Baglin (@pleb) and Aaron Sherber (@asherber).
 
 ## Version 6 - Netstandard 2.0+, 4.0, 4.5+
 
