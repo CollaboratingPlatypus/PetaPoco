@@ -10,7 +10,7 @@ PetaPoco is currently maintained and exteneded by Wade Baglin (@pleb) and Aaron 
 
 Read more about the [v6 update](https://github.com/CollaboratingPlatypus/PetaPoco/wiki/V6NetStandard2-0)
 
-PetaPoco is available from: **NuGet [PetaPoco.Complied](https://www.nuget.org/packages/PetaPoco.Compiled)**
+PetaPoco is available from: **NuGet [PetaPoco.Compiled](https://www.nuget.org/packages/PetaPoco.Compiled)**
 
 |Master|Development|Nuget|
 |:-----|:----------|:----|
