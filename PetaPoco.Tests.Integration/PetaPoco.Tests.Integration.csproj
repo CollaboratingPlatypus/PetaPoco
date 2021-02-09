@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net47;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
     <AssemblyTitle>PetaPoco.Tests.Integration</AssemblyTitle>
     <Description>A Tiny ORMish thing for your POCO's.</Description>
     <Company>Collaborating Platypus</Company>
@@ -42,34 +42,37 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Core" version="4.2.1" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" version="5.12.1" />
-    <PackageReference Include="Google.Protobuf" version="3.5.1" />
-    <PackageReference Include="Moq" version="4.8.2" />
-    <PackageReference Include="MySql.Data" version="8.0.15" />
-    <PackageReference Include="Newtonsoft.Json" version="11.0.2" />
-    <PackageReference Include="Npgsql" version="4.0.0" />
-    <PackageReference Include="Shouldly" version="3.0.0" />
-    <PackageReference Include="Microsoft.Data.SQLite" version="2.2.2" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
-    <PackageReference Include="System.Data.SQLite.Core" version="1.0.109.2" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" version="4.5.0" />
-    <PackageReference Include="System.ValueTuple" version="4.5.0" />
-    <PackageReference Include="xunit" version="2.4.1" />
-    <PackageReference Include="xunit.abstractions" version="2.0.3" />
-    <PackageReference Include="xunit.analyzers" version="0.10.0" />
-    <PackageReference Include="xunit.assert" version="2.4.1" />
-    <PackageReference Include="xunit.core" version="2.4.1" />
-    <PackageReference Include="xunit.extensibility.core" version="2.4.1" />
-    <PackageReference Include="xunit.extensibility.execution" version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" version="2.4.1" />
-
-    <PackageReference Include="Microsoft.SqlServer.Compact" version="4.0.8876.1" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
-    
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
+    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Include="xunit.analyzers" Version="0.10.0" />
+    <PackageReference Include="xunit.assert" Version="2.4.1" />
+    <PackageReference Include="xunit.core" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+      
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
+      
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    
+    <PackageReference Include="MySql.Data" Version="8.0.21" />
+    <PackageReference Include="MySqlConnector" Version="1.0.1" />
+
+    <PackageReference Include="Npgsql" Version="4.1.4" />
+
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
+
+    <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
   </ItemGroup>
     
   <ItemGroup>

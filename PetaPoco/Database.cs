@@ -589,7 +589,7 @@ namespace PetaPoco
                 var t = value.GetType();
                 if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
                 {
-                    p.Value = Convert.ChangeType(value, ((Enum) value).GetTypeCode());
+                    p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
                 }
                 else if (t == typeof(Guid) && !_provider.HasNativeGuidSupport)
                 {
@@ -631,6 +631,11 @@ namespace PetaPoco
                 {
                     p.GetType().GetProperty("UdtTypeName").SetValue(p, "geometry", null); //geography is the equivalent SQL Server Type
                     p.Value = value;
+                }
+                else if (t == typeof(byte[]))
+                {
+                    p.Value = value;
+                    p.DbType = DbType.Binary;
                 }
                 else
                 {

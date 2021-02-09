@@ -16,5 +16,7 @@
         /// <param name="str">The C# string to be converted to ANSI before being passed to the DB</param>
         public AnsiString(string str)
             => Value = str;
+
+        public static explicit operator AnsiString(string s) => new AnsiString(s);
     }
 }

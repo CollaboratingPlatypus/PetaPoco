@@ -375,6 +375,11 @@ namespace PetaPoco.Core
                     return delegate(object src) { return Guid.Parse((string) src); };
                 }
 
+                if (dstType == typeof(string) && srcType == typeof(Guid))
+                {
+                    return delegate(object src) { return Convert.ToString(src); };
+                }
+                
                 return delegate(object src) { return Convert.ChangeType(src, dstType, null); };
             }
 
