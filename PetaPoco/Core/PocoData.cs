@@ -108,6 +108,86 @@ namespace PetaPoco.Core
             return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
         }
 
+        // convert a IDataReader record into a POCO
+        public T PocoFactory<T>(string sql, string connectionString, int firstColumn, int countColumns, IDataReader reader, IMapper defaultMapper) {
+            var mapper = Mappers.GetMapper(Type, defaultMapper);
+
+            T poco = Activator.CreateInstance<T>();
+            //T opoco= new T();
+
+            if (Type == typeof(object)) {
+                // Enumerate all fields generating a set assignment for the column
+                for (int i = firstColumn; i < firstColumn + countColumns; i++) {
+                    var srcType = reader.GetFieldType(i);
+                    var srcName = reader.GetName(i);
+                    var val = reader.GetValue(i);
+                    if (val == DBNull.Value) val = null;
+
+                    // Get the converter
+                    if (val != null) {
+                        Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo)null, srcType);
+                        if (converter != null) {
+                            val = converter(val);
+                        }
+                    }
+
+                    ((IDictionary<string, object>)poco).Add(srcName, val);
+                }
+            } else if (Type.IsValueType || Type == typeof(string) || Type == typeof(byte[])) {
+                // Do we need to install a converter?
+                var srcType = reader.GetFieldType(0);
+                var srcName = reader.GetName(0);
+                var val = reader.GetValue(0);
+                if (val == DBNull.Value) val = null;
+
+                // Get the converter
+                if (val != null) {
+                    var converter = GetConverter(mapper, null, srcType, Type);
+                    if (converter != null) {
+                        val = converter(val);
+                    }
+                }
+
+                poco = (T)val;
+            } else {
+                // Enumerate all fields generating a set assignment for the column
+                for (int i = firstColumn; i < firstColumn + countColumns; i++) {
+                    //PropertyInfo prop = Type.GetProperty(srcName, BindingFlags.Public | BindingFlags.Instance);
+
+                    // Get the PocoColumn for this db column, ignore if not known
+                    PocoColumn pc;
+                    if (!Columns.TryGetValue(reader.GetName(i), out pc))
+                        continue;
+
+                    // Get the source type for this column
+                    var srcType = reader.GetFieldType(i);
+                    var dstType = pc.PropertyInfo.PropertyType;
+
+                    object val = reader.GetValue(i);
+                    if (val == DBNull.Value) val = null;
+
+                    // Get the converter
+                    if (val != null) {
+                        var converter = GetConverter(mapper, pc, srcType, dstType);
+                        if (converter != null) {
+                            val = converter(val);
+                        } else {
+                            if (dstType.IsGenericType && dstType.GetGenericTypeDefinition().Equals(typeof(Nullable<>))) {
+                                dstType = new System.ComponentModel.NullableConverter(dstType).UnderlyingType;
+                            }
+                            val = Convert.ChangeType(val, dstType);
+                        }
+                    }
+
+                    if (null != pc.PropertyInfo && pc.PropertyInfo.CanWrite) {
+                        pc.PropertyInfo.SetValue(poco, val, null);
+                    }
+                }
+            }
+
+            return poco;
+        }
+
         // Create factory function that can convert a IDataReader record into a POCO
         public Delegate GetFactory(string sql, string connectionString, int firstColumn, int countColumns, IDataReader reader, IMapper defaultMapper)
         {
