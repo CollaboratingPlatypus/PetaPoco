@@ -11,7 +11,7 @@ namespace PetaPoco.Internal
     internal class MultiPocoFactory
     {
         // Various cached stuff
-        private static readonly Cache<Tuple<Type, ArrayKey<Type>, string, string>, object> MultiPocoFactories = new Cache<Tuple<Type, ArrayKey<Type>, string, string>, object>();
+        private static readonly Cache<Tuple<Type, ArrayKey<Type>, string, string, int>, object> MultiPocoFactories = new Cache<Tuple<Type, ArrayKey<Type>, string, string, int>, object>();
 
         private static readonly Cache<ArrayKey<Type>, object> AutoMappers = new Cache<ArrayKey<Type>, object>();
 
@@ -142,7 +142,7 @@ namespace PetaPoco.Internal
         // Get (or create) the multi-poco factory for a query
         public static Func<IDataReader, object, TRet> GetFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper)
         {
-            var key = Tuple.Create(typeof(TRet), new ArrayKey<Type>(types), connectionString, sql);
+            var key = Tuple.Create(typeof(TRet), new ArrayKey<Type>(types), connectionString, sql, r.FieldCount);
 
             return (Func<IDataReader, object, TRet>) MultiPocoFactories.Get(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper));
         }
