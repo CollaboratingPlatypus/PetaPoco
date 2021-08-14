@@ -10,11 +10,11 @@ jobs:
     services:
       postgres:
         image: postgres
-          env:
-            POSTGRES_PASSWORD: petapoco
-            POSTGRES_USER: petapoco
-          ports:
-            - 5001:5432
+        env:
+          POSTGRES_PASSWORD: petapoco
+          POSTGRES_USER: petapoco
+        ports:
+          - 5001:5432
     steps:
       - uses: actions/checkout@v2
       - name: Configure dotnet
