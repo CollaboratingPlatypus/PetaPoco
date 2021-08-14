@@ -14,16 +14,16 @@ jobs:
             POSTGRES_PASSWORD: petapoco
             POSTGRES_USER: petapoco
           ports:
-           - 5001:5432
+            - 5001:5432
     steps:
-    - uses: actions/checkout@v2
-    - name: Configure dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore packages
-      run: dotnet restore
-    - name: Build solution
-      run: dotnet build --no-restore
-    - name: Run unit tests
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v2
+      - name: Configure dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Restore packages
+        run: dotnet restore
+      - name: Build solution
+        run: dotnet build --no-restore
+      - name: Run unit tests
+        run: dotnet test --no-build --verbosity normal

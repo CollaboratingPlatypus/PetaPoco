@@ -10,17 +10,17 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PetaPoco.Tests.Unit", "PetaPoco.Tests.Unit\PetaPoco.Tests.Unit.csproj", "{5F2570E2-999C-401C-B5EC-8E64193C7A37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CodeGen", "CodeGen", "{0ADE9D42-D89F-4CBA-A1EA-762C4C2CB5AA}"
-	ProjectSection(SolutionItems) = preProject
-		CodeGen\Database.tt = CodeGen\Database.tt
-		CodeGen\PetaPoco.Core.ttinclude = CodeGen\PetaPoco.Core.ttinclude
-		CodeGen\PetaPoco.Generator.ttinclude = CodeGen\PetaPoco.Generator.ttinclude
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	T4Templates\Database.tt = T4Templates\Database.tt
+	T4Templates\PetaPoco.Core.ttinclude = T4Templates\PetaPoco.Core.ttinclude
+	T4Templates\PetaPoco.Generator.ttinclude = T4Templates\PetaPoco.Generator.ttinclude
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{9C2624A8-C044-4617-B962-DCD1CE40035C}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
-		.github\workflow\pr.yml = .github\workflow\pr.yml
-		.github\workflow\build.yml = .github\workflow\build.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\pr.yml = .github\workflows\pr.yml
 	EndProjectSection
 EndProject
 Global
