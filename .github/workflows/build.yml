@@ -28,4 +28,4 @@ jobs:
       - name: Run unit tests
         run: dotnet test PetaPoco.Tests.Unit --no-build --verbosity normal
       - name: Run integration tests
-        run: dotnet test PetaPoco.Tests.Integration --no-build --filter Category=Postgres
+        run: dotnet test PetaPoco.Tests.Integration --filter Category=Postgres --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
