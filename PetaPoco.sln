@@ -19,6 +19,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{9C2624A8-C044-4617-B962-DCD1CE40035C}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
+		.github\workflow\pr.yml = .github\workflow\pr.yml
+		.github\workflow\build.yml = .github\workflow\build.yml
 	EndProjectSection
 EndProject
 Global
