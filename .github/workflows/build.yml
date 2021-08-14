@@ -24,8 +24,22 @@ jobs:
       - name: Restore packages
         run: dotnet restore
       - name: Build solution
-        run: dotnet build --no-restore
+        run: dotnet build -c Release --no-restore
       - name: Run unit tests
-        run: dotnet test PetaPoco.Tests.Unit --no-build --verbosity normal
+        run: dotnet test PetaPoco.Tests.Unit -c Release --no-build --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+      - name: Publish unit test report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Unit Tests
+          path: PetaPoco.Tests.Unit/**/*.trx
+          reporter: dotnet-trx
       - name: Run integration tests
-        run: dotnet test PetaPoco.Tests.Integration --filter Category=Postgres --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+        run: dotnet test PetaPoco.Tests.Integration -c Release --filter Category=Postgres --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+      - name: Publish integration test report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Integration Tests
+          path: PetaPoco.Tests.Integration/**/*.trx
+          reporter: dotnet-trx
