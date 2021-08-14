@@ -2,7 +2,7 @@ name: PR Build and Test
 
 on:
   push:
-    branches: [ development ]
+    branches: [ 'feature/github-actions' ]
 
 jobs:
   runner-job:
