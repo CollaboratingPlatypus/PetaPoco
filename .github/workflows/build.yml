@@ -26,4 +26,4 @@ jobs:
       - name: Build solution
         run: dotnet build --no-restore
       - name: Run unit tests
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test PetaPoco.Tests.Unit --no-build --verbosity normal
