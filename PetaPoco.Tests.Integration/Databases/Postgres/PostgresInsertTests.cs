@@ -5,6 +5,7 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
     [Collection("Postgres")]
+    [Trait("Category", "Postgres")]
     public class PostgresInsertTests : BaseInsertTests
     {
         public PostgresInsertTests()
