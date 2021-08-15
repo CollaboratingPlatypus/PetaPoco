@@ -31,6 +31,14 @@ jobs:
           SA_PASSWORD: pAtAp0c8
         ports:
           - 5005:1433
+      firebirddb:
+        image: jacobalberty/firebird:latest
+        env:
+          EnableWireCrypt: true
+          ISC_PASSWORD: petapoco
+        ports:
+          - 5004:3050
+
     steps:
       - uses: actions/checkout@v2
       - name: Configure dotnet
@@ -51,7 +59,7 @@ jobs:
           path: PetaPoco.Tests.Unit/**/*.trx
           reporter: dotnet-trx
       - name: Run integration tests
-        run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=Mssql) | (Category=Mysql)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+        run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=Mssql) | (Category=Mysql) | (Category=Firebird)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
       - name: Publish integration test report
         uses: dorny/test-reporter@v1
         if: success() || failure()
