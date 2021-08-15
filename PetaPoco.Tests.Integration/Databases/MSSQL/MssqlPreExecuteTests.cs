@@ -11,6 +11,7 @@ using Shouldly;
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     [Collection("Mssql")]
+    [Trait("Category", "Mssql")]
     public class MssqlPreExecuteTests : BaseDatabase
     {
         public MsssqlPreExecuteDatabaseProvider Provider => DB.Provider as MsssqlPreExecuteDatabaseProvider;

@@ -5,6 +5,7 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     [Collection("Mssql")]
+    [Trait("Category", "Mssql")]
     public class MssqlQueryLinqTests : BaseQueryLinqTests
     {
         private readonly StorePerson _storePerson = new StorePerson
