@@ -25,7 +25,7 @@ jobs:
         ports:
           - 5002:3306
       mssql:
-        image: microsoft/mssql-server-linux
+        image: mcr.microsoft.com/mssql/server:2017-latest
         env:
           ACCEPT_EULA: Y
           SA_PASSWORD: pAtAp0c8
