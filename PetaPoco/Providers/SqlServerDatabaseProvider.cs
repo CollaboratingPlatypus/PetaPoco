@@ -11,7 +11,15 @@ namespace PetaPoco.Providers
     public class SqlServerDatabaseProvider : DatabaseProvider
     {
         public override DbProviderFactory GetFactory()
-            => GetFactory("System.Data.SqlClient.SqlClientFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+        {
+#if NETFRAMEWORK
+            var assemblyName = "System.Data";
+#else
+            var assemblyName = "System.Data.SqlClient";
+#endif
+
+            return GetFactory($"System.Data.SqlClient.SqlClientFactory, {assemblyName}, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+        }
 
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
