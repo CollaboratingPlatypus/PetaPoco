@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -49,11 +50,27 @@ namespace PetaPoco.Internal
                 }
                 else
                 {
-                    // Look for a property on one of the arguments with this name
                     bool found = false;
                     arg_val = null;
+
                     foreach (var o in args_src)
                     {
+                        if (o is IDictionary dict)
+                        {
+                            Type[] arguments = dict.GetType().GetGenericArguments();
+
+                            if (arguments[0] == typeof(string))
+                            {
+                                var val = dict[param];
+                                if (val != null)
+                                {
+                                    found = true;
+                                    arg_val = val;
+                                    break;
+                                }
+                            }
+                        }
+
                         var pi = o.GetType().GetProperty(param);
                         if (pi != null)
                         {
@@ -100,7 +117,19 @@ namespace PetaPoco.Internal
 
             void ProcessArg(object arg)
             {
-                if (arg.IsEnumerable())
+                if (arg is IDictionary dict)
+                {
+                    Type[] arguments = dict.GetType().GetGenericArguments();
+
+                    if (arguments[0] == typeof(string))
+                    {
+                        foreach (string key in dict.Keys)
+                        {
+                            AddParameter(key, dict[key]);
+                        }
+                    }
+                }
+                else if (arg.IsEnumerable())
                 {
                     foreach (var singleArg in (arg as System.Collections.IEnumerable))
                     {
@@ -108,7 +137,7 @@ namespace PetaPoco.Internal
                     }
                 }
                 else if (arg is IDbDataParameter)
-                    result.Add((IDbDataParameter) arg);
+                    result.Add((IDbDataParameter)arg);
                 else
                 {
                     var type = arg.GetType();
@@ -117,12 +146,17 @@ namespace PetaPoco.Internal
                     var readableProps = type.GetProperties().Where(p => p.CanRead);
                     foreach (var prop in readableProps)
                     {
-                        var param = cmd.CreateParameter();
-                        param.ParameterName = prop.Name;
-                        setParameterProperties(param, prop.GetValue(arg, null), null);
-                        result.Add(param);
-                    }
+                        AddParameter(prop.Name, prop.GetValue(arg, null));
+                    }                
                 }
+            }
+
+            void AddParameter(string name, object value)
+            {
+                var param = cmd.CreateParameter();
+                param.ParameterName = name;
+                setParameterProperties(param, value, null);
+                result.Add(param);
             }
 
             foreach (var arg in args)
