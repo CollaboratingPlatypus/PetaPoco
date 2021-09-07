@@ -59,15 +59,11 @@ namespace PetaPoco.Internal
                         {
                             Type[] arguments = dict.GetType().GetGenericArguments();
 
-                            if (arguments[0] == typeof(string))
+                            if (arguments[0] == typeof(string) && dict.Contains(param))
                             {
-                                var val = dict[param];
-                                if (val != null)
-                                {
-                                    found = true;
-                                    arg_val = val;
-                                    break;
-                                }
+                                arg_val = dict[param];
+                                found = true;
+                                break;                                
                             }
                         }
 
