@@ -92,13 +92,55 @@ namespace PetaPoco.Tests.Unit.Utilities
         }
 
         [Fact]
-        public void ProcessQueryParams_MissingParam_ShouldThrow()
+        public void ProcessQueryParams_ObjectMissingParam_ShouldThrow()
         {
             var args_src = new[] { new {first = 87 } };
             Action act = () => NamedQueryParamsTestHelper(args_src);
 
             var ex = act.ShouldThrow<ArgumentException>();
             ex.Message.ShouldMatch(@"^Parameter '@second' specified");
+        }
+
+        [Fact]
+        public void ProcessQueryParams_DictionaryMissingParam_ShouldThrow()
+        {
+            var args_src = new[] { new Dictionary<string, object>() { ["first"] = 87 } };
+            Action act = () => NamedQueryParamsTestHelper(args_src);
+
+            var ex = act.ShouldThrow<ArgumentException>();
+            ex.Message.ShouldMatch(@"^Parameter '@second' specified");
+        }
+
+        [Fact]
+        public void ProcessQueryParams_ObjectWithNull_ShouldWork()
+        {
+            var sql = "select * from foo where a = @first";
+            var args_src = new[] { new { first = (string)null } };
+            var args_dest = new List<object>();
+
+            var expected_sql = "select * from foo where a = @0";
+            var expected_args = new List<object>() { null };
+
+            var output = ParametersHelper.ProcessQueryParams(sql, args_src, args_dest);
+
+            output.ShouldBe(expected_sql);
+            args_dest.ShouldBe(expected_args);
+        }
+
+        [Fact]
+        public void ProcessQueryParams_DictionaryWithNull_ShouldWork()
+        {
+            var sql = "select * from foo where a = @first";
+            var args_src = new[] { new Dictionary<string, object>() { ["first"] = null } };
+            var args_dest = new List<object>();
+
+            var expected_sql = "select * from foo where a = @0";
+            var expected_args = new List<object>() { null };
+
+            var output = ParametersHelper.ProcessQueryParams(sql, args_src, args_dest);
+
+            output.ShouldBe(expected_sql);
+            args_dest.ShouldBe(expected_args);
         }
 
         private void NamedProcParamsTestHelper(object[] args_src)
