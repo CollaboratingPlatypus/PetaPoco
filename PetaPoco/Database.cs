@@ -485,14 +485,28 @@ namespace PetaPoco
         /// <inheritdoc />
         public async Task BeginTransactionAsync(CancellationToken cancellationToken)
         {
-            _transactionDepth++;
-
-            if (_transactionDepth == 1)
+            if (_sharedConnection is DbConnection asyncConn)
             {
-                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
-                _transaction = !_isolationLevel.HasValue ? _sharedConnection.BeginTransaction() : _sharedConnection.BeginTransaction(_isolationLevel.Value);
-                _transactionCancelled = false;
-                OnBeginTransaction();
+                _transactionDepth++;
+
+                if (_transactionDepth == 1)
+                {
+                    await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                    _transaction = !_isolationLevel.HasValue
+#if NETSTANDARD2_1
+                        ? await asyncConn.BeginTransactionAsync().ConfigureAwait(false)
+                        : await asyncConn.BeginTransactionAsync(_isolationLevel.Value).ConfigureAwait(false);
+#else
+                        ? _sharedConnection.BeginTransaction() 
+                        : _sharedConnection.BeginTransaction(_isolationLevel.Value);
+#endif
+                    _transactionCancelled = false;
+                    OnBeginTransaction();
+                }
+            }
+            else
+            {
+                BeginTransaction();
             }
         }
 #endif
@@ -519,8 +533,7 @@ namespace PetaPoco
         public void AbortTransaction()
         {
             _transactionCancelled = true;
-            if ((--_transactionDepth) == 0)
-                CleanupTransaction();
+            CompleteTransaction();
         }
 
         /// <inheritdoc />
@@ -529,6 +542,44 @@ namespace PetaPoco
             if ((--_transactionDepth) == 0)
                 CleanupTransaction();
         }
+
+#if ASYNC
+        private async Task CleanupTransactionAsync()
+        {
+#if NETSTANDARD2_1
+            if (_transaction is DbTransaction asyncTrans)
+            {
+                OnEndTransaction();
+
+                if (_transactionCancelled)
+                    await asyncTrans.RollbackAsync().ConfigureAwait(false);
+                else
+                    await asyncTrans.CommitAsync().ConfigureAwait(false);
+
+                _transaction.Dispose();
+                _transaction = null;
+
+                CloseSharedConnection();
+            }
+            else
+#endif
+            {
+                CleanupTransaction();
+            }
+        }
+
+        public Task AbortTransactionAsync()
+        {
+            this._transactionCancelled = true;
+            return CompleteTransactionAsync();
+        }
+
+        public async Task CompleteTransactionAsync()
+        {
+            if ((--_transactionDepth) == 0)
+                await CleanupTransactionAsync().ConfigureAwait(false);
+        }
+#endif
 
 #endregion
 
