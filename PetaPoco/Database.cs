@@ -624,6 +624,10 @@ namespace PetaPoco
 
         private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi)
         {
+            var columnAttribInfo = pi?.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
+            var isAnsi = columnAttribInfo?.IsAnsi == true;
+            var isDateTime2 = columnAttribInfo?.IsDateTime2 == true;
+
             // Assign the parameter value
             if (value == null)
             {
@@ -638,6 +642,18 @@ namespace PetaPoco
                 value = _provider.MapParameterValue(value);
 
                 var t = value.GetType();
+
+                if (t == typeof(string) && isAnsi == true)
+                {
+                    t = typeof(AnsiString);
+                    value = value.ToAnsiString();
+                }
+                if (t == typeof(DateTime) && isDateTime2 == true)
+                {
+                    t = typeof(DateTime2);
+                    value = value.ToDateTime2();
+                }
+
                 if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
                 {
                     p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
@@ -672,6 +688,19 @@ namespace PetaPoco
                     }
                     // Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
                     p.DbType = DbType.AnsiString;
+                }
+                else if (t == typeof(DateTime2))
+                {
+                    var asValue = (value as DateTime2).Value;
+                    if (asValue == null)
+                    {
+                        p.Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        p.Value = asValue;
+                    }
+                    p.DbType = DbType.DateTime2;
                 }
                 else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
                 {
