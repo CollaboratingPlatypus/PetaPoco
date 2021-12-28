@@ -625,8 +625,8 @@ namespace PetaPoco
         private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi)
         {
             var columnAttribInfo = pi?.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
-            var isAnsi = columnAttribInfo?.ForceToAnsiString == true;
-            var isDateTime2 = columnAttribInfo?.ForceToDateTime2 == true;
+            var forceToAnsiString = columnAttribInfo?.ForceToAnsiString == true;
+            var forceToDateTime2 = columnAttribInfo?.ForceToDateTime2 == true;
 
             // Assign the parameter value
             if (value == null)
@@ -643,12 +643,12 @@ namespace PetaPoco
 
                 var t = value.GetType();
 
-                if (t == typeof(string) && isAnsi == true)
+                if (t == typeof(string) && forceToAnsiString == true)
                 {
                     t = typeof(AnsiString);
                     value = value.ToAnsiString();
                 }
-                if (t == typeof(DateTime) && isDateTime2 == true)
+                if (t == typeof(DateTime) && forceToDateTime2 == true)
                 {
                     t = typeof(DateTime2);
                     value = value.ToDateTime2();
@@ -691,14 +691,14 @@ namespace PetaPoco
                 }
                 else if (t == typeof(DateTime2))
                 {
-                    var asValue = (value as DateTime2).Value;
-                    if (asValue == null)
+                    var dt2Value = (value as DateTime2).Value;
+                    if (dt2Value == null)
                     {
                         p.Value = DBNull.Value;
                     }
                     else
                     {
-                        p.Value = asValue;
+                        p.Value = dt2Value;
                     }
                     p.DbType = DbType.DateTime2;
                 }
