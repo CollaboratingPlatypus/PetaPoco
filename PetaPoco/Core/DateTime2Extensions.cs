@@ -2,7 +2,7 @@
 
 namespace PetaPoco
 {
-    public static class DateTime2Extentions
+    public static class DateTime2Extensions
     {
         /// <summary>
         /// Converts an object to its <see cref="DateTime2"/> representation
