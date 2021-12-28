@@ -38,11 +38,11 @@ namespace PetaPoco
         /// <summary>
         ///     True if AnsiString / VARCHAR column
         /// </summary>
-        public bool IsAnsi { get; set; }
+        public bool ForceToAnsiString { get; set; }
         /// <summary>
         ///     True if DateTime2 column
         /// </summary>
-        public bool IsDateTime2 { get; set; }
+        public bool ForceToDateTime2 { get; set; }
 
         /// <summary>
         ///     Constructs a new instance of the <seealso cref="ColumnAttribute" />.

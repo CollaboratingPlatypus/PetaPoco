@@ -625,8 +625,8 @@ namespace PetaPoco
         private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi)
         {
             var columnAttribInfo = pi?.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
-            var isAnsi = columnAttribInfo?.IsAnsi == true;
-            var isDateTime2 = columnAttribInfo?.IsDateTime2 == true;
+            var isAnsi = columnAttribInfo?.ForceToAnsiString == true;
+            var isDateTime2 = columnAttribInfo?.ForceToDateTime2 == true;
 
             // Assign the parameter value
             if (value == null)
