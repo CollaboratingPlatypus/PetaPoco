@@ -3,7 +3,7 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Wrap strings in an instance of this class to force use of DBType.DateTime2
+    ///     Wrap DateTime in an instance of this class to force use of DBType.DateTime2
     /// </summary>
     public class DateTime2
     {
@@ -15,8 +15,10 @@ namespace PetaPoco
         /// <summary>
         ///     Constructs an DateTime2
         /// </summary>
-        /// <param name="str">The C# string to be converted to ANSI before being passed to the DB</param>
-        public DateTime2(DateTime str)
-            => Value = str;
+        /// <param name="dt">The C# DateTime to be converted to DateTime2 before being passed to the DB</param>
+        public DateTime2(DateTime dt)
+            => Value = dt;
+
+        public static explicit operator DateTime2(DateTime dt) => new DateTime2(dt);
     }
 }
