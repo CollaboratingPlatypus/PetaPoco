@@ -591,7 +591,7 @@ namespace PetaPoco
         /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added</param>
         /// <param name="value">The value to assign to the parameter</param>
         /// <param name="pi">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
-        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi)
+        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi, PocoColumn pc)
         {
             // Convert value to from poco type to db type
             if (pi != null)
@@ -616,18 +616,14 @@ namespace PetaPoco
             {
                 var p = cmd.CreateParameter();
                 p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
-                SetParameterProperties(p, value, pi);
+                SetParameterProperties(p, value, pi, pc);
 
                 cmd.Parameters.Add(p);
             }
         }
 
-        private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi)
+        private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi, PocoColumn pc)
         {
-            var columnAttribInfo = pi?.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
-            var forceToAnsiString = columnAttribInfo?.ForceToAnsiString == true;
-            var forceToDateTime2 = columnAttribInfo?.ForceToDateTime2 == true;
-
             // Assign the parameter value
             if (value == null)
             {
@@ -643,12 +639,12 @@ namespace PetaPoco
 
                 var t = value.GetType();
 
-                if (t == typeof(string) && forceToAnsiString == true)
+                if (t == typeof(string) && pc?.ForceToAnsiString == true)
                 {
                     t = typeof(AnsiString);
                     value = value.ToAnsiString();
                 }
-                if (t == typeof(DateTime) && forceToDateTime2 == true)
+                if (t == typeof(DateTime) && pc?.ForceToDateTime2 == true)
                 {
                     t = typeof(DateTime2);
                     value = value.ToDateTime2();
@@ -753,7 +749,7 @@ namespace PetaPoco
             cmd.CommandText = sql;
 
             foreach (var item in args)
-                AddParam(cmd, item, null);
+                AddParam(cmd, item, null, null);
 
             return cmd;
         }
@@ -1899,7 +1895,7 @@ namespace PetaPoco
 
                 names.Add(_provider.EscapeSqlIdentifier(i.Key));
                 values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
-                AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+                AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo, i.Value);
             }
 
             var outputClause = string.Empty;
@@ -2156,7 +2152,7 @@ namespace PetaPoco
                     sb.AppendFormat(i.Value.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
 
                     // Store the parameter in the command
-                    AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+                    AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo, i.Value);
                 }
             }
             else
@@ -2171,7 +2167,7 @@ namespace PetaPoco
                     sb.AppendFormat(pc.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(colname), _paramPrefix, index++);
 
                     // Store the parameter in the command
-                    AddParam(cmd, pc.GetValue(poco), pc.PropertyInfo);
+                    AddParam(cmd, pc.GetValue(poco), pc.PropertyInfo, pc);
                 }
 
                 // Grab primary key value
@@ -2184,15 +2180,16 @@ namespace PetaPoco
 
             // Find the property info for the primary key
             PropertyInfo pkpi = null;
+            PocoColumn col = null;
             if (primaryKeyName != null)
             {
-                PocoColumn col;
+                //PocoColumn col;
                 pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
             }
 
             cmd.CommandText =
                 $"UPDATE {_provider.EscapeTableName(tableName)} SET {sb} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)} = {_paramPrefix}{index++}";
-            AddParam(cmd, primaryKeyValue, pkpi);
+            AddParam(cmd, primaryKeyValue, pkpi, col);
         }
 
 #if ASYNC
