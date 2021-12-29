@@ -691,15 +691,8 @@ namespace PetaPoco
                 }
                 else if (t == typeof(DateTime2))
                 {
-                    var dt2Value = (value as DateTime2).Value;
-                    if (dt2Value == null)
-                    {
-                        p.Value = DBNull.Value;
-                    }
-                    else
-                    {
-                        p.Value = dt2Value;
-                    }
+                    var dt2Value = (value as DateTime2)?.Value;
+                    p.Value = dt2Value ?? (object)DBNull.Value;
                     p.DbType = DbType.DateTime2;
                 }
                 else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
