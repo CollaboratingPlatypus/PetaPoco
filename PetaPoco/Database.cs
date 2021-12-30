@@ -647,7 +647,7 @@ namespace PetaPoco
                 if (t == typeof(DateTime) && pc?.ForceToDateTime2 == true)
                 {
                     t = typeof(DateTime2);
-                    value = value.ToDateTime2();
+                    value = ((DateTime)value).ToDateTime2();
                 }
 
                 if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
