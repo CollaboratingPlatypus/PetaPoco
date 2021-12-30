@@ -107,7 +107,7 @@ namespace PetaPoco.Internal
             return (input as System.Collections.IEnumerable) != null && (input as string) == null && (input as byte[]) == null;
         }
 
-        public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PropertyInfo, PocoColumn> setParameterProperties)
+        public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PocoColumn> setParameterProperties)
         {
             // For a stored proc, we assume that we're only getting POCOs or parameters
             var result = new List<IDbDataParameter>();
@@ -152,7 +152,7 @@ namespace PetaPoco.Internal
             {
                 var param = cmd.CreateParameter();
                 param.ParameterName = name;
-                setParameterProperties(param, value, null, null);
+                setParameterProperties(param, value, null);
                 result.Add(param);
             }
 
