@@ -60,6 +60,8 @@ namespace PetaPoco.Core
                 pc.ResultColumn = ci.ResultColumn;
                 pc.AutoSelectedResultColumn = ci.AutoSelectedResultColumn;
                 pc.ForceToUtc = ci.ForceToUtc;
+                pc.ForceToAnsiString = ci.ForceToAnsiString;
+                pc.ForceToDateTime2 = ci.ForceToDateTime2;
                 pc.InsertTemplate = ci.InsertTemplate;
                 pc.UpdateTemplate = ci.UpdateTemplate;
 

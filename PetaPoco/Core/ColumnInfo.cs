@@ -35,6 +35,14 @@ namespace PetaPoco
         ///     is simply set to DateTimeKind.Utc instead of DateTimeKind.Unknown.
         /// </summary>
         public bool ForceToUtc { get; set; }
+        /// <summary>
+        ///     True if Database Column is DbType.AnsiString (like VARCHAR)
+        /// </summary>
+        public bool ForceToAnsiString { get; set; }
+        /// <summary>
+        ///     True if Database Colume is DbType.DateTime2
+        /// </summary>
+        public bool ForceToDateTime2 { get; set; }
 
         /// <summary>
         ///     The insert template. If not null, this template is used for generating the insert section instead of the deafult
@@ -70,6 +78,8 @@ namespace PetaPoco
 
                 ci.ColumnName = columnAttr?.Name ?? pi.Name;
                 ci.ForceToUtc = columnAttr?.ForceToUtc == true;
+                ci.ForceToAnsiString = columnAttr?.ForceToAnsiString == true;
+                ci.ForceToDateTime2 = columnAttr?.ForceToDateTime2 == true;
                 ci.InsertTemplate = columnAttr?.InsertTemplate;
                 ci.UpdateTemplate = columnAttr?.UpdateTemplate;
 

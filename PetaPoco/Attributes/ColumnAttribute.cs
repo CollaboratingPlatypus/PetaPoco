@@ -35,6 +35,14 @@ namespace PetaPoco
         ///     json)"
         /// </summary>
         public string UpdateTemplate { get; set; }
+        /// <summary>
+        ///     True if AnsiString / VARCHAR column
+        /// </summary>
+        public bool ForceToAnsiString { get; set; }
+        /// <summary>
+        ///     True if DateTime2 column
+        /// </summary>
+        public bool ForceToDateTime2 { get; set; }
 
         /// <summary>
         ///     Constructs a new instance of the <seealso cref="ColumnAttribute" />.
