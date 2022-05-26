@@ -65,8 +65,8 @@ namespace PetaPoco
             var isExplicit = pi.DeclaringType.GetCustomAttributes(typeof(ExplicitColumnsAttribute), true).Any();
 
             // Check for [Column]/[Ignore] Attributes
-            columnAttr = pi.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
-            var isIgnore = pi.GetCustomAttributes(typeof(IgnoreAttribute), true).Any();
+            columnAttr = Attribute.GetCustomAttributes(pi, typeof(ColumnAttribute)).FirstOrDefault() as ColumnAttribute;
+            var isIgnore = Attribute.GetCustomAttributes(pi, typeof(IgnoreAttribute)).Any();
 
             if (isIgnore || (isExplicit && columnAttr == null))
             {
