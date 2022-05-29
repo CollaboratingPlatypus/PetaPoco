@@ -1,4 +1,5 @@
 ﻿using Moq;
+using PetaPoco.Core;
 using PetaPoco.Internal;
 using Shouldly;
 using System;
@@ -145,7 +146,7 @@ namespace PetaPoco.Tests.Unit.Utilities
 
         private void NamedProcParamsTestHelper(object[] args_src)
         {
-            Action<IDbDataParameter, object, PropertyInfo> setAction = (p, o, pi) => p.Value = o;
+            Action<IDbDataParameter, object, PocoColumn> setAction = (p, o, pc) => p.Value = o;
             var cmd = new SqlCommand();
 
             var expected = new [] { new SqlParameter("foo", 42), new SqlParameter("bar", "Dirk Gently") };
