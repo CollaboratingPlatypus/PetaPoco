@@ -130,7 +130,7 @@ namespace PetaPoco
             {
                 if (pi != null)
                 {
-                    var valueConverter = pi.GetCustomAttributes(typeof(ValueConverterAttribute), true).FirstOrDefault() as ValueConverterAttribute;
+                    var valueConverter = Attribute.GetCustomAttributes(pi, typeof(ValueConverterAttribute)).FirstOrDefault() as ValueConverterAttribute;
                     if (valueConverter != null)
                         return valueConverter.ConvertFromDb;
                 }
@@ -141,7 +141,7 @@ namespace PetaPoco
             {
                 if (pi != null)
                 {
-                    var valueConverter = pi.GetCustomAttributes(typeof(ValueConverterAttribute), true).FirstOrDefault() as ValueConverterAttribute;
+                    var valueConverter = Attribute.GetCustomAttributes(pi, typeof(ValueConverterAttribute)).FirstOrDefault() as ValueConverterAttribute;
                     if (valueConverter != null)
                         return valueConverter.ConvertToDb;
                 }

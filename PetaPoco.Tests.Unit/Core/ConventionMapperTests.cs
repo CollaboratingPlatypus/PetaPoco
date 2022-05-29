@@ -1,4 +1,5 @@
 ﻿using System;
+using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
 
@@ -269,6 +270,17 @@ namespace PetaPoco.Tests.Unit.Core
             public Guid Id { get; set; }
 
             public int Size { get; set; }
+        }
+
+        [Theory]
+        [InlineData(typeof(Child1))]
+        [InlineData(typeof(Child2))]
+        [InlineData(typeof(Child3))]
+        [InlineData(typeof(Child4))]
+        public void Converters_Should_Inherit(Type type)
+        {
+            var func = _mapper.GetToDbConverter(type.GetProperty("ID"));
+            func.ShouldNotBeNull();
         }
     }
 }

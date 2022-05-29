@@ -1,5 +1,6 @@
 ﻿using System;
 using PetaPoco.Core;
+using PetaPoco.Tests.Unit.Models;
 using Shouldly;
 using Xunit;
 
@@ -52,6 +53,18 @@ namespace PetaPoco.Tests.Unit.Core
 
             [ResultColumn(IncludeInAutoSelect.Yes)]
             public string ResultProperty { get; set; }
+        }
+
+        [Theory]
+        [InlineData(typeof(Child1))]
+        [InlineData(typeof(Child2))]
+        [InlineData(typeof(Child3))]
+        [InlineData(typeof(Child4))]
+        public void Atrributes_Should_Inherit(Type type)
+        {
+            var pd = PocoData.ForType(type, new ConventionMapper());
+            pd.Columns.ShouldContainKey("Foo");
+            pd.Columns.ShouldNotContainKey("Ignored");
         }
     }
 }
