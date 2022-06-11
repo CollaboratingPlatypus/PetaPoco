@@ -10,20 +10,29 @@ jobs:
     services:
       postgres:
         image: postgres
-          env:
-            POSTGRES_PASSWORD: petapoco
-            POSTGRES_USER: petapoco
-          ports:
-           - 5001:5432
+        env:
+          POSTGRES_PASSWORD: petapoco
+          POSTGRES_USER: petapoco
+        ports:
+          - 5001:5432
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: petapoco
+          MYSQL_DATABASE: petapoco
+          MYSQL_PASSWORD: petapoco
+          MYSQL_USER: petapoco
+        ports:
+          - 5002:3306
     steps:
-    - uses: actions/checkout@v2
-    - name: Configure dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore packages
-      run: dotnet restore
-    - name: Build solution
-      run: dotnet build --no-restore
-    - name: Run unit tests
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v2
+      - name: Configure dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Restore packages
+        run: dotnet restore
+      - name: Build solution
+        run: dotnet build --no-restore
+      - name: Run unit tests
+        run: dotnet test --no-build --verbosity normal
