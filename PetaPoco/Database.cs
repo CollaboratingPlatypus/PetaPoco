@@ -722,39 +722,48 @@ namespace PetaPoco
         public IDbCommand CreateCommand(IDbConnection connection, CommandType commandType, string sql, params object[] args)
         {
             var cmd = connection.CreateCommand();
-            cmd.Connection = connection;
-            cmd.CommandType = commandType;
-            cmd.Transaction = _transaction;
-
-            switch (commandType)
+            
+            try
             {
-                case CommandType.Text:
-                    // Perform named argument replacements
-                    if (EnableNamedParams)
-                    {
-                        var newArgs = new List<object>();
-                        sql = ParametersHelper.ProcessQueryParams(sql, args, newArgs);
-                        args = newArgs.ToArray();
-                    }
+                cmd.Connection = connection;
+                cmd.CommandType = commandType;
+                cmd.Transaction = _transaction;
 
-                    // Perform parameter prefix replacements
-                    if (_paramPrefix != "@")
-                        sql = sql.ReplaceParamPrefix(_paramPrefix);
-                    sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
-                    break;
-                case CommandType.StoredProcedure:
-                    args = ParametersHelper.ProcessStoredProcParams(cmd, args, SetParameterProperties);
-                    break;
-                case CommandType.TableDirect:
-                    break;
+                switch (commandType)
+                {
+                    case CommandType.Text:
+                        // Perform named argument replacements
+                        if (EnableNamedParams)
+                        {
+                            var newArgs = new List<object>();
+                            sql = ParametersHelper.ProcessQueryParams(sql, args, newArgs);
+                            args = newArgs.ToArray();
+                        }
+
+                        // Perform parameter prefix replacements
+                        if (_paramPrefix != "@")
+                            sql = sql.ReplaceParamPrefix(_paramPrefix);
+                        sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
+                        break;
+                    case CommandType.StoredProcedure:
+                        args = ParametersHelper.ProcessStoredProcParams(cmd, args, SetParameterProperties);
+                        break;
+                    case CommandType.TableDirect:
+                        break;
+                }
+
+                cmd.CommandText = sql;
+
+                foreach (var item in args)
+                    AddParam(cmd, item, null);
+
+                return cmd;
             }
-
-            cmd.CommandText = sql;
-
-            foreach (var item in args)
-                AddParam(cmd, item, null);
-
-            return cmd;
+            catch
+            {
+             cmd.Dispose();
+             throw;
+            }
         }
 
 #endregion
