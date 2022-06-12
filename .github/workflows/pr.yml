@@ -24,6 +24,29 @@ jobs:
           MYSQL_USER: petapoco
         ports:
           - 5002:3306
+      mariadb:
+        image: mariadb
+        env:
+          MYSQL_ROOT_PASSWORD: petapoco
+          MYSQL_DATABASE: petapoco
+          MYSQL_PASSWORD: petapoco
+          MYSQL_USER: petapoco
+        ports:
+          - 5003:3306
+      firebirddb:
+        image: jacobalberty/firebird
+        env:
+          EnableWireCrypt: true
+          ISC_PASSWORD: petapoco
+        ports:
+          - 5004:3050
+      mssql:
+        image: microsoft/mssql-server-linux
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: pAtAp0c8
+        ports:
+          - 5005:1433
     steps:
       - uses: actions/checkout@v2
       - name: Configure dotnet
