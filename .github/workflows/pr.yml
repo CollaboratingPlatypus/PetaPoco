@@ -58,10 +58,10 @@ jobs:
           - 5005:1433
     steps:
       - uses: actions/checkout@v2
-      - name: Configure dotnet
-        uses: actions/setup-dotnet@v1
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 5.0.x
       - name: Restore packages
         run: dotnet restore
       - name: Build solution
