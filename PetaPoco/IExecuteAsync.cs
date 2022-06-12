@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 namespace PetaPoco
 {
-#if ASYNC
     public interface IExecuteAsync
     {
         /// <summary>
@@ -46,5 +45,4 @@ namespace PetaPoco
         /// </summary>
         Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql);
     }
-#endif
 }

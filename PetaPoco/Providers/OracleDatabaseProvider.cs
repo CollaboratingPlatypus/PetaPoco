@@ -4,10 +4,9 @@ using System.Data.Common;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
-#if ASYNC
 using System.Threading;
 using System.Threading.Tasks;
-#endif
+
 
 namespace PetaPoco.Providers
 {
@@ -69,7 +68,7 @@ namespace PetaPoco.Providers
             cmd.Parameters.Add(param);
             return param;
         }
-#if ASYNC
+        
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -82,6 +81,5 @@ namespace PetaPoco.Providers
             await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd).ConfigureAwait(false);
             return -1;
         }
-#endif
     }
 }

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace PetaPoco
 {
-#if ASYNC
     public interface IQueryAsync
     {
         /// <summary>
@@ -419,5 +418,4 @@ namespace PetaPoco
         /// </summary>
         Task<T> FirstOrDefaultAsync<T>(CancellationToken cancellationToken, Sql sql);
     }
-#endif
 }

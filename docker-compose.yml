@@ -16,7 +16,7 @@ mysql:
     - MYSQL_DATABASE=petapoco
     - MYSQL_PASSWORD=petapoco
     - MYSQL_USER=petapoco
-mysql:
+mysqlConnector:
   image: mysql:latest
   container_name: mysqlconnector_petapoco
   ports:
@@ -45,7 +45,7 @@ firebirddb:
     - EnableWireCrypt=true
     - ISC_PASSWORD=petapoco
 mssql:
-  image: microsoft/mssql-server-linux
+  image: mcr.microsoft.com/mssql/server:2022-latest
   container_name: mssql_petapoco
   ports:
     - "5005:1433"

@@ -236,13 +236,12 @@ namespace PetaPoco.Tests.Integration.Databases
             var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Order.PersonId)).ColumnName);
             var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Id)).ColumnName);
 
-            var testQuery = $"SELECT * FROM {orderTable} o " +
-                $"JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
+            var testQuery = $"SELECT * FROM {orderTable} o JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
             var results = DB.Query<Order, Person>(testQuery).ToList();
 
             results.ShouldNotBeEmpty();
 
-            DB.Execute($"ALTER TABLE {orderTable} ADD [SomeRandomColumn] INT NULL");
+            DB.Execute($"ALTER TABLE {orderTable} ADD SomeRandomColumn INT NULL");
 
             results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();

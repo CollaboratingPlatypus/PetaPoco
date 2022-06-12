@@ -9,10 +9,7 @@ namespace PetaPoco
     /// <summary>
     ///     Represents the core functionality of PetaPoco.
     /// </summary>
-    public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection
-#if ASYNC
-                                 , IQueryAsync, IExecuteAsync, IStoredProcAsync, IAlterPocoAsync
-#endif
+    public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection, IQueryAsync, IExecuteAsync, IStoredProcAsync, IAlterPocoAsync
     {
         /// <summary>
         ///     Gets the default mapper. (Default is <see cref="ConventionMapper" />)
@@ -190,7 +187,6 @@ namespace PetaPoco
         /// </summary>
         event EventHandler<ExceptionEventArgs> ExceptionThrown;
 
-#if ASYNC
         /// <summary>
         ///     Async version of <see cref="BeginTransaction" />.
         /// </summary>
@@ -200,6 +196,5 @@ namespace PetaPoco
         ///     Async version of <see cref="BeginTransaction" />.
         /// </summary>
         Task BeginTransactionAsync(CancellationToken cancellationToken);
-#endif
     }
 }

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace PetaPoco.Utilities
 {
-#if ASYNC
     public class AsyncReader<T> : IAsyncReader<T>
     {
         private readonly bool _isAsync;
@@ -60,5 +59,4 @@ namespace PetaPoco.Utilities
         public static AsyncReader<T> Empty()
             => new AsyncReader<T>();
     }
-#endif
 }

@@ -28,12 +28,10 @@ namespace PetaPoco.Providers
             return db.ExecuteScalar<object>("SELECT @@@IDENTITY AS NewID;");
         }
 
-#if ASYNC
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd);
             return await db.ExecuteScalarAsync<object>(cancellationToken, "SELECT @@@IDENTITY AS NewID;");
         }
-#endif
     }
 }
