@@ -354,7 +354,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Specifies an event handler to use when a database connection is about to be opened.
+        ///     Specifies an event handler to use before a connection is opened.
         /// </summary>
         /// <param name="source">The configuration source.</param>
         /// <param name="handler"></param>
