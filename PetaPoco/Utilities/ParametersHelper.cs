@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PetaPoco.Core;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -49,11 +51,23 @@ namespace PetaPoco.Internal
                 }
                 else
                 {
-                    // Look for a property on one of the arguments with this name
                     bool found = false;
                     arg_val = null;
+
                     foreach (var o in args_src)
                     {
+                        if (o is IDictionary dict)
+                        {
+                            Type[] arguments = dict.GetType().GetGenericArguments();
+
+                            if (arguments[0] == typeof(string) && dict.Contains(param))
+                            {
+                                arg_val = dict[param];
+                                found = true;
+                                break;                                
+                            }
+                        }
+
                         var pi = o.GetType().GetProperty(param);
                         if (pi != null)
                         {
@@ -93,14 +107,26 @@ namespace PetaPoco.Internal
             return (input as System.Collections.IEnumerable) != null && (input as string) == null && (input as byte[]) == null;
         }
 
-        public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PropertyInfo> setParameterProperties)
+        public static object[] ProcessStoredProcParams(IDbCommand cmd, object[] args, Action<IDbDataParameter, object, PocoColumn> setParameterProperties)
         {
             // For a stored proc, we assume that we're only getting POCOs or parameters
             var result = new List<IDbDataParameter>();
 
             void ProcessArg(object arg)
             {
-                if (arg.IsEnumerable())
+                if (arg is IDictionary dict)
+                {
+                    Type[] arguments = dict.GetType().GetGenericArguments();
+
+                    if (arguments[0] == typeof(string))
+                    {
+                        foreach (string key in dict.Keys)
+                        {
+                            AddParameter(key, dict[key]);
+                        }
+                    }
+                }
+                else if (arg.IsEnumerable())
                 {
                     foreach (var singleArg in (arg as System.Collections.IEnumerable))
                     {
@@ -108,7 +134,7 @@ namespace PetaPoco.Internal
                     }
                 }
                 else if (arg is IDbDataParameter)
-                    result.Add((IDbDataParameter) arg);
+                    result.Add((IDbDataParameter)arg);
                 else
                 {
                     var type = arg.GetType();
@@ -117,12 +143,17 @@ namespace PetaPoco.Internal
                     var readableProps = type.GetProperties().Where(p => p.CanRead);
                     foreach (var prop in readableProps)
                     {
-                        var param = cmd.CreateParameter();
-                        param.ParameterName = prop.Name;
-                        setParameterProperties(param, prop.GetValue(arg, null), null);
-                        result.Add(param);
-                    }
+                        AddParameter(prop.Name, prop.GetValue(arg, null));
+                    }                
                 }
+            }
+
+            void AddParameter(string name, object value)
+            {
+                var param = cmd.CreateParameter();
+                param.ParameterName = name;
+                setParameterProperties(param, value, null);
+                result.Add(param);
             }
 
             foreach (var arg in args)

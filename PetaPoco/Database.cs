@@ -279,6 +279,7 @@ namespace PetaPoco
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
             settings.TryGetSetting<IsolationLevel>(DatabaseConfigurationExtensions.IsolationLevel, v => IsolationLevel = v);
 
+            settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionOpening, v => ConnectionOpening += v);
             settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionOpened, v => ConnectionOpened += v);
             settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionClosing, v => ConnectionClosing += v);
             settings.TryGetSetting<EventHandler<DbTransactionEventArgs>>(DatabaseConfigurationExtensions.TransactionStarted, v => TransactionStarted += v);
@@ -344,6 +345,8 @@ namespace PetaPoco
             {
                 _sharedConnection = _factory.CreateConnection();
                 _sharedConnection.ConnectionString = _connectionString;
+
+                _sharedConnection = OnConnectionOpening(_sharedConnection);
 
                 if (_sharedConnection.State == ConnectionState.Broken)
                     _sharedConnection.Close();
@@ -485,14 +488,28 @@ namespace PetaPoco
         /// <inheritdoc />
         public async Task BeginTransactionAsync(CancellationToken cancellationToken)
         {
-            _transactionDepth++;
-
-            if (_transactionDepth == 1)
+            if (_sharedConnection is DbConnection asyncConn)
             {
-                await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
-                _transaction = !_isolationLevel.HasValue ? _sharedConnection.BeginTransaction() : _sharedConnection.BeginTransaction(_isolationLevel.Value);
-                _transactionCancelled = false;
-                OnBeginTransaction();
+                _transactionDepth++;
+
+                if (_transactionDepth == 1)
+                {
+                    await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
+                    _transaction = !_isolationLevel.HasValue
+#if NETSTANDARD2_1
+                        ? await asyncConn.BeginTransactionAsync().ConfigureAwait(false)
+                        : await asyncConn.BeginTransactionAsync(_isolationLevel.Value).ConfigureAwait(false);
+#else
+                        ? _sharedConnection.BeginTransaction() 
+                        : _sharedConnection.BeginTransaction(_isolationLevel.Value);
+#endif
+                    _transactionCancelled = false;
+                    OnBeginTransaction();
+                }
+            }
+            else
+            {
+                BeginTransaction();
             }
         }
 #endif
@@ -519,8 +536,7 @@ namespace PetaPoco
         public void AbortTransaction()
         {
             _transactionCancelled = true;
-            if ((--_transactionDepth) == 0)
-                CleanupTransaction();
+            CompleteTransaction();
         }
 
         /// <inheritdoc />
@@ -529,6 +545,44 @@ namespace PetaPoco
             if ((--_transactionDepth) == 0)
                 CleanupTransaction();
         }
+
+#if ASYNC
+        private async Task CleanupTransactionAsync()
+        {
+#if NETSTANDARD2_1
+            if (_transaction is DbTransaction asyncTrans)
+            {
+                OnEndTransaction();
+
+                if (_transactionCancelled)
+                    await asyncTrans.RollbackAsync().ConfigureAwait(false);
+                else
+                    await asyncTrans.CommitAsync().ConfigureAwait(false);
+
+                _transaction.Dispose();
+                _transaction = null;
+
+                CloseSharedConnection();
+            }
+            else
+#endif
+            {
+                CleanupTransaction();
+            }
+        }
+
+        public Task AbortTransactionAsync()
+        {
+            this._transactionCancelled = true;
+            return CompleteTransactionAsync();
+        }
+
+        public async Task CompleteTransactionAsync()
+        {
+            if ((--_transactionDepth) == 0)
+                await CleanupTransactionAsync().ConfigureAwait(false);
+        }
+#endif
 
 #endregion
 
@@ -540,13 +594,13 @@ namespace PetaPoco
         /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added</param>
         /// <param name="value">The value to assign to the parameter</param>
         /// <param name="pi">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
-        private void AddParam(IDbCommand cmd, object value, PropertyInfo pi)
+        private void AddParam(IDbCommand cmd, object value, PocoColumn pc)
         {
             // Convert value to from poco type to db type
-            if (pi != null)
+            if (pc != null)
             {
-                var mapper = Mappers.GetMapper(pi.DeclaringType, _defaultMapper);
-                var fn = mapper.GetToDbConverter(pi);
+                var mapper = Mappers.GetMapper(pc.PropertyInfo.DeclaringType, _defaultMapper);
+                var fn = mapper.GetToDbConverter(pc.PropertyInfo);
                 if (fn != null)
                     value = fn(value);
             }
@@ -565,20 +619,20 @@ namespace PetaPoco
             {
                 var p = cmd.CreateParameter();
                 p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
-                SetParameterProperties(p, value, pi);
+                SetParameterProperties(p, value, pc);
 
                 cmd.Parameters.Add(p);
             }
         }
 
-        private void SetParameterProperties(IDbDataParameter p, object value, PropertyInfo pi)
+        private void SetParameterProperties(IDbDataParameter p, object value, PocoColumn pc)
         {
             // Assign the parameter value
             if (value == null)
             {
                 p.Value = DBNull.Value;
 
-                if (pi?.PropertyType.Name == "Byte[]")
+                if (pc?.PropertyInfo.PropertyType.Name == "Byte[]")
                     p.DbType = DbType.Binary;
             }
             else
@@ -587,6 +641,18 @@ namespace PetaPoco
                 value = _provider.MapParameterValue(value);
 
                 var t = value.GetType();
+
+                if (t == typeof(string) && pc?.ForceToAnsiString == true)
+                {
+                    t = typeof(AnsiString);
+                    value = value.ToAnsiString();
+                }
+                if (t == typeof(DateTime) && pc?.ForceToDateTime2 == true)
+                {
+                    t = typeof(DateTime2);
+                    value = ((DateTime)value).ToDateTime2();
+                }
+
                 if (t.IsEnum) // PostgreSQL .NET driver wont cast enum to int
                 {
                     p.Value = Convert.ChangeType(value, ((Enum)value).GetTypeCode());
@@ -621,6 +687,12 @@ namespace PetaPoco
                     }
                     // Thanks @DataChomp for pointing out the SQL Server indexing performance hit of using wrong string type on varchar
                     p.DbType = DbType.AnsiString;
+                }
+                else if (t == typeof(DateTime2))
+                {
+                    var dt2Value = (value as DateTime2)?.Value;
+                    p.Value = dt2Value ?? (object)DBNull.Value;
+                    p.DbType = DbType.DateTime2;
                 }
                 else if (value.GetType().Name == "SqlGeography") //SqlGeography is a CLR Type
                 {
@@ -717,6 +789,22 @@ namespace PetaPoco
         {
             var args = new DbConnectionEventArgs(conn);
             ConnectionOpened?.Invoke(this, args);
+            return args.Connection;
+        }        
+        
+        /// <summary>
+        ///     Called before a DB connection is opened
+        /// </summary>
+        /// <param name="conn">The soon-to-be-opened IDbConnection</param>
+        /// <returns>The same or a replacement IDbConnection</returns>
+        /// <remarks>
+        ///     Override this method to provide custom logging of opening connection, or
+        ///     to provide a proxy IDbConnection.
+        /// </remarks>
+        public virtual IDbConnection OnConnectionOpening(IDbConnection conn)
+        {
+            var args = new DbConnectionEventArgs(conn);
+            ConnectionOpening?.Invoke(this, args);
             return args.Connection;
         }
 
@@ -1826,7 +1914,7 @@ namespace PetaPoco
 
                 names.Add(_provider.EscapeSqlIdentifier(i.Key));
                 values.Add(string.Format(i.Value.InsertTemplate ?? "{0}{1}", _paramPrefix, index++));
-                AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+                AddParam(cmd, i.Value.GetValue(poco), i.Value);
             }
 
             var outputClause = string.Empty;
@@ -2083,7 +2171,7 @@ namespace PetaPoco
                     sb.AppendFormat(i.Value.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(i.Key), _paramPrefix, index++);
 
                     // Store the parameter in the command
-                    AddParam(cmd, i.Value.GetValue(poco), i.Value.PropertyInfo);
+                    AddParam(cmd, i.Value.GetValue(poco), i.Value);
                 }
             }
             else
@@ -2098,7 +2186,7 @@ namespace PetaPoco
                     sb.AppendFormat(pc.UpdateTemplate ?? "{0} = {1}{2}", _provider.EscapeSqlIdentifier(colname), _paramPrefix, index++);
 
                     // Store the parameter in the command
-                    AddParam(cmd, pc.GetValue(poco), pc.PropertyInfo);
+                    AddParam(cmd, pc.GetValue(poco), pc);
                 }
 
                 // Grab primary key value
@@ -2110,16 +2198,18 @@ namespace PetaPoco
             }
 
             // Find the property info for the primary key
-            PropertyInfo pkpi = null;
+            //PropertyInfo pkpi = null;
+            PocoColumn col = null;
             if (primaryKeyName != null)
             {
-                PocoColumn col;
-                pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
+                //PocoColumn col;
+                //pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
+                pd.Columns.TryGetValue(primaryKeyName, out col);
             }
 
             cmd.CommandText =
                 $"UPDATE {_provider.EscapeTableName(tableName)} SET {sb} WHERE {_provider.EscapeSqlIdentifier(primaryKeyName)} = {_paramPrefix}{index++}";
-            AddParam(cmd, primaryKeyValue, pkpi);
+            AddParam(cmd, primaryKeyValue, col);
         }
 
 #if ASYNC
@@ -3059,6 +3149,11 @@ namespace PetaPoco
         ///     Occurs when a database connection has been opened.
         /// </summary>
         public event EventHandler<DbConnectionEventArgs> ConnectionOpened;
+        
+        /// <summary>
+        ///     Occurs when a database connection is about to be opened.
+        /// </summary>
+        public event EventHandler<DbConnectionEventArgs> ConnectionOpening;
 
         /// <summary>
         ///     Occurs when a database exception has been thrown.

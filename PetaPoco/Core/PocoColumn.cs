@@ -8,6 +8,8 @@ namespace PetaPoco.Core
         public bool AutoSelectedResultColumn;
         public string ColumnName;
         public bool ForceToUtc;
+        public bool ForceToAnsiString;
+        public bool ForceToDateTime2;
         public PropertyInfo PropertyInfo;
         public bool ResultColumn;
         public string InsertTemplate { get; set; }

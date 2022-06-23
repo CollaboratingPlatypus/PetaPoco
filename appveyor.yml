@@ -5,11 +5,11 @@ branches:
   - development  
 skip_tags: true
 max_jobs: 1
-image: Visual Studio 2017
+image: Visual Studio 2022
 configuration: Release
 environment:
   NUGET_API_KEY:
-    secure: CyBw6is7V/vUqMgcZ0wozOYlF/q0Yl6M6f/OKrpSBzlvg9Fp5tllMw2ac2Tl9AAD
+    secure: sIt7IdqyBb92wgo6gqnwJIKUIPZNuZS/tbxdslVnxOpwz9OIBQQGr7xestuyetP9
 build: off    
 build_script:
 - ps: >-
