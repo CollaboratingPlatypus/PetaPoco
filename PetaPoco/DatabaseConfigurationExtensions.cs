@@ -26,6 +26,7 @@ namespace PetaPoco
         internal const string TransactionEnding = "TransactionEnding";
         internal const string CommandExecuting = "CommandExecuting";
         internal const string CommandExecuted = "CommandExecuted";
+        internal const string ConnectionPreOpened = "ConnectionPreOpened";
         internal const string ConnectionOpened = "ConnectionOpened";
         internal const string ConnectionClosing = "ConnectionClosing";
         internal const string ExceptionThrown = "ExceptionThrown";
@@ -352,6 +353,18 @@ namespace PetaPoco
             return source;
         }
 
+        /// <summary>
+        ///     Specifies an event handler to use when a database connection is about to be opened.
+        /// </summary>
+        /// <param name="source">The configuration source.</param>
+        /// <param name="handler"></param>
+        /// <returns>The configuration source, to form a fluent interface.</returns>
+        public static IDatabaseBuildConfiguration UsingConnectionPreOpened(this IDatabaseBuildConfiguration source, EventHandler<DbConnectionEventArgs> handler)
+        {
+            source.SetSetting(ConnectionPreOpened, handler);
+            return source;
+        }
+        
         /// <summary>
         ///     Specifies an event handler to use when a database connection has been opened.
         /// </summary>
