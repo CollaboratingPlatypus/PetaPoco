@@ -279,7 +279,7 @@ namespace PetaPoco
             settings.TryGetSetting<int>(DatabaseConfigurationExtensions.CommandTimeout, v => CommandTimeout = v);
             settings.TryGetSetting<IsolationLevel>(DatabaseConfigurationExtensions.IsolationLevel, v => IsolationLevel = v);
 
-            settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionPreOpened, v => ConnectionPreOpened += v);
+            settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionOpening, v => ConnectionOpening += v);
             settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionOpened, v => ConnectionOpened += v);
             settings.TryGetSetting<EventHandler<DbConnectionEventArgs>>(DatabaseConfigurationExtensions.ConnectionClosing, v => ConnectionClosing += v);
             settings.TryGetSetting<EventHandler<DbTransactionEventArgs>>(DatabaseConfigurationExtensions.TransactionStarted, v => TransactionStarted += v);
@@ -346,7 +346,7 @@ namespace PetaPoco
                 _sharedConnection = _factory.CreateConnection();
                 _sharedConnection.ConnectionString = _connectionString;
 
-                _sharedConnection = OnConnectionPreOpened(_sharedConnection);
+                _sharedConnection = OnConnectionOpening(_sharedConnection);
 
                 if (_sharedConnection.State == ConnectionState.Broken)
                     _sharedConnection.Close();
@@ -801,10 +801,10 @@ namespace PetaPoco
         ///     Override this method to provide custom logging of opening connection, or
         ///     to provide a proxy IDbConnection.
         /// </remarks>
-        public virtual IDbConnection OnConnectionPreOpened(IDbConnection conn)
+        public virtual IDbConnection OnConnectionOpening(IDbConnection conn)
         {
             var args = new DbConnectionEventArgs(conn);
-            ConnectionPreOpened?.Invoke(this, args);
+            ConnectionOpening?.Invoke(this, args);
             return args.Connection;
         }
 
@@ -3153,7 +3153,7 @@ namespace PetaPoco
         /// <summary>
         ///     Occurs when a database connection is about to be opened.
         /// </summary>
-        public event EventHandler<DbConnectionEventArgs> ConnectionPreOpened;
+        public event EventHandler<DbConnectionEventArgs> ConnectionOpening;
 
         /// <summary>
         ///     Occurs when a database exception has been thrown.
