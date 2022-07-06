@@ -757,6 +757,47 @@ namespace PetaPoco
             return cmd;
         }
 
+        /// <summary>
+        /// Create an IDbDataParameter with default values.
+        /// </summary>
+        /// <returns>The IDbDataParameter</returns>
+        public IDbDataParameter CreateParameter() => _factory.CreateParameter();
+
+        /// <summary>
+        /// Create an IDbDataParameter with the given ParameterName and Value.
+        /// </summary>
+        /// <param name="name">The ParameterName.</param>
+        /// <param name="value">The Value of the parameter.</param>
+        /// <returns></returns>
+        public IDbDataParameter CreateParameter(string name, object value)
+            => CreateParameter(name, value, ParameterDirection.Input);
+
+        /// <summary>
+        /// Create an IDbParameter with the given ParameterName and Direction.
+        /// </summary>
+        /// <param name="name">The ParameterName.</param>
+        /// <param name="direction">The Direction of the parameter.</param>
+        /// <returns></returns>
+        public IDbDataParameter CreateParameter(string name, ParameterDirection direction)
+            => CreateParameter(name, null, direction);
+
+        /// <summary>
+        /// Create an IDbParameter with the given ParameterName, Value, and Direction.
+        /// </summary>
+        /// <param name="name">The ParameterName.</param>
+        /// <param name="value">The Value of the parameter.</param>
+        /// <param name="direction">The Direction of the parameter.</param>
+        /// <returns></returns>
+        public IDbDataParameter CreateParameter(string name, object value, ParameterDirection direction)
+        {
+            var result = CreateParameter();
+            result.ParameterName = name;
+            result.Value = value;
+            result.Direction = direction;
+
+            return result;
+        }
+
 #endregion
 
 #region Exception Reporting and Logging
