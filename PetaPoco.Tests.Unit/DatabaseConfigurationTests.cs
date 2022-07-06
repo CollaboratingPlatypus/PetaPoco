@@ -282,7 +282,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbConnectionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingConnectionOpened(handler).Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingConnectionOpening(handler).Create();
 
             (db as Database).OnConnectionOpening(null);
             eventFired.ShouldBeTrue();
@@ -294,7 +294,7 @@ namespace PetaPoco.Tests.Unit
             bool eventFired = false;
             EventHandler<DbConnectionEventArgs> handler = (sender, args) => eventFired = true;
 
-            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingConnectionOpening(handler).Create();
+            var db = config.UsingConnectionString("cs").UsingProvider<SqlServerDatabaseProvider>().UsingConnectionOpened(handler).Create();
 
             (db as Database).OnConnectionOpened(null);
             eventFired.ShouldBeTrue();
