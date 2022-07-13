@@ -871,8 +871,10 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cmd">The command to be executed</param>
         /// <remarks>
-        ///     Override this method to provide custom logging of commands and/or
-        ///     modification of the IDbCommand before it's executed
+        ///     Override this method to provide custom logging of commands, 
+        ///     modification of the IDbCommand before it's executed, or any
+        ///     other custom actions that should be performed before every
+        ///     command
         /// </remarks>
         public virtual void OnExecutingCommand(IDbCommand cmd)
         {
@@ -883,7 +885,11 @@ namespace PetaPoco
         ///     Called on completion of command execution
         /// </summary>
         /// <param name="cmd">The IDbCommand that finished executing</param>
-        public void OnExecutedCommand(IDbCommand cmd)
+        /// <remarks>
+        ///     Override this method to provide custom logging or other actions
+        ///     after every command has completed.
+        /// </remarks>
+        public virtual void OnExecutedCommand(IDbCommand cmd)
         {
             CommandExecuted?.Invoke(this, new DbCommandEventArgs(cmd));
         }
