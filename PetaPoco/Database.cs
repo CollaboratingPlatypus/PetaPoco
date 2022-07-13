@@ -722,39 +722,88 @@ namespace PetaPoco
         public IDbCommand CreateCommand(IDbConnection connection, CommandType commandType, string sql, params object[] args)
         {
             var cmd = connection.CreateCommand();
-            cmd.Connection = connection;
-            cmd.CommandType = commandType;
-            cmd.Transaction = _transaction;
 
-            switch (commandType)
+            try
             {
-                case CommandType.Text:
-                    // Perform named argument replacements
-                    if (EnableNamedParams)
-                    {
-                        var newArgs = new List<object>();
-                        sql = ParametersHelper.ProcessQueryParams(sql, args, newArgs);
-                        args = newArgs.ToArray();
-                    }
+                cmd.CommandType = commandType;
+                cmd.Transaction = _transaction;
 
-                    // Perform parameter prefix replacements
-                    if (_paramPrefix != "@")
-                        sql = sql.ReplaceParamPrefix(_paramPrefix);
-                    sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
-                    break;
-                case CommandType.StoredProcedure:
-                    args = ParametersHelper.ProcessStoredProcParams(cmd, args, SetParameterProperties);
-                    break;
-                case CommandType.TableDirect:
-                    break;
+                switch (commandType)
+                {
+                    case CommandType.Text:
+                        // Perform named argument replacements
+                        if (EnableNamedParams)
+                        {
+                            var newArgs = new List<object>();
+                            sql = ParametersHelper.ProcessQueryParams(sql, args, newArgs);
+                            args = newArgs.ToArray();
+                        }
+
+                        // Perform parameter prefix replacements
+                        if (_paramPrefix != "@")
+                            sql = sql.ReplaceParamPrefix(_paramPrefix);
+                        sql = sql.Replace("@@", "@"); // <- double @@ escapes a single @
+                        break;
+                    case CommandType.StoredProcedure:
+                        args = ParametersHelper.ProcessStoredProcParams(cmd, args, SetParameterProperties);
+                        break;
+                    case CommandType.TableDirect:
+                        break;
+                }
+
+                cmd.CommandText = sql;
+
+                foreach (var item in args)
+                    AddParam(cmd, item, null);
+
+                return cmd;
             }
+            catch
+            {
+                cmd.Dispose();
+                throw;
+            }
+        }
 
-            cmd.CommandText = sql;
+        /// <summary>
+        /// Create an IDbDataParameter with default values.
+        /// </summary>
+        /// <returns>The IDbDataParameter</returns>
+        public IDbDataParameter CreateParameter() => _factory.CreateParameter();
 
-            foreach (var item in args)
-                AddParam(cmd, item, null);
+        /// <summary>
+        /// Create an IDbDataParameter with the given ParameterName and Value.
+        /// </summary>
+        /// <param name="name">The ParameterName.</param>
+        /// <param name="value">The Value of the parameter.</param>
+        /// <returns></returns>
+        public IDbDataParameter CreateParameter(string name, object value)
+            => CreateParameter(name, value, ParameterDirection.Input);
 
-            return cmd;
+        /// <summary>
+        /// Create an IDbParameter with the given ParameterName and Direction.
+        /// </summary>
+        /// <param name="name">The ParameterName.</param>
+        /// <param name="direction">The Direction of the parameter.</param>
+        /// <returns></returns>
+        public IDbDataParameter CreateParameter(string name, ParameterDirection direction)
+            => CreateParameter(name, null, direction);
+
+        /// <summary>
+        /// Create an IDbParameter with the given ParameterName, Value, and Direction.
+        /// </summary>
+        /// <param name="name">The ParameterName.</param>
+        /// <param name="value">The Value of the parameter.</param>
+        /// <param name="direction">The Direction of the parameter.</param>
+        /// <returns></returns>
+        public IDbDataParameter CreateParameter(string name, object value, ParameterDirection direction)
+        {
+            var result = CreateParameter();
+            result.ParameterName = name;
+            result.Value = value;
+            result.Direction = direction;
+
+            return result;
         }
 
 #endregion
@@ -822,8 +871,10 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cmd">The command to be executed</param>
         /// <remarks>
-        ///     Override this method to provide custom logging of commands and/or
-        ///     modification of the IDbCommand before it's executed
+        ///     Override this method to provide custom logging of commands, 
+        ///     modification of the IDbCommand before it's executed, or any
+        ///     other custom actions that should be performed before every
+        ///     command
         /// </remarks>
         public virtual void OnExecutingCommand(IDbCommand cmd)
         {
@@ -834,7 +885,11 @@ namespace PetaPoco
         ///     Called on completion of command execution
         /// </summary>
         /// <param name="cmd">The IDbCommand that finished executing</param>
-        public void OnExecutedCommand(IDbCommand cmd)
+        /// <remarks>
+        ///     Override this method to provide custom logging or other actions
+        ///     after every command has completed.
+        /// </remarks>
+        public virtual void OnExecutedCommand(IDbCommand cmd)
         {
             CommandExecuted?.Invoke(this, new DbCommandEventArgs(cmd));
         }
