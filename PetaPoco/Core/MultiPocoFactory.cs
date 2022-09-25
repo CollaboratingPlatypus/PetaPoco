@@ -29,7 +29,7 @@ namespace PetaPoco.Internal
             // Build a key
             var key = new ArrayKey<Type>(types);
 
-            return AutoMappers.Get(key, () =>
+            return AutoMappers.GetOrAdd(key, () =>
             {
                 // Create a method
                 var m = new DynamicMethod("petapoco_automapper", types[0], types, true);
@@ -144,7 +144,7 @@ namespace PetaPoco.Internal
         {
             var key = Tuple.Create(typeof(TRet), new ArrayKey<Type>(types), connectionString, sql, r.FieldCount);
 
-            return (Func<IDataReader, object, TRet>) MultiPocoFactories.Get(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper));
+            return (Func<IDataReader, object, TRet>) MultiPocoFactories.GetOrAdd(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper));
         }
     }
 }
