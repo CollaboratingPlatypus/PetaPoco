@@ -9,7 +9,7 @@ namespace PetaPoco.Internal
 
         public static object EnumFromString(Type enumType, string value)
         {
-            Dictionary<string, object> map = _types.Get(enumType, () =>
+            Dictionary<string, object> map = _types.GetOrAdd(enumType, () =>
             {
                 var values = Enum.GetValues(enumType);
 

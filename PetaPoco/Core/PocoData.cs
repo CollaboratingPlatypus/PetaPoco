@@ -101,7 +101,7 @@ namespace PetaPoco.Core
             if (type == typeof(System.Dynamic.ExpandoObject))
                 throw new InvalidOperationException("Can't use dynamic types with this method");
 
-            return _pocoDatas.Get(type, () => new PocoData(type, defaultMapper));
+            return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
         }
 
         private static bool IsIntegralType(Type type)
@@ -116,7 +116,7 @@ namespace PetaPoco.Core
             // Check cache
             var key = Tuple.Create<string, string, int, int>(sql, connectionString, firstColumn, countColumns);
 
-            return PocoFactories.Get(key, () =>
+            return PocoFactories.GetOrAdd(key, () =>
             {
                 // Create the method
                 var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), Type, new Type[] { typeof(IDataReader) }, true);
