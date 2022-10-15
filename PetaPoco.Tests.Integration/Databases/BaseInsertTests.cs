@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
@@ -133,14 +134,14 @@ namespace PetaPoco.Tests.Integration.Databases
         public void Insert_GivenNullByteArray_ShouldNotThrow()
         {
             DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[]) null });
-            DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
+            DB.ExecuteScalar<int>($"SELECT COUNT(*)  FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
         }
 
         [Fact]
         public void Insert_GivenNonNullByteArray_ShouldNotThrow()
         {
             DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
-            DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
+            DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
         }
 
         [Fact]
@@ -327,14 +328,14 @@ namespace PetaPoco.Tests.Integration.Databases
         public async Task InsertAsync_GivenNullByteArray_ShouldNotThrow()
         {
             await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[]) null });
-            (await DB.ExecuteScalarAsync<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
+            (await DB.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
         }
 
         [Fact]
         public async Task InsertAsync_GivenNonNullByteArray_ShouldNotThrow()
         {
             await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
-            (await DB.ExecuteScalarAsync<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
+            (await DB.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
         }
 
         [Fact]

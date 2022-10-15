@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Documentation
 {
-    [Collection("MssqlTests")]
+    [Collection("Mssql")]
     public class Save : BaseDatabase
     {
         public Save()

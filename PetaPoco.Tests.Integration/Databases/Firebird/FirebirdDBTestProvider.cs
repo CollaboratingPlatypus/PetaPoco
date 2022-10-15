@@ -44,6 +44,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
                 be.Execute();
             }
 
+
             return db;
         }
     }

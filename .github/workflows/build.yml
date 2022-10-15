@@ -41,16 +41,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        
       - name: Configure dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: '6.0.x'
+          
       - name: Restore packages
         run: dotnet restore
+        
       - name: Build solution
         run: dotnet build -c Release --no-restore
+        
       - name: Run unit tests
         run: dotnet test PetaPoco.Tests.Unit -c Release --no-build --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+        
       - name: Publish unit test report
         uses: dorny/test-reporter@v1
         if: success() || failure()
@@ -58,8 +63,10 @@ jobs:
           name: Unit Tests
           path: PetaPoco.Tests.Unit/**/*.trx
           reporter: dotnet-trx
+          
       - name: Run integration tests
         run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=Mssql) | (Category=Mysql) | (Category=Firebird)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+        
       - name: Publish integration test report
         uses: dorny/test-reporter@v1
         if: success() || failure()
