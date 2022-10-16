@@ -41,34 +41,36 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        
+
       - name: Configure dotnet
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
-          
+
       - name: Restore packages
         run: dotnet restore
-        
+
       - name: Build solution
         run: dotnet build -c Release --no-restore
-        
+
       - name: Run unit tests
         run: dotnet test PetaPoco.Tests.Unit -c Release --no-build --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
-        
+
       - name: Publish unit test report
-        uses: actions/upload-artifact@v3
+        uses: dorny/test-reporter@v1
         if: ${{ always() }}
         with:
           name: unit-tests
           path: PetaPoco.Tests.Unit/**/*.trx
-          
+          reporter: dotnet-trx
+
       - name: Run integration tests
         run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=Mssql) | (Category=Mysql) | (Category=Firebird)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
-        
-      - name: Publish integration test report
-        uses: actions/upload-artifact@v3
+
+      - name: Publish unit test report
+        uses: dorny/test-reporter@v1
         if: ${{ always() }}
         with:
           name: integration-tests
           path: PetaPoco.Tests.Integration/**/*.trx
+          reporter: dotnet-trx
