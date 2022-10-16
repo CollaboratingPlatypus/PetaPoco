@@ -2,7 +2,7 @@ name: PR Build and Test
 
 on:
   push:
-    branches: [ 'feature/github-actions' ]
+    branches: [ 'feature/petapoco-v7' ]
 
 jobs:
   runner-job:
@@ -57,20 +57,18 @@ jobs:
         run: dotnet test PetaPoco.Tests.Unit -c Release --no-build --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
         
       - name: Publish unit test report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
         with:
-          name: Unit Tests
+          name: unit-tests
           path: PetaPoco.Tests.Unit/**/*.trx
-          reporter: dotnet-trx
           
       - name: Run integration tests
         run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=Mssql) | (Category=Mysql) | (Category=Firebird)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
         
       - name: Publish integration test report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        if: ${{ always() }}
         with:
-          name: Integration Tests
+          name: integration-tests
           path: PetaPoco.Tests.Integration/**/*.trx
-          reporter: dotnet-trx
