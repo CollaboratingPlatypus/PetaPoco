@@ -25,30 +25,34 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="Castle.Core" Version="5.1.0" />
+    <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="Shouldly" Version="4.1.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
       
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" PrivateAssets="none" />
       
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.4" />
 
     <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.10" />
     
-    <PackageReference Include="MySql.Data" Version="8.0.29" />
-    <PackageReference Include="MySqlConnector" Version="2.1.10" />
+    <PackageReference Include="MySql.Data" Version="8.0.31" />
+    <PackageReference Include="MySqlConnector" Version="2.1.13" />
 
-    <PackageReference Include="Npgsql" Version="6.0.4" />
+    <PackageReference Include="Npgsql" Version="6.0.7" />
 
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.0.1" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.0.2" />
   </ItemGroup>
     
   <ItemGroup>

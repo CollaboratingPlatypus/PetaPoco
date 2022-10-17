@@ -33,12 +33,12 @@ namespace PetaPoco.Tests.Unit.Core
             catch (KeyNotFoundException ex)
             {
                 var message = ex.Message;
-                message.ShouldContain(nonExistentName, "missing value to convert");
-                message.ShouldContain(enumType.Name, "missing Enum to convert into");
+                message.ShouldContain(nonExistentName, customMessage: "missing value to convert");
+                message.ShouldContain(enumType.Name, customMessage: "missing Enum to convert into");
                 return;
             }
 
-            Assert.False(true, "Expedted InvalidOperationException");
+            Assert.False(true, "Excepted InvalidOperationException");
         }
 
         private enum FakeEnum
