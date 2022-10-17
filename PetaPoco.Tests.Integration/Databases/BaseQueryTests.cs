@@ -241,10 +241,25 @@ namespace PetaPoco.Tests.Integration.Databases
 
             results.ShouldNotBeEmpty();
 
-            DB.Execute($"ALTER TABLE {orderTable} ADD SomeRandomColumn INT NULL");
+            switch (ProviderName)
+            {
+                case "FirebirdSql.Data.FirebirdClient":
+                    DB.Execute($"ALTER TABLE {orderTable} ADD SomeRandomColumn INTEGER DEFAULT NULL");
+                    break;
+                default:
+                    DB.Execute($"ALTER TABLE {orderTable} ADD SomeRandomColumn INT NULL");
+                    break;
+            }
 
-            results = DB.Query<Order, Person>(testQuery).ToList();
-            results.ShouldNotBeEmpty();
+            try
+            {
+                results = DB.Query<Order, Person>(testQuery).ToList();
+                results.ShouldNotBeEmpty();
+            }
+            finally
+            {
+                DB.Execute($"ALTER TABLE {orderTable} DROP SomeRandomColumn");
+            }
         }
 
         [Fact]
