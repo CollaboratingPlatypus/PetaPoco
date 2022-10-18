@@ -43,10 +43,10 @@ jobs:
         ports:
           - 5003:3306
         env:
-          - MYSQL_ROOT_PASSWORD=petapoco
-          - MYSQL_DATABASE=petapoco
-          - MYSQL_PASSWORD=petapoco
-          - MYSQL_USER=petapoco
+          MYSQL_ROOT_PASSWORD: petapoco
+          MYSQL_DATABASE: petapoco
+          MYSQL_PASSWORD: petapoco
+          MYSQL_USER: petapoco
 
     steps:
       - uses: actions/checkout@v2
