@@ -31,8 +31,8 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
-        protected BaseQueryLinqTests(DBTestProvider provider)
-            : base(provider)
+        protected BaseQueryLinqTests(DBTestProvider dbTestProvider)
+            : base(dbTestProvider)
         {
         }
 

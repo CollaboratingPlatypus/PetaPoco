@@ -10,8 +10,8 @@ namespace PetaPoco.Tests.Integration.Databases
     {
         private readonly PocoData _pd;
 
-        protected BaseExecuteTests(DBTestProvider provider)
-            : base(provider)
+        protected BaseExecuteTests(DBTestProvider dbTestProvider)
+            : base(dbTestProvider)
         {
             _pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
         }

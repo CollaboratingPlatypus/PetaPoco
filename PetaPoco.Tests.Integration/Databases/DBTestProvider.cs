@@ -33,7 +33,7 @@ namespace PetaPoco.Tests.Integration.Databases
             return db;
         }
 
-        public virtual void ExecuteBuildScript(IDatabase database, string script)
+        protected virtual void ExecuteBuildScript(IDatabase database, string script)
         {
             database.Execute(script);
         }
@@ -53,6 +53,16 @@ namespace PetaPoco.Tests.Integration.Databases
         public string GetProviderName(string name)
         {
             return AppSetting.Instance.ConnectionStringFor(name).ProviderName;
+        }
+
+        public virtual void AddColumnToTable(string table, string column, string columnType)
+        {
+            Database.Execute($"ALTER TABLE {Database.Provider.EscapeSqlIdentifier(table)} ADD {Database.Provider.EscapeSqlIdentifier(column)} {columnType} NULL");
+        }
+
+        public virtual void DropColumnFromTable(string table, string column)
+        {
+            Database.Execute($"ALTER TABLE {Database.Provider.EscapeSqlIdentifier(table)} DROP COLUMN {Database.Provider.EscapeSqlIdentifier(column)}");
         }
     }
 }

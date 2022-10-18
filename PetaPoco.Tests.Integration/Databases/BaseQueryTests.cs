@@ -13,8 +13,8 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseQueryTests : BaseDatabase
     {
-        protected BaseQueryTests(DBTestProvider provider)
-            : base(provider)
+        protected BaseQueryTests(DBTestProvider dbTestProvider)
+            : base(dbTestProvider)
         {
         }
 
@@ -241,15 +241,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             results.ShouldNotBeEmpty();
 
-            switch (ProviderName)
-            {
-                case "FirebirdSql.Data.FirebirdClient":
-                    DB.Execute($"ALTER TABLE {orderTable} ADD SomeRandomColumn INTEGER DEFAULT NULL");
-                    break;
-                default:
-                    DB.Execute($"ALTER TABLE {orderTable} ADD SomeRandomColumn INT NULL");
-                    break;
-            }
+            DBTestProvider.AddColumnToTable(pdOrder.TableInfo.TableName, "SomeRandomColumn", "INT");
 
             try
             {
@@ -258,7 +250,7 @@ namespace PetaPoco.Tests.Integration.Databases
             }
             finally
             {
-                DB.Execute($"ALTER TABLE {orderTable} DROP SomeRandomColumn");
+                DBTestProvider.DropColumnFromTable(pdOrder.TableInfo.TableName, "SomeRandomColumn");
             }
         }
 

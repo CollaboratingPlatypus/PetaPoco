@@ -6,17 +6,17 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
     [Collection("Sqlite")]
     public class SqliteDatabaseTests : BaseDatabaseTests
     {
-        private readonly SqliteDBTestProvider _provider;
+        private readonly SqliteDBTestProvider _dbTestProvider;
 
         public SqliteDatabaseTests()
             : this(new SqliteDBTestProvider())
         {
         }
 
-        private SqliteDatabaseTests(SqliteDBTestProvider provider)
-            : base(provider)
+        private SqliteDatabaseTests(SqliteDBTestProvider dbTestProvider)
+            : base(dbTestProvider)
         {
-            _provider = provider;
+            _dbTestProvider = dbTestProvider;
         }
 
         /// <remarks>
@@ -28,7 +28,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
             base.AfterDbCreate(db);
 
             // ReSharper disable once PossibleNullReferenceException
-            db.GetType().GetField("_defaultMapper", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(db, _provider.GetDatabase().DefaultMapper);
+            db.GetType().GetField("_defaultMapper", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(db, _dbTestProvider.GetDatabase().DefaultMapper);
         }
     }
 }

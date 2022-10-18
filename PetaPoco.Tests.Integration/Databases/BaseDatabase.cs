@@ -4,23 +4,23 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseDatabase : IDisposable
     {
-        private DBTestProvider _provider;
+        protected DBTestProvider DBTestProvider { get; set; }
         protected IDatabase DB { get; set; }
         protected string ProviderName { get; private set; }
 
-        protected BaseDatabase(DBTestProvider provider)
+        protected BaseDatabase(DBTestProvider dbTestProvider)
         {
-            _provider = provider;
-            DB = _provider.Execute();
-            ProviderName = _provider.ProviderName;
+            DBTestProvider = dbTestProvider;
+            DB = dbTestProvider.Execute();
+            ProviderName = dbTestProvider.ProviderName;
         }
 
         public void Dispose()
         {
             if (DB != null)
             {
-                _provider.Dispose();
-                _provider = null;
+                DBTestProvider.Dispose();
+                DBTestProvider = null;
                 DB.Dispose();
                 DB = null;
             }

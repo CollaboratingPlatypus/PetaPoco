@@ -9,7 +9,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSAccessBuildDatabase.sql";
 
-        public override void ExecuteBuildScript(IDatabase database, string script)
+        protected override void ExecuteBuildScript(IDatabase database, string script)
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {

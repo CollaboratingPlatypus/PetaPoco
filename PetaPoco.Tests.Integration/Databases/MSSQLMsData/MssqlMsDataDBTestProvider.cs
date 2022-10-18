@@ -16,7 +16,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             return base.Execute();
         }
 
-        public override void ExecuteBuildScript(IDatabase database, string script)
+        protected override void ExecuteBuildScript(IDatabase database, string script)
         {
             script.Split(new[] { "GO" }, StringSplitOptions.RemoveEmptyEntries).ToList().ForEach(s => { base.ExecuteBuildScript(database, s); });
         }

@@ -47,5 +47,15 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
 
             return db;
         }
+
+        public override void AddColumnToTable(string table, string column, string columnType)
+        {
+            Database.Execute($"ALTER TABLE {Database.Provider.EscapeSqlIdentifier(table)} ADD {Database.Provider.EscapeSqlIdentifier(column)} {columnType} DEFAULT NULL");
+        }
+
+        public override void DropColumnFromTable(string table, string column)
+        {
+            Database.Execute($"ALTER TABLE {Database.Provider.EscapeSqlIdentifier(table)} DROP {Database.Provider.EscapeSqlIdentifier(column)}");
+        }
     }
 }

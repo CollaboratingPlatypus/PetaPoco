@@ -17,8 +17,8 @@ namespace PetaPoco.Tests.Integration.Databases
             CreatedOn = new DateTime(1955, 1, 11, 4, 2, 4, DateTimeKind.Utc)
         };
 
-        protected BaseDatabaseTests(DBTestProvider provider)
-            : base(provider)
+        protected BaseDatabaseTests(DBTestProvider dbTestProvider)
+            : base(dbTestProvider)
         {
         }
 
