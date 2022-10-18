@@ -11,7 +11,7 @@ namespace PetaPoco.Tests.Integration
       public BeforeAnyTestRuns(IMessageSink messageSink)
         :base(messageSink)
       {
-        Shouldly.ShouldlyConfiguration.DefaultTaskTimeout = TimeSpan.FromSeconds(30);
+        Shouldly.ShouldlyConfiguration.DefaultTaskTimeout = TimeSpan.FromSeconds(60);
       }
    }
 }
