@@ -3,6 +3,7 @@
 namespace PetaPoco.Tests.Integration.Databases.MariaDb
 {
     [Collection("MariaDb")]
+    [Trait("Category", "MariaDb")]
     public class MariaDbQueryLinqTests : BaseQueryLinqTests
     {
         public MariaDbQueryLinqTests()

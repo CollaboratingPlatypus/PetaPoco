@@ -65,7 +65,7 @@ jobs:
           reporter: dotnet-trx
 
       - name: Run integration tests
-        run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=Mssql) | (Category=MssqlMsData) | (Category=Mysql) | (Category=MysqlConnector) | (Category=Firebird) | (Category=Sqlite)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
+        run: dotnet test PetaPoco.Tests.Integration -c Release --filter "(Category=Postgres) | (Category=MariaDb) | (Category=Mssql) | (Category=MssqlMsData) | (Category=Mysql) | (Category=MySqlConnector) | (Category=Firebird) | (Category=Sqlite)" --logger "console;verbosity=detailed" --logger:trx --verbosity=normal
 
       - name: Publish unit test report
         uses: dorny/test-reporter@v1

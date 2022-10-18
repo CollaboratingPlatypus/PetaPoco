@@ -4,6 +4,7 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
 {
     [Collection("Sqlite")]
+    [Trait("Category", "Sqlite")]
     public class SqliteDatabaseTests : BaseDatabaseTests
     {
         private readonly SqliteDBTestProvider _dbTestProvider;

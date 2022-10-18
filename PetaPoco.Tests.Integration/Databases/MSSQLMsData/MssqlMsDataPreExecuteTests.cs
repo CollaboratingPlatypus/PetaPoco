@@ -10,6 +10,7 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
     [Collection("MssqlMsData")]
+    [Trait("Category", "MssqlMsData")]
     public class MssqlMsDataPreExecuteTests : BaseDatabase
     {
         public MssqlMsDataPreExecuteDatabaseProvider Provider => DB.Provider as MssqlMsDataPreExecuteDatabaseProvider;
@@ -196,5 +197,5 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
         public class PreExecuteException : Exception { }
     }
 
-    
+
 }
