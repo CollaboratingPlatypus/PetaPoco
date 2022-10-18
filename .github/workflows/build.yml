@@ -38,6 +38,16 @@ jobs:
           ISC_PASSWORD: petapoco
         ports:
           - 5004:3050
+      mariadb:
+        image: mariadb:latest
+        container_name: mariadb_petapoco
+        ports:
+          - "5003:3306"
+        environment:
+          - MYSQL_ROOT_PASSWORD=petapoco
+          - MYSQL_DATABASE=petapoco
+          - MYSQL_PASSWORD=petapoco
+          - MYSQL_USER=petapoco
 
     steps:
       - uses: actions/checkout@v2
