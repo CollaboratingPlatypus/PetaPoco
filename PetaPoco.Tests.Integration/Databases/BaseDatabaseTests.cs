@@ -78,23 +78,6 @@ namespace PetaPoco.Tests.Integration.Databases
             }
         }
 
-#if !NETCOREAPP
-        [Fact]
-        public void Construct_GivenConnectionStringName_ShouldBeValid()
-        {
-            var connectionString = DB.ConnectionString;
-            var entry = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>().FirstOrDefault(c => c.ConnectionString.Equals(connectionString));
-
-            using (var db = new Database(entry.Name))
-            {
-                AfterDbCreate(db);
-                var key = db.Insert(_note);
-                var otherNote = db.SingleOrDefault<Note>(key);
-                _note.ShouldBe(otherNote);
-            }
-        }
-#endif
-
         [Fact]
         public void Construct_GivenConnectionStringAndProvider_ShouldBeValid()
         {

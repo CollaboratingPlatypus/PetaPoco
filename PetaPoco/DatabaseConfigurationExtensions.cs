@@ -15,11 +15,6 @@ namespace PetaPoco
         internal const string Provider = "Provider";
         internal const string ConnectionString = "ConnectionString";
         internal const string ProviderName = "ProviderName";
-
-#if !NETSTANDARD
-        internal const string ConnectionStringName = "ConnectionStringName";
-#endif
-
         internal const string DefaultMapper = "DefaultMapper";
         internal const string IsolationLevel = "IsolationLevel";
         internal const string TransactionStarted = "TransactionStarted";
@@ -179,23 +174,6 @@ namespace PetaPoco
             source.SetSetting(ConnectionString, connectionString);
             return source;
         }
-
-#if !NETSTANDARD
-        /// <summary>
-        ///     Adds a connection string name.
-        /// </summary>
-        /// <param name="source">The configuration source.</param>
-        /// <param name="connectionStringName">The connection string name.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="connectionStringName" /> is null or empty.</exception>
-        /// <returns>The configuration source, to form a fluent interface.</returns>
-        public static IDatabaseBuildConfiguration UsingConnectionStringName(this IDatabaseBuildConfiguration source, string connectionStringName)
-        {
-            if (string.IsNullOrEmpty(connectionStringName))
-                throw new ArgumentException("Argument is null or empty", nameof(connectionStringName));
-            source.SetSetting(ConnectionStringName, connectionStringName);
-            return source;
-        }
-#endif
 
         /// <summary>
         ///     Adds a provider name string - see <see cref="DatabaseProvider.Resolve(string, bool, string)" />.
@@ -364,7 +342,7 @@ namespace PetaPoco
             source.SetSetting(ConnectionOpening, handler);
             return source;
         }
-        
+
         /// <summary>
         ///     Specifies an event handler to use when a database connection has been opened.
         /// </summary>

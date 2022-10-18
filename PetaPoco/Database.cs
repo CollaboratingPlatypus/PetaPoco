@@ -413,13 +413,8 @@ namespace PetaPoco
                 {
                     await OpenSharedConnectionAsync(cancellationToken).ConfigureAwait(false);
                     _transaction = !_isolationLevel.HasValue
-#if NETSTANDARD2_1
                         ? await asyncConn.BeginTransactionAsync().ConfigureAwait(false)
                         : await asyncConn.BeginTransactionAsync(_isolationLevel.Value).ConfigureAwait(false);
-#else
-                        ? _sharedConnection.BeginTransaction() 
-                        : _sharedConnection.BeginTransaction(_isolationLevel.Value);
-#endif
                     _transactionCancelled = false;
                     OnBeginTransaction();
                 }
@@ -462,10 +457,8 @@ namespace PetaPoco
                 CleanupTransaction();
         }
 
-#if ASYNC
         private async Task CleanupTransactionAsync()
         {
-#if NETSTANDARD2_1
             if (_transaction is DbTransaction asyncTrans)
             {
                 OnEndTransaction();
@@ -481,7 +474,6 @@ namespace PetaPoco
                 CloseSharedConnection();
             }
             else
-#endif
             {
                 CleanupTransaction();
             }
@@ -498,7 +490,6 @@ namespace PetaPoco
             if ((--_transactionDepth) == 0)
                 await CleanupTransactionAsync().ConfigureAwait(false);
         }
-#endif
 
 #endregion
 
@@ -755,8 +746,8 @@ namespace PetaPoco
             var args = new DbConnectionEventArgs(conn);
             ConnectionOpened?.Invoke(this, args);
             return args.Connection;
-        }        
-        
+        }
+
         /// <summary>
         ///     Called before a DB connection is opened
         /// </summary>
@@ -787,7 +778,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cmd">The command to be executed</param>
         /// <remarks>
-        ///     Override this method to provide custom logging of commands, 
+        ///     Override this method to provide custom logging of commands,
         ///     modification of the IDbCommand before it's executed, or any
         ///     other custom actions that should be performed before every
         ///     command
@@ -1397,7 +1388,7 @@ namespace PetaPoco
                 {
                     IDataReader reader;
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
-                    
+
                     try
                     {
                         reader = await ExecuteReaderHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
@@ -2012,7 +2003,7 @@ namespace PetaPoco
         /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
             => Update(tableName, primaryKeyName, poco, null, columns);
-        
+
         /// <inheritdoc />
         public int Update(object poco, IEnumerable<string> columns)
             => Update(poco, null, columns);
@@ -2992,7 +2983,7 @@ namespace PetaPoco
         }
 
         private object CommandHelper(IDbCommand cmd, Func<IDbCommand, object> cmdFunc)
-        {            
+        {
             DoPreExecute(cmd);
             var result = cmdFunc(cmd);
             OnExecutedCommand(cmd);
@@ -3003,7 +2994,7 @@ namespace PetaPoco
         {
             if (cmd is DbCommand dbCommand)
             {
-                var task = CommandHelper(cancellationToken, dbCommand, 
+                var task = CommandHelper(cancellationToken, dbCommand,
                     async (t, c) => await c.ExecuteReaderAsync(t).ConfigureAwait(false));
                 return (IDataReader)await task.ConfigureAwait(false);
             }
@@ -3015,7 +3006,7 @@ namespace PetaPoco
         {
             if (cmd is DbCommand dbCommand)
             {
-                var task = CommandHelper(cancellationToken, dbCommand, 
+                var task = CommandHelper(cancellationToken, dbCommand,
                     async (t, c) => await c.ExecuteNonQueryAsync(t).ConfigureAwait(false));
                 return (int)await task.ConfigureAwait(false);
             }
@@ -3026,19 +3017,19 @@ namespace PetaPoco
         internal protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
         {
             if (cmd is DbCommand dbCommand)
-                return CommandHelper(cancellationToken, dbCommand, 
-                    async (t, c) => await c.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false));                
+                return CommandHelper(cancellationToken, dbCommand,
+                    async (t, c) => await c.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false));
             else
                 return Task.FromResult(ExecuteScalarHelper(cmd));
         }
 
-        private async Task<object> CommandHelper(CancellationToken cancellationToken, DbCommand cmd, 
+        private async Task<object> CommandHelper(CancellationToken cancellationToken, DbCommand cmd,
             Func<CancellationToken, DbCommand, Task<object>> cmdFunc)
         {
             DoPreExecute(cmd);
             var result = await cmdFunc(cancellationToken, cmd).ConfigureAwait(false);
             OnExecutedCommand(cmd);
-            return result;            
+            return result;
         }
 
         #endregion
@@ -3074,7 +3065,7 @@ namespace PetaPoco
         ///     Occurs when a database connection has been opened.
         /// </summary>
         public event EventHandler<DbConnectionEventArgs> ConnectionOpened;
-        
+
         /// <summary>
         ///     Occurs when a database connection is about to be opened.
         /// </summary>

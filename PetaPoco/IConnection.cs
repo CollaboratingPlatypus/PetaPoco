@@ -35,12 +35,10 @@ namespace PetaPoco
         /// <seealso cref="Database.KeepConnectionAlive" />
         void OpenSharedConnection();
 
-#if !NET40
         /// <summary>
         ///     The async version of <see cref="Database.OpenSharedConnection" />.
         /// </summary>
         Task OpenSharedConnectionAsync();
-#endif
 
         /// <summary>
         ///     Releases the shared connection.
