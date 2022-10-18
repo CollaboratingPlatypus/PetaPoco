@@ -18,16 +18,6 @@ services:
       - MYSQL_DATABASE=petapoco
       - MYSQL_PASSWORD=petapoco
       - MYSQL_USER=petapoco
-  mysqlConnector:
-    image: mysql:latest
-    container_name: mysqlconnector_petapoco
-    ports:
-      - "5006:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=petapoco
-      - MYSQL_DATABASE=petapoco
-      - MYSQL_PASSWORD=petapoco
-      - MYSQL_USER=petapoco
   mariadb:
     image: mariadb:latest
     container_name: mariadb_petapoco
