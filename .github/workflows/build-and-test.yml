@@ -24,4 +24,4 @@ jobs:
       - name: checkout-source
         uses: actions/checkout@v2
 
-      - uses: './.github/workflows/workflow-build-and-test.yml'
+      - uses: ./.github/actions/workflow-build-and-test.yml
