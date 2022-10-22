@@ -26,3 +26,4 @@ jobs:
 
   build-and-test:
     uses: ./.github/workflows/workflow-build-and-test.yml
+    secrets: inherit
