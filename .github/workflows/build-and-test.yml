@@ -15,5 +15,6 @@ jobs:
     timeout-minutes: 25
 
     steps:
-      - uses: ./.github/workflows/workflow-build-and-test.yml
       - uses: actions/checkout@v2
+
+      - uses: ./.github/workflows/workflow-build.yml
