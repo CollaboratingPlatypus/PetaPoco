@@ -1,8 +1,8 @@
 name: Build, Test and Deploy
 
 on:
-  push:
-    branches:
+#  push:
+#    branches:
 #      - 'feature/petapoco-v7'
 #      - main
 #  pull_requests:
