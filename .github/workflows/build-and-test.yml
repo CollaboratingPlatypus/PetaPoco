@@ -18,8 +18,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  checkout-source:
-    uses: actions/checkout@v2
-
   build-and-test:
-    uses: ./.github/workflows/workflow-build-and-test.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-source
+        uses: actions/checkout@v2
+
+      - uses: ./.github/workflows/workflow-build-and-test
