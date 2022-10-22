@@ -51,8 +51,6 @@ jobs:
           MYSQL_USER: petapoco
 
     steps:
-      - uses: actions/checkout@v2
-
       - name: Configure dotnet
         uses: actions/setup-dotnet@v3
         with:
