@@ -7,16 +7,19 @@ on:
 #      - main
 #  pull_requests:
 #    branches:
-#      - main
+#      - main'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
 
 jobs:
-  initialisation:
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v2
+  checkout-source:
+    uses: actions/checkout@v2
 
   build-and-test:
-      uses: ./.github/workflows/workflow-build-and-test.yml
+    uses: ./.github/workflows/workflow-build-and-test.yml
