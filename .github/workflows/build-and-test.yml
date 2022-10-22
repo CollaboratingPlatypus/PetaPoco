@@ -25,4 +25,4 @@ jobs:
         uses: actions/checkout@v2
 
   build-and-test:
-    uses: ./.github/actions/workflow-build-and-test.yml
+    uses: ./.github/actions/workflow-build-and-test
