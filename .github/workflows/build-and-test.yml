@@ -10,7 +10,7 @@ on:
 #      - main
 
 jobs:
-  runner-job:
+  initialisation:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -18,4 +18,5 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
 
-      - uses: ./.github/workflows/workflow-build-and-test.yml
+  build-and-test:
+      uses: ./.github/workflows/workflow-build-and-test.yml
