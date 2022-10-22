@@ -1,12 +1,14 @@
-name: PR Build and Test
+name: Build and Test
 
 on:
-  push:
-    branches: [ 'feature/petapoco-v7' ]
+  workflow_call:
+    secrets: inherit
 
 jobs:
   runner-job:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+
     services:
       postgres:
         image: postgres

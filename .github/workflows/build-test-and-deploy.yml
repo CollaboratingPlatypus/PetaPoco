@@ -1,0 +1,19 @@
+name: Build, Test and Deploy
+
+on:
+  push:
+    branches:
+#      - 'feature/petapoco-v7'
+#      - main
+#  pull_requests:
+#    branches:
+#      - main
+
+jobs:
+  runner-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: ./.github/workflows/workflow-build.yml
+      - uses: actions/checkout@v2

@@ -17,8 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{11F3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{2C2E04C0-91CF-4483-B331-43E30E0883FD}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\build.yml = .github\workflows\build.yml
-		.github\workflows\pr.yml = .github\workflows\pr.yml
+		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
+		.github\workflows\build-test-and-deploy.yml = .github\workflows\build-test-and-deploy.yml
+		.github\workflows\workflow-build-and-test.yml = .github\workflows\workflow-build-and-test.yml
 	EndProjectSection
 EndProject
 Global
