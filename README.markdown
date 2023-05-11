@@ -4,7 +4,7 @@
 
 Originally the brainchild of [Brad Robinson]. 
 
-PetaPoco is currently maintained and exteneded by Wade Baglin (@pleb) and Aaron Sherber (@asherber).
+PetaPoco is maintained and extended by Wade Baglin (@pleb) and Aaron Sherber (@asherber).
 
 ## Version 6 - Netstandard 2.0+, 4.0, 4.5+
 
@@ -40,16 +40,16 @@ For configuration, code examples and other general information [See the docs]
 * Like [Massive], it now also supports dynamic Expandos too
 * Like [ActiveRecord], it supports a close relationship between object and database table
 * Like [SubSonic], it supports generation of poco classes with T4 templates (V5 only)
-* Like [Massive] it's available as single file that you easily add to any project or complied. (V5 only)
+* Like [Massive] it's available as a single file that you easily add to any project or complied. (V5 only)
 
 ## Features at a Glance
 
 * Tiny, and absolutely no dependencies!
-* Asychronise or synchronise, the choice is yours. (aka async) (V6)
+* Asychronise or synchronise; the choice is yours. (aka async) (V6)
 * Works with strictly undecorated POCOs, or attributed almost-POCOs.
 * Easy to configure and includes [fluent configuration] out of the box.
 * Helper methods for Insert/Delete/Update/Save and IsNew
-* Paged requests automatically work out total record count and fetch a specific page.
+* Paged requests automatically work out the total record count and fetch a specific page.
 * Easy transaction support.
 * Better parameter replacement support, including grabbing named parameters from object properties.
 * Great performance by eliminating Linq and fast property assignment with DynamicMethod generation.
@@ -57,7 +57,7 @@ For configuration, code examples and other general information [See the docs]
 * Includes a low friction SQL builder class that makes writing inline SQL *much* easier.
 * Includes T4 templates to automatically generate POCO classes for you. (V5)
 * Hooks for logging exceptions, installing value converters and mapping columns to properties without attributes.
-* Works with SQL Server, SQL Server CE, MS Access, SQLite, MySQL, MariaDB, Firebird, and PostgreSQL. (Oracle supported but does not have integration tests).
+* Works with SQL Server, SQL Server CE, MS Access, SQLite, MySQL, MariaDB, Firebird, and PostgreSQL. (Oracle is supported but does not have integration tests).
 * Works under Net Standard 2.0, .NET 4.0/4.5+ or Mono 2.8 and later.
 * Has [Xunit] unit tests.
 * Has supported DBs integration tests.
@@ -108,4 +108,4 @@ PetaPoco welcomes input from the community. After all, what is a product without
 
 ## Contributions Honour Roll
 
-A product like PetaPoco isn't the effort of one person, but rather a combined effort of many. For those individuals who rise above and beyond [we have a special place to honour them].
+A product like PetaPoco isn't the effort of one person but rather a combined effort of many. For those individuals who rise above and beyond [we have a special place to honour them].
