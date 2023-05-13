@@ -47,10 +47,15 @@ namespace PetaPoco.Internal
                         if (candidates.Length > 1)
                             throw new InvalidOperationException(string.Format("Can't auto join {0} as {1} has more than one property of type {0}", types[i], types[j]));
 
+                        // Find the Set method
+                        var setMethod = candidates.First().GetSetMethod(true);
+                        if (setMethod == null)
+                            throw new InvalidOperationException(candidates.First().Name + " is either missing a Set method, or the Set method is readonly. If this is intentional, decorate the property with the `PetaPoco.IgnoreAttribute`.");
+
                         // Generate code
                         il.Emit(OpCodes.Ldarg_S, j);
                         il.Emit(OpCodes.Ldarg_S, i);
-                        il.Emit(OpCodes.Callvirt, candidates.First().GetSetMethod(true));
+                        il.Emit(OpCodes.Callvirt, setMethod);
                         handled = true;
                     }
 

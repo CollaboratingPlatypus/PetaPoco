@@ -224,6 +224,21 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        public void Query_ForPocoWithPropertyMissingSetMethod_ShouldThrow()
+        {
+            AddPeople(1, 1);
+
+            var pdPerson = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+
+            var dbPeople = DB.Provider.EscapeTableName(pdPerson.TableInfo.TableName);
+            var pFullName = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Name)).ColumnName);
+
+            var sql = new Sql($"SELECT {pFullName} FROM {dbPeople}");
+
+            Should.Throw<InvalidOperationException>(() => DB.Query<ReadOnlyPoco>(sql).ToList());
+        }
+
+        [Fact]
         public void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
         {
             AddOrders(1);
@@ -246,6 +261,28 @@ namespace PetaPoco.Tests.Integration.Databases
 
             results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();
+        }
+
+        [Fact]
+        public void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
+        {
+            AddOrders(1);
+
+            var pdOrder = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var pdPerson = PocoData.ForType(typeof(Person), DB.DefaultMapper);
+
+            var dbOrders = DB.Provider.EscapeTableName(pdOrder.TableInfo.TableName);
+            var dbPeople = DB.Provider.EscapeTableName(pdPerson.TableInfo.TableName);
+
+            var oId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Order.Id)).ColumnName);
+            var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Id)).ColumnName);
+
+            var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Order.PersonId)).ColumnName);
+            var pFullName = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Name)).ColumnName);
+
+            var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} o JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
+
+            Should.Throw<InvalidOperationException>(() => DB.Fetch<ReadOnlyMultiPoco, Person>(sql).ToList());
         }
 
         [Fact]
