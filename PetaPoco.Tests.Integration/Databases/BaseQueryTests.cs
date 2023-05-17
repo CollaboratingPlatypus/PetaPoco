@@ -242,7 +242,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
             results.ShouldNotBeEmpty();
 
-            DB.Execute($"ALTER TABLE {orderTable} ADD [SomeRandomColumn] INT NULL");
+            DB.Execute($"ALTER TABLE {orderTable} ADD `[SomeRandomColumn]` INT NULL");
 
             results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();
