@@ -19,7 +19,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual void Page_SqlCountStatmentNotWoksCorrectlyWithGroupBy()
+        public virtual void PageCount_GivenSqlWithGroupBy_ShouldReturnEntireQueryCount()
         {
             // Add duplicate names
             AddPeople(15, 5);
@@ -46,7 +46,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var page = DB.Page<Person>(2, 3, sql);
 
             fetchResult.Count.ShouldBe(correctNumberOfTotalItems);
-            page.TotalItems.ShouldBe(fetchResult.Count, $"Statment {sqlParts.SqlCount} is not correct. Correct syntax is {correctSyntax}");
+            page.TotalItems.ShouldBe(fetchResult.Count, $"Statement {sqlParts.SqlCount} is not correct. Correct syntax is {correctSyntax}");
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual void Page_ForPocoSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        public virtual void Page_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
             AddPeople(15, 5);
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
@@ -99,7 +99,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async Task PageAsync_ForPocoSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        public virtual async Task PageAsync_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
             AddPeople(15, 5);
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);

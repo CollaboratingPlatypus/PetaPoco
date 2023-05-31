@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.IO;
 using System.Text;
@@ -67,7 +67,6 @@ namespace PetaPoco.Tests.Integration.Databases
 #else
             return ConfigurationManager.ConnectionStrings[name].ProviderName;
 #endif
-
         }
     }
 }

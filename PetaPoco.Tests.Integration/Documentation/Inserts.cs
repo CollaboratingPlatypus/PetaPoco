@@ -33,7 +33,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.Single<Person>(id);
 
-            // See, they're are the same
+            // See, they are the same
             clone.ShouldBe(person);
 
             // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
@@ -65,7 +65,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.Single<Order>(id);
 
-            // See, they're are the same
+            // See, they are the same
             clone.ShouldBe(order);
 
             // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
@@ -95,7 +95,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: we can't use auto select builder here because PetaPoco would create columns such as People.Id
             clone = DB.Query<Person>("SELECT * FROM [SpecificPeople] sp WHERE sp.[Id] = @0", id).Single();
 
-            // See, they're are the same
+            // See, they are the same
             clone.ShouldBe(person);
 
             // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
@@ -110,7 +110,7 @@ namespace PetaPoco.Tests.Integration.Documentation
 
             // Insert some notes using all APIs
 
-            // Each of the API usuages here are effectively the same, as PetaPoco is providing the correct unknown values. 
+            // Each of the API usuages here are effectively the same, as PetaPoco is providing the correct unknown values.
             // This is because the poco has been mapped by convention and therefore PetaPoco understands how to do this.
             var id1 = DB.Insert(new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) });
             var id2 = DB.Insert("Note", new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) });
@@ -140,7 +140,7 @@ namespace PetaPoco.Tests.Integration.Documentation
                          )");
 
             // This POCO is unconventional because, when using the default conventional mapper, PetaPoco won't understand how this poco maps to the database.
-            // To understand the power of unconventional mapping, a developer could configure it to work in this situation. 
+            // To understand the power of unconventional mapping, a developer could configure it to work in this situation.
             var poco = new UnconventionalPoco { Text = "PetaPoco" };
 
             // Insert the poco
@@ -149,7 +149,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.Query<UnconventionalPoco>("SELECT * FROM [TBL_UnconventionalPocos] WHERE [PrimaryKey] = @0", id).Single();
 
-            // See, they're are the same
+            // See, they are the same
             clone.ShouldBe(poco);
 
             // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
@@ -192,7 +192,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.SingleOrDefault<UnconventionalPoco>(id);
 
-            // See, they're are the same
+            // See, they are the same
             clone.ShouldBe(poco);
 
             // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
@@ -218,10 +218,10 @@ namespace PetaPoco.Tests.Integration.Documentation
             var id = DB.Insert("XFiles", "Id", true, xfile);
 
             // Get a clone/copy from the DB
-            // Note: Check out the name parameters - cool eh?
+            // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they're are the same
+            // See, they are the same
             id.ShouldBe((int) clone.Id);
             xfile.FileName.ShouldBe((string) clone.FileName);
         }
@@ -238,7 +238,7 @@ namespace PetaPoco.Tests.Integration.Documentation
 	                         [FileName] VARCHAR(255) NOT NULL
                          )");
 
-            // Dynamics type are friend of PetaPoco
+            // Dynamic types are PetaPoco's friend
             dynamic xfile = new System.Dynamic.ExpandoObject();
             xfile.FileName = "Agent Mulder.sec";
 
@@ -246,10 +246,10 @@ namespace PetaPoco.Tests.Integration.Documentation
             var id = DB.Insert("XFiles", "Id", true, (object) xfile);
 
             // Get a clone/copy from the DB
-            // Note: Check out the name parameters - cool eh?
+            // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they're are the same
+            // See, they are the same
             id.ShouldBe((int) clone.Id);
             ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }

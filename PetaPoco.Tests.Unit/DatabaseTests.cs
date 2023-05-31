@@ -166,7 +166,7 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
-        public void IsNew_GivenTransientEntity_ShoudlBeTrue()
+        public void IsNew_GivenTransientEntity_ShouldBeTrue()
         {
             DB.IsNew(new GenericIdEntity<Guid>()).ShouldBeTrue();
             DB.IsNew(new GenericIdEntity<Guid?>()).ShouldBeTrue();

@@ -36,10 +36,6 @@ END!!
 SET TERM ; !!
 
 
-
-
-
-
 SET TERM !! ;
 EXECUTE BLOCK AS BEGIN
 	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'OrderLines'))	then execute statement 'DROP TABLE "OrderLines";';
@@ -272,8 +268,8 @@ BEGIN
 END!!
 SET TERM ; !!
 
-
 -- Stored procedures
+
 SET TERM !! ;
 CREATE PROCEDURE SelectPeople
 RETURNS (id varchar(100), fullname varchar(100), age integer)

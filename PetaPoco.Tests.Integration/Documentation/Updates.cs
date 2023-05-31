@@ -57,7 +57,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get the poco data
             var pocoData = PocoData.ForType(person.GetType(), DB.DefaultMapper);
 
-            // Tell PetaPoco to update only ther person's name
+            // Tell PetaPoco to update only the person's name
             // The update statement produced is `UPDATE [People] SET [FullName] = @0 WHERE [Id] = @1`
             DB.Update(person, new[] { pocoData.GetColumnName(nameof(Person.Name)) });
 
@@ -76,7 +76,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void UpdateToDifferentTable()
         {
-            // Create the and insert the person
+            // Create and insert the person
             var person = new Person { Id = Guid.NewGuid(), Name = "PetaPoco", Dob = new DateTime(2011, 1, 1), Age = (DateTime.Now.Year - 2011), Height = 242 };
             var id = DB.Insert("SpecificPeople", "Id", person);
 
@@ -106,20 +106,21 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Clear out any notes and reset the ID sequence counter
             DB.Execute("TRUNCATE TABLE [Note]");
 
-            // Insert some notes using all APIs
+            // Create some notes
             var note1 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
             var note2 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
             var note3 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
             var note4 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
             var note5 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
 
-            // Each of the API usuages here are effectively the same, as PetaPoco is providing the correct unknown values. 
+            // Now we insert them using all APIs
+            // Each of the API usages here are effectively the same, as PetaPoco is providing the correct unknown values.
             // This is because the poco has been mapped by convention and therefore PetaPoco understands how to do this.
             DB.Insert(note1);
             DB.Insert(note2);
-            DB.Insert(note3);
-            DB.Insert(note4);
-            DB.Insert(note5);
+            DB.Insert("Note", note3);
+            DB.Insert("Note", "Id", note4);
+            DB.Insert("Note", "Id", true, note5);
 
             //Update the notes
             note1.Text += " some more text";
@@ -160,7 +161,7 @@ namespace PetaPoco.Tests.Integration.Documentation
                          )");
 
             // This POCO is unconventional because, when using the default conventional mapper, PetaPoco won't understand how this poco maps to the database.
-            // To understand the power of unconventional mapping, a developer could configure it to work in this situation. 
+            // To understand the power of unconventional mapping, a developer could configure it to work in this situation.
             var poco = new UnconventionalPoco { Text = "PetaPoco" };
 
             // Insert the poco
@@ -168,6 +169,8 @@ namespace PetaPoco.Tests.Integration.Documentation
 
             // Update the poco
             poco.Text += " some more text";
+
+            // Update the database with the poco's changes
             DB.Update("TBL_UnconventionalPocos", "PrimaryKey", poco);
 
             // Get a clone/copy from the DB
@@ -214,16 +217,16 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.SingleOrDefault<UnconventionalPoco>(id);
 
-            // See, they're are the same
+            // See, they are the same
             clone.ShouldBe(poco);
 
             // Update the original poco
             poco.Text += " some more text";
 
-            // Update the poco
+            // Update the database with the poco's changes
             DB.Update(poco);
 
-            // Get the clone from teh database again
+            // Get the clone from the database again
             clone = DB.SingleOrDefault<UnconventionalPoco>(id);
 
             // Confirm the text was updated
@@ -251,14 +254,14 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Update the poco
             xfile = new { FileName = "Agent Mulder.sec" };
 
-            // Update the database
+            // Update the database with the poco's changes
             DB.Update("XFiles", "Id", xfile);
 
             // Get a clone/copy from the DB
-            // Note: Check out the name parameters - cool eh?
+            // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they're are the same
+            // See, they are the same
             id.ShouldBe((int) clone.Id);
             xfile.FileName.ShouldBe((string) clone.FileName);
         }
@@ -275,7 +278,7 @@ namespace PetaPoco.Tests.Integration.Documentation
 	                         [FileName] VARCHAR(255) NOT NULL
                          )");
 
-            // Dynamics type are friend of PetaPoco
+            // Dynamic types are PetaPoco's friend
             dynamic xfile = new System.Dynamic.ExpandoObject();
             xfile.FileName = "Agent Mulder.sec";
 
@@ -285,14 +288,14 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Update the poco
             xfile.FileName = "Agent Mulder.sec";
 
-            // Update the database
+            // Update the database with the poco's changes
             DB.Update("XFiles", "Id", (object) xfile);
 
             // Get a clone/copy from the DB
-            // Note: Check out the name parameters - cool eh?
+            // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they're are the same
+            // See, they are the same
             id.ShouldBe((int) clone.Id);
             ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }

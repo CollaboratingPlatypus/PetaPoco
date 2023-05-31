@@ -92,13 +92,13 @@ CREATE TABLE `BugInvestigation_3F489XV0` (
 ) ENGINE=INNODB;
 
 -- Stored Procedures
+
 DROP PROCEDURE IF EXISTS `SelectPeople`;
 DROP PROCEDURE IF EXISTS `SelectPeopleWithParam`;
 DROP PROCEDURE IF EXISTS `CountPeople`;
 DROP PROCEDURE IF EXISTS `CountPeopleWithParam`;
 DROP PROCEDURE IF EXISTS `UpdatePeople`;
 DROP PROCEDURE IF EXISTS `UpdatePeopleWithParam`;
-
 
 CREATE PROCEDURE `SelectPeople` ()
 	SELECT * FROM `People`;

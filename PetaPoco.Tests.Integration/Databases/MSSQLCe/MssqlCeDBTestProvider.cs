@@ -14,7 +14,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 
         public MssqlCeDBTestProvider()
         {
-            // Hack: Nuget package is old and dones't support newer content
+            // Hack: Nuget package is old and doesn't support newer content
             // ReSharper disable AssignNullToNotNullAttribute
             var codeBase = typeof(SqlCeConnection).Assembly.CodeBase;
             var uri = new UriBuilder(codeBase);

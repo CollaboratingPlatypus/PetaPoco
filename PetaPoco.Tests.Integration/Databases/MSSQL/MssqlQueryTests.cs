@@ -17,7 +17,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
-        public void Query_ForPocoGivenDbColumPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public void Query_ForPocoGivenDbColumnPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             DB.Insert(new PocoOverlapPoco1 { Column1 = "A", Column2 = "B" });
             DB.Insert(new PocoOverlapPoco2 { Column1 = "B", Column2 = "A" });

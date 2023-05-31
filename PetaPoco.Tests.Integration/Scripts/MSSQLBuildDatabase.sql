@@ -118,6 +118,7 @@ CREATE TABLE dbo.[BugInvestigation_5TN5C4U4] (
 GO
 
 -- Stored procedures
+
 IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeople')
 	DROP PROCEDURE SelectPeople
 IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeopleWithParam')
@@ -132,7 +133,7 @@ IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePe
 	DROP PROCEDURE UpdatePeopleWithParam
 GO
 
-CREATE PROCEDURE dbo.SelectPeople 
+CREATE PROCEDURE dbo.SelectPeople
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -149,7 +150,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.CountPeople 
+CREATE PROCEDURE dbo.CountPeople
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -166,11 +167,11 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.UpdatePeople 
+CREATE PROCEDURE dbo.UpdatePeople
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [People] SET [FullName] = 'Updated' 
+	UPDATE [People] SET [FullName] = 'Updated'
 END
 GO
 

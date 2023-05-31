@@ -9,7 +9,7 @@ namespace PetaPoco.Tests.Unit.Core
     public class PocoDataTests
     {
         [Fact]
-        public void GetFactory_GivenTypeWithNotPublicConstructor_ShouldThrow()
+        public void GetFactory_GivenTypeWithNonPublicConstructor_ShouldThrow()
         {
             var pd = PocoData.ForObject(TestEntity.Instance, "Id", new ConventionMapper());
 
@@ -24,9 +24,9 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
-        public void PD_IncludedResultColumn_InAutoSelect()
+        public void PD_IncludeResultColumn_InAutoSelect()
         {
-            var pd = PocoData.ForType(typeof(PocoWithIncludedResultColumn), new ConventionMapper());
+            var pd = PocoData.ForType(typeof(PocoWithIncludeResultColumn), new ConventionMapper());
             pd.QueryColumns.ShouldBe(new[] { "RegularProperty", "ResultProperty" });
         }
 
@@ -47,7 +47,7 @@ namespace PetaPoco.Tests.Unit.Core
             public string ResultProperty { get; set; }
         }
 
-        public class PocoWithIncludedResultColumn
+        public class PocoWithIncludeResultColumn
         {
             public string RegularProperty { get; set; }
 

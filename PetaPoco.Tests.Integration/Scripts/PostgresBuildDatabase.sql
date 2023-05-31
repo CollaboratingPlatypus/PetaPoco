@@ -6,7 +6,6 @@ DROP FUNCTION IF EXISTS CountPeopleWithParam(age integer);
 DROP FUNCTION IF EXISTS UpdatePeople();
 DROP FUNCTION IF EXISTS UpdatePeopleWithParam(age integer);
 
-
 DROP TABLE IF EXISTS "OrderLines";
 DROP TABLE IF EXISTS "Orders";
 DROP TABLE IF EXISTS "People";
@@ -97,7 +96,6 @@ CREATE TABLE "BugInvestigation_7K2TX4VR" (
 	"Json1" JSON NOT NULL,
 	"Json2" JSONB NOT NULL
 );
-
 
 -- Stored Procedures
 

@@ -102,7 +102,7 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
-        public void GetColumnInfo_GivenPropertyWithResultAttribute_ShouldBeValdid()
+        public void GetColumnInfo_GivenPropertyWithResultAttribute_ShouldBeValid()
         {
             var columnInfo1 = _mapper.GetColumnInfo(typeof(TeraEntity).GetProperty(nameof(TeraEntity.ResultColumn)));
             var columnInfo2 = _mapper.GetColumnInfo(typeof(YottaEntity).GetProperty(nameof(YottaEntity.ResultColumn)));

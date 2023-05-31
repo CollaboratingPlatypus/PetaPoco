@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
@@ -18,9 +18,9 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
             Should.Throw<NotSupportedException>(() => base.Page_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection());
         }
 
-        public override void Page_ForPocoSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        public override void Page_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
-            Should.Throw<NotSupportedException>(() => base.Page_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection());
+            Should.Throw<NotSupportedException>(() => base.Page_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection());
         }
 
         public override Task PageAsync_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
@@ -29,9 +29,9 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
             return Task.CompletedTask;
         }
 
-        public override Task PageAsync_ForPocoSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
+        public override Task PageAsync_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
-            Should.Throw<NotSupportedException>(() => base.PageAsync_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection().Wait());
+            Should.Throw<NotSupportedException>(() => base.PageAsync_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection().Wait());
             return Task.CompletedTask;
         }
     }
