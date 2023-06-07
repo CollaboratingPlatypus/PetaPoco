@@ -18,7 +18,7 @@ PetaPoco is available from: **NuGet [PetaPoco.Compiled](https://www.nuget.org/pa
 
 ### Documentation
 
-For configuration documentation, code examples, and other general usage information, [read the docs]
+For configuration documentation, code examples, and other general usage information, [see the docs].
 
 ### Add-ons
 
@@ -94,7 +94,7 @@ PetaPoco welcomes input from the community. After all, what is a product without
 
 ## Contributions Honour Roll
 
-PetaPoco is not just the effort of one person, but rather the combined effort of many. For those individuals who rise above and beyond, [we have a special place to honour them].
+PetaPoco is not the result of just one person's labour, but rather, the product of a combined effort by many. For those individuals who go above and beyond, [we have a special place to honour them].
 
 [Brad Robinson]:https://www.toptensoftware.com/
 [Massive]:https://github.com/FransBouma/Massive
@@ -104,7 +104,7 @@ PetaPoco is not just the effort of one person, but rather the combined effort of
 [POCO]:https://en.wikipedia.org/wiki/Plain_Old_CLR_Object
 [CodingHorror]:https://web.archive.org/web/20160215051631/subsonicproject.com/docs/CodingHorror
 [XUnit]:https://github.com/xunit/xunit
-[See the docs]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki
+[see the docs]:https://github.com/CollaboratingPlatypus/PetaPoco/wiki
 [the contribution guide]:./contributing.md
 [Contributing to Open Source on GitHub]:https://guides.github.com/activities/contributing-to-open-source/
 [we have a special place to honour them]:./honourRoll.md
