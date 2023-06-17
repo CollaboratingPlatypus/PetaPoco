@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net40;net45;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyTitle>PetaPoco</AssemblyTitle>
     <Description>A Tiny ORMish thing for your POCO's.</Description>
     <Company>Collaborating Platypus</Company>
@@ -16,11 +17,11 @@
     <PackageId>PetaPoco.Compiled</PackageId>
     <DefineConstants Condition="'$(TargetFramework)' != 'net40'">ASYNC</DefineConstants>
   </PropertyGroup>
- 
+
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
- 
+
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -38,5 +39,5 @@
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
   </ItemGroup>
-  
+
 </Project>
