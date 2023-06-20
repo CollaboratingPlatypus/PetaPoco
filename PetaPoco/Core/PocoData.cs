@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -30,6 +30,7 @@ namespace PetaPoco.Core
         }
 
         public TableInfo TableInfo { get; private set; }
+
         public Dictionary<string, PocoColumn> Columns { get; private set; }
 
         public PocoData()
@@ -142,9 +143,9 @@ namespace PetaPoco.Core
                         Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo) null, srcType);
 
                         /*
-						if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
-							converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
-						 */
+                        if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
+                            converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
+                         */
 
                         // Setup stack for call to converter
                         AddConverterToStack(il, converter);

@@ -4,41 +4,39 @@ using System.Reflection;
 
 namespace PetaPoco
 {
-    /* 
-	Thanks to Adam Schroder (@schotime) for this.
-	
-	This extra file provides an implementation of DbProviderFactory for early versions of the Oracle
-	drivers that don't include include it.  For later versions of Oracle, the standard OracleProviderFactory
-	class should work fine
-	
-	Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands
-	
-	Currently untested.
-	
-	Usage:   
-		
-			new PetaPoco.Database("<connstring>", new PetaPoco.OracleProvider())
-	
-	Or in your app/web config (be sure to change ASSEMBLYNAME to the name of your 
-	assembly containing OracleProvider.cs)
-	
-		<connectionStrings>
-			<add
-				name="oracle"
-				connectionString="WHATEVER"
-				providerName="Oracle"
-				/>
-		</connectionStrings>
-
-		<system.data>
-			<DbProviderFactories>
-				<add name="PetaPoco Oracle Provider" invariant="Oracle" description="PetaPoco Oracle Provider" 
-								type="PetaPoco.OracleProvider, ASSEMBLYNAME" />
-			</DbProviderFactories>
-		</system.data>
-
-	 */
-
+    /// <summary>
+    /// The OracleProvider class provides an implementation of <see cref="DbProviderFactory"/> for early versions of the Oracle drivers that don't include it.
+    /// </summary>
+    /// <remarks>
+    /// For later versions of Oracle, the standard OracleProviderFactory class should work fine. Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands.
+    /// <para/>Thanks to Adam Schroder (@schotime) for this.
+    /// <para/><i>Currently untested.</i>
+    /// </remarks>
+    /// <example>
+    /// <code language="cs" title="OracleProvider Usage">
+    /// <![CDATA[
+    /// var db = new PetaPoco.Database("CONNECTION_STRING", new PetaPoco.OracleProvider());
+    /// ]]>
+    /// </code>
+    /// Or in your app/web config (be sure to change <c>ASSEMBLY_NAME</c> to the name of your assembly containing OracleProvider.cs):
+    /// <code language="xml" title="OracleProvider web/app.config Usage">
+    /// <![CDATA[
+    /// <connectionStrings>
+    ///     <add name="oracle"
+    ///          connectionString="CONNECTION_STRING"
+    ///          providerName="Oracle" />
+    /// </connectionStrings>
+    /// <system.data>
+    ///     <DbProviderFactories>
+    ///         <add name="PetaPoco Oracle Provider"
+    ///              invariant="Oracle"
+    ///              description="PetaPoco Oracle Provider"
+    ///              type="PetaPoco.OracleProvider, ASSEMBLY_NAME" />
+    ///     </DbProviderFactories>
+    /// </system.data>
+    /// ]]>
+    /// </code>
+    /// </example>
     public class OracleProvider : DbProviderFactory
     {
         private const string _assemblyName = "Oracle.DataAccess";
@@ -47,9 +45,15 @@ namespace PetaPoco
         private static Type _connectionType;
         private static Type _commandType;
 
-        // Required for DbProviderFactories.GetFactory() to work.
+        /// <summary>
+        /// Singleton instance of OracleProvider. Required for DbProviderFactories.GetFactory() to work.
+        /// </summary>
         public static OracleProvider Instance = new OracleProvider();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleProvider"/> class.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when unable to find the connection type from the assembly.</exception>
         public OracleProvider()
         {
             _connectionType = TypeFromAssembly(_connectionTypeName, _assemblyName);
@@ -58,11 +62,19 @@ namespace PetaPoco
                 throw new InvalidOperationException("Can't find Connection type: " + _connectionTypeName);
         }
 
+        /// <summary>
+        /// Creates a new instance of an OracleConnection.
+        /// </summary>
+        /// <returns>A new <see cref="DbConnection"/>.</returns>
         public override DbConnection CreateConnection()
         {
             return (DbConnection) Activator.CreateInstance(_connectionType);
         }
 
+        /// <summary>
+        /// Creates a new instance of an OracleCommand.
+        /// </summary>
+        /// <returns>A new <see cref="DbCommand"/>.</returns>
         public override DbCommand CreateCommand()
         {
             DbCommand command = (DbCommand) Activator.CreateInstance(_commandType);
@@ -73,6 +85,12 @@ namespace PetaPoco
             return command;
         }
 
+        /// <summary>
+        /// Returns the Type object for the specified <paramref name="typeName"/> from the provided <paramref name="assemblyName"/>.
+        /// </summary>
+        /// <param name="typeName">The name of the type to get.</param>
+        /// <param name="assemblyName">The name of the assembly to get the type from.</param>
+        /// <returns>The Type object, or null if unable to locate it.</returns>
         public static Type TypeFromAssembly(string typeName, string assemblyName)
         {
             try

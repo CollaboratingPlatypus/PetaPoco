@@ -3,38 +3,41 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Holds the results of a paged request.
+    /// Provides access to the result collection from a paged request.
     /// </summary>
-    /// <typeparam name="T">The type of Poco in the returned result set</typeparam>
+    /// <remarks>
+    /// Represents a paged result set, both providing access to the items on the current page and maintaining state information about the pagination for additional queries.
+    /// </remarks>
+    /// <typeparam name="T">The type of POCO objects in the returned result set.</typeparam>
     public class Page<T>
     {
         /// <summary>
-        ///     The current page number contained in this page of result set
+        /// Gets or sets the number of the current page in the result set.
         /// </summary>
         public long CurrentPage { get; set; }
 
         /// <summary>
-        ///     The total number of pages in the full result set
+        /// Gets or sets the total number of pages in the full result set.
         /// </summary>
         public long TotalPages { get; set; }
 
         /// <summary>
-        ///     The total number of records in the full result set
+        /// Gets or sets the total number of records in the full result set.
         /// </summary>
         public long TotalItems { get; set; }
 
         /// <summary>
-        ///     The number of items per page
+        /// Gets or sets the number of items per page.
         /// </summary>
         public long ItemsPerPage { get; set; }
 
         /// <summary>
-        ///     The actual records on this page
+        /// Gets or sets the result records on the current page.
         /// </summary>
         public List<T> Items { get; set; }
 
         /// <summary>
-        ///     User property to hold anything.
+        /// Gets or sets a context object, which can be used to store additional information about the result set.
         /// </summary>
         public object Context { get; set; }
     }

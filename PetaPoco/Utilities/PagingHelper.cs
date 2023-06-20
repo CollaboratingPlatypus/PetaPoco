@@ -2,41 +2,61 @@
 
 namespace PetaPoco.Utilities
 {
+    /// <summary>
+    /// Provides utility methods for splitting SQL queries into parts and handling paging.
+    /// </summary>
     public class PagingHelper : IPagingHelper
     {
-        public Regex RegexColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b",
+        /// <summary>
+        /// Gets the regular expression used for matching the columns in a SELECT statement.
+        /// </summary>
+        public Regex RegexColumns { get; } = new Regex(
+            @"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b",
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public Regex RegexDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-
-        public Regex RegexOrderBy =
-            new Regex(
-                @"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
-                RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-
-        public Regex SimpleRegexOrderBy = new Regex(@"\bORDER\s+BY\s+",
-            RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-
-        public Regex RegexGroupBy = new Regex(@"\bGROUP\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?)*",
-                                              RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-
-        public Regex SimpleRegexGroupBy = new Regex(@"\bGROUP\s+BY\s+",
-                                                    RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-
-
-        public static IPagingHelper Instance { get; private set; }
-
-        static PagingHelper()
-        {
-            Instance = new PagingHelper();
-        }
+        /// <summary>
+        /// Gets the regular expression used for matching the DISTINCT keyword.
+        /// </summary>
+        public Regex RegexDistinct { get; } = new Regex(
+            @"\ADISTINCT\s",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
-        ///     Splits the given <paramref name="sql" /> into <paramref name="parts" />;
+        /// Gets the regular expression used for matching the ORDER BY clause.
         /// </summary>
-        /// <param name="sql">The SQL to split.</param>
-        /// <param name="parts">The SQL parts.</param>
-        /// <returns><c>True</c> if the SQL could be split; else, <c>False</c>.</returns>
+        public Regex RegexOrderBy { get; } = new Regex(
+            @"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
+            RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Gets the regular expression used for matching the simple ORDER BY clause.
+        /// </summary>
+        public Regex SimpleRegexOrderBy { get; } = new Regex(
+            @"\bORDER\s+BY\s+",
+            RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Gets the regular expression used for matching the GROUP BY clause.
+        /// </summary>
+        public Regex RegexGroupBy { get; } = new Regex(
+            @"\bGROUP\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?)*",
+            RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Gets the regular expression used for matching the simple GROUP BY clause.
+        /// </summary>
+        public Regex SimpleRegexGroupBy { get; } = new Regex(
+            @"\bGROUP\s+BY\s+",
+            RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+
+        /// <summary>
+        /// Gets the singleton instance of the <see cref="PagingHelper"/> class.
+        /// </summary>
+        public static IPagingHelper Instance { get; private set; }
+
+        static PagingHelper() => Instance = new PagingHelper();
+
+        /// <inheritdoc/>
         public bool SplitSQL(string sql, out SQLParts parts)
         {
             parts.Sql = sql;

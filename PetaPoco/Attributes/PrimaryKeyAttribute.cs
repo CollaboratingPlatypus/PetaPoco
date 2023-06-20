@@ -1,43 +1,37 @@
-﻿using System;
+using System;
 
 namespace PetaPoco
 {
     /// <summary>
-    ///     Is an attribute, which when applied to a POCO class, specifies primary key column. Additionally, specifies whether
-    ///     the column is auto incrementing and the optional sequence name for Oracle sequence columns.
+    /// The PrimaryKeyAttribute class defines an attribute for POCO properties that map to primary key columns in the database.
     /// </summary>
+    /// <remarks>
+    /// The PrimaryKeyAttribute, when used in a POCO class, designates the decorated property as the primary key column in the database. It can also be used to override the default mapped column name for the primary key, mark the column as auto-incrementing, and optionally assign a sequence name for Oracle sequence columns.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     public class PrimaryKeyAttribute : Attribute
     {
         /// <summary>
-        ///     The column name.
+        /// Gets the column name.
         /// </summary>
-        /// <returns>
-        ///     The column name.
-        /// </returns>
         public string Value { get; }
 
         /// <summary>
-        ///     The sequence name.
+        /// Gets or sets the optional sequence name, for Oracle databases.
         /// </summary>
-        /// <returns>
-        ///     The sequence name.
-        /// </returns>
         public string SequenceName { get; set; }
 
         /// <summary>
-        ///     A flag which specifies if the primary key is auto incrementing.
+        /// Gets or sets whether the primary key column represented by this property is auto-incrementing in the database.
         /// </summary>
-        /// <returns>
-        ///     True if the primary key is auto incrementing; else, False.
-        /// </returns>
+        /// <value>Default value is <see langword="true"/> (auto-incrementing).</value>
         public bool AutoIncrement { get; set; } = true;
 
         /// <summary>
-        ///     Constructs a new instance of the <seealso cref="PrimaryKeyAttribute" />.
+        /// Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class with the specified column name.
+        /// <para/><inheritdoc cref="PrimaryKeyAttribute"/>
         /// </summary>
-        /// <param name="primaryKey">The name of the primary key column.</param>
-        public PrimaryKeyAttribute(string primaryKey)
-            => Value = primaryKey;
+        /// <param name="primaryKey">The primary key column name in the database that this property maps to.</param>
+        public PrimaryKeyAttribute(string primaryKey) => Value = primaryKey;
     }
 }

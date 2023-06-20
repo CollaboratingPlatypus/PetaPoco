@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
@@ -14,7 +14,7 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Core
 {
     /// <summary>
-    ///     Base class for DatabaseType handlers - provides default/common handling for different database engines
+    /// The DatabaseProvider class defines a base implementation for database Provider classes, and provides common defaults used by different database engines.
     /// </summary>
     public abstract class DatabaseProvider : IProvider
     {
@@ -34,21 +34,13 @@ namespace PetaPoco.Core
             => tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
 
         /// <inheritdoc />
-        public virtual string EscapeSqlIdentifier(string sqlIdentifier)
-            => $"[{sqlIdentifier}]";
+        public virtual string EscapeSqlIdentifier(string sqlIdentifier) => $"[{sqlIdentifier}]";
 
         /// <inheritdoc />
-        public virtual string GetParameterPrefix(string connectionString)
-            => "@";
+        public virtual string GetParameterPrefix(string connectionString) => "@";
 
         /// <inheritdoc />
-        public virtual object MapParameterValue(object value)
-        {
-            if (value is bool b)
-                return b ? 1 : 0;
-
-            return value;
-        }
+        public virtual object MapParameterValue(object value) => value is bool b ? b ? 1 : 0 : value;
 
         /// <inheritdoc />
         public virtual void PreExecute(IDbCommand cmd)
@@ -64,16 +56,13 @@ namespace PetaPoco.Core
         }
 
         /// <inheritdoc />
-        public virtual string GetExistsSql()
-            => "SELECT COUNT(*) FROM {0} WHERE {1}";
+        public virtual string GetExistsSql() => "SELECT COUNT(*) FROM {0} WHERE {1}";
 
         /// <inheritdoc />
-        public virtual string GetAutoIncrementExpression(TableInfo tableInfo)
-            => null;
+        public virtual string GetAutoIncrementExpression(TableInfo tableInfo) => null;
 
         /// <inheritdoc />
-        public virtual string GetInsertOutputClause(string primaryKeyName)
-            => string.Empty;
+        public virtual string GetInsertOutputClause(string primaryKeyName) => string.Empty;
 
         /// <inheritdoc />
         public virtual object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
@@ -83,6 +72,7 @@ namespace PetaPoco.Core
         }
 
 #if ASYNC
+        /// <inheritdoc />
         public virtual Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName)
         {
             cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
@@ -91,10 +81,10 @@ namespace PetaPoco.Core
 #endif
 
         /// <summary>
-        ///     Returns the DbProviderFactory.
+        /// Returns the DbProviderFactory.
         /// </summary>
         /// <param name="assemblyQualifiedNames">The assembly qualified name of the provider factory.</param>
-        /// <returns>The db provider factory.</returns>
+        /// <returns>The DbProviderFactory factory.</returns>
         /// <exception cref="ArgumentException">Thrown when <paramref name="assemblyQualifiedNames" /> does not match a type.</exception>
         protected DbProviderFactory GetFactory(params string[] assemblyQualifiedNames)
         {
@@ -113,11 +103,11 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        ///     Registers a custom IProvider with a string that will match the beginning of the name
-        ///     of the provider, DbConnection, or DbProviderFactory.
+        /// Registers a custom IProvider with a string that will match the beginning of the name of the provider, DbConnection, or DbProviderFactory.
         /// </summary>
         /// <typeparam name="T">Type of IProvider to be registered.</typeparam>
         /// <param name="initialString">String to be matched against the beginning of the provider name.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="initialString" /> is null, empty, or consists only of white space.</exception>
         public static void RegisterCustomProvider<T>(string initialString) where T : IProvider, new()
         {
             if (String.IsNullOrWhiteSpace(initialString))
@@ -136,19 +126,16 @@ namespace PetaPoco.Core
             return null;
         }
 
-        internal static void ClearCustomProviders()
-            => customProviders.Clear();
+        internal static void ClearCustomProviders() => customProviders.Clear();
 
         /// <summary>
-        ///     Look at the type and provider name being used and instantiate a suitable IProvider instance.
+        /// Instantiates a suitable IProvider instance based on the type and provider name.
         /// </summary>
         /// <param name="type">The type name.</param>
-        /// <param name="allowDefault">
-        ///     A flag that when set allows the default <see cref="SqlServerDatabaseProvider" /> to be
-        ///     returned if not match is found.
-        /// </param>
+        /// <param name="allowDefault">A flag that when set allows the default <see cref="SqlServerDatabaseProvider" /> to be returned if not match is found.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <returns>The database provider.</returns>
+        /// <exception cref="ArgumentException">Thrown when the <paramref name="type" /> name cannot be matched to a provider.</exception>
         internal static IProvider Resolve(Type type, bool allowDefault, string connectionString)
         {
             var typeName = type.Name;
@@ -207,13 +194,10 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        ///     Look at the type and provider name being used and instantiate a suitable IProvider instance.
+        /// Instantiates a suitable IProvider instance based on the type and provider name.
         /// </summary>
         /// <param name="providerName">The provider name.</param>
-        /// <param name="allowDefault">
-        ///     A flag that when set allows the default <see cref="SqlServerDatabaseProvider" /> to be
-        ///     returned if not match is found.
-        /// </param>
+        /// <param name="allowDefault">A flag that when set allows the default <see cref="SqlServerDatabaseProvider" /> to be returned if not match is found.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <returns>The database type.</returns>
         internal static IProvider Resolve(string providerName, bool allowDefault, string connectionString)
@@ -263,8 +247,6 @@ namespace PetaPoco.Core
                 return Singleton<MsAccessDbDatabaseProvider>.Instance;
             }
 
-
-
             if (!allowDefault)
                 throw new ArgumentException($"Could not match `{providerName}` to a provider.", nameof(providerName));
 
@@ -273,7 +255,7 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        ///     Unwraps a wrapped <see cref="DbProviderFactory" />.
+        /// Unwraps a wrapped <see cref="DbProviderFactory" />.
         /// </summary>
         /// <param name="factory">The factory to unwrap.</param>
         /// <returns>The unwrapped factory or the original factory if no wrapping occurred.</returns>

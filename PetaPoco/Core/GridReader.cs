@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -7,6 +7,9 @@ using PetaPoco.Internal;
 
 namespace PetaPoco
 {
+    /// <summary>
+    /// Provides methods for reading a result set from a database query into an enumerable collection of single or multi-POCO objects.
+    /// </summary>
     public class GridReader : IGridReader
     {
         private readonly Database _db;
@@ -15,12 +18,12 @@ namespace PetaPoco
         private IDataReader _reader;
 
         /// <summary>
-        ///     The control structure for a multi-result set query
+        /// Initializes a new instance of the GridReader class with the control structure for a multi-poco query result set.
         /// </summary>
-        /// <param name="database"></param>
-        /// <param name="command"></param>
-        /// <param name="reader"></param>
-        /// <param name="defaultMapper"></param>
+        /// <param name="database">The Database instance that this GridReader is associated with.</param>
+        /// <param name="command">The command that represents the database query to be executed.</param>
+        /// <param name="reader">The underlying reader that will be used to read the result sets from the database query.</param>
+        /// <param name="defaultMapper">The default mapper to be used for mapping the result sets to POCOs.</param>
         internal GridReader(Database database, IDbCommand command, IDataReader reader, IMapper defaultMapper)
         {
             _db = database;
@@ -31,89 +34,43 @@ namespace PetaPoco
 
 #region public Read<T> methods
 
-        /// <summary>
-        ///     Reads from a GridReader, returning the results as an IEnumerable collection
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <returns>An enumerable collection of result records</returns>
+        /// <inheritdoc/>
         public IEnumerable<T> Read<T>()
         {
             return SinglePocoFromIDataReader<T>(_gridIndex);
         }
 
-        /// <summary>
-        ///     Perform a multi-poco read from a GridReader
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type</typeparam>
-        /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <inheritdoc/>
         public IEnumerable<T1> Read<T1, T2>()
         {
             return MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2) }, null);
         }
 
-        /// <summary>
-        ///     Perform a multi-poco read from a GridReader
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type</typeparam>
-        /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <typeparam name="T3">The third POCO type</typeparam>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <inheritdoc/>
         public IEnumerable<T1> Read<T1, T2, T3>()
         {
             return MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3) }, null);
         }
 
-        /// <summary>
-        ///     Perform a multi-poco read from a GridReader
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type</typeparam>
-        /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <typeparam name="T3">The third POCO type</typeparam>
-        /// <typeparam name="T4">The forth POCO type</typeparam>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <inheritdoc/>
         public IEnumerable<T1> Read<T1, T2, T3, T4>()
         {
             return MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null);
         }
 
-        /// <summary>
-        ///     Perform a multi-poco query
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type</typeparam>
-        /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <inheritdoc/>
         public IEnumerable<TRet> Read<T1, T2, TRet>(Func<T1, T2, TRet> cb)
         {
             return MultiPocoFromIDataReader<TRet>(_gridIndex, new Type[] { typeof(T1), typeof(T2) }, cb);
         }
 
-        /// <summary>
-        ///     Perform a multi-poco query
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type</typeparam>
-        /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <typeparam name="T3">The third POCO type</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <inheritdoc/>
         public IEnumerable<TRet> Read<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb)
         {
             return MultiPocoFromIDataReader<TRet>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3) }, cb);
         }
 
-        /// <summary>
-        ///     Perform a multi-poco query
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type</typeparam>
-        /// <typeparam name="T2">The second POCO type</typeparam>
-        /// <typeparam name="T3">The third POCO type</typeparam>
-        /// <typeparam name="T4">The forth POCO type</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <inheritdoc/>
         public IEnumerable<TRet> Read<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb)
         {
             return MultiPocoFromIDataReader<TRet>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, cb);
@@ -124,11 +81,13 @@ namespace PetaPoco
 #region PocoFromIDataReader
 
         /// <summary>
-        ///     Read data to a single poco
+        /// Reads data to a single POCO.
         /// </summary>
-        /// <typeparam name="T">The type representing a row in the result set</typeparam>
-        /// <param name="index">Reader row to be read from the underlying IDataReader</param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type representing a row in the result set.</typeparam>
+        /// <param name="index">The row to be read from the underlying <see cref="IDataReader"/>.</param>
+        /// <returns>A <typeparamref name="T"/> POCO.</returns>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException"/>
         private IEnumerable<T> SinglePocoFromIDataReader<T>(int index)
         {
             if (_reader == null)
@@ -174,13 +133,15 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Read data to multiple POCOs
+        /// Reads data to multiple POCOs.
         /// </summary>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable</typeparam>
-        /// <param name="index">Reader row to be read from the underlying IDataReader</param>
-        /// <param name="types">An array of Types representing the POCO types of the returned result set.</param>
-        /// <param name="cb">A callback function to connect the POCO instances, or null to automatically guess the relationships</param>
-        /// <returns>A collection of POCOs as an IEnumerable</returns>
+        /// <typeparam name="TRet">The type of objects in the returned <see cref="IEnumerable{T}"/>.</typeparam>
+        /// <param name="index">The row to be read from the underlying <see cref="IDataReader"/>.</param>
+        /// <param name="types">An array of types representing the POCO types in the returned result set.</param>
+        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to let PetaPoco automatically deduce the relationships.</param>
+        /// <returns>A collection of <typeparamref name="TRet"/> POCOs as an IEnumerable.</returns>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="InvalidOperationException"/>
         private IEnumerable<TRet> MultiPocoFromIDataReader<TRet>(int index, Type[] types, object cb)
         {
             if (_reader == null)
@@ -247,7 +208,7 @@ namespace PetaPoco
         private bool _consumed;
 
         /// <summary>
-        ///     Advance the IDataReader to the NextResult, if available
+        /// Advances the <see cref="IDataReader"/> to the <see cref="IDataReader.NextResult"/>, if one exists.
         /// </summary>
         private void NextResult()
         {
@@ -258,7 +219,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Dispose the grid, closing and disposing the underlying reader, command, and shared connection
+        /// Disposes the GridReader, closing and disposing the underlying reader, command, and shared connection.
         /// </summary>
         public void Dispose()
         {

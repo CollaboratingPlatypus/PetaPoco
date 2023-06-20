@@ -103,9 +103,6 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void UpdateConventionalPoco()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
             // Create some notes
             var note1 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
             var note2 = new Note { Text = "PetaPoco's note", CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc) };
@@ -153,7 +150,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
-                             DROP TABLE dbo.[TBL_UnconventionalPocos]
+                         DROP TABLE dbo.[TBL_UnconventionalPocos]
 
                          CREATE TABLE dbo.[TBL_UnconventionalPocos] (
                              [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
@@ -186,7 +183,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
-                             DROP TABLE dbo.[TBL_UnconventionalPocos]
+                         DROP TABLE dbo.[TBL_UnconventionalPocos]
 
                          CREATE TABLE dbo.[TBL_UnconventionalPocos] (
                              [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
@@ -238,7 +235,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
-                             DROP TABLE dbo.[XFiles]
+                         DROP TABLE dbo.[XFiles]
 
                          CREATE TABLE dbo.[XFiles] (
                              [Id] INT IDENTITY(1,1) PRIMARY KEY,
@@ -262,8 +259,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they are the same
-            id.ShouldBe((int)clone.Id);
-            xfile.FileName.ShouldBe((string)clone.FileName);
+            id.ShouldBe((int) clone.Id);
+            xfile.FileName.ShouldBe((string) clone.FileName);
         }
 
         [Fact]
@@ -271,7 +268,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
-                             DROP TABLE dbo.[XFiles]
+                         DROP TABLE dbo.[XFiles]
 
                          CREATE TABLE dbo.[XFiles] (
                              [Id] INT IDENTITY(1,1) PRIMARY KEY,
@@ -296,8 +293,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they are the same
-            id.ShouldBe((int)clone.Id);
-            ((string)xfile.FileName).ShouldBe((string)clone.FileName);
+            id.ShouldBe((int) clone.Id);
+            ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }
     }
 }

@@ -1,57 +1,54 @@
-﻿using System.Data;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace PetaPoco
 {
     public interface IConnection
     {
-		/// <summary>
-		///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection" />
-		///     or <see cref="Database.Dispose" /> is called.
-		/// </summary>
-		/// <seealso cref="OpenSharedConnection" />
-		bool KeepConnectionAlive { get; set; }
+        /// <summary>
+        /// Gets or sets the connection reuse policy for the shared connection or <see cref="IDatabase"/> instance.
+        /// </summary>
+        /// <remarks>
+        /// When set to <see langword="true"/> the first opened connection is kept alive until <see cref="CloseSharedConnection" /> is called or the <see cref="IDatabase" /> is disposed.
+        /// </remarks>
+        /// <seealso cref="OpenSharedConnection" />
+        bool KeepConnectionAlive { get; set; }
 
         /// <summary>
-        ///     Provides access to the currently open shared connection.
+        /// Gets the currently open shared connection, or <see langword="null"/> if there is no open connection.
         /// </summary>
-        /// <returns>
-        ///     The currently open connection, or <c>Null</c>.
-        /// </returns>
+        /// <seealso cref="KeepConnectionAlive" />
         /// <seealso cref="OpenSharedConnection" />
         /// <seealso cref="CloseSharedConnection" />
-        /// <seealso cref="KeepConnectionAlive" />
         IDbConnection Connection { get; }
 
         /// <summary>
-        ///     Opens a connection that will be used for all subsequent queries.
+        /// Opens a connection that will be used for all subsequent queries.
         /// </summary>
         /// <remarks>
-        ///     Calls to <see cref="Database.OpenSharedConnection" />/<see cref="Database.CloseSharedConnection" /> are reference
-        ///     counted and should be balanced
+        /// Calls to <see cref="Database.OpenSharedConnection" /> and <see cref="Database.CloseSharedConnection" /> are reference counted and should be balanced.
         /// </remarks>
         /// <seealso cref="Database.Connection" />
-        /// <seealso cref="Database.CloseSharedConnection" />
         /// <seealso cref="Database.KeepConnectionAlive" />
+        /// <seealso cref="Database.CloseSharedConnection" />
         void OpenSharedConnection();
 
 #if !NET40
         /// <summary>
-        ///     The async version of <see cref="Database.OpenSharedConnection" />.
+        /// The asyncronous version of <see cref="Database.OpenSharedConnection" />.
         /// </summary>
         Task OpenSharedConnectionAsync();
 #endif
 
         /// <summary>
-        ///     Releases the shared connection.
+        /// Releases the shared connection.
         /// </summary>
         /// <remarks>
-        ///     Calls to <see cref="Database.OpenSharedConnection" />/<see cref="Database.CloseSharedConnection" /> are reference
-        ///     counted and should be balanced
+        /// Calls to <see cref="Database.OpenSharedConnection" /> and <see cref="Database.CloseSharedConnection" /> are reference counted and should be balanced.
         /// </remarks>
         /// <seealso cref="Database.Connection" />
-        /// <seealso cref="Database.OpenSharedConnection" />
         /// <seealso cref="Database.KeepConnectionAlive" />
+        /// <seealso cref="Database.OpenSharedConnection" />
         void CloseSharedConnection();
     }
 }

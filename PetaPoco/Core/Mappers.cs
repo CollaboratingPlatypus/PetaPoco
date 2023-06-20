@@ -9,42 +9,42 @@ using System.Reflection;
 namespace PetaPoco
 {
     /// <summary>
-    ///     This static class manages registation of IMapper instances with PetaPoco
+    /// This static class manages registration of IMapper instances with PetaPoco.
     /// </summary>
     public static class Mappers
     {
         private static ConcurrentDictionary<object, Lazy<IMapper>> _mappers = new ConcurrentDictionary<object, Lazy<IMapper>>();
 
         /// <summary>
-        ///     Registers a mapper for all types in a specific assembly
+        /// Registers a mapper for all types in a specific assembly.
         /// </summary>
-        /// <param name="assembly">The assembly whose types are to be managed by this mapper</param>
-        /// <param name="mapper">The IMapper implementation</param>
+        /// <param name="assembly">The assembly whose types are to be managed by this mapper.</param>
+        /// <param name="mapper">The IMapper implementation.</param>
         public static bool Register(Assembly assembly, IMapper mapper) => RegisterInternal(assembly, mapper);
 
         /// <summary>
-        ///     Registers a mapper for a single POCO type
+        /// Registers a mapper for a single POCO type.
         /// </summary>
-        /// <param name="type">The type to be managed by this mapper</param>
-        /// <param name="mapper">The IMapper implementation</param>
+        /// <param name="type">The type to be managed by this mapper.</param>
+        /// <param name="mapper">The IMapper implementation.</param>
         public static bool Register(Type type, IMapper mapper) => RegisterInternal(type, mapper);
 
         /// <summary>
-        ///     Remove all mappers for all types in a specific assembly
+        /// Remove all mappers for all types in a specific assembly.
         /// </summary>
-        /// <param name="assembly">The assembly whose mappers are to be revoked</param>
+        /// <param name="assembly">The assembly whose mappers are to be revoked.</param>
         public static bool Revoke(Assembly assembly) => RevokeInternal(assembly);
 
         /// <summary>
-        ///     Remove the mapper for a specific type
+        /// Remove the mapper for a specific type.
         /// </summary>
-        /// <param name="type">The type whose mapper is to be removed</param>
+        /// <param name="type">The type whose mapper is to be removed.</param>
         public static bool Revoke(Type type) => RevokeInternal(type);
 
         /// <summary>
-        ///     Revoke an instance of a mapper
+        /// Revoke an instance of a mapper.
         /// </summary>
-        /// <param name="mapper">The IMapper to be revkoed</param>
+        /// <param name="mapper">The IMapper to be revoked.</param>
         public static bool Revoke(IMapper mapper)
         {
             var ret = false;
@@ -59,7 +59,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Revokes all registered mappers.
+        /// Revokes all registered mappers.
         /// </summary>
         public static void RevokeAll()
         {
@@ -68,7 +68,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Retrieve the IMapper implementation to be used for a specified POCO type.
+        /// Retrieve the IMapper implementation to be used for a specified POCO type.
         /// </summary>
         /// <param name="entityType">The entity type to get the mapper for.</param>
         /// <param name="defaultMapper">The default mapper to use when none is registered for the type.</param>

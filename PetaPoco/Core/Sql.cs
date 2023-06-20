@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using PetaPoco.Internal;
 namespace PetaPoco
 {
     /// <summary>
-    ///     A simple helper class for building SQL statements
+    /// A simple helper class for building SQL statements.
     /// </summary>
     public class Sql
     {
@@ -19,17 +19,18 @@ namespace PetaPoco
         private string _sqlFinal;
 
         /// <summary>
-        ///     Instantiate a new SQL Builder object.  Weirdly implemented as a property but makes
-        ///     for more elegantly readable fluent style construction of SQL Statements
-        ///     eg: db.Query(Sql.Builder.Append(....))
+        /// Instantiates a new SQL Builder object.
         /// </summary>
+        /// <remarks>
+        /// Weirdly implemented as a property, but makes for more elegant and readable fluent-style construction of SQL Statements, eg: <c>db.Query(Sql.Builder.Append(/*...*/));</c>.
+        /// </remarks>
         public static Sql Builder
         {
             get { return new Sql(); }
         }
 
         /// <summary>
-        ///     Returns the final SQL statement represented by this builder
+        /// Returns the final SQL statement stored in this this builder.
         /// </summary>
         public string SQL
         {
@@ -41,7 +42,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Gets the complete, final set of arguments collected by this builder.
+        /// Gets the complete, final array of arguments collected by this builder.
         /// </summary>
         public object[] Arguments
         {
@@ -53,17 +54,17 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Default, empty constructor
+        /// Initializes a new default builder.
         /// </summary>
         public Sql()
         {
         }
 
         /// <summary>
-        ///     Construct an SQL statement with the supplied SQL and arguments
+        /// Construct an SQL statement from the given SQL string and arguments.
         /// </summary>
-        /// <param name="sql">The SQL statement or fragment</param>
-        /// <param name="args">Arguments to any parameters embedded in the SQL</param>
+        /// <param name="sql">The SQL statement or fragment.</param>
+        /// <param name="args">Arguments to any parameters embedded in <paramref name="sql"/> string.</param>
         public Sql(string sql, params object[] args)
         {
             _sql = sql;
@@ -85,10 +86,10 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Append another SQL builder instance to the right-hand-side of this SQL builder
+        /// Append another SQL builder instance to the right-hand-side of this SQL builder.
         /// </summary>
-        /// <param name="sql">A reference to another SQL builder instance</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="sql">A reference to another SQL builder instance.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql Append(Sql sql)
         {
             if (_rhs != null)
@@ -101,11 +102,11 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Append an SQL fragment to the right-hand-side of this SQL builder
+        /// Append an SQL fragment to the right-hand-side of this SQL builder instance.
         /// </summary>
-        /// <param name="sql">The SQL statement or fragment</param>
-        /// <param name="args">Arguments to any parameters embedded in the SQL</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="sql">The SQL statement or fragment.</param>
+        /// <param name="args">Arguments to any parameters embedded in the SQL.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql Append(string sql, params object[] args)
         {
             return Append(new Sql(sql, args));
@@ -145,62 +146,62 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Appends an SQL SET clause to this SQL builder
+        /// Appends an SQL SET clause to this SQL builder.
         /// </summary>
-        /// <param name="sql">The SET clause like "{field} = {value}"</param>
-        /// <param name="args">Arguments to any parameters embedded in the supplied SQL</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="sql">The SET clause: <c>{field} = {value}</c>.</param>
+        /// <param name="args">Arguments to any parameters embedded in the supplied SQL.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql Set(string sql, params object[] args)
         {
             return Append(new Sql("SET " + sql, args));
         }
 
         /// <summary>
-        ///     Appends an SQL WHERE clause to this SQL builder
+        /// Appends an SQL WHERE clause to this SQL builder.
         /// </summary>
-        /// <param name="sql">The condition of the WHERE clause</param>
-        /// <param name="args">Arguments to any parameters embedded in the supplied SQL</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="sql">The condition of the WHERE clause.</param>
+        /// <param name="args">Arguments to any parameters embedded in the supplied SQL.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql Where(string sql, params object[] args)
         {
             return Append(new Sql("WHERE (" + sql + ")", args));
         }
 
         /// <summary>
-        ///     Appends an SQL ORDER BY clause to this SQL builder
+        /// Appends an SQL ORDER BY clause to this SQL builder.
         /// </summary>
-        /// <param name="columns">A collection of SQL column names to order by</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="columns">A collection of SQL column names to order by.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql OrderBy(params object[] columns)
         {
             return Append(new Sql("ORDER BY " + string.Join(", ", (from x in columns select x.ToString()).ToArray())));
         }
 
         /// <summary>
-        ///     Appends an SQL SELECT clause to this SQL builder
+        /// Appends an SQL SELECT clause to this SQL builder.
         /// </summary>
-        /// <param name="columns">A collection of SQL column names to select</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="columns">A collection of SQL column names to select.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql Select(params object[] columns)
         {
             return Append(new Sql("SELECT " + string.Join(", ", (from x in columns select x.ToString()).ToArray())));
         }
 
         /// <summary>
-        ///     Appends an SQL FROM clause to this SQL builder
+        /// Appends an SQL FROM clause to this SQL builder.
         /// </summary>
-        /// <param name="tables">A collection of table names to be used in the FROM clause</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="tables">A collection of table names to be used in the FROM clause.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql From(params object[] tables)
         {
             return Append(new Sql("FROM " + string.Join(", ", (from x in tables select x.ToString()).ToArray())));
         }
 
         /// <summary>
-        ///     Appends an SQL GROUP BY clause to this SQL builder
+        /// Appends an SQL GROUP BY clause to this SQL builder.
         /// </summary>
-        /// <param name="columns">A collection of column names to be grouped by</param>
-        /// <returns>A reference to this builder, allowing for fluent style concatenation</returns>
+        /// <param name="columns">A collection of column names to be grouped by.</param>
+        /// <returns>A reference to this builder, allowing for fluent style concatenation.</returns>
         public Sql GroupBy(params object[] columns)
         {
             return Append(new Sql("GROUP BY " + string.Join(", ", (from x in columns select x.ToString()).ToArray())));
@@ -212,30 +213,30 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Appends an SQL INNER JOIN clause to this SQL builder
+        /// Appends an SQL INNER JOIN clause to this SQL builder.
         /// </summary>
-        /// <param name="table">The name of the table to join</param>
-        /// <returns>A reference an SqlJoinClause through which the join condition can be specified</returns>
+        /// <param name="table">The name of the table to join.</param>
+        /// <returns>A reference an SqlJoinClause through which the join condition can be specified.</returns>
         public SqlJoinClause InnerJoin(string table)
         {
             return Join("INNER JOIN ", table);
         }
 
         /// <summary>
-        ///     Appends an SQL LEFT JOIN clause to this SQL builder
+        /// Appends an SQL LEFT JOIN clause to this SQL builder.
         /// </summary>
-        /// <param name="table">The name of the table to join</param>
-        /// <returns>A reference an SqlJoinClause through which the join condition can be specified</returns>
+        /// <param name="table">The name of the table to join.</param>
+        /// <returns>A reference an SqlJoinClause through which the join condition can be specified.</returns>
         public SqlJoinClause LeftJoin(string table)
         {
             return Join("LEFT JOIN ", table);
         }
 
         /// <summary>
-        ///     Returns the SQL statement.
+        /// Returns the SQL statement.
         /// </summary>
         /// <summary>
-        ///     Returns the final SQL statement represented by this builder
+        /// Returns the final SQL statement represented by this builder.
         /// </summary>
         public override string ToString()
         {
@@ -243,7 +244,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     The SqlJoinClause is a simple helper class used in the construction of SQL JOIN statements with the SQL builder
+        /// The SqlJoinClause is a simple helper class used in the construction of SQL JOIN statements with the SQL builder.
         /// </summary>
         public class SqlJoinClause
         {
@@ -255,11 +256,11 @@ namespace PetaPoco
             }
 
             /// <summary>
-            ///     Appends a SQL ON clause after a JOIN statement
+            /// Appends an SQL ON clause after a JOIN statement.
             /// </summary>
-            /// <param name="onClause">The ON clause to be appended</param>
-            /// <param name="args">Arguments to any parameters embedded in the supplied SQL</param>
-            /// <returns>A reference to the parent SQL builder, allowing for fluent style concatenation</returns>
+            /// <param name="onClause">The ON clause to be appended.</param>
+            /// <param name="args">Arguments to any parameters embedded in the supplied SQL.</param>
+            /// <returns>A reference to the parent SQL builder, allowing for fluent style concatenation.</returns>
             public Sql On(string onClause, params object[] args)
             {
                 return _sql.Append("ON " + onClause, args);

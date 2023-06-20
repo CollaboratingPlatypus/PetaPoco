@@ -1,5 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+#if !NETSTANDARD
+using System.Configuration;
+#endif
 using System.Data;
 using System.Data.Common;
 using System.Dynamic;
@@ -11,14 +14,10 @@ using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
-#if !NETSTANDARD
-using System.Configuration;
-
-#endif
 
 namespace PetaPoco
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="IDatabase"/>
     public class Database : IDatabase
     {
 #region Internal operations
@@ -62,7 +61,7 @@ namespace PetaPoco
 
 #if !NETSTANDARD
         /// <summary>
-        ///     Constructs an instance using the first connection string found in the app/web configuration file.
+        /// Constructs an instance using the first connection string found in the app/web configuration file.
         /// </summary>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
         /// <exception cref="InvalidOperationException">Thrown when no connection strings can registered.</exception>
@@ -77,8 +76,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using a supplied connection string name. The actual connection string and provider will be
-        ///     read from app/web.config.
+        /// Constructs an instance using a supplied connection string name. The actual connection string and provider will be read from app/web.config.
         /// </summary>
         /// <param name="connectionStringName">The name of the connection.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
@@ -106,14 +104,13 @@ namespace PetaPoco
 #endif
 
         /// <summary>
-        ///     Constructs an instance using a supplied IDbConnection.
+        /// Constructs an instance using a supplied IDbConnection.
         /// </summary>
+        /// <remarks>
+        /// The supplied IDbConnection will not be closed and disposed of by PetaPoco - that remains the responsibility of the caller.
+        /// </remarks>
         /// <param name="connection">The IDbConnection to use.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
-        /// <remarks>
-        ///     The supplied IDbConnection will not be closed/disposed by PetaPoco - that remains
-        ///     the responsibility of the caller.
-        /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connection" /> is null or empty.</exception>
         public Database(IDbConnection connection, IMapper defaultMapper = null)
         {
@@ -134,14 +131,14 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using a supplied connection string and provider name.
+        /// Constructs an instance using a supplied connection string and provider name.
         /// </summary>
+        /// <remarks>
+        /// PetaPoco will automatically close and dispose of any connections it creates.
+        /// </remarks>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="providerName">The database provider name.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
-        /// <remarks>
-        ///     PetaPoco will automatically close and dispose any connections it creates.
-        /// </remarks>
         /// <exception cref="ArgumentException">Thrown when <paramref name="connectionString" /> is null or empty.</exception>
         public Database(string connectionString, string providerName, IMapper defaultMapper = null)
         {
@@ -155,7 +152,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using the supplied connection string and DbProviderFactory.
+        /// Constructs an instance using the supplied connection string and DbProviderFactory.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="factory">The DbProviderFactory to use for instantiating IDbConnections.</param>
@@ -175,7 +172,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using the supplied provider and optional default mapper.
+        /// Constructs an instance using the supplied provider and optional default mapper.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="provider">The provider to use.</param>
@@ -195,14 +192,11 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Constructs an instance using the supplied <paramref name="configuration" />.
+        /// Constructs an instance using the supplied <paramref name="configuration" />.
         /// </summary>
         /// <param name="configuration">The configuration for constructing an instance.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration" /> is null.</exception>
-        /// <exception cref="InvalidOperationException">
-        ///     Thrown when no configuration string is configured and app/web config does
-        ///     any connection string registered.
-        /// </exception>
+        /// <exception cref="InvalidOperationException">Thrown when no configuration string is configured and there are no connection strings registered in the app/web config.</exception>
         /// <exception cref="InvalidOperationException">Thrown when a connection string configured and no provider is configured.</exception>
         public Database(IDatabaseBuildConfiguration configuration)
         {
@@ -290,7 +284,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Provides common initialization for the various constructors.
+        /// Provides common initialization for the various constructors.
         /// </summary>
         private void Initialise(IProvider provider, IMapper mapper)
         {
@@ -312,29 +306,25 @@ namespace PetaPoco
 #region Connection Management
 
         /// <summary>
-        ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection" />
-        ///     or <see cref="Dispose" /> is called.
+        /// When set to <see langword="true"/> the first opened connection is kept alive until <see cref="CloseSharedConnection" /> or <see cref="Dispose" /> is called.
         /// </summary>
         /// <seealso cref="OpenSharedConnection" />
         public bool KeepConnectionAlive { get; set; }
 
         /// <summary>
-        ///     Provides access to the currently open shared connection.
+        /// Provides access to the currently open shared connection.
         /// </summary>
-        /// <returns>
-        ///     The currently open connection, or <c>Null</c>.
-        /// </returns>
+        /// <returns>The currently open connection, or <see langword="null"/>.</returns>
         /// <seealso cref="OpenSharedConnection" />
         /// <seealso cref="CloseSharedConnection" />
         /// <seealso cref="KeepConnectionAlive" />
         public IDbConnection Connection => _sharedConnection;
 
         /// <summary>
-        ///     Opens a connection that will be used for all subsequent queries.
+        /// Opens a connection that will be used for all subsequent queries.
         /// </summary>
         /// <remarks>
-        ///     Calls to <see cref="OpenSharedConnection" />/<see cref="CloseSharedConnection" /> are reference
-        ///     counted and should be balanced
+        /// Calls to <see cref="OpenSharedConnection" /> and <see cref="CloseSharedConnection" /> are reference counted and should be balanced
         /// </remarks>
         /// <seealso cref="Connection" />
         /// <seealso cref="CloseSharedConnection" />
@@ -365,13 +355,13 @@ namespace PetaPoco
 
 #if ASYNC
         /// <summary>
-        ///     The async version of <see cref="OpenSharedConnection" />.
+        /// The async version of <see cref="OpenSharedConnection" />.
         /// </summary>
         public Task OpenSharedConnectionAsync()
             => OpenSharedConnectionAsync(CancellationToken.None);
 
         /// <summary>
-        ///     The async version of <see cref="OpenSharedConnection" />.
+        /// The async version of <see cref="OpenSharedConnection" />.
         /// </summary>
         public async Task OpenSharedConnectionAsync(CancellationToken cancellationToken)
         {
@@ -405,15 +395,14 @@ namespace PetaPoco
 #endif
 
         /// <summary>
-        ///     Releases the shared connection.
+        /// Releases the shared connection.
         /// </summary>
         /// <remarks>
-        ///     Calls to <see cref="OpenSharedConnection" />/<see cref="CloseSharedConnection" /> are reference
-        ///     counted and should be balanced
+        /// Calls to <see cref="OpenSharedConnection" /> and <see cref="CloseSharedConnection" /> are reference counted and should be balanced
         /// </remarks>
         /// <seealso cref="Connection" />
-        /// <seealso cref="OpenSharedConnection" />
         /// <seealso cref="KeepConnectionAlive" />
+        /// <seealso cref="OpenSharedConnection" />
         public void CloseSharedConnection()
         {
             if (_sharedConnectionDepth > 0)
@@ -429,10 +418,10 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Alias for <see cref="CloseSharedConnection" />.
+        /// Alias for <see cref="CloseSharedConnection" />.
         /// </summary>
         /// <remarks>
-        ///     Called implicitly when making use of the .NET `using` language feature.
+        /// Called implicitly when making use of the .NET `using` language feature.
         /// </remarks>
         public void Dispose()
         {
@@ -453,15 +442,16 @@ namespace PetaPoco
             => new Transaction(this);
 
         /// <summary>
-        ///     Called when a transaction starts.
+        /// Called when a transaction starts.
         /// </summary>
+        /// <seealso cref="BeginTransaction"/>
         public virtual void OnBeginTransaction()
         {
             TransactionStarted?.Invoke(this, new DbTransactionEventArgs(_transaction));
         }
 
         /// <summary>
-        ///     Called when a transaction ends.
+        /// Called when a transaction ends.
         /// </summary>
         public virtual void OnEndTransaction()
         {
@@ -517,7 +507,7 @@ namespace PetaPoco
 #endif
 
         /// <summary>
-        ///     Internal helper to cleanup transaction
+        /// Internal helper to cleanup transaction.
         /// </summary>
         private void CleanupTransaction()
         {
@@ -549,6 +539,7 @@ namespace PetaPoco
         }
 
 #if ASYNC
+#pragma warning disable 1998
         private async Task CleanupTransactionAsync()
         {
 #if NETSTANDARD2_1
@@ -572,6 +563,7 @@ namespace PetaPoco
                 CleanupTransaction();
             }
         }
+#pragma warning restore 1998
 
         public Task AbortTransactionAsync()
         {
@@ -591,10 +583,10 @@ namespace PetaPoco
 #region Command Management
 
         /// <summary>
-        ///     Add a parameter to a DB command
+        /// Adds a parameter to a DB command.
         /// </summary>
-        /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added</param>
-        /// <param name="value">The value to assign to the parameter</param>
+        /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added.</param>
+        /// <param name="value">The value to assign to the parameter.</param>
         /// <param name="pc">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
         private void AddParam(IDbCommand cmd, object value, PocoColumn pc)
         {
@@ -768,43 +760,42 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Create an IDbDataParameter with default values.
+        /// Creates an IDbDataParameter with default values.
         /// </summary>
-        /// <returns>The IDbDataParameter</returns>
+        /// <returns>The IDbDataParameter.</returns>
         public IDbDataParameter CreateParameter() => _factory.CreateParameter();
 
         /// <summary>
-        /// Create an IDbDataParameter with the given ParameterName and Value.
+        /// Creates an IDbDataParameter with the given name and value.
         /// </summary>
-        /// <param name="name">The ParameterName.</param>
-        /// <param name="value">The Value of the parameter.</param>
-        /// <returns></returns>
+        /// <param name="name">The parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>The IDbDataParameter.</returns>
         public IDbDataParameter CreateParameter(string name, object value)
             => CreateParameter(name, value, ParameterDirection.Input);
 
         /// <summary>
-        /// Create an IDbParameter with the given ParameterName and Direction.
+        /// Creates an IDbDataParameter with the given name and direction.
         /// </summary>
-        /// <param name="name">The ParameterName.</param>
-        /// <param name="direction">The Direction of the parameter.</param>
-        /// <returns></returns>
+        /// <param name="name">The parameter name.</param>
+        /// <param name="direction">The parameter direction.</param>
+        /// <returns>The IDbDataParameter.</returns>
         public IDbDataParameter CreateParameter(string name, ParameterDirection direction)
             => CreateParameter(name, null, direction);
 
         /// <summary>
         /// Create an IDbParameter with the given ParameterName, Value, and Direction.
         /// </summary>
-        /// <param name="name">The ParameterName.</param>
-        /// <param name="value">The Value of the parameter.</param>
-        /// <param name="direction">The Direction of the parameter.</param>
-        /// <returns></returns>
+        /// <param name="name">The parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <param name="direction">The parameter direction.</param>
+        /// <returns>The IDbDataParameter.</returns>
         public IDbDataParameter CreateParameter(string name, object value, ParameterDirection direction)
         {
             var result = CreateParameter();
             result.ParameterName = name;
             result.Value = value;
             result.Direction = direction;
-
             return result;
         }
 
@@ -813,29 +804,28 @@ namespace PetaPoco
 #region Exception Reporting and Logging
 
         /// <summary>
-        ///     Called if an exception occurs during processing of a DB operation.  Override to provide custom logging/handling.
+        /// Called if an exception occurs during processing of a DB operation.  Override to provide custom logging/handling.
         /// </summary>
-        /// <param name="x">The exception instance</param>
-        /// <returns>True to re-throw the exception, false to suppress it</returns>
-        public virtual bool OnException(Exception x)
+        /// <param name="ex">The exception instance.</param>
+        /// <returns><see langword="true"/> to re-throw the exception, <see langword="false"/> to suppress it.</returns>
+        public virtual bool OnException(Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(x.ToString());
+            System.Diagnostics.Debug.WriteLine(ex.ToString());
             System.Diagnostics.Debug.WriteLine(LastCommand);
 
-            var args = new ExceptionEventArgs(x);
-            ExceptionThrown?.Invoke(this, new ExceptionEventArgs(x));
+            var args = new ExceptionEventArgs(ex);
+            ExceptionThrown?.Invoke(this, new ExceptionEventArgs(ex));
             return args.Raise;
         }
 
         /// <summary>
-        ///     Called when DB connection opened
+        /// Called when DB connection opened.
         /// </summary>
-        /// <param name="conn">The newly-opened IDbConnection</param>
-        /// <returns>The same or a replacement IDbConnection</returns>
         /// <remarks>
-        ///     Override this method to provide custom logging of opening connection, or
-        ///     to provide a proxy IDbConnection.
+        /// Override this method to provide custom logging of opened connections, or to provide a proxy IDbConnection.
         /// </remarks>
+        /// <param name="conn">The newly-opened IDbConnection.</param>
+        /// <returns>The same or a replacement IDbConnection.</returns>
         public virtual IDbConnection OnConnectionOpened(IDbConnection conn)
         {
             var args = new DbConnectionEventArgs(conn);
@@ -844,14 +834,13 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Called before a DB connection is opened
+        /// Called before a DB connection is opened.
         /// </summary>
-        /// <param name="conn">The soon-to-be-opened IDbConnection</param>
-        /// <returns>The same or a replacement IDbConnection</returns>
         /// <remarks>
-        ///     Override this method to provide custom logging of opening connection, or
-        ///     to provide a proxy IDbConnection.
+        /// Override this method to provide custom logging of opening connections, or to provide a proxy IDbConnection.
         /// </remarks>
+        /// <param name="conn">The soon-to-be-opened IDbConnection.</param>
+        /// <returns>The same or a replacement IDbConnection.</returns>
         public virtual IDbConnection OnConnectionOpening(IDbConnection conn)
         {
             var args = new DbConnectionEventArgs(conn);
@@ -860,37 +849,33 @@ namespace PetaPoco
         }
 
         /// <summary>
-        ///     Called when DB connection closed
+        /// Called when DB connection closed.
         /// </summary>
-        /// <param name="conn">The soon-to-be-closed IDBConnection</param>
+        /// <param name="conn">The soon-to-be-closed IDBConnection.</param>
         public virtual void OnConnectionClosing(IDbConnection conn)
         {
             ConnectionClosing?.Invoke(this, new DbConnectionEventArgs(conn));
         }
 
         /// <summary>
-        ///     Called just before an DB command is executed
+        /// Called just before an DB command is executed.
         /// </summary>
-        /// <param name="cmd">The command to be executed</param>
         /// <remarks>
-        ///     Override this method to provide custom logging of commands,
-        ///     modification of the IDbCommand before it's executed, or any
-        ///     other custom actions that should be performed before every
-        ///     command
+        /// Override this method to provide custom logging of commands, modification of the IDbCommand before it's executed, or any other custom actions that should be performed before every command
         /// </remarks>
+        /// <param name="cmd">The command to be executed.</param>
         public virtual void OnExecutingCommand(IDbCommand cmd)
         {
             CommandExecuting?.Invoke(this, new DbCommandEventArgs(cmd));
         }
 
         /// <summary>
-        ///     Called on completion of command execution
+        /// Called on completion of command execution.
         /// </summary>
-        /// <param name="cmd">The IDbCommand that finished executing</param>
         /// <remarks>
-        ///     Override this method to provide custom logging or other actions
-        ///     after every command has completed.
+        /// Override this method to provide custom logging or other actions after every command has completed.
         /// </remarks>
+        /// <param name="cmd">The IDbCommand that finished executing.</param>
         public virtual void OnExecutedCommand(IDbCommand cmd)
         {
             CommandExecuted?.Invoke(this, new DbCommandEventArgs(cmd));
@@ -1182,16 +1167,16 @@ namespace PetaPoco
 #region operation: Page
 
         /// <summary>
-        ///     Starting with a regular SELECT statement, derives the SQL statements required to query a
-        ///     DB for a page of records and the total number of records
+        /// Starting with a regular SELECT statement, derives the SQL statements required to query a DB for a page of records and the total number of records.
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set</typeparam>
-        /// <param name="skip">The number of rows to skip before the start of the page</param>
-        /// <param name="take">The number of rows in the page</param>
-        /// <param name="sql">The original SQL select statement</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <param name="sqlCount">Outputs the SQL statement to query for the total number of matching rows</param>
-        /// <param name="sqlPage">Outputs the SQL statement to retrieve a single page of matching rows</param>
+        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
+        /// <param name="skip">The number of rows to skip before the start of the page.</param>
+        /// <param name="take">The number of rows in the page.</param>
+        /// <param name="sql">The original SQL select statement.</param>
+        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
+        /// <param name="sqlCount">Outputs the SQL statement to query for the total number of matching rows.</param>
+        /// <param name="sqlPage">Outputs the SQL statement to retrieve a single page of matching rows.</param>
+        /// <exception cref="Exception">Thrown when unable to parse the given <paramref name="sql"/> statement.</exception>
         protected virtual void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
         {
             if (EnableAutoSelect)
@@ -1696,7 +1681,7 @@ namespace PetaPoco
 
 #endregion
 
-#region operation: Linq style (Exists, Single, SingleOrDefault etc...)
+#region operation: Linq style (Exists, Single, SingleOrDefault, First, FirstOrDefault, etc...)
 
         /// <inheritdoc />
         public T Single<T>(object primaryKey)
@@ -1888,6 +1873,7 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="poco"/> is <see langword="null"/>.</exception>
         public object Insert(object poco)
         {
             if (poco == null)
@@ -2096,9 +2082,9 @@ namespace PetaPoco
 
 #endif
 
-        #endregion
+#endregion
 
-        #region operation: Update
+#region operation: Update
 
         /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
@@ -2574,6 +2560,8 @@ namespace PetaPoco
 #region operation: IsNew
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="poco"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="primaryKeyName"/> is null or empty.</exception>
         public bool IsNew(string primaryKeyName, object poco)
         {
             if (poco == null)
@@ -2586,6 +2574,7 @@ namespace PetaPoco
         }
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="poco"/> is null.</exception>
         public bool IsNew(object poco)
         {
             if (poco == null)
@@ -2987,17 +2976,17 @@ namespace PetaPoco
 #region Last Command
 
         /// <summary>
-        ///     Retrieves the SQL of the last executed statement
+        /// Gets the SQL used for the most recently executed statement.
         /// </summary>
         public string LastSQL => _lastSql;
 
         /// <summary>
-        ///     Retrieves the arguments to the last execute statement
+        /// Gets the arguments used for the most recently executed statement.
         /// </summary>
         public object[] LastArgs => _lastArgs;
 
         /// <summary>
-        ///     Returns a formatted string describing the last executed SQL statement and its argument values
+        /// Gets a formatted string describing the last executed SQL statement and its argument values.
         /// </summary>
         public string LastCommand => FormatCommand(_lastSql, _lastArgs);
 
@@ -3006,21 +2995,21 @@ namespace PetaPoco
 #region FormatCommand
 
         /// <summary>
-        ///     Formats the contents of a DB command for display
+        /// Formats the contents of a DB command for display.
         /// </summary>
-        /// <param name="cmd"></param>
-        /// <returns></returns>
+        /// <param name="cmd">The <see cref="IDbCommand"/>command.</param>
+        /// <returns>The formatted command.</returns>
         public string FormatCommand(IDbCommand cmd)
         {
             return FormatCommand(cmd.CommandText, (from IDataParameter parameter in cmd.Parameters select parameter.Value).ToArray());
         }
 
         /// <summary>
-        ///     Formats an SQL query and its arguments for display
+        /// Formats an SQL statement and its arguments for display.
         /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
+        /// <param name="sql">The SQL statement.</param>
+        /// <param name="args">The arguments.</param>
+        /// <returns>The formatted SQL statement.</returns>
         public string FormatCommand(string sql, object[] args)
         {
             var sb = new StringBuilder();
@@ -3046,53 +3035,44 @@ namespace PetaPoco
 #region Public Properties
 
         /// <summary>
-        ///     Gets the default mapper.
+        /// Gets the default mapper.
         /// </summary>
         public IMapper DefaultMapper => _defaultMapper;
 
         /// <summary>
-        ///     When set to true, PetaPoco will automatically create the "SELECT columns" part of any query that looks like it
-        ///     needs it
+        /// When set to <see langword="true"/>, PetaPoco will automatically create the "SELECT columns" part of any query that looks like it needs it.
         /// </summary>
         public bool EnableAutoSelect { get; set; }
 
         /// <summary>
-        ///     When set to true, parameters can be named ?myparam and populated from properties of the passed-in argument values.
+        /// When set to <see langword="true"/>, parameters can be named <c>?myparam</c> and populated from properties of the passed-in argument values.
         /// </summary>
         public bool EnableNamedParams { get; set; }
 
         /// <summary>
-        ///     Sets the timeout value for all SQL statements.
+        /// Gets or sets the timeout value for all SQL statements.
         /// </summary>
         public int CommandTimeout { get; set; }
 
         /// <summary>
-        ///     Sets the timeout value for the next (and only next) SQL statement
+        /// Gets or sets the timeout value for the next (and only next) SQL statement.
         /// </summary>
         public int OneTimeCommandTimeout { get; set; }
 
         /// <summary>
-        ///     Gets the loaded database provider. <seealso cref="Provider" />.
+        /// Gets the loaded database provider.
         /// </summary>
-        /// <returns>
-        ///     The loaded database type.
-        /// </returns>
         public IProvider Provider => _provider;
 
         /// <summary>
-        ///     Gets the connection string.
+        /// Gets the connection string.
         /// </summary>
-        /// <returns>
-        ///     The connection string.
-        /// </returns>
         public string ConnectionString => _connectionString;
 
         /// <summary>
-        ///     Gets or sets the transaction isolation level.
+        /// Gets or sets the transaction isolation level.
         /// </summary>
-        /// <remarks>
-        ///     When value is null, the underlying providers default isolation level is used.
-        /// </remarks>
+        /// <value>If <see langword="null"/>, the underlying provider's default isolation level is used.</value>
         public IsolationLevel? IsolationLevel
         {
             get => _isolationLevel;
@@ -3105,9 +3085,9 @@ namespace PetaPoco
             }
         }
 
-        #endregion
+#endregion
 
-        #region Helpers
+#region Helpers
         internal protected IDataReader ExecuteReaderHelper(IDbCommand cmd)
         {
             return (IDataReader)CommandHelper(cmd, c => c.ExecuteReader());
@@ -3174,57 +3154,44 @@ namespace PetaPoco
             return result;
         }
 #endif
-        #endregion
 
-        #region Events
+#endregion
 
-        /// <summary>
-        ///     Occurs when a new transaction has started.
-        /// </summary>
+#region Events
+
+        /// <inheritdoc/>
         public event EventHandler<DbTransactionEventArgs> TransactionStarted;
 
-        /// <summary>
-        ///     Occurs when a transaction is about to be rolled back or committed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DbTransactionEventArgs> TransactionEnding;
 
-        /// <summary>
-        ///     Occurs when a database command is about to be executed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DbCommandEventArgs> CommandExecuting;
 
-        /// <summary>
-        ///     Occurs when a database command has been executed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DbCommandEventArgs> CommandExecuted;
 
-        /// <summary>
-        ///     Occurs when a database connection is about to be closed.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DbConnectionEventArgs> ConnectionClosing;
 
-        /// <summary>
-        ///     Occurs when a database connection has been opened.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DbConnectionEventArgs> ConnectionOpened;
 
-        /// <summary>
-        ///     Occurs when a database connection is about to be opened.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<DbConnectionEventArgs> ConnectionOpening;
 
-        /// <summary>
-        ///     Occurs when a database exception has been thrown.
-        /// </summary>
+        /// <inheritdoc/>
         public event EventHandler<ExceptionEventArgs> ExceptionThrown;
 
 #endregion
     }
 
+    /// <inheritdoc/>
+    /// <typeparam name="TDatabaseProvider">The provider type, which must implement the <see cref="IProvider"/> interface.</typeparam>
     public class Database<TDatabaseProvider> : Database where TDatabaseProvider : IProvider
     {
         /// <summary>
-        ///     Constructs an instance using a supplied connection string and provider type.
+        /// Constructs an instance using a supplied connection string and provider type.
         /// </summary>
         /// <param name="connectionString">The database connection string.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
