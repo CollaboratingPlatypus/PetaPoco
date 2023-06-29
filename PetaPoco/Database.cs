@@ -1960,7 +1960,7 @@ namespace PetaPoco
                     var autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
                     if (autoIncExpression != null)
                     {
-                        names.Add(i.Key);
+                        names.Add(_provider.EscapeSqlIdentifier(i.Key));
                         values.Add(autoIncExpression);
                     }
 
