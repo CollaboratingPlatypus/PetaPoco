@@ -17,10 +17,11 @@ build_script:
 
     if ($env:APPVEYOR_REPO_BRANCH -ieq "development") {
         $packVersion += "-beta"
-        dotnet pack -c "Release" -p:Version=$packVersion
     }
-    elseif ($env:APPVEYOR_REPO_BRANCH -ieq "master") {
-        dotnet pack -c "Release" -p:Version=$packVersion
-        dotnet nuget push ".\PetaPoco\bin\Release\*.nupkg" -k "$($env:NUGET_API_KEY)" -s "https://www.nuget.org/api/v2/package"
+    
+    dotnet pack -c "Release" -p:Version=$packVersion
+    
+    if ($env:APPVEYOR_REPO_BRANCH -ieq "master") {
+        dotnet nuget push "./PetaPoco/bin/Release/*.nupkg" -k "$($env:NUGET_API_KEY)" -s "https://www.nuget.org/api/v2/package"
     }
 test: off
