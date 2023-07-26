@@ -74,6 +74,14 @@ namespace PetaPoco.Core
             QueryColumns = (from c in Columns where !c.Value.ResultColumn || c.Value.AutoSelectedResultColumn select c.Key).ToArray();
         }
 
+        public static PocoData ForType(Type type, IMapper defaultMapper)
+        {
+            if (type == typeof(System.Dynamic.ExpandoObject))
+                throw new InvalidOperationException("Can't use dynamic types with this method");
+
+            return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
+        }
+
         public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
         {
             var t = obj.GetType();
@@ -95,20 +103,6 @@ namespace PetaPoco.Core
             }
 
             return ForType(t, defaultMapper);
-        }
-
-        public static PocoData ForType(Type type, IMapper defaultMapper)
-        {
-            if (type == typeof(System.Dynamic.ExpandoObject))
-                throw new InvalidOperationException("Can't use dynamic types with this method");
-
-            return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
-        }
-
-        private static bool IsIntegralType(Type type)
-        {
-            var tc = Type.GetTypeCode(type);
-            return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
         }
 
         // Create factory function that can convert a IDataReader record into a POCO
@@ -391,6 +385,12 @@ namespace PetaPoco.Core
             }
 
             return null;
+        }
+
+        private static bool IsIntegralType(Type type)
+        {
+            var tc = Type.GetTypeCode(type);
+            return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
         }
 
         private static T RecurseInheritedTypes<T>(Type t, Func<Type, T> cb)

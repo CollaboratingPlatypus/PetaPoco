@@ -11,17 +11,25 @@
         /// <summary>
         /// Executes a non-query command.
         /// </summary>
+        /// <param name="sql">An Sql builder object representing the SQL statement and its arguments.</param>
+        /// <returns>The number of rows affected.</returns>
+        int Execute(Sql sql);
+
+        /// <summary>
+        /// Executes a non-query command.
+        /// </summary>
         /// <param name="sql">The SQL statement to execute.</param>
         /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
         /// <returns>The number of rows affected.</returns>
         int Execute(string sql, params object[] args);
 
         /// <summary>
-        /// Executes a non-query command.
+        /// Executes the query and returns the first column of the first row in the result set.
         /// </summary>
-        /// <param name="sql">An Sql builder object representing the SQL statement and its arguments.</param>
-        /// <returns>The number of rows affected.</returns>
-        int Execute(Sql sql);
+        /// <typeparam name="T">The type that the result value should be cast to.</typeparam>
+        /// <param name="sql">An Sql builder object representing the SQL query and its arguments.</param>
+        /// <returns>The scalar value cast to <typeparamref name="T"/>.</returns>
+        T ExecuteScalar<T>(Sql sql);
 
         /// <summary>
         /// Executes the query and returns the first column of the first row in the result set.
@@ -31,13 +39,5 @@
         /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
         /// <returns>The scalar value cast to <typeparamref name="T"/>.</returns>
         T ExecuteScalar<T>(string sql, params object[] args);
-
-        /// <summary>
-        /// Executes the query and returns the first column of the first row in the result set.
-        /// </summary>
-        /// <typeparam name="T">The type that the result value should be cast to.</typeparam>
-        /// <param name="sql">An Sql builder object representing the SQL query and its arguments.</param>
-        /// <returns>The scalar value cast to <typeparamref name="T"/>.</returns>
-        T ExecuteScalar<T>(Sql sql);
     }
 }

@@ -139,6 +139,18 @@ namespace PetaPoco
         /// </remarks>
         void BeginTransaction();
 
+#if ASYNC
+        /// <summary>
+        /// Async version of <see cref="BeginTransaction" />.
+        /// </summary>
+        Task BeginTransactionAsync();
+
+        /// <summary>
+        /// Async version of <see cref="BeginTransaction" />.
+        /// </summary>
+        Task BeginTransactionAsync(CancellationToken cancellationToken);
+#endif
+
         /// <summary>
         /// Aborts the entire outermost transaction scope.
         /// </summary>
@@ -178,30 +190,18 @@ namespace PetaPoco
         event EventHandler<DbCommandEventArgs> CommandExecuted;
 
         /// <summary>
-        /// Occurs when a database connection is about to be closed.
-        /// </summary>
-        event EventHandler<DbConnectionEventArgs> ConnectionClosing;
-
-        /// <summary>
         /// Occurs when a database connection has been opened.
         /// </summary>
         event EventHandler<DbConnectionEventArgs> ConnectionOpened;
 
         /// <summary>
+        /// Occurs when a database connection is about to be closed.
+        /// </summary>
+        event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+
+        /// <summary>
         /// Occurs when a database exception has been thrown.
         /// </summary>
         event EventHandler<ExceptionEventArgs> ExceptionThrown;
-
-#if ASYNC
-        /// <summary>
-        /// Async version of <see cref="BeginTransaction" />.
-        /// </summary>
-        Task BeginTransactionAsync();
-
-        /// <summary>
-        /// Async version of <see cref="BeginTransaction" />.
-        /// </summary>
-        Task BeginTransactionAsync(CancellationToken cancellationToken);
-#endif
     }
 }

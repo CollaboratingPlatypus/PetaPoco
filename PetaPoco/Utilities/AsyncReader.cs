@@ -14,8 +14,8 @@ namespace PetaPoco.Utilities
     {
         private readonly bool _isAsync;
         private readonly Func<IDataReader, T> _pocoFactory;
-        private IDbCommand _cmd;
         private IDatabase _db;
+        private IDbCommand _cmd;
         private IDataReader _reader;
         private DbDataReader Reader => (DbDataReader)_reader;
 

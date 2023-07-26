@@ -92,6 +92,18 @@ namespace PetaPoco
         /// <seealso cref="ColumnAttribute.UpdateTemplate"/>
         public string UpdateTemplate { get; set; }
 
+        /// <summary>
+        /// Creates and populates a ColumnInfo from the attributes of a POCO property.
+        /// </summary>
+        /// <param name="propertyInfo">The POCO property to use for initializing the ColumnInfo.</param>
+        /// <returns>A ColumnInfo instance.</returns>
+        public static ColumnInfo FromProperty(PropertyInfo propertyInfo)
+        {
+            var ci = new ColumnInfo();
+            PopulateFromProperty(propertyInfo, ref ci, out _);
+            return ci;
+        }
+
         internal static void PopulateFromProperty(PropertyInfo pi, ref ColumnInfo ci, out ColumnAttribute columnAttr)
         {
             // Check if declaring poco has [Explicit] attribute
@@ -122,18 +134,6 @@ namespace PetaPoco
                     ci.AutoSelectedResultColumn = resAttr.IncludeInAutoSelect == IncludeInAutoSelect.Yes;
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates and populates a ColumnInfo from the attributes of a POCO property.
-        /// </summary>
-        /// <param name="propertyInfo">The POCO property to use for initializing the ColumnInfo.</param>
-        /// <returns>A ColumnInfo instance.</returns>
-        public static ColumnInfo FromProperty(PropertyInfo propertyInfo)
-        {
-            var ci = new ColumnInfo();
-            PopulateFromProperty(propertyInfo, ref ci, out _);
-            return ci;
         }
     }
 }
