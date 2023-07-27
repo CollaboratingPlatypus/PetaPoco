@@ -3,6 +3,8 @@ name: PR Build and Test
 on:
   pull_request:
     branches: [ development ]
+  push:
+    branches: [ development, master ]
 
 jobs:
   runner-job:
