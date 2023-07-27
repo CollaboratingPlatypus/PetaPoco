@@ -6,7 +6,6 @@ using PetaPoco.Core;
 
 namespace PetaPoco
 {
-    // TODO: Comments stating default values should be moved to the base implementation, where the defaults are actually set.
     /// <summary>
     /// Represents the core functionality of PetaPoco.
     /// </summary>
@@ -18,156 +17,102 @@ namespace PetaPoco
         /// <summary>
         /// Gets the default mapper.
         /// </summary>
-        /// <remarks>
-        /// By default, this is the <see cref="ConventionMapper" />.
-        /// </remarks>
-        /// <returns>The default mapper.</returns>
         IMapper DefaultMapper { get; }
 
         /// <summary>
-        /// Gets the SQL of the last executed statement.
+        /// Gets the SQL of the last executed command.
         /// </summary>
-        /// <returns>The last executed SQL.</returns>
         string LastSQL { get; }
 
         /// <summary>
-        /// Gets the arguments to the last execute statement.
+        /// Gets an array containing the arguments of the last executed command.
         /// </summary>
-        /// <returns>The last executed SQL arguments.</returns>
         object[] LastArgs { get; }
 
         /// <summary>
-        /// Gets a formatted string describing the last executed SQL statement and its argument values.
+        /// Gets a formatted string describing the last executed command and its argument values.
         /// </summary>
-        /// <returns>The formatted string.</returns>
         string LastCommand { get; }
 
         /// <summary>
-        /// Gets or sets the enable auto select. The default value is <see langword="true"/>.
+        /// Gets or sets a value indicating whether automatic generation of the <c>SELECT</c> and <c>WHERE</c> parts of an SQL statement is enabled when not explicitly provided by the caller.
         /// </summary>
-        /// <remarks>
-        /// When set to <see langword="true"/>, PetaPoco will automatically create the "SELECT columns" section of the query for any query which is found to require them.
-        /// </remarks>
-        /// <returns><see langword="true"/>, if auto select is enabled; otherwise, <see langword="false"/>.</returns>
         bool EnableAutoSelect { get; set; }
 
         /// <summary>
-        /// Gets or sets the flag for whether named params are enabled. The default value is <see langword="true"/>.
+        /// Gets or sets a value indicating whether named parameters are enabled.
         /// </summary>
-        /// <remarks>
-        /// When set to <see langword="true"/>, parameters can be named ?myparam and populated from properties of the passed-in argument values.
-        /// </remarks>
-        /// <returns><see langword="true"/>, if named parameters are enabled; otherwise, <see langword="false"/>.</returns>
         bool EnableNamedParams { get; set; }
 
         /// <summary>
-        /// Gets or sets the command timeout value, in seconds, which PetaPoco applies to all commands. The default value is 0 seconds.
+        /// Gets or sets the wait time (in seconds) before terminating the attempt to execute a command.
         /// </summary>
-        /// <remarks>
-        /// If the current value is zero PetaPoco will not set the command timeout, and therefore the .NET default (30 seconds) will be in effect.
-        /// </remarks>
-        /// <returns>The current command timeout.</returns>
         int CommandTimeout { get; set; }
 
         /// <summary>
-        /// Gets or sets the timeout value for the next (and only next) SQL statement.
+        /// Gets or sets a single-use timeout value that will temporarily override <see cref="CommandTimeout"/> for the next command execution.
         /// </summary>
-        /// <remarks>
-        /// This is a one-shot setting, which after use, will revert back to the previously set <see cref="CommandTimeout" /> setting.
-        /// </remarks>
-        /// <returns>The one time command timeout.</returns>
         int OneTimeCommandTimeout { get; set; }
 
         /// <summary>
-        /// Gets the current database Provider.
+        /// Gets the underlying database Provider.
         /// </summary>
-        /// <returns>The current database provider.</returns>
         IProvider Provider { get; }
 
         /// <summary>
         /// Gets the connection string.
         /// </summary>
-        /// <returns>The connection string.</returns>
         string ConnectionString { get; }
+
+        #region Transaction Interface
 
         /// <summary>
         /// Gets or sets the transaction isolation level.
         /// </summary>
-        /// <value>If <see langword="null"/>, the underlying provider's default isolation level is used.</value>
         IsolationLevel? IsolationLevel { get; set; }
 
         /// <summary>
-        /// Starts or continues a transaction.
+        /// Begins or continues a transaction.
         /// </summary>
-        /// <remarks>
-        /// This method facilitates proper transaction lifetime management, especially when nested.
-        /// <para/>Transactions can be nested but they must all be <see cref="CompleteTransaction">completed</see> prior to leaving their scope, otherwise the entire transaction is aborted.
-        /// <example>
-        /// A basic example of using transactional scopes (part pseudocode) is shown below:
-        /// <code language="cs" title="Transaction Scopes">
-        /// <![CDATA[
-        /// void DoStuff()
-        /// {
-        ///     using (var tx = db.GetTransaction()) // Starts transaction
-        ///     {
-        ///         db.Update(/*...*/); // Do stuff
-        ///         if (DateTime.Now.DayOfWeek == DayOfWeek.Monday)
-        ///             DoDoubleStuff(); // Nested transaction scope
-        ///         tx.Complete(); // Mark the transaction as complete
-        ///     }
-        /// }
-        /// void DoDoubleStuff()
-        /// {
-        ///     using var tx = db.GetTransaction(); // Continues transaction if we're nested
-        ///     db.Update(/*...*/); // Do boss's stuff, too
-        ///     tx.Complete(); // Mark transaction as complete before we exit scope
-        /// }
-        /// ]]>
-        /// </code>
-        /// </example>
-        /// </remarks>
-        /// <returns>An <see cref="ITransaction" /> reference that must be <see cref="CompleteTransaction">completed</see> or <see cref="IDisposable.Dispose">disposed</see>.</returns>
         ITransaction GetTransaction();
 
         /// <summary>
-        /// Starts a transaction scope.
+        /// Begins a transaction scope.
         /// </summary>
-        /// <remarks>
-        /// <example>
-        /// <inheritdoc cref="GetTransaction"/>
-        /// </example>
-        /// </remarks>
         void BeginTransaction();
 
 #if ASYNC
         /// <summary>
-        /// Async version of <see cref="BeginTransaction" />.
+        /// Asynchronously begins a transaction scope.
         /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         Task BeginTransactionAsync();
 
         /// <summary>
-        /// Async version of <see cref="BeginTransaction" />.
+        /// Asynchronously begins a transaction scope.
         /// </summary>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         Task BeginTransactionAsync(CancellationToken cancellationToken);
 #endif
 
         /// <summary>
         /// Aborts the entire outermost transaction scope.
         /// </summary>
-        /// <remarks>
-        /// Called automatically by <see cref="IDisposable.Dispose"/> if the transaction wasn't completed.
-        /// </remarks>
         void AbortTransaction();
+
+#if ASYNC
+        // TODO: Missing: `AbortTransactionAsync()`
+#endif
 
         /// <summary>
         /// Marks the current transaction scope as complete.
         /// </summary>
-        /// <remarks>
-        /// <example>
-        /// <inheritdoc cref="GetTransaction"/>
-        /// </example>
-        /// </remarks>
         void CompleteTransaction();
+
+#if ASYNC
+        // TODO: Missing: `CompleteTransactionAsync()`
+#endif
 
         /// <summary>
         /// Occurs when a new transaction has started.
@@ -179,6 +124,8 @@ namespace PetaPoco
         /// </summary>
         event EventHandler<DbTransactionEventArgs> TransactionEnding;
 
+        #endregion
+
         /// <summary>
         /// Occurs when a database command is about to be executed.
         /// </summary>
@@ -188,6 +135,8 @@ namespace PetaPoco
         /// Occurs when a database command has been executed.
         /// </summary>
         event EventHandler<DbCommandEventArgs> CommandExecuted;
+
+        // TODO: Missing: `event EventHandler<DbConnectionEventArgs> ConnectionOpening`
 
         /// <summary>
         /// Occurs when a database connection has been opened.

@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 namespace PetaPoco
 {
     /// <summary>
-    /// Defines methods for asynchronously reading data as POCO objects from a data source.
+    /// Specifies a set of methods for asynchronously reading data as POCO objects from a data source.
     /// </summary>
-    /// <typeparam name="T">The type of POCO object to read from the data source.</typeparam>
+    /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
     public interface IAsyncReader<out T> : IDisposable
     {
         /// <summary>
@@ -17,7 +17,9 @@ namespace PetaPoco
         /// <summary>
         /// Asynchronously reads the next row from the data source.
         /// </summary>
-        /// <returns>A task that represents the asynchronous read operation. The task result contains <see langword="true"/> if more records exist; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if more records exist, otherwise <see langword="false"/>.</returns>
         Task<bool> ReadAsync();
+
+        // TODO: Missing overload: `Task<bool> ReadAsync(CancellationToken)`
     }
 }

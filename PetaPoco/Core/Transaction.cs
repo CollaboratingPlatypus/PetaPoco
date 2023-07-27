@@ -8,9 +8,9 @@
         private IDatabase _db;
 
         /// <summary>
-        /// Constructs an instance using the supplied <paramref name="database"/>, and begins the transaction.
+        /// Creates a new Transaction instance for the specified database, and begins the transaction.
         /// </summary>
-        /// <param name="database">The IDatabase instance to use.</param>
+        /// <param name="database">The database instance that will execute the transaction.</param>
         /// <seealso cref="IDatabase.BeginTransaction"/>
         public Transaction(IDatabase database)
         {

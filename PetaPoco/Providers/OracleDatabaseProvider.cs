@@ -27,6 +27,7 @@ namespace PetaPoco.Providers
         }
 
         /// <inheritdoc />
+        /// <exception cref="Exception">A paged query does not alias '*'</exception>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             if (parts.SqlSelectRemoved.StartsWith("*"))

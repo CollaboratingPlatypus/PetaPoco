@@ -6,12 +6,12 @@ namespace PetaPoco
     /// Represents the contract for the transaction.
     /// </summary>
     /// <remarks>
-    /// A PetaPoco helper to support transactions using the using syntax.
+    /// A PetaPoco helper to support transactions inside the using block syntax.
     /// </remarks>
     public interface ITransaction : IDisposable, IHideObjectMethods
     {
         /// <summary>
-        /// Completes the transaction. Not calling complete will cause the transaction to rollback on <see cref="IDisposable.Dispose"/>.
+        /// Completes the transaction.
         /// </summary>
         void Complete();
     }

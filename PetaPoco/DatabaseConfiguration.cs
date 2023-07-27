@@ -26,13 +26,13 @@ namespace PetaPoco
                 _settings.Remove(key);
         }
 
-        void IBuildConfigurationSettings.TryGetSetting<T>(string key, Action<T> setSetting, Action onFail)
+        void IBuildConfigurationSettings.TryGetSetting<T>(string key, Action<T> onGetAction, Action onFailAction)
         {
             // Note: no argument checking because, pref, enduser unlikely and handled by RT/FW
             if (_settings.TryGetValue(key, out var setting))
-                setSetting((T) setting);
+                onGetAction((T) setting);
             else
-                onFail?.Invoke();
+                onFailAction?.Invoke();
         }
 
         /// <summary>

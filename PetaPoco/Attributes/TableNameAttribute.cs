@@ -12,14 +12,13 @@ namespace PetaPoco
     public class TableNameAttribute : Attribute
     {
         /// <summary>
-        /// The database table name this POCO maps to.
+        /// Gets the database table name this POCO maps to.
         /// </summary>
         /// <value>Overrides this class's inflected table name from the mapper.</value>
         public string Value { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TableNameAttribute"/> class with the specified table name.
-        /// <para/><inheritdoc cref="TableNameAttribute"/>
         /// </summary>
         /// <param name="tableName">The database table name this class maps to.</param>
         public TableNameAttribute(string tableName) => Value = tableName;

@@ -14,12 +14,12 @@ namespace PetaPoco
     public class ConventionMapper : IMapper
     {
         /// <summary>
-        /// Gets or sets the get sequence name logic.
+        /// Gets or sets the sequence name logic (for Oracle).
         /// </summary>
         public Func<Type, PropertyInfo, string> GetSequenceName { get; set; }
 
         /// <summary>
-        /// Gets or sets the inflect column name logic.
+        /// Gets or sets the inflected column name logic.
         /// </summary>
         public Func<IInflector, string, string> InflectColumnName { get; set; }
 

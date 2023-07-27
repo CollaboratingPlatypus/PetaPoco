@@ -1,652 +1,457 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace PetaPoco
 {
+    /// <summary>
+    /// Specifies a set of methods for executing SQL queries and returning the result set as lists, enumerables, single POCOs, multi-POCOs, or paged results.
+    /// </summary>
     public interface IQuery
     {
-        #region Query : Single-Poco
+        #region Query : Single-POCO
 
         /// <summary>
-        /// Streams the result of a select all query (SELECT *).
+        /// Executes an auto-select query (<c>SELECT *</c>) and returns the results as a sequence of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// For some DB providers, care should be taken to not start a new Query before finishing with and disposing of the previous one. In cases where this is an issue, consider using Fetch, which returns the results as a List rather than streaming as an IEnumerable.
+        /// <see cref="IDatabase.EnableAutoSelect"/> must be enabled in order to generate the auto-select portion of the SQL statement.
+        /// <para/><inheritdoc cref="Query{T}(Sql)"/>
         /// </remarks>
-        /// <typeparam name="T">The POCO type.</typeparam>
-        /// <returns>An IEnumerable collection of POCOs.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="T"/>.</returns>
         IEnumerable<T> Query<T>();
 
-        /// <summary>
-        /// Runs an SQL query, returning the results as an IEnumerable collection.
-        /// </summary>
-        /// <remarks>
-        /// For some DB providers, care should be taken to not start a new Query before finishing with and disposing of the previous one. In cases where this is an issue, consider using Fetch, which returns the results as a List rather than an IEnumerable.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">An SQL builder object representing the base SQL query and its arguments.</param>
-        /// <returns>An IEnumerable collection of POCOs.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="Query{T}(string, object[])"/>
         IEnumerable<T> Query<T>(Sql sql);
 
         /// <summary>
-        /// Runs an SQL query, returning the results as an IEnumerable collection.
+        /// Executes a query and returns the results as a sequence of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// For some DB providers, care should be taken to not start a new Query before finishing with and disposing of the previous one. In cases where this is an issue, consider using Fetch, which returns the results as a List rather than an IEnumerable.
+        /// Because this method streams the results from the database, care should be taken to not start a new query before finishing with and disposing of the previous one to prevent encountering database locks. In cases where contention could be an issue, consider using the equivalent Fetch method.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">The SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>An IEnumerable collection of POCOs.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="T"/>.</returns>
         IEnumerable<T> Query<T>(string sql, params object[] args);
 
         #endregion
 
-        #region Query : Multi-Poco
+        #region Query with Default Mapping : Multi-POCO
 
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5}(Sql)"/>
         IEnumerable<T1> Query<T1, T2>(Sql sql);
 
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5}(Sql)"/>
         IEnumerable<T1> Query<T1, T2, T3>(Sql sql);
 
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5}(Sql)"/>
         IEnumerable<T1> Query<T1, T2, T3, T4>(Sql sql);
 
         /// <summary>
-        /// Perform a multi-poco query.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="T1"/> using a default mapping function.
         /// </summary>
+        /// <remarks>
+        /// PetaPoco will automatically attempt to determine the split points and auto-map each additional POCO type into <typeparamref name="T1"/>.
+        /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
         /// <typeparam name="T3">The third POCO type.</typeparam>
         /// <typeparam name="T4">The fourth POCO type.</typeparam>
         /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="T1"/>.</returns>
         IEnumerable<T1> Query<T1, T2, T3, T4, T5>(Sql sql);
 
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5}(string, object[])"/>
         IEnumerable<T1> Query<T1, T2>(string sql, params object[] args);
 
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5}(string, object[])"/>
         IEnumerable<T1> Query<T1, T2, T3>(string sql, params object[] args);
 
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5}(string, object[])"/>
         IEnumerable<T1> Query<T1, T2, T3, T4>(string sql, params object[] args);
 
         /// <summary>
-        /// Perform a multi-poco query.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="T1"/> using a default mapping function.
         /// </summary>
+        /// <remarks>
+        /// PetaPoco will automatically attempt to determine the split points and auto-map each additional POCO type into <typeparamref name="T1"/>.
+        /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
         /// <typeparam name="T3">The third POCO type.</typeparam>
         /// <typeparam name="T4">The fourth POCO type.</typeparam>
         /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="T1"/>.</returns>
         IEnumerable<T1> Query<T1, T2, T3, T4, T5>(string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, TRet>(Func<T1, T2, TRet> cb, Sql sql);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, Sql sql);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, Sql sql);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, Sql sql);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, TRet>(Func<T1, T2, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco query.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Performs a multi-poco query.
-        /// </summary>
-        /// <typeparam name="TRet">The type of objects in the returned IEnumerable.</typeparam>
-        /// <param name="types">An array of Types representing the POCO types of the returned result set.</param>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as an IEnumerable.</returns>
-        IEnumerable<TRet> Query<TRet>(Type[] types, object cb, string sql, params object[] args);
 
         #endregion
 
-        #region QueryMultiple : Multi-POCO Result Set IGridReader
+        #region Query with Custom Mapping : Multi-POCO
+
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, Sql)"/>
+        IEnumerable<TResult> Query<T1, T2, TResult>(Func<T1, T2, TResult> projector, Sql sql);
+
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, Sql)"/>
+        IEnumerable<TResult> Query<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> projector, Sql sql);
+
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, Sql)"/>
+        IEnumerable<TResult> Query<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> projector, Sql sql);
 
         /// <summary>
-        /// Perform a multi-results set query.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="TResult"/> using the provided mapping function.
         /// </summary>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A GridReader to be queried.</returns>
+        /// <remarks>
+        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and auto-map each POCO type into <typeparamref name="TResult"/>.
+        /// </remarks>
+        /// <typeparam name="T1">The first POCO type.</typeparam>
+        /// <typeparam name="T2">The second POCO type.</typeparam>
+        /// <typeparam name="T3">The third POCO type.</typeparam>
+        /// <typeparam name="T4">The fourth POCO type.</typeparam>
+        /// <typeparam name="T5">The fifth POCO type.</typeparam>
+        /// <typeparam name="TResult">The projected POCO type representing a single result record.</typeparam>
+        /// <param name="projector">A function that transforms each of the given types into a <typeparamref name="TResult"/>, or <see langword="null"/> to use a default mapping function.</param>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="TResult"/>.</returns>
+        IEnumerable<TResult> Query<T1, T2, T3, T4, T5, TResult>(Func<T1, T2, T3, T4, T5, TResult> projector, Sql sql);
+
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, string, object[])"/>
+        IEnumerable<TResult> Query<T1, T2, TResult>(Func<T1, T2, TResult> projector, string sql, params object[] args);
+
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, string, object[])"/>
+        IEnumerable<TResult> Query<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> projector, string sql, params object[] args);
+
+        /// <inheritdoc cref="Query{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, string, object[])"/>
+        IEnumerable<TResult> Query<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> projector, string sql, params object[] args);
+
+        /// <summary>
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="TResult"/> using the provided mapping function.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and auto-map each POCO type into <typeparamref name="TResult"/>.
+        /// </remarks>
+        /// <typeparam name="T1">The first POCO type.</typeparam>
+        /// <typeparam name="T2">The second POCO type.</typeparam>
+        /// <typeparam name="T3">The third POCO type.</typeparam>
+        /// <typeparam name="T4">The fourth POCO type.</typeparam>
+        /// <typeparam name="T5">The fifth POCO type.</typeparam>
+        /// <typeparam name="TResult">The projected POCO type representing a single result record.</typeparam>
+        /// <param name="projector">A function that transforms each of the given types into a <typeparamref name="TResult"/>, or <see langword="null"/> to use a default mapping function.</param>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="TResult"/>.</returns>
+        IEnumerable<TResult> Query<T1, T2, T3, T4, T5, TResult>(Func<T1, T2, T3, T4, T5, TResult> projector, string sql, params object[] args);
+
+        /// <summary>
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="TResult"/> using the provided mapping function.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and auto-map each POCO type into <typeparamref name="TResult"/>.
+        /// </remarks>
+        /// <typeparam name="TResult">The projected POCO type representing a single result record.</typeparam>
+        /// <param name="types">An array of POCO types representing the types referenced in composite type <typeparamref name="TResult"/>.</param>
+        /// <param name="projector">A function that transforms each of the given types into a <typeparamref name="TResult"/>, or <see langword="null"/> to use a default mapping function.</param>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>An enumerable sequence of POCOs of type <typeparamref name="TResult"/>.</returns>
+        IEnumerable<TResult> Query<TResult>(Type[] types, object projector, string sql, params object[] args);
+
+        #endregion
+
+        #region QueryMultiple using IGridReader : Multi-POCO Result Set
+
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="QueryMultiple(string, object[])"/>
         IGridReader QueryMultiple(Sql sql);
 
         /// <summary>
-        /// Perform a multi-results set query.
+        /// Executes a multi-result set query.
         /// </summary>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A GridReader to be queried.</returns>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>A GridReader for reading the sequence of results.</returns>
         IGridReader QueryMultiple(string sql, params object[] args);
 
         #endregion
 
-        #region Fetch : Single-Poco
+        #region Fetch : Single-POCO
 
         /// <summary>
-        /// Runs a SELECT * query and returns the result set as a typed list.
+        /// Executes an auto-select query (<c>SELECT *</c>) and returns the results as a list of type <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <returns>A List holding the results of the query.</returns>
+        /// <remarks>
+        /// <see cref="IDatabase.EnableAutoSelect"/> must be enabled in order to generate the auto-select portion of the SQL statement.
+        /// </remarks>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <returns>A list of POCOs of type <typeparamref name="T"/>.</returns>
         List<T> Fetch<T>();
 
-        /// <summary>
-        /// Runs a query and returns the result set as a typed list.
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A List holding the results of the query.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="Fetch{T}(string, object[])"/>
         List<T> Fetch<T>(Sql sql);
 
         /// <summary>
-        /// Runs a query and returns the result set as a typed list.
+        /// Executes a query and returns the results as a list of type <typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">The SQL query to execute.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A List holding the results of the query.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T"/>.</returns>
         List<T> Fetch<T>(string sql, params object[] args);
 
         #endregion
 
-        #region Fetch : Multi-Poco
+        #region Fetch with Default Mapping : Multi-POCO
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5}(Sql)"/>
         List<T1> Fetch<T1, T2>(Sql sql);
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5}(Sql)"/>
         List<T1> Fetch<T1, T2, T3>(Sql sql);
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5}(Sql)"/>
         List<T1> Fetch<T1, T2, T3, T4>(Sql sql);
 
         /// <summary>
-        /// Perform a multi-poco fetch.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="T1"/> using a default mapping function.
         /// </summary>
+        /// <remarks>
+        /// PetaPoco will automatically attempt to determine the split points and auto-map each additional POCO type into <typeparamref name="T1"/>.
+        /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
         /// <typeparam name="T3">The third POCO type.</typeparam>
         /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="T5">The fourth POCO type.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <typeparam name="T5">The fifth POCO type.</typeparam>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T1"/>.</returns>
         List<T1> Fetch<T1, T2, T3, T4, T5>(Sql sql);
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5}(string, object[])"/>
         List<T1> Fetch<T1, T2>(string sql, params object[] args);
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5}(string, object[])"/>
         List<T1> Fetch<T1, T2, T3>(string sql, params object[] args);
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5}(string, object[])"/>
         List<T1> Fetch<T1, T2, T3, T4>(string sql, params object[] args);
 
         /// <summary>
-        /// Perform a multi-poco fetch.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="T1"/> using a default mapping function.
         /// </summary>
+        /// <remarks>
+        /// PetaPoco will automatically attempt to determine the split points and auto-map each additional POCO type into <typeparamref name="T1"/>.
+        /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
         /// <typeparam name="T3">The third POCO type.</typeparam>
         /// <typeparam name="T4">The fourth POCO type.</typeparam>
         /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T1"/>.</returns>
         List<T1> Fetch<T1, T2, T3, T4, T5>(string sql, params object[] args);
 
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, TRet>(Func<T1, T2, TRet> cb, Sql sql);
+        #endregion
+
+        #region Fetch with Custom Mapping : Multi-POCO
+
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, Sql)"/>
+        List<TResult> Fetch<T1, T2, TResult>(Func<T1, T2, TResult> projector, Sql sql);
+
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, Sql)"/>
+        List<TResult> Fetch<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> projector, Sql sql);
+
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, Sql)"/>
+        List<TResult> Fetch<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> projector, Sql sql);
 
         /// <summary>
-        /// Perform a multi-poco fetch.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="TResult"/> using the provided mapping function.
         /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, Sql sql);
-
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, Sql sql);
-
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
+        /// <remarks>
+        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and auto-map each POCO type into <typeparamref name="TResult"/>.
+        /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
         /// <typeparam name="T3">The third POCO type.</typeparam>
         /// <typeparam name="T4">The fourth POCO type.</typeparam>
         /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, Sql sql);
+        /// <typeparam name="TResult">The projected POCO type representing a single result record.</typeparam>
+        /// <param name="projector">A function that transforms each of the given types into a <typeparamref name="TResult"/>, or <see langword="null"/> to use a default mapping function.</param>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T1"/>.</returns>
+        List<TResult> Fetch<T1, T2, T3, T4, T5, TResult>(Func<T1, T2, T3, T4, T5, TResult> projector, Sql sql);
+
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, string, object[])"/>
+        List<TResult> Fetch<T1, T2, TResult>(Func<T1, T2, TResult> projector, string sql, params object[] args);
+
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, string, object[])"/>
+        List<TResult> Fetch<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> projector, string sql, params object[] args);
+
+        /// <inheritdoc cref="Fetch{T1, T2, T3, T4, T5, TResult}(Func{T1, T2, T3, T4, T5, TResult}, string, object[])"/>
+        List<TResult> Fetch<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> projector, string sql, params object[] args);
 
         /// <summary>
-        /// Perform a multi-poco fetch.
+        /// Executes a multi-poco query and projects the result sequence into a new form of type <typeparamref name="TResult"/> using the provided mapping function.
         /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, TRet>(Func<T1, T2, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
-        /// <typeparam name="T1">The first POCO type.</typeparam>
-        /// <typeparam name="T2">The second POCO type.</typeparam>
-        /// <typeparam name="T3">The third POCO type.</typeparam>
-        /// <typeparam name="T4">The fourth POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb, string sql, params object[] args);
-
-        /// <summary>
-        /// Perform a multi-poco fetch.
-        /// </summary>
+        /// <remarks>
+        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and auto-map each POCO type into <typeparamref name="TResult"/>.
+        /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
         /// <typeparam name="T3">The third POCO type.</typeparam>
         /// <typeparam name="T4">The fourth POCO type.</typeparam>
         /// <typeparam name="T5">The fifth POCO type.</typeparam>
-        /// <typeparam name="TRet">The returned list POCO type.</typeparam>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to automatically guess the relationships.</param>
-        /// <param name="sql">The SQL query to be executed.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL.</param>
-        /// <returns>A collection of POCOs as a List.</returns>
-        List<TRet> Fetch<T1, T2, T3, T4, T5, TRet>(Func<T1, T2, T3, T4, T5, TRet> cb, string sql, params object[] args);
+        /// <typeparam name="TResult">The projected POCO type representing a single result record.</typeparam>
+        /// <param name="projector">A function that transforms each of the given types into a <typeparamref name="TResult"/>, or <see langword="null"/> to use a default mapping function.</param>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T1"/>.</returns>
+        List<TResult> Fetch<T1, T2, T3, T4, T5, TResult>(Func<T1, T2, T3, T4, T5, TResult> projector, string sql, params object[] args);
 
         #endregion
 
         #region Fetch : Paged SkipTake
 
         /// <summary>
-        /// Retrieves a page of records (without the total count).
+        /// Executes an auto-select query (<c>SELECT *</c>) for a subset of records based on the specified parameters, and returns the results as a list of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify a default SELECT * statement to only retrieve the records for the specified page.
+        /// <see cref="IDatabase.EnableAutoSelect"/> must be enabled in order to generate the auto-select portion of the SQL statement.
+        /// <para/>This method performs essentially the same operation as <see cref="SkipTake{T}(long, long)"/>.
+        /// Determining the number of records to skip, and how many to take, however, are calculated automatically based on the specified <paramref name="page"/> index and <paramref name="maxItemsPerPage"/> values.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <returns>A List of results.</returns>
-        List<T> Fetch<T>(long page, long itemsPerPage);
+        /// <inheritdoc cref="Fetch{T}(long, long, string, object[])"/>
+        List<T> Fetch<T>(long page, long maxItemsPerPage);
+
+        /// <remarks>
+        /// This method performs essentially the same operation as <see cref="SkipTake{T}(long, long, Sql)"/>.
+        /// Determining the number of records to skip, and how many to take, however, are calculated automatically based on the specified <paramref name="page"/> index and <paramref name="maxItemsPerPage"/> values.
+        /// </remarks>
+        /// <param name="page">The one-based page number used to calculate the number of records to skip.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="Fetch{T}(long, long, string, object[])"/>
+        List<T> Fetch<T>(long page, long maxItemsPerPage, Sql sql);
 
         /// <summary>
-        /// Retrieves a page of records (without the total count).
+        /// Executes a query for a subset of records based on the specified parameters, and returns the results as a list of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify the supplied SELECT statement to only retrieve the records for the specified page.
+        /// This method performs essentially the same operation as <see cref="SkipTake{T}(long, long, string, object[])"/>.
+        /// Determining the number of records to skip, and how many to take, however, are calculated automatically based on the specified <paramref name="page"/> index and <paramref name="maxItemsPerPage"/> values.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <param name="sql">An SQL builder object representing the base SQL query and its arguments.</param>
-        /// <returns>A List of results.</returns>
-        List<T> Fetch<T>(long page, long itemsPerPage, Sql sql);
-
-        /// <summary>
-        /// Retrieves a page of records (without the total count).
-        /// </summary>
-        /// <remarks>
-        /// PetaPoco will automatically modify the supplied SELECT statement to only retrieve the records for the specified page.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <param name="sql">The base SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>A List of results.</returns>
-        List<T> Fetch<T>(long page, long itemsPerPage, string sql, params object[] args);
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="page">The one-based page number used to calculate the number of records to skip.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>A list containing at most <paramref name="maxItemsPerPage"/> POCOs of type <typeparamref name="T"/>.</returns>
+        List<T> Fetch<T>(long page, long maxItemsPerPage, string sql, params object[] args);
 
         #endregion
 
         #region Page
 
         /// <summary>
-        /// Retrieves a page of records and the total number of available records.
+        /// Executes an auto-select query (<c>SELECT *</c>) for a subset of records based on the specified parameters, and returns the results as a Page of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify a default SELECT * statement to only retrieve the records for the specified page.  It will also execute a second query to retrieve the total number of records in the result set.
+        /// <see cref="IDatabase.EnableAutoSelect"/> must be enabled in order to generate the auto-select portion of the SQL statement.
+        /// <para/>PetaPoco will automatically modify a default <c>SELECT *</c> statement to only retrieve the records for the specified page.
+        /// It will also execute a second query to retrieve the total number of records in the result set.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <returns>A Page of results.</returns>
-        Page<T> Page<T>(long page, long itemsPerPage);
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="page">The one-based page number used to calculate the number of records to skip.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <returns>An initialized <see cref="PetaPoco.Page{T}"/> containing a list of POCOs.</returns>
+        Page<T> Page<T>(long page, long maxItemsPerPage);
+
+        /// <param name="page">The one-based page number used to calculate the number of records to skip.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="Page{T}(long, long, string, object[])"/>
+        Page<T> Page<T>(long page, long maxItemsPerPage, Sql sql);
 
         /// <summary>
-        /// Retrieves a page of records and the total number of available records.
+        /// Executes a query for a subset of records based on the specified parameters, and returns the results as a Page of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify the supplied SELECT statement to only retrieve the records for the specified page.  It will also execute a second query to retrieve the total number of records in the result set.
+        /// PetaPoco will automatically modify the supplied <c>SELECT</c> statement to only retrieve the records for the specified page.
+        /// It will also execute a second query to retrieve the total number of records in the result set.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <param name="sql">An SQL builder object representing the base SQL query and its arguments.</param>
-        /// <returns>A Page of results.</returns>
-        Page<T> Page<T>(long page, long itemsPerPage, Sql sql);
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="page">The one-based page number used to calculate the number of records to skip.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>An initialized <see cref="PetaPoco.Page{T}"/> containing a list of POCOs.</returns>
+        Page<T> Page<T>(long page, long maxItemsPerPage, string sql, params object[] args);
+
+        /// <param name="page">The one-based page number for this page.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <param name="countSql">An SQL builder instance representing the SQL statement and its parameters, used to query the total number of records.</param>
+        /// <param name="pageSql">An SQL builder instance representing the SQL statement and its parameters, used to retrieve a single page of results.</param>
+        /// <inheritdoc cref="Page{T}(long, long, string, object[], string, object[])"/>
+        Page<T> Page<T>(long page, long maxItemsPerPage, Sql countSql, Sql pageSql);
 
         /// <summary>
-        /// Retrieves a page of records and the total number of available records.
+        /// Executes a query for a subset of records based on the specified parameters, and returns the results as a Page of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify the supplied SELECT statement to only retrieve the records for the specified page.  It will also execute a second query to retrieve the total number of records in the result set.
+        /// This method accepts two separate SQL statements that will be used explicitly for both parts of the page query.
+        /// The <paramref name="page"/> and <paramref name="maxItemsPerPage"/> parameters are used to populate the returned Page object.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <param name="sql">The base SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>A Page of results.</returns>
-        Page<T> Page<T>(long page, long itemsPerPage, string sql, params object[] args);
-
-        /// <summary>
-        /// Retrieves a page of records and the total number of available records.
-        /// </summary>
-        /// <remarks>
-        /// This method allows separate SQL statements to be explicitly provided for the two parts of the page query. The page and itemsPerPage parameters are not used directly and are used simply to populate the returned Page object.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <param name="sqlCount">An SQL builder object representing the SQL to retrieve the total number of records.</param>
-        /// <param name="sqlPage">An SQL builder object representing the SQL to retrieve a single page of results.</param>
-        /// <returns>A Page of results.</returns>
-        Page<T> Page<T>(long page, long itemsPerPage, Sql sqlCount, Sql sqlPage);
-
-        /// <summary>
-        /// Retrieves a page of records and the total number of available records.
-        /// </summary>
-        /// <remarks>
-        /// This method allows separate SQL statements to be explicitly provided for the two parts of the page query. The page and itemsPerPage parameters are not used directly and are used simply to populate the returned Page object.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="page">The 1-based page number to retrieve.</param>
-        /// <param name="itemsPerPage">The number of records per page.</param>
-        /// <param name="sqlCount">The SQL to retrieve the total number of records.</param>
-        /// <param name="countArgs">Arguments to any embedded parameters in the sqlCount statement.</param>
-        /// <param name="sqlPage">The SQL to retrieve a single page of results.</param>
-        /// <param name="pageArgs">Arguments to any embedded parameters in the sqlPage statement.</param>
-        /// <returns>A Page of results.</returns>
-        Page<T> Page<T>(long page, long itemsPerPage, string sqlCount, object[] countArgs, string sqlPage, object[] pageArgs);
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="page">The one-based page number for this page.</param>
+        /// <param name="maxItemsPerPage">The maximum number of records per page.</param>
+        /// <param name="countSql">The SQL statement used to query the total number of records.</param>
+        /// <param name="countArgs">The parameters to embed in <paramref name="countSql"/>.</param>
+        /// <param name="pageSql">The SQL statement used to retrieve a single page of results.</param>
+        /// <param name="pageArgs">The parameters to embed in the <paramref name="pageSql"/> string.</param>
+        /// <returns>An initialized <see cref="PetaPoco.Page{T}"/> containing a list of POCOs.</returns>
+        Page<T> Page<T>(long page, long maxItemsPerPage, string countSql, object[] countArgs, string pageSql, object[] pageArgs);
 
         #endregion
 
         #region SkipTake
 
         /// <summary>
-        /// Retrieves a range of records from result set.
+        /// Executes an auto-select query (<c>SELECT *</c>) and returns a subset of the results as a list of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify a default SELECT * statement to only retrieve the records for the specified range.
+        /// <see cref="IDatabase.EnableAutoSelect"/> must be enabled in order to generate the auto-select portion of the SQL statement.
+        /// <para/><inheritdoc cref="SkipTake{T}(long, long, Sql)"/>
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="skip">The number of rows at the start of the result set to skip over.</param>
-        /// <param name="take">The number of rows to retrieve.</param>
-        /// <returns>A List of results.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="skip">The number of records to skip.</param>
+        /// <param name="take">The number of records to take.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T"/>.</returns>
         List<T> SkipTake<T>(long skip, long take);
 
-        /// <summary>
-        /// Retrieves a range of records from result set.
-        /// </summary>
-        /// <remarks>
-        /// PetaPoco will automatically modify the supplied SELECT statement to only retrieve the records for the specified range.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="skip">The number of rows at the start of the result set to skip over.</param>
-        /// <param name="take">The number of rows to retrieve.</param>
-        /// <param name="sql">An SQL builder object representing the base SQL query and its arguments.</param>
-        /// <returns>A List of results.</returns>
+        /// <param name="skip">The number of records to skip.</param>
+        /// <param name="take">The number of records to take.</param>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="SkipTake{T}(long, long, string, object[])"/>
         List<T> SkipTake<T>(long skip, long take, Sql sql);
 
         /// <summary>
-        /// Retrieves a range of records from result set.
+        /// Executes a query and returns a subset of the results as a list of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically modify the supplied SELECT statement to only retrieve the records for the specified range.
+        /// The provided SQL query will be modified to limit the starting offset and number of returned records based on the specified parameters.
         /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="skip">The number of rows at the start of the result set to skip over.</param>
-        /// <param name="take">The number of rows to retrieve.</param>
-        /// <param name="sql">The base SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>A List of results.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="skip">The number of records to skip.</param>
+        /// <param name="take">The number of records to take.</param>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>A list of POCOs of type <typeparamref name="T"/>.</returns>
         List<T> SkipTake<T>(long skip, long take, string sql, params object[] args);
 
         #endregion
@@ -654,58 +459,52 @@ namespace PetaPoco
         #region Exists
 
         /// <summary>
-        /// Checks for the existence of a row with the specified primary key value.
+        /// Determines whether a record exists with the specified primary key value.
         /// </summary>
-        /// <typeparam name="T">The Type representing the table being queried.</typeparam>
-        /// <param name="primaryKey">The primary key value to look for.</param>
-        /// <returns><see langword="true"/> if a record with the specified primary key value exists, otherwise <see langword="false"/>.</returns>
-        bool Exists<T>(object primaryKey);
+        /// <remarks>
+        /// If provided a POCO instance as the <paramref name="pocoOrPrimaryKeyValue"/> parameter, PetaPoco will extract the value from the POCO's mapped primary key property, and perform the same query as if the primary key value was provided directly.
+        /// </remarks>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="pocoOrPrimaryKeyValue">The primary key value, or a POCO containing an assigned primary key value.</param>
+        /// <returns><see langword="true"/> if one or more records exist with the specified primary key value; otherwise, <see langword="false"/>.</returns>
+        bool Exists<T>(object pocoOrPrimaryKeyValue);
+
+        // TODO: Missing overload: `bool IQuery.Exists<T>(Sql)`
 
         /// <summary>
-        /// Checks for the existence of a row matching the specified condition.
+        /// Determines whether a record exists that matches the conditions defined by the specified query.
         /// </summary>
-        /// <typeparam name="T">The Type representing the table being queried.</typeparam>
-        /// <param name="sqlCondition">The SQL expression to be tested for (the WHERE expression).</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns><see langword="true"/> if a record matching the condition is found, otherwise <see langword="false"/>.</returns>
-        bool Exists<T>(string sqlCondition, params object[] args);
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL string representing the condition portion of the WHERE clause.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns><see langword="true"/> if one or more records exist that satisfy the conditions defined in the specified query; otherwise, <see langword="false"/>.</returns>
+        bool Exists<T>(string sql, params object[] args);
 
         #endregion
 
         #region Single
 
         /// <summary>
-        /// Returns the record with the specified primary key value.
+        /// Returns the only record that matches the specified primary key value, and throws an exception if there is not exactly one matching record.
         /// </summary>
-        /// <remarks>
-        /// Throws an exception if there is not exactly one record with the specified primary key value.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="primaryKey">The primary key value of the record to fetch.</param>
-        /// <returns>The single record matching the specified primary key value.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="primaryKey">The primary key value.</param>
+        /// <returns>The single result returned by the query.</returns>
+        /// <exception cref="InvalidOperationException">The result set is empty, or the result set contains more than one record.</exception>
         T Single<T>(object primaryKey);
 
-        /// <summary>
-        /// Runs a query that should always return a single row.
-        /// </summary>
-        /// <remarks>
-        /// Throws an exception if there is not exactly one matching record
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>The single record matching the specified SQL query.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="Single{T}(string, object[])"/>
         T Single<T>(Sql sql);
 
         /// <summary>
-        /// Runs a query that should always return a single row.
+        /// Returns the only record that matches the specified query, and throws an exception if there is not exactly one matching record.
         /// </summary>
-        /// <remarks>
-        /// Throws an exception if there is not exactly one record
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">The SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>The single record matching the specified SQL query.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>The single result returned by the query.</returns>
+        /// <exception cref="InvalidOperationException">The result set is empty, or the result set contains more than one record.</exception>
         T Single<T>(string sql, params object[] args);
 
         #endregion
@@ -713,73 +512,61 @@ namespace PetaPoco
         #region SingleOrDefault
 
         /// <summary>
-        /// Returns the record with the specified primary key value, or the default value if not found.
+        /// Returns the only record that matches the specified primary key value, or a default value if the result set is empty; this method throws an exception if there is more than one matching record.
         /// </summary>
-        /// <remarks>
-        /// If there are no records with the specified primary key value, <see langword="default">default(T)</see> (typically <see langword="null"/>) is returned.
-        /// </remarks>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="primaryKey">The primary key value of the record to fetch.</param>
-        /// <returns>The single record matching the specified primary key value.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="primaryKey">The primary key value.</param>
+        /// <returns>default(T) if no record is found; otherwise, the single result returned by the query.</returns>
+        /// <exception cref="InvalidOperationException">The result set contains more than one record.</exception>
         T SingleOrDefault<T>(object primaryKey);
 
-        /// <summary>
-        /// Runs a query that should always return either a single row, or no rows.
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>The single record matching the specified primary key value, or default(T) if no matching rows.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="SingleOrDefault{T}(string, object[])"/>
         T SingleOrDefault<T>(Sql sql);
 
         /// <summary>
-        /// Runs a query that should always return either a single row, or no rows.
+        /// Returns the only record that matches the specified query, or a default value if the result set is empty; this method throws an exception if there is more than one matching record.
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">The SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>The single record matching the specified primary key value, or default(T) if no matching rows.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>default(T) if no record is found; otherwise, the single result returned by the query.</returns>
+        /// <exception cref="InvalidOperationException">The result set contains more than one record.</exception>
         T SingleOrDefault<T>(string sql, params object[] args);
 
         #endregion
 
         #region First
 
-        /// <summary>
-        /// Runs a query that should always return at least one record.
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>The first record in the result set.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="First{T}(string, object[])"/>
         T First<T>(Sql sql);
 
         /// <summary>
-        /// Runs a query that should always return at least one record.
+        /// Returns the first record that matches the specified query, and throws an exception if the result set is empty.
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">The SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>The first record in the result set.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>The first result record returned by the specified query.</returns>
+        /// <exception cref="InvalidOperationException">The result set is empty.</exception>
         T First<T>(string sql, params object[] args);
 
         #endregion
 
         #region FirstOrDefault
 
-        /// <summary>
-        /// Runs a query and returns the first record, or the default value if no matching records.
-        /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">An SQL builder object representing the query and its arguments.</param>
-        /// <returns>The first record in the result set, or default(T) if no matching rows.</returns>
+        /// <param name="sql">An SQL builder instance representing the SQL query and its parameters.</param>
+        /// <inheritdoc cref="FirstOrDefault{T}(string, object[])"/>
         T FirstOrDefault<T>(Sql sql);
 
         /// <summary>
-        /// Runs a query and returns the first record, or the default value if no matching records.
+        /// Returns the first record that matches the specified query, or a default value if the result set is empty.
         /// </summary>
-        /// <typeparam name="T">The Type representing a row in the result set.</typeparam>
-        /// <param name="sql">The SQL query.</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL statement.</param>
-        /// <returns>The first record in the result set, or default(T) if no matching rows.</returns>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="sql">The SQL query string.</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>default(T) if the result set is empty; otherwise, the first record that matches the specified query.</returns>
         T FirstOrDefault<T>(string sql, params object[] args);
 
         #endregion

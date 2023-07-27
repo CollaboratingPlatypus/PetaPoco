@@ -12,7 +12,7 @@ namespace PetaPoco
     public class PrimaryKeyAttribute : Attribute
     {
         /// <summary>
-        /// Gets the column name.
+        /// Gets the column name in the database.
         /// </summary>
         public string Value { get; }
 
@@ -22,16 +22,15 @@ namespace PetaPoco
         public string SequenceName { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the primary key column represented by this property is auto-incrementing in the database.
+        /// Gets or sets whether the primary key column represented by this property in the database is auto-incrementing.
+        /// Default is <see langword="true"/>.
         /// </summary>
-        /// <value>Default value is <see langword="true"/> (auto-incrementing).</value>
         public bool AutoIncrement { get; set; } = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class with the specified column name.
-        /// <para/><inheritdoc cref="PrimaryKeyAttribute"/>
         /// </summary>
-        /// <param name="primaryKey">The primary key column name in the database that this property maps to.</param>
-        public PrimaryKeyAttribute(string primaryKey) => Value = primaryKey;
+        /// <param name="primaryKeyName">The database table's primary key column name that this property maps to.</param>
+        public PrimaryKeyAttribute(string primaryKeyName) => Value = primaryKeyName;
     }
 }

@@ -20,20 +20,20 @@ namespace PetaPoco.Providers
             => GetFactory("System.Data.OleDb.OleDbFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
         /// <inheritdoc />
-        public override object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
+        public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
-            ExecuteNonQueryHelper(database, cmd);
+            ExecuteNonQueryHelper(db, cmd);
             cmd.CommandText = "SELECT @@IDENTITY AS NewID;";
-            return ExecuteScalarHelper(database, cmd);
+            return ExecuteScalarHelper(db, cmd);
         }
 
 #if ASYNC
         /// <inheritdoc />
-        public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName)
+        public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
-            await ExecuteNonQueryHelperAsync(cancellationToken, database, cmd).ConfigureAwait(false);
+            await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd).ConfigureAwait(false);
             cmd.CommandText = "SELECT @@IDENTITY AS NewID;";
-            return await ExecuteScalarHelperAsync(cancellationToken, database, cmd).ConfigureAwait(false);
+            return await ExecuteScalarHelperAsync(cancellationToken, db, cmd).ConfigureAwait(false);
         }
 #endif
 
@@ -41,7 +41,7 @@ namespace PetaPoco.Providers
         /// Page queries are not supported by MsAccess database.
         /// </summary>
         /// <returns>This method always throws a <see cref="NotSupportedException"/>.</returns>
-        /// <exception cref="NotSupportedException">Always thrown because the Access provider does not support paging.</exception>
+        /// <exception cref="NotSupportedException">The MsAccess provider does not support paging.</exception>
         /// <inheritdoc />
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
             => throw new NotSupportedException("The MS Access provider does not support paging.");

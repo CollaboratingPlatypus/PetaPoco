@@ -8,13 +8,14 @@ namespace PetaPoco.Core.Inflection
         private static IInflector _inflector;
 
         /// <summary>
-        /// Gets or sets the <see cref="IInflector" /> instance.
+        /// Gets or sets the <see cref="IInflector"/> instance.
+        /// Default is <see cref="EnglishInflector"/>.
         /// </summary>
         /// <remarks>
-        /// Set to <see langword="null"/> to restore the default <see cref="EnglishInflector" />.
+        /// Set to <see langword="null"/> to restore the default <see cref="EnglishInflector"/>.
         /// </remarks>
-        /// <value>The currently set <see cref="IInflector" /> instance.</value>
-        /// <seealso cref="EnglishInflector" />
+        /// <value>The currently set <see cref="IInflector"/> instance.</value>
+        /// <seealso cref="EnglishInflector"/>
         public static IInflector Instance
         {
             get { return _inflector; }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Common;
 using System.Reflection;
 
@@ -9,8 +9,8 @@ namespace PetaPoco
     /// </summary>
     /// <remarks>
     /// For later versions of Oracle, the standard OracleProviderFactory class should work fine. Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands.
-    /// <para/>Thanks to Adam Schroder (@schotime) for this.
-    /// <para/><i>Currently untested.</i>
+    /// <para>Thanks to Adam Schroder (@schotime) for this.</para>
+    /// <para><i>Currently untested.</i></para>
     /// </remarks>
     /// <example>
     /// <code language="cs" title="OracleProvider Usage">
@@ -53,7 +53,7 @@ namespace PetaPoco
         /// <summary>
         /// Initializes a new instance of the <see cref="OracleProvider"/> class.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when unable to find the connection type from the assembly.</exception>
+        /// <exception cref="InvalidOperationException">Unable to find the connection type from the assembly.</exception>
         public OracleProvider()
         {
             _connectionType = TypeFromAssembly(_connectionTypeName, _assemblyName);
@@ -86,11 +86,13 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Returns the Type object for the specified <paramref name="typeName"/> from the provided <paramref name="assemblyName"/>.
+        /// Returns the Type for the specified <paramref name="typeName"/> from the provided <paramref name="assemblyName"/>.
         /// </summary>
         /// <param name="typeName">The name of the type to get.</param>
         /// <param name="assemblyName">The name of the assembly to get the type from.</param>
-        /// <returns>The Type object, or null if unable to locate it.</returns>
+        /// <returns>The Type, or <see langword="null"/> if unable to locate it.</returns>
+        /// <exception cref="TypeLoadException">Unable to load <paramref name="typeName"/>.</exception>
+        /// <exception cref="InvalidOperationException">Unable to find the <paramref name="assemblyName"/>.</exception>
         public static Type TypeFromAssembly(string typeName, string assemblyName)
         {
             try
@@ -114,7 +116,7 @@ namespace PetaPoco
 
                 if (assembly == null)
                 {
-                    throw new InvalidOperationException("Can't find assembly: " + assemblyName);
+                    throw new InvalidOperationException("Cannot find assembly: " + assemblyName);
                 }
 
                 type = assembly.GetType(typeName);

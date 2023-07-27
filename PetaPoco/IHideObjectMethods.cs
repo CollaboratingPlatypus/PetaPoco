@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace PetaPoco
 {
     /// <summary>
-    /// An interface used to hide the four <see cref="object" /> instance methods from the API in Visual Studio intellisense.
+    /// An interface used to hide the compiler-generated public <see cref="object"/> instance methods from the list of intellisense code completion suggestions.
     /// </summary>
     /// <remarks>
     /// <br/>Reference Project: MicroLite ORM (<see href="https://github.com/TrevorPilley/MicroLite"/>)
@@ -14,37 +14,24 @@ namespace PetaPoco
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IHideObjectMethods
     {
-        /// <summary>
-        /// Determines whether the given <see cref="object" /> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="object" /> to compare with this instance.</param>
-        /// <returns><see langword="true"/> if <paramref name="other" /> is equal to this instance; otherwise, <see langword="false"/>.</returns>
+        /// <inheritdoc cref="object.Equals(object)"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        bool Equals(object other);
+        bool Equals(object obj);
 
-        /// <summary>
-        /// Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
+        /// <inheritdoc cref="object.GetHashCode()"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
         int GetHashCode();
 
-        /// <summary>
-        /// Gets the type.
-        /// </summary>
-        /// <returns>The type of the object.</returns>
+        /// <inheritdoc cref="object.GetType()"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
-            Justification = "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio")]
+            Justification = "The method is defined on System.Object, this interface is just to hide it from intellisense")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords",
-            Justification = "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio",
+            Justification = "The method is defined on System.Object, this interface is just to hide it from intellisense",
             MessageId = "GetType")]
         Type GetType();
 
-        /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
-        /// </summary>
-        /// <returns>A <see cref="string" /> that represents this instance.</returns>
+        /// <inheritdoc cref="object.ToString()"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
         string ToString();
     }

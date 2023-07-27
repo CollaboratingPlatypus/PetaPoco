@@ -9,7 +9,7 @@ namespace PetaPoco.Utilities
     /// <summary>
     /// Represents an asynchronous reader that reads a sequence of rows from a data source.
     /// </summary>
-    /// <typeparam name="T">The type of POCO object to read from the data source.</typeparam>
+    /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
     public class AsyncReader<T> : IAsyncReader<T>
     {
         private readonly bool _isAsync;
@@ -26,14 +26,14 @@ namespace PetaPoco.Utilities
         /// <summary>
         /// Initializes a new instance of the AsyncReader class.
         /// </summary>
-        /// <param name="db">The database from which to read data.</param>
-        /// <param name="cmd">The command to execute against the database.</param>
-        /// <param name="reader">The data reader to use for reading data.</param>
-        /// <param name="pocoFactory">The factory method to be used for when creating POCOs of type <typeparamref name="T"/>.</param>
-        public AsyncReader(IDatabase db, IDbCommand cmd, IDataReader reader, Func<IDataReader, T> pocoFactory)
+        /// <param name="database">The database instance this AsyncReader is associated with.</param>
+        /// <param name="command">The database query command to execute.</param>
+        /// <param name="reader">The underlying data reader for reading the result sets.</param>
+        /// <param name="pocoFactory">The factory function to use for creating POCOs of type <typeparamref name="T"/>.</param>
+        public AsyncReader(IDatabase database, IDbCommand command, IDataReader reader, Func<IDataReader, T> pocoFactory)
         {
-            _db = db;
-            _cmd = cmd;
+            _db = database;
+            _cmd = command;
             _reader = reader;
             _pocoFactory = pocoFactory;
             _isAsync = reader is DbDataReader;
@@ -58,8 +58,10 @@ namespace PetaPoco.Utilities
             return hasRecords;
         }
 
+        // TODO: Not implemented: `ReadAsync(CancellationToken)`
+
         /// <summary>
-        /// Releases all resources used by the current instance.
+        /// Disposes the AsyncReader, closing and releasing the underlying <see cref="IDataReader"/>, <see cref="IDbCommand"/>, and shared <see cref="IConnection.Connection"/>.
         /// </summary>
         public void Dispose()
         {

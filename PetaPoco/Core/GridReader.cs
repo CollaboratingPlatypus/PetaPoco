@@ -20,9 +20,9 @@ namespace PetaPoco
         /// <summary>
         /// Initializes a new instance of the GridReader class with the control structure for a multi-poco query result set.
         /// </summary>
-        /// <param name="database">The Database instance that this GridReader is associated with.</param>
-        /// <param name="command">The command that represents the database query to be executed.</param>
-        /// <param name="reader">The underlying reader that will be used to read the result sets from the database query.</param>
+        /// <param name="database">The database instance this GridReader is associated with.</param>
+        /// <param name="command">The database query command to execute.</param>
+        /// <param name="reader">The underlying data reader for reading the result sets.</param>
         /// <param name="defaultMapper">The default mapper to be used for mapping the result sets to POCOs.</param>
         internal GridReader(Database database, IDbCommand command, IDataReader reader, IMapper defaultMapper)
         {
@@ -32,71 +32,60 @@ namespace PetaPoco
             _defaultMapper = defaultMapper;
         }
 
-#region public Read<T> methods
+        #region Public Read methods
 
         /// <inheritdoc/>
         public IEnumerable<T> Read<T>()
-        {
-            return SinglePocoFromIDataReader<T>(_gridIndex);
-        }
+            => SinglePocoFromIDataReader<T>(_gridIndex);
 
         /// <inheritdoc/>
         public IEnumerable<T1> Read<T1, T2>()
-        {
-            return MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2) }, null);
-        }
+            => MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2) }, null);
 
         /// <inheritdoc/>
         public IEnumerable<T1> Read<T1, T2, T3>()
-        {
-            return MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3) }, null);
-        }
+            => MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3) }, null);
 
         /// <inheritdoc/>
         public IEnumerable<T1> Read<T1, T2, T3, T4>()
-        {
-            return MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null);
-        }
+            => MultiPocoFromIDataReader<T1>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, null);
 
         /// <inheritdoc/>
-        public IEnumerable<TRet> Read<T1, T2, TRet>(Func<T1, T2, TRet> cb)
-        {
-            return MultiPocoFromIDataReader<TRet>(_gridIndex, new Type[] { typeof(T1), typeof(T2) }, cb);
-        }
+        public IEnumerable<TResult> Read<T1, T2, TResult>(Func<T1, T2, TResult> projector)
+            => MultiPocoFromIDataReader<TResult>(_gridIndex, new Type[] { typeof(T1), typeof(T2) }, projector);
 
         /// <inheritdoc/>
-        public IEnumerable<TRet> Read<T1, T2, T3, TRet>(Func<T1, T2, T3, TRet> cb)
-        {
-            return MultiPocoFromIDataReader<TRet>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3) }, cb);
-        }
+        public IEnumerable<TResult> Read<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> projector)
+            => MultiPocoFromIDataReader<TResult>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3) }, projector);
 
         /// <inheritdoc/>
-        public IEnumerable<TRet> Read<T1, T2, T3, T4, TRet>(Func<T1, T2, T3, T4, TRet> cb)
-        {
-            return MultiPocoFromIDataReader<TRet>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, cb);
-        }
+        public IEnumerable<TResult> Read<T1, T2, T3, T4, TResult>(Func<T1, T2, T3, T4, TResult> projector)
+            => MultiPocoFromIDataReader<TResult>(_gridIndex, new Type[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, projector);
 
-#endregion
+        #endregion
 
-#region PocoFromIDataReader
+        #region PocoFromIDataReader
 
         /// <summary>
         /// Reads data to a single POCO.
         /// </summary>
-        /// <typeparam name="T">The type representing a row in the result set.</typeparam>
-        /// <param name="index">The row to be read from the underlying <see cref="IDataReader"/>.</param>
-        /// <returns>A <typeparamref name="T"/> POCO.</returns>
-        /// <exception cref="ObjectDisposedException"/>
-        /// <exception cref="InvalidOperationException"/>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="index">The zero-based row index to be read from the underlying <see cref="IDataReader"/>.</param>
+        /// <returns>A POCO of type <typeparamref name="T"/>.</returns>
+        /// <exception cref="ObjectDisposedException">Called after the data reader has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">Result records are consumed in the incorrect order, or more than once.</exception>
         private IEnumerable<T> SinglePocoFromIDataReader<T>(int index)
         {
+            // TODO: Incorrect object name used when throwing ObjectDisposedException; should be `nameof(_reader)`
             if (_reader == null)
                 throw new ObjectDisposedException(GetType().FullName, "The data reader has been disposed");
             if (_consumed)
                 throw new InvalidOperationException("Query results must be consumed in the correct order, and each result can only be consumed once");
+
             _consumed = true;
 
             var pd = PocoData.ForType(typeof(T), _defaultMapper);
+
             try
             {
                 while (index == _gridIndex)
@@ -123,7 +112,7 @@ namespace PetaPoco
                     }
                 }
             }
-            finally // finally so that First etc progresses things even when multiple rows
+            finally // Ensure that calls to .First() etc progresses the data reader when there are multiple rows
             {
                 if (index == _gridIndex)
                 {
@@ -135,39 +124,44 @@ namespace PetaPoco
         /// <summary>
         /// Reads data to multiple POCOs.
         /// </summary>
-        /// <typeparam name="TRet">The type of objects in the returned <see cref="IEnumerable{T}"/>.</typeparam>
-        /// <param name="index">The row to be read from the underlying <see cref="IDataReader"/>.</param>
+        /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
+        /// <param name="index">The zero-based row index to be read from the underlying <see cref="IDataReader"/>.</param>
         /// <param name="types">An array of types representing the POCO types in the returned result set.</param>
-        /// <param name="cb">A callback function to connect the POCO instances, or <see langword="null"/> to let PetaPoco automatically deduce the relationships.</param>
-        /// <returns>A collection of <typeparamref name="TRet"/> POCOs as an IEnumerable.</returns>
-        /// <exception cref="ObjectDisposedException"/>
-        /// <exception cref="InvalidOperationException"/>
-        private IEnumerable<TRet> MultiPocoFromIDataReader<TRet>(int index, Type[] types, object cb)
+        /// <param name="transformer">A function used to connect the POCO instances as a single POCO of type <typeparamref name="T"/>, or <see langword="null"/> to let PetaPoco automatically deduce the relationships.</param>
+        /// <returns>A composite POCO of type <typeparamref name="T"/>.</returns>
+        /// <exception cref="ObjectDisposedException">Called after the data reader has been disposed.</exception>
+        /// <exception cref="InvalidOperationException">Result records are consumed in the incorrect order, or more than once.</exception>
+        private IEnumerable<T> MultiPocoFromIDataReader<T>(int index, Type[] types, object transformer)
         {
+            // TODO: Incorrect object name used when throwing ObjectDisposedException; should be `nameof(_reader)`
             if (_reader == null)
                 throw new ObjectDisposedException(GetType().FullName, "The data reader has been disposed");
             if (_consumed)
                 throw new InvalidOperationException("Query results must be consumed in the correct order, and each result can only be consumed once");
+
             _consumed = true;
 
             try
             {
                 var cmd = _command;
-                var r = _reader;
+                var rdr = _reader;
 
-                var factory = MultiPocoFactory.GetFactory<TRet>(types, cmd.Connection.ConnectionString, cmd.CommandText, r, _defaultMapper);
-                if (cb == null)
-                    cb = MultiPocoFactory.GetAutoMapper(types.ToArray());
+                var factory = MultiPocoFactory.GetFactory<T>(types, cmd.Connection.ConnectionString, cmd.CommandText, rdr, _defaultMapper);
+
+                // if no projector function provided by caller, figure out the split points and connect them ourself
+                if (transformer == null)
+                    transformer = MultiPocoFactory.GetAutoMapper(types.ToArray());
+
                 bool bNeedTerminator = false;
 
                 while (true)
                 {
-                    TRet poco;
+                    T poco;
                     try
                     {
-                        if (!r.Read())
+                        if (!rdr.Read())
                             break;
-                        poco = factory(r, cb);
+                        poco = factory(rdr, transformer);
                     }
                     catch (Exception x)
                     {
@@ -184,7 +178,7 @@ namespace PetaPoco
 
                 if (bNeedTerminator)
                 {
-                    var poco = (TRet) (cb as Delegate).DynamicInvoke(new object[types.Length]);
+                    var poco = (T)(transformer as Delegate).DynamicInvoke(new object[types.Length]);
                     if (poco != null)
                         yield return poco;
                     else
@@ -200,9 +194,9 @@ namespace PetaPoco
             }
         }
 
-#endregion
+        #endregion
 
-#region DataReader Management
+        #region DataReader Management
 
         private int _gridIndex;
         private bool _consumed;
@@ -219,7 +213,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Disposes the GridReader, closing and disposing the underlying reader, command, and shared connection.
+        /// Disposes the GridReader, closing and releasing the underlying <see cref="IDataReader"/>, <see cref="IDbCommand"/>, and shared <see cref="IConnection.Connection"/>.
         /// </summary>
         public void Dispose()
         {
@@ -240,6 +234,6 @@ namespace PetaPoco
             _db.CloseSharedConnection();
         }
 
-#endregion
+        #endregion
     }
 }

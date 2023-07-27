@@ -14,7 +14,7 @@ namespace PetaPoco
         /// <summary>
         /// Gets or sets the database column name this property maps to.
         /// </summary>
-        /// <value>If not null, overrides this property's inflected column name from the mapper.</value>
+        /// <value>When not <see langword="null"/>, overrides this property's inflected column name from the mapper.</value>
         public string Name { get; set; }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace PetaPoco
         /// <remarks>
         /// When set, this template is used for generating the INSERT portion of the SQL statement instead of the default
         /// <br/><c>String.Format("{0}{1}", paramPrefix, index)</c>.
-        /// <para/>Setting this allows database-related interactions, such as:
-        /// <br/><c>String.Format("CAST({0}{1} AS JSON)", paramPrefix, index)</c>.
+        /// <para>Setting this allows database-related interactions, such as:
+        /// <br/><c>String.Format("CAST({0}{1} AS JSON)", paramPrefix, index)</c>.</para>
         /// </remarks>
         public string InsertTemplate { get; set; }
 
@@ -59,14 +59,13 @@ namespace PetaPoco
         /// <remarks>
         /// When set, this template is used for generating the UPDATE portion of the SQL statement instead of the default
         /// <br/><c>String.Format("{0} = {1}{2}", colName, paramPrefix, index)</c>.
-        /// <para/>Setting this allows database-related interactions, such as:
-        /// <br/><c>String.Format("{0} = CAST({1}{2} AS JSON)", colName, paramPrefix, index)</c>
+        /// <para>Setting this allows database-related interactions, such as:
+        /// <br/><c>String.Format("{0} = CAST({1}{2} AS JSON)", colName, paramPrefix, index)</c></para>
         /// </remarks>
         public string UpdateTemplate { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ColumnAttribute"/> class with default values.
-        /// <para/><inheritdoc cref="ColumnAttribute"/>
         /// </summary>
         public ColumnAttribute()
         {
@@ -74,12 +73,11 @@ namespace PetaPoco
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ColumnAttribute"/> class with the specified column name.
-        /// <para/><inheritdoc cref="ColumnAttribute"/>
         /// </summary>
-        /// <param name="name">The database column name this property maps to.</param>
-        public ColumnAttribute(string name)
+        /// <param name="column">The name of the database column associated with this property.</param>
+        public ColumnAttribute(string column)
         {
-            Name = name;
+            Name = column;
         }
     }
 }

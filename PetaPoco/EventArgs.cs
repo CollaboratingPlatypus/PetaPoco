@@ -60,7 +60,8 @@ namespace PetaPoco
     public class ExceptionEventArgs : EventArgs
     {
         /// <summary>
-        /// Gets or sets a flag specifying whether the exception should be raised or ignored. Default value is <see langword="true"/>.
+        /// Gets or sets a flag specifying whether the exception should be raised or ignored.
+        /// Default is <see langword="true"/>.
         /// </summary>
         public bool Raise { get; set; } = true;
 

@@ -29,18 +29,18 @@ namespace PetaPoco.Providers
         }
 
         /// <inheritdoc/>
-        public override object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
+        public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             PrepareInsert(cmd, primaryKeyName);
-            return ExecuteScalarHelper(database, cmd);
+            return ExecuteScalarHelper(db, cmd);
         }
 
 #if ASYNC
         /// <inheritdoc/>
-        public override Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName)
+        public override Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             PrepareInsert(cmd, primaryKeyName);
-            return ExecuteScalarHelperAsync(cancellationToken, database, cmd);
+            return ExecuteScalarHelperAsync(cancellationToken, db, cmd);
         }
 #endif
 

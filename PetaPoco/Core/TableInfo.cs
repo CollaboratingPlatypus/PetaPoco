@@ -15,12 +15,12 @@ namespace PetaPoco
         public string TableName { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the primary key column of the table.
+        /// Gets or sets the name of the table's primary key column.
         /// </summary>
         public string PrimaryKey { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the primary key column is an auto-incrementing.
+        /// Gets or sets whether the primary key column is auto-incrementing.
         /// </summary>
         public bool AutoIncrement { get; set; }
 
@@ -30,9 +30,9 @@ namespace PetaPoco
         public string SequenceName { get; set; }
 
         /// <summary>
-        /// Constructs and initializes a TableInfo instance from the attributes of a POCO.
+        /// Constructs and initializes a TableInfo instance from the attributes of the specified POCO type.
         /// </summary>
-        /// <param name="pocoType">The POCO type.</param>
+        /// <param name="pocoType">The POCO type representing a single result record in the associated database table.</param>
         /// <returns>The TableInfo instance.</returns>
         public static TableInfo FromPoco(Type pocoType)
         {
@@ -41,7 +41,6 @@ namespace PetaPoco
             PopulatePrimaryKeyFromPoco(pocoType, ref ti, out _, out _);
             return ti;
         }
-
 
         internal static void PopulateTableNameFromPoco(Type t, ref TableInfo ti, out TableNameAttribute tblAttr)
         {

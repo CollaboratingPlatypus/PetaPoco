@@ -64,7 +64,7 @@
         string Titleise(string word);
 
         /// <summary>
-        /// Humanises the word using <see langword="abstract"/>"Sentence case" transformation.
+        /// Humanises the word using "Sentence case" transformation.
         /// </summary>
         /// <remarks>
         /// <c>the_brown_fox => The brown fox</c>

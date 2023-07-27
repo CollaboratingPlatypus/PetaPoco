@@ -11,9 +11,11 @@ namespace PetaPoco.Internal
     internal class MultiPocoFactory
     {
         // Various cached stuff
-        private static readonly Cache<Tuple<Type, ArrayKey<Type>, string, string, int>, object> MultiPocoFactories = new Cache<Tuple<Type, ArrayKey<Type>, string, string, int>, object>();
+        private static readonly Cache<Tuple<Type, ArrayKey<Type>, string, string, int>, object> MultiPocoFactories
+            = new Cache<Tuple<Type, ArrayKey<Type>, string, string, int>, object>();
 
-        private static readonly Cache<ArrayKey<Type>, object> AutoMappers = new Cache<ArrayKey<Type>, object>();
+        private static readonly Cache<ArrayKey<Type>, object> AutoMappers
+            = new Cache<ArrayKey<Type>, object>();
 
         // Instance data used by the Multipoco factory delegate - essentially a list of the nested poco factories to call
         private List<Delegate> _delegates;
@@ -59,6 +61,7 @@ namespace PetaPoco.Internal
                         handled = true;
                     }
 
+                    // TODO: InvalidOperationException using `types[i]` in exception string; should probably be `types[i].Name`
                     if (!handled)
                         throw new InvalidOperationException(string.Format("Can't auto join {0}", types[i]));
                 }
@@ -97,10 +100,11 @@ namespace PetaPoco.Internal
                 usedColumns.Add(fieldName, true);
             }
 
+            // TODO: InvalidOperationException using `typeThis, typeNext` in exception string; should probably be `typeThis.Name, typeNext.Name`
             throw new InvalidOperationException(string.Format("Couldn't find split point between {0} and {1}", typeThis, typeNext));
         }
 
-        // Create a multi-poco factory
+        // Create a multi-poco factory for a query
         private static Func<IDataReader, object, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper)
         {
             var m = new DynamicMethod("petapoco_multipoco_factory", typeof(TRet), new[] { typeof(MultiPocoFactory), typeof(IDataReader), typeof(object) },
@@ -130,7 +134,7 @@ namespace PetaPoco.Internal
                 il.Emit(OpCodes.Callvirt, tDelInvoke); // Poco left on stack
             }
 
-            // By now we should have the callback and the N pocos all on the stack.  Call the callback and we're done
+            // By now we should have the callback and the N pocos all on the stack. Call the callback and we're done
             il.Emit(OpCodes.Callvirt, Expression.GetFuncType(types.Concat(new[] { typeof(TRet) }).ToArray()).GetMethod("Invoke"));
             il.Emit(OpCodes.Ret);
 
@@ -144,7 +148,7 @@ namespace PetaPoco.Internal
             AutoMappers.Flush();
         }
 
-        // Get (or create) the multi-poco factory for a query
+        // Get (or create) a multi-poco factory for a query
         public static Func<IDataReader, object, TRet> GetFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper)
         {
             var key = Tuple.Create(typeof(TRet), new ArrayKey<Type>(types), connectionString, sql, r.FieldCount);
