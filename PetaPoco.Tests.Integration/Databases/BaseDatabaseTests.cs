@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -145,6 +146,68 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Connection.ShouldBeNull();
             await DB.OpenSharedConnectionAsync();
+            DB.Connection.State.ShouldBe(ConnectionState.Open);
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public void OpenSharedConnection_WhenCalled_ShouldInvokeOnConnectionOpening()
+        {
+            bool eventInvoked = false;
+            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
+            // NOTE: Casting DB to Database, since it's not defined in IDatabase
+            (DB as Database).ConnectionOpening += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
+          
+            DB.OpenSharedConnection();
+            eventInvoked.ShouldBeTrue();
+            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Closed);
+            
+            DB.Connection.State.ShouldBe(ConnectionState.Open);
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public async Task OpenSharedConnectionAsync_WhenCalled_ShouldInvokeOnConnectionOpening()
+        {
+            bool eventInvoked = false;
+            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
+            // NOTE: Casting DB to Database, since it's not defined in IDatabase
+            (DB as Database).ConnectionOpening += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
+           
+            await DB.OpenSharedConnectionAsync();
+            eventInvoked.ShouldBeTrue();
+            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Closed);
+         
+            DB.Connection.State.ShouldBe(ConnectionState.Open);
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public void OpenSharedConnection_AfterBeingCalled_ShouldInvokeOnConnectionOpened()
+        {
+            bool eventInvoked = false;
+            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
+            DB.ConnectionOpened += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
+            
+            DB.OpenSharedConnection();
+            eventInvoked.ShouldBeTrue();
+            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Open);
+
+            DB.Connection.State.ShouldBe(ConnectionState.Open);
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public async Task OpenSharedConnectionAsync_AfterBeingCalled_ShouldInvokeOnConnectionOpened()
+        {
+            bool eventInvoked = false;
+            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
+            DB.ConnectionOpened += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
+          
+            await DB.OpenSharedConnectionAsync();
+            eventInvoked.ShouldBeTrue();
+            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Open);
+
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
         }
