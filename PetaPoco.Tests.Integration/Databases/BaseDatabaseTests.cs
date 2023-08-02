@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -127,13 +127,13 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.IsolationLevel = IsolationLevel.Serializable;
             using (var t = DB.GetTransaction())
             {
-                var transaction = (IDbTransaction) DB.GetType().GetField("_transaction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(DB);
+                var transaction = (IDbTransaction)DB.GetType().GetField("_transaction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(DB);
                 transaction.IsolationLevel.ShouldBe(DB.IsolationLevel.Value);
             }
         }
 
         [Fact]
-        public void OpenShredConnection_WhenCalled_ShouldBeValid()
+        public void OpenSharedConnection_WhenCalled_ShouldBeValid()
         {
             DB.Connection.ShouldBeNull();
             DB.OpenSharedConnection();
@@ -154,14 +154,12 @@ namespace PetaPoco.Tests.Integration.Databases
         public void OpenSharedConnection_WhenCalled_ShouldInvokeOnConnectionOpening()
         {
             bool eventInvoked = false;
-            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
-            // NOTE: Casting DB to Database, since it's not defined in IDatabase
-            (DB as Database).ConnectionOpening += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
-          
+            // NOTE: Casting DB to Database, since `ConnectionOpening` is missing in IDatabase
+            (DB as Database).ConnectionOpening += (_, e) => { eventInvoked = true; e.Connection.State.ShouldBe(ConnectionState.Closed); };
+
+            DB.Connection.ShouldBeNull();
             DB.OpenSharedConnection();
             eventInvoked.ShouldBeTrue();
-            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Closed);
-            
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
         }
@@ -170,14 +168,12 @@ namespace PetaPoco.Tests.Integration.Databases
         public async Task OpenSharedConnectionAsync_WhenCalled_ShouldInvokeOnConnectionOpening()
         {
             bool eventInvoked = false;
-            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
-            // NOTE: Casting DB to Database, since it's not defined in IDatabase
-            (DB as Database).ConnectionOpening += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
-           
+            // NOTE: Casting DB to Database, since `ConnectionOpening` is missing in IDatabase
+            (DB as Database).ConnectionOpening += (_, e) => { eventInvoked = true; e.Connection.State.ShouldBe(ConnectionState.Closed); };
+
+            DB.Connection.ShouldBeNull();
             await DB.OpenSharedConnectionAsync();
             eventInvoked.ShouldBeTrue();
-            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Closed);
-         
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
         }
@@ -186,13 +182,11 @@ namespace PetaPoco.Tests.Integration.Databases
         public void OpenSharedConnection_AfterBeingCalled_ShouldInvokeOnConnectionOpened()
         {
             bool eventInvoked = false;
-            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
-            DB.ConnectionOpened += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
-            
+            DB.ConnectionOpened += (_, e) => { eventInvoked = true; e.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            DB.Connection.ShouldBeNull();
             DB.OpenSharedConnection();
             eventInvoked.ShouldBeTrue();
-            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Open);
-
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
         }
@@ -201,15 +195,146 @@ namespace PetaPoco.Tests.Integration.Databases
         public async Task OpenSharedConnectionAsync_AfterBeingCalled_ShouldInvokeOnConnectionOpened()
         {
             bool eventInvoked = false;
-            ConnectionState connectionStateWhenEventInvoked = ConnectionState.Broken;
-            DB.ConnectionOpened += (_, cxn) => { eventInvoked = true; connectionStateWhenEventInvoked = DB.Connection.State; };
-          
+            DB.ConnectionOpened += (_, e) => { eventInvoked = true; e.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            DB.Connection.ShouldBeNull();
             await DB.OpenSharedConnectionAsync();
             eventInvoked.ShouldBeTrue();
-            connectionStateWhenEventInvoked.ShouldBe(ConnectionState.Open);
-
             DB.Connection.State.ShouldBe(ConnectionState.Open);
             DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public void CloseSharedConnection_WhenCalled_ShouldInvokeOnConnectionClosing()
+        {
+            bool eventInvoked = false;
+            DB.ConnectionClosing += (_, e) => { eventInvoked = true; e.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            DB.OpenSharedConnection();
+            DB.Connection.State.ShouldBe(ConnectionState.Open);
+            DB.CloseSharedConnection();
+            eventInvoked.ShouldBeTrue();
+            DB.Connection.ShouldBeNull();
+        }
+
+        [Fact]
+        public void CommandHelper_WhenCalled_ShouldInvokeOnExecutingCommand()
+        {
+            bool eventInvoked = false;
+            DB.CommandExecuting += (_, e) => { eventInvoked = true; DB.LastSQL.ShouldNotBe(e.Command.CommandText); };
+
+            DB.OpenSharedConnection();
+            DB.Insert(_note);
+            DB.Exists<Note>(_note);
+            eventInvoked.ShouldBeTrue();
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public async Task CommandHelperAsync_WhenCalled_ShouldInvokeOnExecutingCommand()
+        {
+            bool eventInvoked = false;
+            DB.CommandExecuting += (_, e) => { eventInvoked = true; DB.LastSQL.ShouldNotBe(e.Command.CommandText); };
+
+            DB.OpenSharedConnection();
+            await DB.InsertAsync(_note);
+            await DB.ExistsAsync<Note>(_note);
+            eventInvoked.ShouldBeTrue();
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public void CommandHelper_AfterBeingCalled_ShouldInvokeOnExecutedCommand()
+        {
+            bool eventInvoked = false;
+            DB.CommandExecuted += (_, e) => { eventInvoked = true; DB.LastSQL.ShouldBe(e.Command.CommandText); };
+
+            DB.OpenSharedConnection();
+            DB.Insert(_note);
+            DB.Exists<Note>(_note);
+            eventInvoked.ShouldBeTrue();
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public async Task CommandHelperAsync_AfterBeingCalled_ShouldInvokeOnExecutedCommand()
+        {
+            bool eventInvoked = false;
+            DB.CommandExecuted += (_, e) => { eventInvoked = true; DB.LastSQL.ShouldBe(e.Command.CommandText); };
+
+            DB.OpenSharedConnection();
+            await DB.InsertAsync(_note);
+            await DB.ExistsAsync<Note>(_note);
+            eventInvoked.ShouldBeTrue();
+            DB.CloseSharedConnection();
+        }
+
+        [Fact]
+        public void BeginTransaction_AfterBeingCalled_ShouldInvokeOnBeginTransaction()
+        {
+            bool eventInvoked = false;
+            DB.TransactionStarted += (_, e) => { eventInvoked = true; e.Transaction.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            DB.BeginTransaction();
+            eventInvoked.ShouldBeTrue();
+            DB.AbortTransaction();
+        }
+
+        [Fact]
+        public async Task BeginTransactionAsync_AfterBeingCalled_ShouldInvokeOnBeginTransaction()
+        {
+            bool eventInvoked = false;
+            DB.TransactionStarted += (_, e) => { eventInvoked = true; e.Transaction.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            await DB.BeginTransactionAsync();
+            eventInvoked.ShouldBeTrue();
+            DB.AbortTransaction();
+        }
+
+        [Fact]
+        public void CompleteTransaction_WhenCalled_ShouldInvokeOnEndTransaction()
+        {
+            bool eventInvoked = false;
+            DB.TransactionEnding += (_, e) => { eventInvoked = true; e.Transaction.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            DB.BeginTransaction();
+            DB.CompleteTransaction();
+            eventInvoked.ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task CompleteTransactionAsync_WhenCalled_ShouldInvokeOnEndTransaction()
+        {
+            bool eventInvoked = false;
+            DB.TransactionEnding += (_, e) => { eventInvoked = true; e.Transaction.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            await DB.BeginTransactionAsync();
+            // NOTE: Casting DB to Database, since `CompleteTransactionAsync` is missing in IDatabase
+            await (DB as Database).CompleteTransactionAsync();
+            eventInvoked.ShouldBeTrue();
+        }
+
+        [Fact]
+        public void AbortTransaction_WhenCalled_ShouldInvokeOnEndTransaction()
+        {
+            bool eventInvoked = false;
+            DB.TransactionEnding += (_, e) => { eventInvoked = true; e.Transaction.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            DB.BeginTransaction();
+            DB.AbortTransaction();
+            eventInvoked.ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task AbortTransactionAsync_WhenCalled_ShouldInvokeOnEndTransaction()
+        {
+            bool eventInvoked = false;
+            DB.TransactionEnding += (_, e) => { eventInvoked = true; e.Transaction.Connection.State.ShouldBe(ConnectionState.Open); };
+
+            await DB.BeginTransactionAsync();
+            // NOTE: Casting DB to Database, since `AbortTransactionAsync` is missing in IDatabase
+            await (DB as Database).AbortTransactionAsync();
+            eventInvoked.ShouldBeTrue();
         }
     }
 }
