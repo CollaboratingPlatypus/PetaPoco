@@ -150,6 +150,8 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.CloseSharedConnection();
         }
 
+        #region Events
+
         [Fact]
         public void OpenSharedConnection_WhenCalled_ShouldInvokeOnConnectionOpening()
         {
@@ -336,5 +338,7 @@ namespace PetaPoco.Tests.Integration.Databases
             await (DB as Database).AbortTransactionAsync();
             eventInvoked.ShouldBeTrue();
         }
+
+        #endregion
     }
 }
