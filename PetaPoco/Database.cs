@@ -380,7 +380,9 @@ namespace PetaPoco
                 _sharedConnection = _factory.CreateConnection();
                 _sharedConnection.ConnectionString = _connectionString;
 
-                if (_sharedConnection.State == ConnectionState.Broken)
+				_sharedConnection = OnConnectionOpening(_sharedConnection);
+
+				if (_sharedConnection.State == ConnectionState.Broken)
                     _sharedConnection.Close();
 
                 if (_sharedConnection.State == ConnectionState.Closed)
