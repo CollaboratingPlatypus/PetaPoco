@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PetaPoco.Core;
@@ -32,6 +32,12 @@ namespace PetaPoco.Tests.Integration.Databases
             Dob = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc),
             Height = 180,
             Name = "Peta"
+        };
+
+        private Note _note = new Note
+        {
+            CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc),
+            Text = "Peta's Note",
         };
 
         protected BaseUpdateTests(DBTestProvider provider)
@@ -282,6 +288,14 @@ namespace PetaPoco.Tests.Integration.Databases
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        [Trait("Issue", "667")]
+        public void Update_GivenDynamicPoco_ShouldNotThrow() {
+            DB.Insert(_note);
+            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            Should.NotThrow(() => DB.Update("Note", "Id", entity));
         }
 
         [Fact]
