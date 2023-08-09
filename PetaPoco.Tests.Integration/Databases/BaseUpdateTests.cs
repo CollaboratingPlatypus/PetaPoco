@@ -294,8 +294,20 @@ namespace PetaPoco.Tests.Integration.Databases
         [Trait("Issue", "667")]
         public void Update_GivenDynamicPoco_ShouldNotThrow() {
             DB.Insert(_note);
-            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
-            Should.NotThrow(() => DB.Update("Note", "Id", entity));
+			var entity = DB.First<dynamic>("SELECT * FROM Note");
+			Should.NotThrow(() => DB.Update("Note", "Id", entity));
+        }
+
+        [Fact]
+        public void Update_GivenDynamicPoco_ShouldUpdate() {
+            DB.Insert(_note);
+			var entity = DB.First<dynamic>("SELECT * FROM Note");
+
+			entity.Text += " was updated";
+			DB.Update("Note", "Id", entity);
+
+			var entity2 = DB.First<dynamic>("SELECT * FROM Note");
+			((string)entity2.Text).ShouldContain("updated");
         }
 
         [Fact]
