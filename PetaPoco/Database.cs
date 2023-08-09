@@ -599,7 +599,7 @@ namespace PetaPoco
         private void AddParam(IDbCommand cmd, object value, PocoColumn pc)
         {
             // Convert value to from poco type to db type
-            if (pc != null)
+            if (pc != null && pc.PropertyInfo != null)
             {
                 var mapper = Mappers.GetMapper(pc.PropertyInfo.DeclaringType, _defaultMapper);
                 var fn = mapper.GetToDbConverter(pc.PropertyInfo);
@@ -2124,7 +2124,7 @@ namespace PetaPoco
 
         /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco)
-            => Update(tableName, primaryKeyName, poco, null);
+            => Update(tableName, primaryKeyName, poco, null, null);
 
         /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
