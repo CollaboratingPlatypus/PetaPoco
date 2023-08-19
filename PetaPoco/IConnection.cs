@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 namespace PetaPoco
 {
     /// <summary>
-    /// Defines methods and properties for managing database connections. This includes opening and closing shared connections, and accessing the currently open connection.
+    /// Defines methods and properties for managing database connections. This includes opening and closing shared connections, and
+    /// accessing the currently open connection.
     /// </summary>
     public interface IConnection
     {
@@ -12,7 +13,8 @@ namespace PetaPoco
         /// Gets or sets the connection reuse policy for the shared connection or <see cref="IDatabase"/> instance.
         /// </summary>
         /// <remarks>
-        /// When set to <see langword="true"/> the first opened connection is kept alive until <see cref="CloseSharedConnection"/> is called or the <see cref="IDatabase"/> is disposed.
+        /// When set to <see langword="true"/> the first opened connection is kept alive until <see cref="CloseSharedConnection"/> is called
+        /// or the <see cref="IDatabase"/> is disposed.
         /// </remarks>
         bool KeepConnectionAlive { get; set; }
 
@@ -25,7 +27,7 @@ namespace PetaPoco
         /// Opens a connection that will be used for all subsequent queries.
         /// </summary>
         /// <remarks>
-        /// Calls to <see cref="OpenSharedConnection"/> and <see cref="CloseSharedConnection"/> are reference counted and should be balanced.
+        /// Calls to <see cref="OpenSharedConnection"/> and <see cref="CloseSharedConnection"/> are reference counted and must be balanced.
         /// </remarks>
         void OpenSharedConnection();
 
@@ -34,9 +36,12 @@ namespace PetaPoco
         /// Asynchronously opens a connection that will be used for all subsequent queries.
         /// </summary>
         /// <remarks>
-        /// Calls to <see cref="OpenSharedConnectionAsync()"/> and <see cref="CloseSharedConnection"/> are reference counted and should be balanced.
+        /// Calls to <see cref="OpenSharedConnectionAsync()"/> and <see cref="CloseSharedConnection"/> are reference counted and must be
+        /// balanced.
         /// </remarks>
-        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <returns>
+		/// A task that represents the asynchronous operation.
+		/// </returns>
         Task OpenSharedConnectionAsync();
 
         // TODO: Missing overload: `Task OpenSharedConnectionAsync(CancellationToken)`
@@ -46,7 +51,7 @@ namespace PetaPoco
         /// Releases the shared connection.
         /// </summary>
         /// <remarks>
-        /// Calls to <see cref="OpenSharedConnection"/> and <see cref="CloseSharedConnection"/> are reference counted and should be balanced.
+        /// Calls to <see cref="OpenSharedConnection"/> and <see cref="CloseSharedConnection"/> are reference counted and must be balanced.
         /// </remarks>
         void CloseSharedConnection();
     }

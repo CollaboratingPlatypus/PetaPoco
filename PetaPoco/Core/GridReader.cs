@@ -127,7 +127,8 @@ namespace PetaPoco
         /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
         /// <param name="index">The zero-based row index to be read from the underlying <see cref="IDataReader"/>.</param>
         /// <param name="types">An array of types representing the POCO types in the returned result set.</param>
-        /// <param name="transformer">A function used to connect the POCO instances as a single POCO of type <typeparamref name="T"/>, or <see langword="null"/> to let PetaPoco automatically deduce the relationships.</param>
+        /// <param name="transformer">A function used to connect the POCO instances as a single POCO of type <typeparamref name="T"/>, or
+        /// <see langword="null"/> to let PetaPoco automatically deduce the relationships.</param>
         /// <returns>A composite POCO of type <typeparamref name="T"/>.</returns>
         /// <exception cref="ObjectDisposedException">Called after the data reader has been disposed.</exception>
         /// <exception cref="InvalidOperationException">Result records are consumed in the incorrect order, or more than once.</exception>
@@ -213,7 +214,8 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Disposes the GridReader, closing and releasing the underlying <see cref="IDataReader"/>, <see cref="IDbCommand"/>, and shared <see cref="IConnection.Connection"/>.
+        /// Disposes the GridReader, closing and releasing the underlying <see cref="IDataReader"/>, <see cref="IDbCommand"/>, and shared
+        /// <see cref="IConnection.Connection"/>.
         /// </summary>
         public void Dispose()
         {

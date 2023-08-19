@@ -5,10 +5,10 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for the MariaDB database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for MariaDB.
     /// </summary>
     /// <remarks>
-    /// Under the hood, this class uses the MySql data provider.
+    /// This class uses the <see cref="MySqlDatabaseProvider"/> provider.
     /// </remarks>
     public class MariaDbDatabaseProvider : DatabaseProvider
     {

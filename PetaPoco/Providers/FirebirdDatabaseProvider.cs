@@ -12,7 +12,7 @@ namespace PetaPoco.Providers
 {
 	// TODO: It irks the ¢®@₱ out of me that the Firebird DBProvider class name is the only one that improperly appends "Db" after the provider name.
     /// <summary>
-    /// The FirebirdDbDatabaseProvider class provides an implementation of the <see cref="DatabaseProvider"/> class specific to the Firebird database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Firebird.
     /// </summary>
     public class FirebirdDbDatabaseProvider : DatabaseProvider
     {

@@ -14,40 +14,41 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Core
 {
     /// <summary>
-    /// The DatabaseProvider class defines a base implementation for database Provider classes, and provides common defaults used by different database engines.
+    /// The DatabaseProvider class defines a base implementation for database Provider classes, and provides common defaults used by
+    /// different database management systems.
     /// </summary>
     public abstract class DatabaseProvider : IProvider
     {
         private static readonly ConcurrentDictionary<string, IProvider> customProviders = new ConcurrentDictionary<string, IProvider>();
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public abstract DbProviderFactory GetFactory();
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual bool HasNativeGuidSupport => false;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual IPagingHelper PagingUtility => PagingHelper.Instance;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string EscapeTableName(string tableName)
             => tableName.IndexOf('.') >= 0 ? tableName : EscapeSqlIdentifier(tableName);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string EscapeSqlIdentifier(string sqlIdentifier) => $"[{sqlIdentifier}]";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string GetParameterPrefix(string connectionString) => "@";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual object MapParameterValue(object value) => value is bool b ? b ? 1 : 0 : value;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual void PreExecute(IDbCommand cmd)
         {
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var sql = $"{parts.Sql}\nLIMIT @{args.Length} OFFSET @{args.Length + 1}";
@@ -55,16 +56,16 @@ namespace PetaPoco.Core
             return sql;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string GetExistsSql() => "SELECT COUNT(*) FROM {0} WHERE {1}";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string GetAutoIncrementExpression(TableInfo tableInfo) => null;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual string GetInsertOutputClause(string primaryKeyName) => string.Empty;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
@@ -72,7 +73,7 @@ namespace PetaPoco.Core
         }
 
 #if ASYNC
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public virtual Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             cmd.CommandText += ";\nSELECT @@IDENTITY AS NewID;";
@@ -104,11 +105,13 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        /// Registers a custom IProvider with a string that will match the beginning of the name of the provider, DbConnection, or DbProviderFactory.
+        /// Registers a custom IProvider with a string that will match the beginning of the name of the provider, DbConnection, or
+        /// DbProviderFactory.
         /// </summary>
         /// <typeparam name="T">The type of IProvider to be registered.</typeparam>
         /// <param name="initialString">The string to be matched against the beginning of the provider name.</param>
-        /// <exception cref="ArgumentException"><paramref name="initialString"/> is null, empty, or consists of only white space.</exception>
+        /// <exception cref="ArgumentException"><paramref name="initialString"/> is null, empty, or consists of only white
+        /// space.</exception>
         public static void RegisterCustomProvider<T>(string initialString) where T : IProvider, new()
         {
             if (String.IsNullOrWhiteSpace(initialString))
@@ -133,7 +136,8 @@ namespace PetaPoco.Core
         /// Instantiates a suitable IProvider instance based on the specified provider's type.
         /// </summary>
         /// <param name="providerType">The type of provider to be registered.</param>
-        /// <param name="allowDefault">Specifies whether to allow the default <see cref="SqlServerDatabaseProvider"/> to be returned if no matching provider is found.</param>
+        /// <param name="allowDefault">Specifies whether to allow the default <see cref="SqlServerDatabaseProvider"/> to be returned if no
+        /// matching provider is found.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <returns>The resolved database provider.</returns>
         /// <exception cref="ArgumentException">The <paramref name="providerType"/> name cannot be matched to a provider.</exception>
@@ -198,7 +202,8 @@ namespace PetaPoco.Core
         /// Instantiates a suitable IProvider instance based on the specified provider name.
         /// </summary>
         /// <param name="providerName">The provider name.</param>
-        /// <param name="allowDefault">Specifies whether to allow the default <see cref="SqlServerDatabaseProvider"/> to be returned if no matching provider is found.</param>
+        /// <param name="allowDefault">Specifies whether to allow the default <see cref="SqlServerDatabaseProvider"/> to be returned if no
+        /// matching provider is found.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <returns>The resolved database provider.</returns>
         /// <exception cref="ArgumentException">The <paramref name="providerName"/> name cannot be matched to a provider.</exception>
@@ -229,7 +234,8 @@ namespace PetaPoco.Core
                 providerName.IndexOf("SqlCeConnection", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SqlServerCEDatabaseProviders>.Instance;
 
-            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0 || providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
+            if (providerName.IndexOf("Npgsql", StringComparison.InvariantCultureIgnoreCase) >= 0 ||
+                providerName.IndexOf("pgsql", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
 
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -298,7 +304,9 @@ namespace PetaPoco.Core
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="db">The database instance that will execute the SQL command.</param>
         /// <param name="cmd">The SQL command to execute.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// </returns>
         protected Task ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
             => db.ExecuteNonQueryHelperAsync(cancellationToken, cmd);
 
@@ -308,7 +316,9 @@ namespace PetaPoco.Core
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="db">The database instance that will execute the SQL command.</param>
         /// <param name="cmd">The SQL command to execute.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the first column of the first row in the result set.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the first column of the first row in the result set.
+        /// </returns>
         protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd)
             => db.ExecuteScalarHelperAsync(cancellationToken, cmd);
 #endif

@@ -7,15 +7,15 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The SQLiteDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the SQLite database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for SQLite.
     /// </summary>
     public class SQLiteDatabaseProvider : DatabaseProvider
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("System.Data.SQLite.SQLiteFactory, System.Data.SQLite", "Microsoft.Data.Sqlite.SqliteFactory, Microsoft.Data.Sqlite");
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object MapParameterValue(object value)
         {
             if (value is uint u)
@@ -24,7 +24,7 @@ namespace PetaPoco.Providers
             return base.MapParameterValue(value);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -38,7 +38,7 @@ namespace PetaPoco.Providers
         }
 
 #if ASYNC
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -52,7 +52,7 @@ namespace PetaPoco.Providers
         }
 #endif
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetExistsSql() => "SELECT EXISTS (SELECT 1 FROM {0} WHERE {1})";
     }
 }

@@ -60,7 +60,8 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ResultColumnAttribute"/> class with the specified column name and auto-select inclusion setting.
+        /// Initializes a new instance of the <see cref="ResultColumnAttribute"/> class with the specified column name and auto-select
+        /// inclusion setting.
         /// </summary>
         /// <param name="column">The name of the database column associated with this property.</param>
         /// <param name="includeInAutoSelect">Specifies whether the property should be included in auto-select queries.</param>

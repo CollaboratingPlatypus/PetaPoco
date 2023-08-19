@@ -6,8 +6,10 @@ namespace PetaPoco
     /// Wraps a <see cref="DateTime"/> that will be stored in the database as a <see cref="System.Data.DbType.DateTime2"/>.
     /// </summary>
     /// <remarks>
-    /// Using this type for a column-mapped POCO property is equivalent to decorating a DateTime property with <see cref="ColumnAttribute.ForceToDateTime2"/>.
-    /// <para><see cref="System.Data.DbType.DateTime2">DbType.DateTime2</see> is a data type used by SQL DBs with a larger date range and fractional second precision than <see cref="System.Data.DbType.DateTime">DbType.DateTime</see>.</para>
+    /// Using this type for a column-mapped POCO property is equivalent to decorating a DateTime property with <see
+    /// cref="ColumnAttribute.ForceToDateTime2"/>.
+    /// <para><see cref="System.Data.DbType.DateTime2">DbType.DateTime2</see> is a data type used by SQL DBs with a larger date range and
+    /// fractional second precision than <see cref="System.Data.DbType.DateTime">DbType.DateTime</see>.</para>
     /// </remarks>
     public class DateTime2
     {

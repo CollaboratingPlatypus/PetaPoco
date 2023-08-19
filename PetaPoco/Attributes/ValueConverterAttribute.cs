@@ -6,8 +6,10 @@ namespace PetaPoco
     /// The ValueConverterAttribute class provides a base class all ValueConverters must derive from and implement.
     /// </summary>
     /// <remarks>
-    /// ValueConverters are used to implement custom two-way conversions between your POCO property data type, and the mapped database column's data type. They are ideal for implementing a custom conversion without requiring any changes to the mapper.
-    /// <para>To provide a custom ValueConverter for a property, inherit from this class, and supply definitions for both conversion methods for your data type. Decorate the appropriate properties that require your ValueConverter with your derived class.</para>
+    /// ValueConverters are used to implement custom two-way conversions between your POCO property data type, and the mapped database
+    /// column's data type. They are ideal for implementing a custom conversion without requiring any changes to the mapper.
+    /// <para>To provide a custom ValueConverter for a property, inherit from this class, and supply definitions for both conversion methods
+    /// for your data type. Decorate the appropriate properties that require your ValueConverter with your derived class.</para>
     /// </remarks>
     [AttributeUsage(AttributeTargets.Property)]
     public abstract class ValueConverterAttribute : Attribute

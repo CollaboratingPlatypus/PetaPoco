@@ -28,10 +28,12 @@ namespace PetaPoco
         IEnumerable<T1> Read<T1, T2, T3>();
 
         /// <summary>
-        /// Reads a sequence of results from a data reader and projects them into a new form of type <typeparamref name="T1"/> using a default mapping function.
+        /// Reads a sequence of results from a data reader and projects them into a new form of type <typeparamref name="T1"/> using a
+        /// default mapping function.
         /// </summary>
         /// <remarks>
-        /// PetaPoco will automatically attempt to determine the split points and auto-map any additional POCO types into <typeparamref name="T1"/>.
+        /// PetaPoco will automatically attempt to determine the split points and auto-map any additional POCO types into <typeparamref
+        /// name="T1"/>.
         /// </remarks>
         /// <typeparam name="T1">The first POCO type, and the projected POCO type representing a single composite result record.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>
@@ -51,10 +53,12 @@ namespace PetaPoco
         IEnumerable<TResult> Read<T1, T2, T3, TResult>(Func<T1, T2, T3, TResult> projector);
 
         /// <summary>
-        /// Reads a sequence of results from a data reader and projects them into a new form of type <typeparamref name="TResult"/> using the provided mapping function.
+        /// Reads a sequence of results from a data reader and projects them into a new form of type <typeparamref name="TResult"/> using
+        /// the provided mapping function.
         /// </summary>
         /// <remarks>
-        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and auto-map each POCO type into <typeparamref name="TResult"/>.
+        /// If <paramref name="projector"/> is <see langword="null"/>, PetaPoco will automatically attempt to determine the split points and
+        /// auto-map each POCO type into <typeparamref name="TResult"/>.
         /// </remarks>
         /// <typeparam name="T1">The first POCO type.</typeparam>
         /// <typeparam name="T2">The second POCO type.</typeparam>

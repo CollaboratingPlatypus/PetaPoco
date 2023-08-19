@@ -59,14 +59,15 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Constructs an instance with the specified connection string name. The connection string and database provider will be read from the app or web configuration file.
+        /// Constructs an instance with the specified connection string name. The connection string and database provider will be read from
+        /// the app or web configuration file.
         /// </summary>
         /// <remarks>
         /// PetaPoco will automatically close and dispose of any connections it creates.
         /// </remarks>
         /// <param name="connectionStringName">The name of the connection string to locate.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
-        /// <exception cref="ArgumentException"><paramref name="connectionStringName" /> is null or empty.</exception>
+        /// <exception cref="ArgumentException"><paramref name="connectionStringName"/> is null or empty.</exception>
         /// <exception cref="InvalidOperationException">A connection string cannot be found.</exception>
         public Database(string connectionStringName, IMapper defaultMapper = null)
         {
@@ -116,7 +117,8 @@ namespace PetaPoco
         /// <param name="connectionString">The connection string.</param>
         /// <param name="providerName">The database provider name.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
-        /// <exception cref="ArgumentException"><paramref name="connectionString"/> or <paramref name="providerName"/> is null or empty.</exception>
+        /// <exception cref="ArgumentException"><paramref name="connectionString"/> or <paramref name="providerName"/> is null or
+        /// empty.</exception>
         public Database(string connectionString, string providerName, IMapper defaultMapper = null)
         {
             if (string.IsNullOrEmpty(connectionString))
@@ -177,7 +179,8 @@ namespace PetaPoco
         /// </summary>
         /// <param name="configuration">The build configuration instance.</param>
         /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is null.</exception>
-        /// <exception cref="InvalidOperationException">A connection string cannot be found or is not configured, or unable to locate a provider.</exception>
+        /// <exception cref="InvalidOperationException">A connection string cannot be found or is not configured, or unable to locate a
+        /// provider.</exception>
         public Database(IDatabaseBuildConfiguration configuration)
         {
             if (configuration == null)
@@ -376,7 +379,8 @@ namespace PetaPoco
         /// Releases the shared connection.
         /// </summary>
         /// <remarks>
-        /// Implicitly called when the <see cref="Database"/> instance goes out of scope at the end of a <c>using</c> block, calling <see cref="CloseSharedConnection"/> to ensure the connection is properly closed.
+        /// Implicitly called when the <see cref="Database"/> instance goes out of scope at the end of a <c>using</c> block, calling <see
+        /// cref="CloseSharedConnection"/> to ensure the connection is properly closed.
         /// </remarks>
         public void Dispose()
         {
@@ -394,7 +398,9 @@ namespace PetaPoco
 
         /// <inheritdoc/>
         /// <remarks>
-        /// This method facilitates proper transaction lifetime management, especially when nested. Transactions can be nested but they must all include a call to <see cref="CompleteTransaction"/> <b>prior to exiting the scope</b>, otherwise the entire transaction is aborted.
+        /// This method facilitates proper transaction lifetime management, especially when nested. Transactions can be nested but they must
+        /// all include a call to <see cref="CompleteTransaction"/> <b>prior to exiting the scope</b>, otherwise the entire transaction is
+        /// aborted.
         /// </remarks>
         /// <example>
         /// <para>A basic example of using transactional scopes (part pseudocode) is shown below:</para>
@@ -419,7 +425,8 @@ namespace PetaPoco
         /// ]]>
         /// </code>
         /// </example>
-        /// <returns>An <see cref="ITransaction" /> reference that must be <see cref="CompleteTransaction">completed</see> or <see cref="Transaction.Dispose">disposed</see>.</returns>
+        /// <returns>An <see cref="ITransaction"/> reference that must be <see cref="CompleteTransaction">completed</see> or <see
+        /// cref="Transaction.Dispose">disposed</see>.</returns>
         public ITransaction GetTransaction()
             => new Transaction(this);
 
@@ -573,6 +580,7 @@ namespace PetaPoco
         #region Exception Reporting and Logging
 
         // TODO: Not in IDatabase interface: `OnException(Exception)`, to allow GridReader's DI impl to accept IDatabase (IAsyncReader is able to correctly use the interface for it's IOC because it doesn't require the OnException))
+
         /// <summary>
         /// Called if an exception is thrown during a database operation, and invokes the <see cref="IDatabase.ExceptionThrown"/> event.
         /// </summary>
@@ -631,7 +639,8 @@ namespace PetaPoco
         /// Called immediately before a database command is executed, and invokes the <see cref="IDatabase.CommandExecuting"/> event.
         /// </summary>
         /// <remarks>
-        /// Override this method to provide custom logging of commands, modification of the IDbCommand before it's executed, or any other custom actions that should be performed before every command
+        /// Override this method to provide custom logging of commands, modification of the IDbCommand before it's executed, or any other
+        /// custom actions that should be performed before every command
         /// </remarks>
         /// <param name="cmd">The SQL command to be executed.</param>
         public virtual void OnExecutingCommand(IDbCommand cmd)
@@ -640,7 +649,7 @@ namespace PetaPoco
         }
 
         /// <summary>
-        /// Called immediately after completion of a database command execution, and invokes the <see cref="IDatabase.CommandExecuted"/> event.
+        /// Called immediately after a database command execution completes, and invokes the <see cref="IDatabase.CommandExecuted"/> event.
         /// </summary>
         /// <remarks>
         /// Override this method to provide custom logging or other actions after every command has completed.
@@ -889,6 +898,7 @@ namespace PetaPoco
             => QueryAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
 
         // TODO: QueryAsync(CancellationToken, string, object[]) takes a caller-provided CancellationToken, but uses a default empty token for wrapped call
+
         /// <inheritdoc/>
         public Task<IAsyncReader<T>> QueryAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
             => QueryAsync<T>(CancellationToken.None, CommandType.Text, sql, args);
@@ -943,6 +953,7 @@ namespace PetaPoco
             => QueryAsync(action, cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
 
         // TODO: QueryAsync(Action<T>, CancellationToken, string, object[]) takes a caller-provided CancellationToken, but uses a default empty token for wrapped call
+
         /// <inheritdoc/>
         public Task QueryAsync<T>(Action<T> action, CancellationToken cancellationToken, string sql, params object[] args)
             => QueryAsync(action, CancellationToken.None, CommandType.Text, sql, args);
@@ -1334,6 +1345,7 @@ namespace PetaPoco
             => FetchAsync<T>(cancellationToken, CommandType.Text, sql.SQL, sql.Arguments);
 
         // TODO: FetchAsync(CancellationToken, string, object[]) takes a caller-provided CancellationToken, but uses a default empty token for wrapped call
+
         /// <inheritdoc/>
         public Task<List<T>> FetchAsync<T>(CancellationToken cancellationToken, string sql, params object[] args)
             => FetchAsync<T>(CancellationToken.None, CommandType.Text, sql, args);
@@ -1616,6 +1628,7 @@ namespace PetaPoco
             => SkipTakeAsync<T>(CancellationToken.None, skip, take, string.Empty);
 
         // TODO: SkipTakeAsync(long, long, Sql) should forward call to an overload that receives a CancellationToken
+
         /// <inheritdoc/>
         public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql)
             => SkipTakeAsync<T>(skip, take, sql.SQL, sql.Arguments);
@@ -1641,15 +1654,16 @@ namespace PetaPoco
 #endif
 
         /// <summary>
-        /// Starting with a regular <c>SELECT</c> statement, derives the SQL statements required to query a DB for a page of records and the total number of records.
+        /// Starting with a regular <c>SELECT</c> statement, derives the SQL statements required to query a DB for a page of records and the
+        /// total number of records.
         /// </summary>
         /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
         /// <param name="skip">The number of records to skip before the start of the page.</param>
         /// <param name="take">The number of records in the page.</param>
         /// <param name="sql">The SQL statement.</param>
         /// <param name="args">The parameters to embed in the SQL statement.</param>
-        /// <param name="countSql">When this method returns, contains the SQL statement to query for the total number of matching records.</param>
-        /// <param name="pageSql">When this method returns, contains the SQL statement to retrieve a single page of matching records.</param>
+        /// <param name="countSql">When this method returns, contains the SQL statement to query for the total number of records.</param>
+        /// <param name="pageSql">When this method returns, contains the SQL statement to retrieve a single page of records.</param>
         /// <exception cref="Exception">Unable to parse the given <paramref name="sql"/> statement.</exception>
         protected virtual void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string countSql, out string pageSql)
         {
@@ -1925,7 +1939,8 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public object Insert(string tableName, string primaryKeyName, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1946,7 +1961,8 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -1973,12 +1989,14 @@ namespace PetaPoco
             => InsertAsync(CancellationToken.None, tableName, poco);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<object> InsertAsync(string tableName, string primaryKeyName, object poco)
             => InsertAsync(CancellationToken.None, tableName, primaryKeyName, poco);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<object> InsertAsync(string tableName, string primaryKeyName, bool autoIncrement, object poco)
             => InsertAsync(CancellationToken.None, tableName, primaryKeyName, autoIncrement, poco);
 
@@ -2008,7 +2026,8 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
         {
             // TODO: use `string.IsNullOrEmpty(tableName)` (not `tableName == null`)
@@ -2029,7 +2048,8 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<object> InsertAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, bool autoIncrement, object poco)
         {
             // TODO: use `string.IsNullOrEmpty(tableName)` (not `tableName == null`)
@@ -2215,22 +2235,26 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public int Update(string tableName, string primaryKeyName, object poco)
             => Update(tableName, primaryKeyName, poco, null, null);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
             => Update(tableName, primaryKeyName, poco, null, columns);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
             => Update(tableName, primaryKeyName, poco, primaryKeyValue, null);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -2292,22 +2316,26 @@ namespace PetaPoco
             => UpdateAsync(CancellationToken.None, poco, primaryKeyValue, columns);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, columns);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
             => UpdateAsync(CancellationToken.None, tableName, primaryKeyName, poco, primaryKeyValue, columns);
 
@@ -2351,22 +2379,26 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
             => UpdateAsync(cancellationToken, tableName, primaryKeyName, poco, null);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
             => UpdateAsync(cancellationToken, tableName, primaryKeyName, poco, null, columns);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue)
             => UpdateAsync(cancellationToken, tableName, primaryKeyName, poco, primaryKeyValue, null);
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task<int> UpdateAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns)
         {
             if (string.IsNullOrEmpty(tableName))
@@ -2718,8 +2750,10 @@ namespace PetaPoco
         /// <param name="primaryKeyName">The table's primary key column name.</param>
         /// <param name="pocoData">The PocoData instance for the specified POCO.</param>
         /// <param name="poco">The POCO instance to check.</param>
-        /// <exception cref="InvalidOperationException"><paramref name="primaryKeyName"/> is null or empty, or <paramref name="poco"/> is an ExpandoObject.</exception>
-        /// <exception cref="ArgumentException">The <paramref name="poco"/> doesn't have a property matching the primary key column name.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="primaryKeyName"/> is null or empty, or <paramref name="poco"/> is an
+        /// ExpandoObject.</exception>
+        /// <exception cref="ArgumentException">The <paramref name="poco"/> doesn't have a property matching the primary key column
+        /// name.</exception>
         protected virtual bool IsNew(string primaryKeyName, PocoData pocoData, object poco)
         {
             if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
@@ -2783,10 +2817,12 @@ namespace PetaPoco
         }
 
         // TODO: Inconsistent exception types for same params. Save(string,string,object) throws: first 2 types (2 lines) from IsNew, last 3 types (1 line) from Insert and Update. `primaryKeyName` overlaps with 2 different exception types.
+
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"><paramref name="primaryKeyName"/> is null or empty.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="poco"/> is null.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public void Save(string tableName, string primaryKeyName, object poco)
         {
             if (IsNew(primaryKeyName, poco))
@@ -2803,7 +2839,8 @@ namespace PetaPoco
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"><paramref name="primaryKeyName"/> is null or empty.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task SaveAsync(string tableName, string primaryKeyName, object poco)
             => SaveAsync(CancellationToken.None, tableName, primaryKeyName, poco);
 
@@ -2817,7 +2854,8 @@ namespace PetaPoco
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"><paramref name="primaryKeyName"/> is null or empty.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref name="poco"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="tableName"/>, <paramref name="primaryKeyName"/>, or <paramref
+        /// name="poco"/> is null or empty.</exception>
         public Task SaveAsync(CancellationToken cancellationToken, string tableName, string primaryKeyName, object poco)
         {
             if (IsNew(primaryKeyName, poco))
@@ -3193,7 +3231,9 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="cmd">The SQL command to execute.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains a data reader for reading the result set.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains a data reader for reading the result set.
+        /// </returns>
         /// <seealso cref="IDbCommand.ExecuteReader()"/>
         internal protected async Task<IDataReader> ExecuteReaderHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
         {
@@ -3212,7 +3252,9 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="cmd">The SQL command to execute.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the number of rows affected.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the number of rows affected.
+        /// </returns>
         /// <seealso cref="IDbCommand.ExecuteNonQuery"/>
         internal protected async Task<int> ExecuteNonQueryHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
         {
@@ -3231,7 +3273,9 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="cmd">The SQL command to execute.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the first column of the first row in the result set.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the first column of the first row in the result set.
+        /// </returns>
         /// <seealso cref="IDbCommand.ExecuteScalar"/>
         internal protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
         {
@@ -3245,13 +3289,17 @@ namespace PetaPoco
         }
 
         // TODO: `CommandHelperAsync(CancellationToken, DbCommand, Func<CancellationToken, DbCommand, Task<object>>` takes DBCommand type; inconsistent with synchronous version `CommandHelper(IDbCommand, Func<IDbCommand, object>)` which uses IDbCommand type (is this intentional?)
+
         /// <summary>
         /// Asynchronously executes an SQL command using the provided function and returns the result.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="cmd">The SQL command to execute.</param>
         /// <param name="executionFunction">The function to execute the SQL command and return the result.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an object containing the result of the SQL command execution.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains an object containing the result of the SQL command
+        /// execution.
+        /// </returns>
         private async Task<object> CommandHelperAsync(CancellationToken cancellationToken, DbCommand cmd, Func<CancellationToken, DbCommand, Task<object>> executionFunction)
         {
             DoPreExecute(cmd);
@@ -3366,7 +3414,8 @@ namespace PetaPoco
         /// <inheritdoc/>
         /// Default is <see langword="true"/>.
         /// </summary>
-        /// <value>If <see langword="true"/>, PetaPoco will automatically generate the <c>SELECT</c> portion of the query when needed if not explicitly provided in the supplied SQL statement.</value>
+        /// <value>If <see langword="true"/>, PetaPoco will automatically generate the <c>SELECT</c> portion of the query when needed if not
+        /// explicitly provided in the supplied SQL statement.</value>
         /// <example>
         /// <para/>In the following example, all three queries below will result in the same outcome:
         /// <code language="cs" title="EnableAutoSelect">
@@ -3386,17 +3435,17 @@ namespace PetaPoco
         public bool EnableAutoSelect { get; set; }
 
         /// <summary>
-        /// <inheritdoc/>
-        /// Default is <see langword="true"/>.
+        /// <inheritdoc/> Default is <see langword="true"/>.
         /// </summary>
-        /// <value>If <see langword="true"/>, parameters can be named "?myparam" in the SQL string, and populated from properties of the passed-in argument values.</value>
+        /// <value>If <see langword="true"/>, parameters can be named "?myparam" in the SQL string, and populated from properties of the
+        /// passed-in argument values.</value>
         public bool EnableNamedParams { get; set; }
 
         /// <summary>
-        /// <inheritdoc/>
-        /// Default is 0.
+        /// <inheritdoc/> Default is 0.
         /// </summary>
-        /// <value>If 0, PetaPoco will use the default <see cref="IDbCommand.CommandTimeout"/> value for the active database <see cref="Provider"/> (typically 30 seconds).</value>
+        /// <value>If 0, PetaPoco will use the default <see cref="IDbCommand.CommandTimeout"/> value for the active database <see
+        /// cref="Provider"/> (typically 30 seconds).</value>
         public int CommandTimeout { get; set; }
 
         /// <summary>

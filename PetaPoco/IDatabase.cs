@@ -35,7 +35,8 @@ namespace PetaPoco
         string LastCommand { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether automatic generation of the <c>SELECT</c> and <c>WHERE</c> parts of an SQL statement is enabled when not explicitly provided by the caller.
+        /// Gets or sets a value indicating whether automatic generation of the <c>SELECT</c> and <c>WHERE</c> parts of an SQL statement is
+        /// enabled when not explicitly provided by the caller.
         /// </summary>
         bool EnableAutoSelect { get; set; }
 
@@ -50,7 +51,7 @@ namespace PetaPoco
         int CommandTimeout { get; set; }
 
         /// <summary>
-        /// Gets or sets a single-use timeout value that will temporarily override <see cref="CommandTimeout"/> for the next command execution.
+        /// Gets or sets a one-time timeout value to temporarily override <see cref="CommandTimeout"/> for the next command execution.
         /// </summary>
         int OneTimeCommandTimeout { get; set; }
 
@@ -85,14 +86,18 @@ namespace PetaPoco
         /// <summary>
         /// Asynchronously begins a transaction scope.
         /// </summary>
-        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// </returns>
         Task BeginTransactionAsync();
 
         /// <summary>
         /// Asynchronously begins a transaction scope.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// </returns>
         Task BeginTransactionAsync(CancellationToken cancellationToken);
 #endif
 

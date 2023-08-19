@@ -260,7 +260,8 @@ namespace PetaPoco
             /// <summary>
             /// Appends an <c>ON</c> expression to the <c>JOIN</c> clause.
             /// </summary>
-            /// <param name="onClause">The SQL expression defining the ON condition for the JOIN clause: <c>{table1}.{column1} = {table2}.{column2}</c>.</param>
+            /// <param name="onClause">The SQL expression defining the ON condition for the JOIN clause: <c>{table1}.{column1} =
+            /// {table2}.{column2}</c>.</param>
             /// <param name="args">The parameters to embed in the SQL string.</param>
             /// <returns>The parent Sql builder, allowing for fluent style concatenation.</returns>
             public Sql On(string onClause, params object[] args)

@@ -14,7 +14,7 @@ namespace PetaPoco.Core
     public interface IProvider
     {
         /// <summary>
-        /// Gets the <see cref="IPagingHelper" /> supplied by this provider.
+        /// Gets the <see cref="IPagingHelper"/> supplied by this provider.
         /// </summary>
         IPagingHelper PagingUtility { get; }
 
@@ -26,7 +26,8 @@ namespace PetaPoco.Core
         /// <summary>
         /// Escapes a table name into a suitable format for the associated database provider.
         /// </summary>
-        /// <param name="tableName">The name of the table as specified by the client program, or as attributes on the associated POCO class.</param>
+        /// <param name="tableName">The name of the table as specified by the client program, or as attributes on the associated POCO
+        /// class.</param>
         /// <returns>The escaped table name.</returns>
         string EscapeTableName(string tableName);
 
@@ -55,7 +56,8 @@ namespace PetaPoco.Core
         object MapParameterValue(object value);
 
         /// <summary>
-        /// Called immediately before an SQL command is executed, allowing for modification of the command before being passed to the database provider.
+        /// Called immediately before an SQL command is executed, allowing for modification of the command before being passed to the
+        /// database provider.
         /// </summary>
         /// <param name="cmd">The SQL command to be executed.</param>
         void PreExecute(IDbCommand cmd);
@@ -83,7 +85,9 @@ namespace PetaPoco.Core
         /// <param name="db">The database instance that will execute the SQL command.</param>
         /// <param name="cmd">The SQL command to be executed.</param>
         /// <param name="primaryKeyName">The primary key column name for the table being inserted into.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the primary key of the new record.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains the primary key of the new record.
+        /// </returns>
         Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName);
 #endif
 

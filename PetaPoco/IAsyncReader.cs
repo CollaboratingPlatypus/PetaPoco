@@ -17,7 +17,10 @@ namespace PetaPoco
         /// <summary>
         /// Asynchronously reads the next row from the data source.
         /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if more records exist, otherwise <see langword="false"/>.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result contains <see langword="true"/> if more records exist,
+        /// otherwise <see langword="false"/>.
+        /// </returns>
         Task<bool> ReadAsync();
 
         // TODO: Missing overload: `Task<bool> ReadAsync(CancellationToken)`

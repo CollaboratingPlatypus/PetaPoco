@@ -61,7 +61,8 @@ namespace PetaPoco.Utilities
         // TODO: Not implemented: `ReadAsync(CancellationToken)`
 
         /// <summary>
-        /// Disposes the AsyncReader, closing and releasing the underlying <see cref="IDataReader"/>, <see cref="IDbCommand"/>, and shared <see cref="IConnection.Connection"/>.
+        /// Disposes the AsyncReader, closing and releasing the underlying <see cref="IDataReader"/>, <see cref="IDbCommand"/>, and shared
+        /// <see cref="IConnection.Connection"/>.
         /// </summary>
         public void Dispose()
         {

@@ -38,7 +38,7 @@ namespace PetaPoco
         /// <summary>
         /// Starts a new PetaPoco build configuration.
         /// </summary>
-        /// <returns>An instance of <see cref="IDatabaseBuildConfiguration" /> to form a fluent interface.</returns>
+        /// <returns>An instance of <see cref="IDatabaseBuildConfiguration"/> to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration Build()
         {
             return new DatabaseConfiguration();

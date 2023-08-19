@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The PostgreSQLDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the PostgreSQL database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for PostgreSQL.
     /// </summary>
     public class PostgreSQLDatabaseProvider : DatabaseProvider
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override bool HasNativeGuidSupport => true;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("Npgsql.NpgsqlFactory, Npgsql, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7");
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetExistsSql() => "SELECT CASE WHEN EXISTS(SELECT 1 FROM {0} WHERE {1}) THEN 1 ELSE 0 END";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object MapParameterValue(object value)
         {
             // Don't map bools to ints in PostgreSQL
@@ -33,10 +33,10 @@ namespace PetaPoco.Providers
             return base.MapParameterValue(value);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string EscapeSqlIdentifier(string sqlIdentifier) => $"\"{sqlIdentifier}\"";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -50,7 +50,7 @@ namespace PetaPoco.Providers
         }
 
 #if ASYNC
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)

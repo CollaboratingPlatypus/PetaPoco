@@ -15,7 +15,8 @@ namespace PetaPoco
         void SetSetting(string key, object value);
 
         /// <summary>
-        /// Attempts to locate a setting of type <typeparamref name="T"/> using the specified <paramref name="key"/>, and invokes <paramref name="onGetAction"/> with the setting's value if found.
+        /// Attempts to locate a setting of type <typeparamref name="T"/> using the specified <paramref name="key"/>, and invokes <paramref
+        /// name="onGetAction"/> with the setting's value if found.
         /// </summary>
         /// <typeparam name="T">The type of the setting's value object.</typeparam>
         /// <param name="key">The setting's key.</param>

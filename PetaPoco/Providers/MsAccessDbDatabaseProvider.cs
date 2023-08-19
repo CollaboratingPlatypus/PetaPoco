@@ -11,15 +11,15 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The MsAccessDbDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the Microsoft Access database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Microsoft Access.
     /// </summary>
     public class MsAccessDbDatabaseProvider : DatabaseProvider
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("System.Data.OleDb.OleDbFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             ExecuteNonQueryHelper(db, cmd);
@@ -28,7 +28,7 @@ namespace PetaPoco.Providers
         }
 
 #if ASYNC
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd).ConfigureAwait(false);
@@ -42,7 +42,7 @@ namespace PetaPoco.Providers
         /// </summary>
         /// <returns>This method always throws a <see cref="NotSupportedException"/>.</returns>
         /// <exception cref="NotSupportedException">The MsAccess provider does not support paging.</exception>
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
             => throw new NotSupportedException("The MS Access provider does not support paging.");
     }

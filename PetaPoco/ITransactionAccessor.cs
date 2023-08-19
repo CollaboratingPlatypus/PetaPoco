@@ -3,7 +3,7 @@
 namespace PetaPoco
 {
     /// <summary>
-    /// Represents a contract which exposes the current <see cref="IDbTransaction" /> instance.
+    /// Represents a contract which exposes the current <see cref="IDbTransaction"/> instance.
     /// </summary>
     public interface ITransactionAccessor
     {

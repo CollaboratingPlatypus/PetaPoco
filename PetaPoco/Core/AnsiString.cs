@@ -4,7 +4,8 @@
     /// Wraps a Unicode string that will be stored in a <c>VARCHAR</c> DB column as an <see cref="System.Data.DbType.AnsiString"/>.
     /// </summary>
     /// <remarks>
-    /// Using this type for a column-mapped POCO property is equivalent to decorating a <see cref="string"/> property with <see cref="ColumnAttribute.ForceToAnsiString"/>.
+    /// Using this type for a column-mapped POCO property is equivalent to decorating a <see cref="string"/> property with <see
+    /// cref="ColumnAttribute.ForceToAnsiString"/>.
     /// </remarks>
     public class AnsiString
     {

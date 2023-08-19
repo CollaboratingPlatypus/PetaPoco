@@ -4,10 +4,10 @@ using System.Reflection;
 namespace PetaPoco
 {
     /// <summary>
-    /// This is the original default implementation of <see cref="IMapper" /> used by PetaPoco.
+    /// This is the original default implementation of <see cref="IMapper"/> used by PetaPoco.
     /// </summary>
     /// <remarks>
-    /// PetaPoco now ships with an improved <see cref="ConventionMapper" /> as the default mapper.
+    /// PetaPoco now ships with an improved <see cref="ConventionMapper"/> as the default mapper.
     /// </remarks>
     public class StandardMapper : IMapper
     {

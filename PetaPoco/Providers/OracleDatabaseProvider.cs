@@ -12,21 +12,21 @@ using System.Threading.Tasks;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The OracleDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the Oracle database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Oracle.
     /// </summary>
     public class OracleDatabaseProvider : DatabaseProvider
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetParameterPrefix(string connectionString) => ":";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override void PreExecute(IDbCommand cmd)
         {
             cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
             cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         /// <exception cref="Exception">A paged query does not alias '*'</exception>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
@@ -37,7 +37,7 @@ namespace PetaPoco.Providers
             return Singleton<SqlServerDatabaseProvider>.Instance.BuildPageQuery(skip, take, parts, ref args);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
         {
             // "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" is for Oracle.ManagedDataAccess.dll
@@ -46,13 +46,13 @@ namespace PetaPoco.Providers
                 "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string EscapeSqlIdentifier(string sqlIdentifier) => $"\"{sqlIdentifier.ToUpperInvariant()}\"";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetAutoIncrementExpression(TableInfo ti) => !string.IsNullOrEmpty(ti.SequenceName) ? $"{ti.SequenceName}.nextval" : null;
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -67,7 +67,7 @@ namespace PetaPoco.Providers
         }
 
 #if ASYNC
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)

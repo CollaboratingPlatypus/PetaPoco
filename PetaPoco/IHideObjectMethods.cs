@@ -4,12 +4,12 @@ using System.ComponentModel;
 namespace PetaPoco
 {
     /// <summary>
-    /// An interface used to hide the compiler-generated public <see cref="object"/> instance methods from the list of intellisense code completion suggestions.
+    /// Hides the compiler-generated public <see cref="object"/> instance methods from the list of intellisense code completion suggestions.
     /// </summary>
     /// <remarks>
-    /// <br/>Reference Project: MicroLite ORM (<see href="https://github.com/TrevorPilley/MicroLite"/>)
+    /// Reference Project: MicroLite ORM (<see href="https://github.com/TrevorPilley/MicroLite"/>)
     /// <br/>Author: Trevor Pilley
-    /// <br/>Source: <see href="https://github.com/TrevorPilley/MicroLite/blob/develop/MicroLite/IHideObjectMethods.cs" />
+    /// <br/>Source: <see href="https://github.com/TrevorPilley/MicroLite/blob/develop/MicroLite/IHideObjectMethods.cs"/>
     /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IHideObjectMethods

@@ -5,15 +5,15 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The MySqlDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the MySQL database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for MySQL.
     /// </summary>
     public class MySqlDatabaseProvider : DatabaseProvider
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Culture=neutral, PublicKeyToken=c5687fc88969c44d");
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetParameterPrefix(string connectionString)
         {
             if (connectionString != null && connectionString.IndexOf("Allow User Variables=true", StringComparison.Ordinal) >= 0)
@@ -21,10 +21,10 @@ namespace PetaPoco.Providers
             return "@";
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string EscapeSqlIdentifier(string sqlIdentifier) => $"`{sqlIdentifier}`";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetExistsSql() => "SELECT EXISTS (SELECT 1 FROM {0} WHERE {1})";
     }
 }

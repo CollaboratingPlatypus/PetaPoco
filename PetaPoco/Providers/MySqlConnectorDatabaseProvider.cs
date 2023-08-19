@@ -5,7 +5,7 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The MySqlConnectorDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the MySQL database using the MySqlConnector library.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for MySQL using the MySqlConnector library.
     /// </summary>
     public class MySqlConnectorDatabaseProvider : DatabaseProvider
     {

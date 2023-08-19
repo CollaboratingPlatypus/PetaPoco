@@ -6,7 +6,8 @@ namespace PetaPoco
     /// Provides access to the result collection from a paged request.
     /// </summary>
     /// <remarks>
-    /// Represents a paged result set, both providing access to the items on the current page and maintaining state information about the pagination for additional queries.
+    /// Represents a paged result set, both providing access to the items on the current page and maintaining state information about the
+    /// pagination for additional queries.
     /// </remarks>
     /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
     public class Page<T>

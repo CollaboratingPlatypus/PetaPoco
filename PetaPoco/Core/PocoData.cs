@@ -31,11 +31,16 @@ namespace PetaPoco.Core
         public Type Type { get; set; }
 
         /// <summary>
-        /// Gets the array of all queryable database column names used by auto-select for query operations when <see cref="IDatabase.EnableAutoSelect"/> is enabled.
+        /// Gets the array of all queryable database column names used by auto-select for query operations when <see
+        /// cref="IDatabase.EnableAutoSelect"/> is enabled.
         /// </summary>
         /// <remarks>
-        /// Column names are returned unescaped. Escaping should be applied based on the configured <see cref="IDatabase.Provider"/> if accessing this list to construct an SQL query. To access all
-        /// <para>Excluded columns include: columns decorated with the <see cref="IgnoreAttribute"/>, unannotated columns in a POCO marked with the <see cref="ExplicitColumnsAttribute"/>, and any <see cref="ColumnInfo.ResultColumn"/> that has opted out of auto-select by setting <see cref="ResultColumnAttribute.IncludeInAutoSelect"/> to <see cref="IncludeInAutoSelect.No"/> or through the <see cref="ColumnInfo.AutoSelectedResultColumn"/> property.</para>
+        /// Column names are returned unescaped. Escaping should be applied based on the configured <see cref="IDatabase.Provider"/> if
+        /// accessing this list to construct an SQL query. To access all
+        /// <para>Excluded columns include: columns decorated with the <see cref="IgnoreAttribute"/>, unannotated columns in a POCO marked
+        /// with the <see cref="ExplicitColumnsAttribute"/>, and any <see cref="ColumnInfo.ResultColumn"/> that has opted out of auto-select
+        /// by setting <see cref="ResultColumnAttribute.IncludeInAutoSelect"/> to <see cref="IncludeInAutoSelect.No"/> or through the <see
+        /// cref="ColumnInfo.AutoSelectedResultColumn"/> property.</para>
         /// </remarks>
         public string[] QueryColumns { get; private set; }
 
@@ -154,7 +159,8 @@ namespace PetaPoco.Core
         }
 
         /// <summary>
-        /// Creates a factory function to generate and cache a POCO from a data reader record at runtime. Subsequent reads attempt to locate the object in the <see cref="Cache{TKey, TValue}"/> for performance gains.
+        /// Creates a factory function to generate and cache a POCO from a data reader record at runtime. Subsequent reads attempt to locate
+        /// the object in the <see cref="Cache{TKey, TValue}"/> for performance gains.
         /// </summary>
         /// <param name="sql">The SQL statement.</param>
         /// <param name="connectionString">The connection string.</param>
@@ -163,7 +169,8 @@ namespace PetaPoco.Core
         /// <param name="reader">The data reader instance.</param>
         /// <param name="defaultMapper">The default mapper to use for the POCO.</param>
         /// <returns>A delegate that can convert an <see cref="IDataReader"/> record into a POCO.</returns>
-        /// <exception cref="InvalidOperationException">The POCO type is a value type, or the POCO type has no default constructor, or the POCO type is an interface or abstract class.</exception>
+        /// <exception cref="InvalidOperationException">The POCO type is a value type, or the POCO type has no default constructor, or the
+        /// POCO type is an interface or abstract class.</exception>
         public Delegate GetFactory(string sql, string connectionString, int firstColumn, int columnCount, IDataReader reader, IMapper defaultMapper)
         {
             // Create key for cache lookup

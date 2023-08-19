@@ -9,15 +9,15 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// The SqlServerDatabaseProvider class provides a specific implementation of the <see cref="DatabaseProvider"/> class for the SQL Server database.
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for SQL Server.
     /// </summary>
     public class SqlServerDatabaseProvider : DatabaseProvider
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("System.Data.SqlClient.SqlClientFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var helper = (PagingHelper) PagingUtility;
@@ -41,21 +41,21 @@ namespace PetaPoco.Providers
             return sqlPage;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
             => ExecuteScalarHelper(db, cmd);
 
 #if ASYNC
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
             => ExecuteScalarHelperAsync(cancellationToken, db, cmd);
 #endif
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetExistsSql()
             => "IF EXISTS (SELECT 1 FROM {0} WHERE {1}) SELECT 1 ELSE SELECT 0";
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public override string GetInsertOutputClause(string primaryKeyName)
             => $" OUTPUT INSERTED.[{primaryKeyName}]";
     }

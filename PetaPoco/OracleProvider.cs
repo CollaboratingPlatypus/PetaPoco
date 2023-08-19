@@ -5,10 +5,11 @@ using System.Reflection;
 namespace PetaPoco
 {
     /// <summary>
-    /// The OracleProvider class provides an implementation of <see cref="DbProviderFactory"/> for early versions of the Oracle drivers that don't include it.
+    /// Pprovides an implementation of <see cref="DbProviderFactory"/> for early versions of the Oracle drivers that don't include it.
     /// </summary>
     /// <remarks>
-    /// For later versions of Oracle, the standard OracleProviderFactory class should work fine. Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands.
+    /// For later versions of Oracle, the standard OracleProviderFactory class should work fine.
+    /// Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands.
     /// <para>Thanks to Adam Schroder (@schotime) for this.</para>
     /// <para><i>Currently untested.</i></para>
     /// </remarks>

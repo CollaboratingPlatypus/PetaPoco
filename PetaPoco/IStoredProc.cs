@@ -11,7 +11,8 @@ namespace PetaPoco
         /// Executes a non-query stored procedure and returns the number of rows affected.
         /// </summary>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure.
+        /// Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
         /// </remarks>
         /// <param name="storedProcedureName">The name of the stored procedure to execute.</param>
         /// <param name="args">The arguments to pass to the stored procedure.</param>
@@ -22,7 +23,8 @@ namespace PetaPoco
         /// Executes a scalar stored procedure and returns the first column of the first row in the result set.
         /// </summary>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure.
+        /// Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
         /// </remarks>
         /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
         /// <param name="storedProcedureName">The name of the stored procedure to execute.</param>
@@ -34,7 +36,8 @@ namespace PetaPoco
         /// Executes a query stored procedure and returns the results as a sequence of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure.
+        /// Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
         /// </remarks>
         /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
         /// <param name="storedProcedureName">The name of the stored procedure to execute.</param>
@@ -46,7 +49,8 @@ namespace PetaPoco
         /// Executes a query stored procedure and returns the results as a list of type <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
-        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure. Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
+        /// For any arguments which are POCOs, each readable property will be turned into a named parameter for the stored procedure.
+        /// Arguments which are IDbDataParameters will be passed through. Any other argument types will throw an exception.
         /// </remarks>
         /// <typeparam name="T">The POCO type representing a single result record.</typeparam>
         /// <param name="storedProcedureName">The name of the stored procedure to execute.</param>

@@ -26,7 +26,9 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="sql">An SQL builder instance representing the SQL statement and its parameters.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the number of rows affected by the operation.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result is the number of rows affected by the operation.
+        /// </returns>
         Task<int> ExecuteAsync(CancellationToken cancellationToken, Sql sql);
 
         /// <summary>
@@ -35,7 +37,9 @@ namespace PetaPoco
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="sql">The SQL string.</param>
         /// <param name="args">The parameters to embed in the SQL string.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the number of rows affected by the operation.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result is the number of rows affected by the operation.
+        /// </returns>
         Task<int> ExecuteAsync(CancellationToken cancellationToken, string sql, params object[] args);
 
         /// <summary>
@@ -44,7 +48,9 @@ namespace PetaPoco
         /// <typeparam name="T">The type of the result value.</typeparam>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="sql">An SQL builder instance representing the SQL statement and its parameters.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the scalar result value of type <typeparamref name="T"/>.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result is the scalar result value of type <typeparamref name="T"/>.
+        /// </returns>
         Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, Sql sql);
 
         /// <summary>
@@ -54,7 +60,9 @@ namespace PetaPoco
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <param name="sql">The SQL query string.</param>
         /// <param name="args">The parameters to embed in the SQL query string.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the scalar result value of type <typeparamref name="T"/>.</returns>
+        /// <returns>
+        /// A task that represents the asynchronous operation. The task result is the scalar result value of type <typeparamref name="T"/>.
+        /// </returns>
         Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken, string sql, params object[] args);
     }
 #endif

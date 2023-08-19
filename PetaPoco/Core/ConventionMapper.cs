@@ -9,7 +9,7 @@ namespace PetaPoco
     /// The ConventionMapper class represents a configurable convention mapper.
     /// </summary>
     /// <remarks>
-    /// By default this mapper replaces the original <see cref="StandardMapper" /> without change, ensuring backwards compatibility.
+    /// By default this mapper replaces the original <see cref="StandardMapper"/> without change, ensuring backwards compatibility.
     /// </remarks>
     public class ConventionMapper : IMapper
     {

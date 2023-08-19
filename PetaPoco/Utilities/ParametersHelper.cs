@@ -13,7 +13,8 @@ namespace PetaPoco.Internal
     /// Provides static utility methods and extensions for handling SQL parameters.
     /// </summary>
     /// <remarks>
-    /// This class includes extensions for validating and replacing parameter prefixes, as well as static methods used for processing parameters for queries and stored procedures.
+    /// This class includes extensions for validating and replacing parameter prefixes, as well as static methods used for processing
+    /// parameters for queries and stored procedures.
     /// </remarks>
     internal static class ParametersHelper
     {
@@ -47,7 +48,6 @@ namespace PetaPoco.Internal
         public static string EnsureParamPrefix(this string value, string paramPrefix)
             => value.StartsWith(paramPrefix) ? value : NonWordStartRegex.Replace(value, paramPrefix);
 
-        // TODO: Use same collection type for srcArgs and destArgs (`object[]` vs `List<object>`)
         /// <summary>
         /// Processes the parameters for an SQL statement.
         /// </summary>
@@ -58,10 +58,13 @@ namespace PetaPoco.Internal
         /// <param name="srcArgs">The source arguments to be processed.</param>
         /// <param name="destArgs">The destination list to store the processed arguments.</param>
         /// <returns>The SQL statement with the parameters processed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The number of parameters is less than the count of numbered parameters in the SQL string.</exception>
-        /// <exception cref="ArgumentException">None of the passed parameters have a property with the name used as a named parameter.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The number of parameters is less than the count of numbered parameters in the SQL
+        /// string.</exception>
+        /// <exception cref="ArgumentException">None of the passed parameters have a property with the name used as a named
+        /// parameter.</exception>
         public static string ProcessQueryParams(string sql, object[] srcArgs, List<object> destArgs)
         {
+            // TODO: Use same collection type for srcArgs and destArgs (`object[]` vs `List<object>`)
             return ParamPrefixRegex.Replace(sql, m =>
             {
                 string param = m.Value.Substring(1);

@@ -6,7 +6,9 @@ namespace PetaPoco
     /// The PrimaryKeyAttribute class defines an attribute for POCO properties that map to primary key columns in the database.
     /// </summary>
     /// <remarks>
-    /// The PrimaryKeyAttribute, when used in a POCO class, designates the decorated property as the primary key column in the database. It can also be used to override the default mapped column name for the primary key, mark the column as auto-incrementing, and optionally assign a sequence name for Oracle sequence columns.
+    /// The PrimaryKeyAttribute, when used in a POCO class, designates the decorated property as the primary key column in the database. It
+    /// can also be used to override the default mapped column name for the primary key, mark the column as auto-incrementing, and
+    /// optionally assign a sequence name for Oracle sequence columns.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     public class PrimaryKeyAttribute : Attribute
