@@ -597,7 +597,7 @@ namespace PetaPoco
         private void AddParam(IDbCommand cmd, object value, PocoColumn pc)
         {
             // Convert value to from poco type to db type
-            if (pc != null && pc.PropertyInfo != null)
+            if (pc?.PropertyInfo != null)
             {
                 var mapper = Mappers.GetMapper(pc.PropertyInfo.DeclaringType, _defaultMapper);
                 var fn = mapper.GetToDbConverter(pc.PropertyInfo);
@@ -2253,13 +2253,14 @@ namespace PetaPoco
             }
 
             // Find the property info for the primary key
-            //PropertyInfo pkpi = null;
             PocoColumn col = null;
             if (primaryKeyName != null)
             {
-                //PocoColumn col;
-                //pkpi = pd.Columns.TryGetValue(primaryKeyName, out col) ? col.PropertyInfo : new { Id = primaryKeyValue }.GetType().GetProperties()[0];
-                pd.Columns.TryGetValue(primaryKeyName, out col);
+                if (!pd.Columns.TryGetValue(primaryKeyName, out col))
+                {
+                    var pkpi = new { Id = primaryKeyValue }.GetType().GetProperty("Id");
+                    col = new PocoColumn() { PropertyInfo = pkpi };
+                }
             }
 
             cmd.CommandText =
