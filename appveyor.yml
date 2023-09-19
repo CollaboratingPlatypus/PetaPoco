@@ -9,7 +9,7 @@ image: Visual Studio 2022
 configuration: Release
 environment:
   NUGET_API_KEY:
-    secure: n3qgTtBApk5rBNeoxxzvZwd3CR0L9dPgovFUFWT0eLiA38HPzlDQAkHAQo2A6vGt
+    secure: ZqmEpSdcRJCzQ+mPQpjdN9ayLmxCcs+N60TOyDc9O+hHSXTlD6YBzQbsNj2nLAgG
 build: off
 build_script:
 - ps: >-
