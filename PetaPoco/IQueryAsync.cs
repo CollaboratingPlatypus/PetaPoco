@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading;
@@ -345,17 +345,17 @@ namespace PetaPoco
         Task<T> SingleAsync<T>(Sql sql);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.Single{T}(CancellationToken, Sql)" />.
+        ///     Async version of <see cref="IQuery.Single{T}(Sql)" />.
         /// </summary>
         Task<T> SingleAsync<T>(CancellationToken cancellationToken, Sql sql);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(PetaPoco.Sql)" />.
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(Sql)" />.
         /// </summary>
         Task<T> SingleOrDefaultAsync<T>(Sql sql);
 
         /// <summary>
-        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(PetaPoco.Sql)" />.
+        ///     Async version of <see cref="IQuery.SingleOrDefault{T}(Sql)" />.
         /// </summary>
         Task<T> SingleOrDefaultAsync<T>(CancellationToken cancellationToken, Sql sql);
 

@@ -1,16 +1,16 @@
-using System.Data;
+﻿using System.Data;
 using System.Threading.Tasks;
 
 namespace PetaPoco
 {
     public interface IConnection
     {
-        /// <summary>
-        ///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection" />
-        ///     or <see cref="Dispose" /> is called.
-        /// </summary>
-        /// <seealso cref="OpenSharedConnection" />
-        bool KeepConnectionAlive { get; set; }
+		/// <summary>
+		///     When set to true the first opened connection is kept alive until <see cref="CloseSharedConnection" />
+		///     or <see cref="Database.Dispose" /> is called.
+		/// </summary>
+		/// <seealso cref="OpenSharedConnection" />
+		bool KeepConnectionAlive { get; set; }
 
         /// <summary>
         ///     Provides access to the currently open shared connection.

@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 #if ASYNC
 using System.Threading;
@@ -80,12 +80,10 @@ namespace PetaPoco.Core
         object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName);
 
 #if ASYNC
-
         /// <summary>
-        ///     Async version of <see cref="ExecuteInsertAsync(Database, IDbCommand, string)" />.
+        ///     Async version of <see cref="ExecuteInsert(Database, IDbCommand, string)" />.
         /// </summary>
         Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName);
-
 #endif
 
         /// <summary>

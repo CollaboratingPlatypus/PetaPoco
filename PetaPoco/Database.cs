@@ -380,6 +380,8 @@ namespace PetaPoco
                 _sharedConnection = _factory.CreateConnection();
                 _sharedConnection.ConnectionString = _connectionString;
 
+                _sharedConnection = OnConnectionOpening(_sharedConnection);
+
                 if (_sharedConnection.State == ConnectionState.Broken)
                     _sharedConnection.Close();
 
@@ -500,7 +502,7 @@ namespace PetaPoco
                         ? await asyncConn.BeginTransactionAsync().ConfigureAwait(false)
                         : await asyncConn.BeginTransactionAsync(_isolationLevel.Value).ConfigureAwait(false);
 #else
-                        ? _sharedConnection.BeginTransaction() 
+                        ? _sharedConnection.BeginTransaction()
                         : _sharedConnection.BeginTransaction(_isolationLevel.Value);
 #endif
                     _transactionCancelled = false;
@@ -593,7 +595,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cmd">A reference to the IDbCommand to which the parameter is to be added</param>
         /// <param name="value">The value to assign to the parameter</param>
-        /// <param name="pi">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
+        /// <param name="pc">Optional, a reference to the property info of the POCO property from which the value is coming.</param>
         private void AddParam(IDbCommand cmd, object value, PocoColumn pc)
         {
             // Convert value to from poco type to db type
@@ -839,8 +841,8 @@ namespace PetaPoco
             var args = new DbConnectionEventArgs(conn);
             ConnectionOpened?.Invoke(this, args);
             return args.Connection;
-        }        
-        
+        }
+
         /// <summary>
         ///     Called before a DB connection is opened
         /// </summary>
@@ -871,7 +873,7 @@ namespace PetaPoco
         /// </summary>
         /// <param name="cmd">The command to be executed</param>
         /// <remarks>
-        ///     Override this method to provide custom logging of commands, 
+        ///     Override this method to provide custom logging of commands,
         ///     modification of the IDbCommand before it's executed, or any
         ///     other custom actions that should be performed before every
         ///     command
@@ -1501,7 +1503,7 @@ namespace PetaPoco
                 {
                     IDataReader reader;
                     var pd = PocoData.ForType(typeof(T), _defaultMapper);
-                    
+
                     try
                     {
                         reader = await ExecuteReaderHelperAsync(cancellationToken, cmd).ConfigureAwait(false);
@@ -1960,7 +1962,7 @@ namespace PetaPoco
                     var autoIncExpression = _provider.GetAutoIncrementExpression(pd.TableInfo);
                     if (autoIncExpression != null)
                     {
-                        names.Add(i.Key);
+                        names.Add(_provider.EscapeSqlIdentifier(i.Key));
                         values.Add(autoIncExpression);
                     }
 
@@ -2127,7 +2129,7 @@ namespace PetaPoco
         /// <inheritdoc />
         public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns)
             => Update(tableName, primaryKeyName, poco, null, columns);
-        
+
         /// <inheritdoc />
         public int Update(object poco, IEnumerable<string> columns)
             => Update(poco, null, columns);
@@ -3121,7 +3123,7 @@ namespace PetaPoco
         }
 
         private object CommandHelper(IDbCommand cmd, Func<IDbCommand, object> cmdFunc)
-        {            
+        {
             DoPreExecute(cmd);
             var result = cmdFunc(cmd);
             OnExecutedCommand(cmd);
@@ -3133,7 +3135,7 @@ namespace PetaPoco
         {
             if (cmd is DbCommand dbCommand)
             {
-                var task = CommandHelper(cancellationToken, dbCommand, 
+                var task = CommandHelper(cancellationToken, dbCommand,
                     async (t, c) => await c.ExecuteReaderAsync(t).ConfigureAwait(false));
                 return (IDataReader)await task.ConfigureAwait(false);
             }
@@ -3145,7 +3147,7 @@ namespace PetaPoco
         {
             if (cmd is DbCommand dbCommand)
             {
-                var task = CommandHelper(cancellationToken, dbCommand, 
+                var task = CommandHelper(cancellationToken, dbCommand,
                     async (t, c) => await c.ExecuteNonQueryAsync(t).ConfigureAwait(false));
                 return (int)await task.ConfigureAwait(false);
             }
@@ -3156,19 +3158,19 @@ namespace PetaPoco
         internal protected Task<object> ExecuteScalarHelperAsync(CancellationToken cancellationToken, IDbCommand cmd)
         {
             if (cmd is DbCommand dbCommand)
-                return CommandHelper(cancellationToken, dbCommand, 
-                    async (t, c) => await c.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false));                
+                return CommandHelper(cancellationToken, dbCommand,
+                    async (t, c) => await c.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false));
             else
                 return Task.FromResult(ExecuteScalarHelper(cmd));
         }
 
-        private async Task<object> CommandHelper(CancellationToken cancellationToken, DbCommand cmd, 
+        private async Task<object> CommandHelper(CancellationToken cancellationToken, DbCommand cmd,
             Func<CancellationToken, DbCommand, Task<object>> cmdFunc)
         {
             DoPreExecute(cmd);
             var result = await cmdFunc(cancellationToken, cmd).ConfigureAwait(false);
             OnExecutedCommand(cmd);
-            return result;            
+            return result;
         }
 #endif
         #endregion
@@ -3204,7 +3206,7 @@ namespace PetaPoco
         ///     Occurs when a database connection has been opened.
         /// </summary>
         public event EventHandler<DbConnectionEventArgs> ConnectionOpened;
-        
+
         /// <summary>
         ///     Occurs when a database connection is about to be opened.
         /// </summary>
