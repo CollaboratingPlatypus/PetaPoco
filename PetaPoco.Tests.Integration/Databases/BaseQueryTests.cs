@@ -11,6 +11,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
+	// TODO: Make test cases in BaseQueryTests virtual
     public abstract class BaseQueryTests : BaseDatabase
     {
         protected BaseQueryTests(DBTestProvider provider)
@@ -239,7 +240,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
+        public virtual void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
         {
             AddOrders(1);
             var pdOrder = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -252,13 +253,13 @@ namespace PetaPoco.Tests.Integration.Databases
             var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Id)).ColumnName);
             var randColumn = DB.Provider.EscapeSqlIdentifier("SomeRandomColumn");
 
-            var testQuery = $"SELECT * FROM {orderTable} o " +
-                $"JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
-            var results = DB.Query<Order, Person>(testQuery).ToList();
+            var testQuery = $"SELECT * FROM {orderTable} o JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
 
+            var results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();
 
-            DB.Execute($"ALTER TABLE {orderTable} ADD {randColumn} INT NULL");
+			var execStmt = $"ALTER TABLE {orderTable} ADD {randColumn} INT NULL";
+            DB.Execute(execStmt);
 
             results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();
