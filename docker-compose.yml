@@ -39,13 +39,15 @@ services:
       - MYSQL_PASSWORD=petapoco
       - MYSQL_USER=petapoco
   firebirddb:
-    image: jacobalberty/firebird:latest
+    image: jacobalberty/firebird:2.5-sc
     container_name: firebirddb_petapoco
     ports:
       - "5004:3050"
     environment:
       - EnableWireCrypt=true
       - ISC_PASSWORD=petapoco
+  # TODO: Create image for: jacobalberty/firebird:v3.0
+  # TODO: Create image for: jacobalberty/firebird:v4.0
   mssql:
     # image: microsoft/mssql-server-linux
     image: mcr.microsoft.com/mssql/server:2019-latest
