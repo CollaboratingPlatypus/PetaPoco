@@ -29,7 +29,7 @@ services:
       - MYSQL_PASSWORD=petapoco
       - MYSQL_USER=petapoco
   mariadb:
-    image: mariadb:latest
+    image: mariadb:10.9
     container_name: mariadb_petapoco
     ports:
       - "5003:3306"

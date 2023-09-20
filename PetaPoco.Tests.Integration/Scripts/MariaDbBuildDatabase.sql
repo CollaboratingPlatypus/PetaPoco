@@ -1,4 +1,6 @@
-﻿DROP TABLE IF EXISTS `OrderLines`;
+﻿SET NAMES utf8mb4;
+
+DROP TABLE IF EXISTS `OrderLines`;
 DROP TABLE IF EXISTS `Orders`;
 DROP TABLE IF EXISTS `People`;
 DROP TABLE IF EXISTS `SpecificOrderLines`;
