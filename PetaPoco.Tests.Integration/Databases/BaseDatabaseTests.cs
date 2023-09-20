@@ -10,7 +10,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-    public abstract class BaseDatabaseTests : BaseDatabase
+	public abstract class BaseDatabaseTests : BaseDatabase
     {
         private readonly Note _note = new Note
         {

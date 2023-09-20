@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Databases;
 using PetaPoco.Tests.Integration.Databases.MSSQL;
@@ -8,8 +8,8 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Documentation
 {
-    [Collection("MssqlTests")]
-    public class Deletes : BaseDatabase
+	[Collection("Documentation")]
+	public class Deletes : BaseDatabase
     {
         public Deletes()
             : base(new MssqlDBTestProvider())

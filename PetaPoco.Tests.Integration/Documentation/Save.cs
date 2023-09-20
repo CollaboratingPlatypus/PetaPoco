@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Databases;
 using PetaPoco.Tests.Integration.Databases.MSSQL;
@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Documentation
 {
-    [Collection("MssqlTests")]
+    [Collection("Documentation")]
     public class Save : BaseDatabase
     {
         public Save()

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Documentation
 {
-    [Collection("MssqlTests")]
+    [Collection("Documentation")]
     public class Inserts : BaseDatabase
     {
         public Inserts()
