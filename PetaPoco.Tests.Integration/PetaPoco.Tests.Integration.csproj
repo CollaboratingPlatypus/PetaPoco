@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\FirebirdDbBuildDatabase.sql" />
+    <None Remove="Scripts\FirebirdBuildDatabase.sql" />
     <None Remove="Scripts\MariaDbBuildDatabase.sql" />
     <None Remove="Scripts\MSAccessBuildDatabase.sql" />
     <None Remove="Scripts\MSSQLBuildDatabase.sql" />
@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\FirebirdDbBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\FirebirdBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSSQLBuildDatabase.sql" />

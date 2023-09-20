@@ -9,7 +9,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
     {
         protected override string ConnectionName => "Firebird";
 
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.FirebirdDbBuildDatabase.sql";
+        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.FirebirdBuildDatabase.sql";
 
         public override IDatabase Execute()
         {

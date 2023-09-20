@@ -1,4 +1,15 @@
 version: '3'
+
+x-mysql-environment: &mysql-environment
+  MYSQL_ROOT_PASSWORD: petapoco
+  MYSQL_DATABASE: petapoco
+  MYSQL_PASSWORD: petapoco
+  MYSQL_USER: petapoco
+
+x-mssql-environment: &mssql-environment
+  ACCEPT_EULA: Y
+  SA_PASSWORD: pAtAp0c8
+
 services:
   postgres:
     image: postgres:latest
@@ -8,58 +19,65 @@ services:
     environment:
       - POSTGRES_PASSWORD=petapoco
       - POSTGRES_USER=petapoco
+
+  firebird:
+    image: jacobalberty/firebird:2.5-sc
+    container_name: firebird_petapoco
+    ports:
+      - "5004:3050"
+    environment:
+      - EnableWireCrypt=true
+      - ISC_PASSWORD=petapoco
+
+  # TODO: firebird:v3.0
+
+  # TODO: firebird:v4.0
+
   mysql:
     image: mysql:latest
     container_name: mysql_petapoco
     ports:
       - "5002:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=petapoco
-      - MYSQL_DATABASE=petapoco
-      - MYSQL_PASSWORD=petapoco
-      - MYSQL_USER=petapoco
+      <<: *mysql-environment
+
   mysqlconnector:
     image: mysql:latest
     container_name: mysqlconnector_petapoco
     ports:
-      - "5006:3306"
+      - "5005:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=petapoco
-      - MYSQL_DATABASE=petapoco
-      - MYSQL_PASSWORD=petapoco
-      - MYSQL_USER=petapoco
+      <<: *mysql-environment
+
   mariadb:
     image: mariadb:10.9
     container_name: mariadb_petapoco
     ports:
       - "5003:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=petapoco
-      - MYSQL_DATABASE=petapoco
-      - MYSQL_PASSWORD=petapoco
-      - MYSQL_USER=petapoco
-  firebirddb:
-    image: jacobalberty/firebird:2.5-sc
-    container_name: firebirddb_petapoco
-    ports:
-      - "5004:3050"
-    environment:
-      - EnableWireCrypt=true
-      - ISC_PASSWORD=petapoco
-  # TODO: Create image for: jacobalberty/firebird:v3.0
-  # TODO: Create image for: jacobalberty/firebird:v4.0
+      <<: *mysql-environment
+
   mssql:
-    # image: microsoft/mssql-server-linux
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: mssql_petapoco
     ports:
-      - "5005:1433"
+      - "5006:1433"
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=pAtAp0c8
-  # oracledb:
+      <<: *mssql-environment
+
+  mssqlmsdata:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssqlmsdata_petapoco
+    ports:
+      - "5007:1433"
+    environment:
+      <<: *mssql-environment
+
+  #oracledb:
   #  image: sath89/oracle-12c:latest
   #  container_name: oracledb_petapoco
   #  ports:
-  #    - "5005:1521"
-  #    - "5006:8008"
+  #    - "5008:1521"
+  #    - "5009:8008"
+
+  # TODO: teradata
