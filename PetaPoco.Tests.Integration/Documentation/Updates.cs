@@ -267,7 +267,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         }
 
         [Fact]
-        public void InsertDynamicUnknownPocoWithConventionalNaming()
+        public void UpdateDynamicUnknownPocoWithConventionalNaming()
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
