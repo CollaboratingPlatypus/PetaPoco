@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PetaPoco.Core;
@@ -32,6 +32,12 @@ namespace PetaPoco.Tests.Integration.Databases
             Dob = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc),
             Height = 180,
             Name = "Peta"
+        };
+
+        private Note _note = new Note
+        {
+            CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc),
+            Text = "Peta's Note",
         };
 
         protected BaseUpdateTests(DBTestProvider provider)
@@ -285,6 +291,63 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        public void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            dynamic person = new System.Dynamic.ExpandoObject();
+            person.Id = _person.Id;
+            person.FullName = "Feta";
+            person.Age = 19;
+            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
+            person.Height = 190;
+
+            ((int)DB.Update("People", "Id", person)).ShouldBe(1);
+
+            var personOther = DB.Single<Person>(_person.Id);
+            personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        public void Update_GivenTablePrimaryKeyNameDynamicTypeAndPrimaryKeyValue_ShouldBeValid()
+        {
+            DB.Insert(_person);
+
+            dynamic person = new System.Dynamic.ExpandoObject();
+            person.FullName = "Feta";
+            person.Age = 19;
+            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
+            person.Height = 190;
+
+            ((int)DB.Update("People", "Id", person, _person.Id)).ShouldBe(1);
+
+            var personOther = DB.Single<Person>(_person.Id);
+            personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        [Trait("Issue", "667")]
+        public void Update_GivenDynamicPoco_ShouldNotThrow()
+        {
+            DB.Insert(_note);
+            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            Should.NotThrow(() => DB.Update("Note", "Id", entity));
+        }
+
+        [Fact]
+        public void Update_GivenDynamicPoco_ShouldUpdate()
+        {
+            DB.Insert(_note);
+            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+
+            entity.Text += " was updated";
+            DB.Update("Note", "Id", entity);
+
+            var entity2 = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            ((string)entity2.Text).ShouldContain("updated");
+        }
+
+        [Fact]
         public async Task UpdateAsync_GivenPoco_ShouldBeValid()
         {
             // Arrange
@@ -526,6 +589,63 @@ namespace PetaPoco.Tests.Integration.Databases
             var personOther = await DB.SingleAsync<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldBeValid()
+        {
+            await DB.InsertAsync(_person);
+
+            dynamic person = new System.Dynamic.ExpandoObject();
+            person.Id = _person.Id;
+            person.FullName = "Feta";
+            person.Age = 19;
+            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
+            person.Height = 190;
+
+            ((int)await DB.UpdateAsync("People", "Id", person)).ShouldBe(1);
+
+            var personOther = await DB.SingleAsync<Person>(_person.Id);
+            personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_GivenTablePrimaryKeyNameDynamicTypeAndPrimaryKeyValue_ShouldBeValid()
+        {
+            await DB.InsertAsync(_person);
+
+            dynamic person = new System.Dynamic.ExpandoObject();
+            person.FullName = "Feta";
+            person.Age = 19;
+            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
+            person.Height = 190;
+
+            ((int)await DB.UpdateAsync("People", "Id", person, _person.Id)).ShouldBe(1);
+
+            var personOther = await DB.SingleAsync<Person>(_person.Id);
+            personOther.ShouldNotBe(_person, true);
+        }
+
+        [Fact]
+        [Trait("Issue", "667")]
+        public async Task UpdateAsync_GivenDynamicPoco_ShouldNotThrow()
+        {
+            await DB.InsertAsync(_note);
+            var entity = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+            Should.NotThrow(() => DB.Update("Note", "Id", entity));
+        }
+
+        [Fact]
+        public async Task UpdateAsync_GivenDynamicPoco_ShouldUpdate()
+        {
+            await DB.InsertAsync(_note);
+            var entity = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+
+            entity.Text += " was updated";
+            DB.Update("Note", "Id", entity);
+
+            var entity2 = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+            ((string)entity2.Text).ShouldContain("updated");
         }
 
         private Person SinglePersonOther(Guid id)
