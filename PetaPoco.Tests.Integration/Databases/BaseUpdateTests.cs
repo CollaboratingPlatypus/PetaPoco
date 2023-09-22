@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PetaPoco.Core;
@@ -329,21 +329,27 @@ namespace PetaPoco.Tests.Integration.Databases
         [Trait("Issue", "667")]
         public virtual void Update_GivenDynamicPoco_ShouldNotThrow()
         {
+			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             DB.Insert(_note);
-            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
             Should.NotThrow(() => DB.Update("Note", "Id", entity));
         }
 
         [Fact]
         public virtual void Update_GivenDynamicPoco_ShouldUpdate()
         {
+			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             DB.Insert(_note);
-            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
             entity.Text += " was updated";
             DB.Update("Note", "Id", entity);
 
-            var entity2 = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            var entity2 = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
             ((string)entity2.Text).ShouldContain("updated");
         }
 
@@ -630,21 +636,27 @@ namespace PetaPoco.Tests.Integration.Databases
         [Trait("Issue", "667")]
         public async Task UpdateAsync_GivenDynamicPoco_ShouldNotThrow()
         {
+			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             await DB.InsertAsync(_note);
-            var entity = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+            var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
             Should.NotThrow(() => DB.Update("Note", "Id", entity));
         }
 
         [Fact]
         public async Task UpdateAsync_GivenDynamicPoco_ShouldUpdate()
         {
+			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             await DB.InsertAsync(_note);
-            var entity = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+            var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             entity.Text += " was updated";
             DB.Update("Note", "Id", entity);
 
-            var entity2 = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+            var entity2 = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
             ((string)entity2.Text).ShouldContain("updated");
         }
 
