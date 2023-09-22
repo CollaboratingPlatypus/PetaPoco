@@ -260,7 +260,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Id)).ColumnName);
             var randColumn = DB.Provider.EscapeSqlIdentifier("SomeRandomColumn");
 
-            var testQuery = $"SELECT * FROM {orderTable} o JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
+            var testQuery = $"SELECT * FROM {orderTable} o INNER JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
 
             var results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();
@@ -289,7 +289,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Order.PersonId)).ColumnName);
             var pFullName = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Name)).ColumnName);
 
-            var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} o JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
+            var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} AS o INNER JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
 
             Should.Throw<InvalidOperationException>(() => DB.Fetch<ReadOnlyMultiPoco, Person>(sql).ToList());
         }
