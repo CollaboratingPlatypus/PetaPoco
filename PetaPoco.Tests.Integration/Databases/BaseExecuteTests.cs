@@ -17,7 +17,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Execute_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
+        public virtual void Execute_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
             var sql = $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0";
@@ -32,7 +32,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Execute_GivenSqlAndArgumentsAffectsTwoRows_ShouldReturnTwo()
+        public virtual void Execute_GivenSqlAndArgumentsAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
@@ -47,7 +47,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Execute_GivenSqlAffectsOneRow_ShouldReturnOne()
+        public virtual void Execute_GivenSqlAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
 
@@ -62,7 +62,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Execute_GivenSqlAffectsTwoRows_ShouldReturnTwo()
+        public virtual void Execute_GivenSqlAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
@@ -77,7 +77,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteAsync_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
+        public virtual async void ExecuteAsync_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
             var sql = $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0";
@@ -92,7 +92,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteAsync_GivenSqlAndArgumentsAffectsTwoRows_ShouldReturnTwo()
+        public virtual async void ExecuteAsync_GivenSqlAndArgumentsAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
@@ -107,7 +107,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteAsync_GivenSqlAffectsOneRow_ShouldReturnOne()
+        public virtual async void ExecuteAsync_GivenSqlAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
 
@@ -122,7 +122,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteAsync_GivenSqlAffectsTwoRows_ShouldReturnTwo()
+        public virtual async void ExecuteAsync_GivenSqlAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
@@ -137,7 +137,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void ExecuteScalar_GivenSql_ReturnShouldBeValid()
+        public virtual void ExecuteScalar_GivenSql_ReturnShouldBeValid()
         {
             InsertNotes(3);
 
@@ -145,7 +145,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void ExecuteScalar_GivenSqlAndParameter_ReturnShouldBeValid()
+        public virtual void ExecuteScalar_GivenSqlAndParameter_ReturnShouldBeValid()
         {
             InsertNotes(4);
 
@@ -155,7 +155,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void ExecuteScalar_GivenSqlAndParameters_ReturnShouldBeValid()
+        public virtual void ExecuteScalar_GivenSqlAndParameters_ReturnShouldBeValid()
         {
             InsertNotes(5);
 
@@ -165,7 +165,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteScalarAsync_GivenSql_ReturnShouldBeValid()
+        public virtual async void ExecuteScalarAsync_GivenSql_ReturnShouldBeValid()
         {
             InsertNotes(3);
 
@@ -173,7 +173,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteScalarAsync_GivenSqlAndParameter_ReturnShouldBeValid()
+        public virtual async void ExecuteScalarAsync_GivenSqlAndParameter_ReturnShouldBeValid()
         {
             InsertNotes(4);
 
@@ -183,7 +183,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void ExecuteScalarAsync_GivenSqlAndParameters_ReturnShouldBeValid()
+        public virtual async void ExecuteScalarAsync_GivenSqlAndParameters_ReturnShouldBeValid()
         {
             InsertNotes(5);
 

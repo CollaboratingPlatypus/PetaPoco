@@ -46,7 +46,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPoco_ShouldBeValid()
+        public virtual void Update_GivenPoco_ShouldBeValid()
         {
             // Arrange
             DB.Insert(_person);
@@ -78,7 +78,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoAndNullColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoAndNullColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -91,7 +91,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -108,7 +108,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoAndPrimaryKey_ShouldBeValid()
+        public virtual void Update_GivenPocoAndPrimaryKey_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -121,7 +121,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -134,7 +134,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -151,7 +151,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoAndEmptyColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoAndEmptyColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -168,7 +168,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -181,7 +181,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -194,7 +194,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -211,7 +211,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -228,7 +228,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenSqlAndParameters_ShouldBeValid()
+        public virtual void Update_GivenSqlAndParameters_ShouldBeValid()
         {
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -243,7 +243,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoUpdateSql_ShouldUpdateThePoco()
+        public virtual void Update_GivenPocoUpdateSql_ShouldUpdateThePoco()
         {
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -259,7 +259,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenNoPocoExists_ShouldBeValid()
+        public virtual void Update_GivenNoPocoExists_ShouldBeValid()
         {
             var rowEffected = DB.Update(_person);
 
@@ -267,7 +267,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -279,7 +279,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -291,7 +291,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -309,7 +309,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameDynamicTypeAndPrimaryKeyValue_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameDynamicTypeAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -327,7 +327,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("Issue", "667")]
-        public void Update_GivenDynamicPoco_ShouldNotThrow()
+        public virtual void Update_GivenDynamicPoco_ShouldNotThrow()
         {
             DB.Insert(_note);
             var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
@@ -335,7 +335,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenDynamicPoco_ShouldUpdate()
+        public virtual void Update_GivenDynamicPoco_ShouldUpdate()
         {
             DB.Insert(_note);
             var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
@@ -348,7 +348,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPoco_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPoco_ShouldBeValid()
         {
             // Arrange
             await DB.InsertAsync(_person);
@@ -380,7 +380,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoAndNullColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndNullColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -393,7 +393,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -410,7 +410,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoAndPrimaryKey_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndPrimaryKey_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -423,7 +423,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -436,7 +436,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -452,7 +452,7 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Height.ShouldNotBe(_person.Height);
         }
         [Fact]
-        public async Task UpdateAsync_GivenPocoAndEmptyColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndEmptyColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -469,7 +469,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -482,7 +482,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -495,7 +495,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -512,7 +512,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -529,7 +529,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenSqlAndParameters_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenSqlAndParameters_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -544,7 +544,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoUpdateSql_ShouldUpdateThePoco()
+        public virtual async Task UpdateAsync_GivenPocoUpdateSql_ShouldUpdateThePoco()
         {
             await DB.InsertAsync(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -560,7 +560,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenNoPocoExists_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenNoPocoExists_ShouldBeValid()
         {
             var rowEffected = await DB.UpdateAsync(_person);
 
@@ -568,7 +568,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -580,7 +580,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 

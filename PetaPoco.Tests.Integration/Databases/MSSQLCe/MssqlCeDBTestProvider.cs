@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -33,10 +33,12 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         public override IDatabase Execute()
         {
             if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
+            {
                 using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
                 {
                     engine.CreateDatabase();
                 }
+            }
 
             return base.Execute();
         }

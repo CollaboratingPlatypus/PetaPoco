@@ -11,7 +11,6 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases
 {
-	// TODO: Make test cases in BaseQueryTests virtual
     public abstract class BaseQueryTests : BaseDatabase
     {
         protected BaseQueryTests(DBTestProvider provider)
@@ -117,7 +116,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -127,18 +126,18 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Query<dynamic>(sql, OrderStatus.Pending).ToArray();
             results.Length.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public void Query_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual void Query_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -149,18 +148,18 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Query<dynamic>(sql).ToArray();
             results.Length.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public void Query_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -180,7 +179,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -191,7 +190,7 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = DB.Query<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }).ToList();
+            var results = DB.Query<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null }).ToList();
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -205,7 +204,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -225,7 +224,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForPocoWithPropertyMissingSetMethod_ShouldThrow()
+        public virtual void Query_ForPocoWithPropertyMissingSetMethod_ShouldThrow()
         {
             AddPeople(1, 1);
 
@@ -258,7 +257,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Query<Order, Person>(testQuery).ToList();
             results.ShouldNotBeEmpty();
 
-			var execStmt = $"ALTER TABLE {orderTable} ADD {randColumn} INT NULL";
+            var execStmt = $"ALTER TABLE {orderTable} ADD {randColumn} INT NULL";
             DB.Execute(execStmt);
 
             results = DB.Query<Order, Person>(testQuery).ToList();
@@ -266,7 +265,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
+        public virtual void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
         {
             AddOrders(1);
 
@@ -288,7 +287,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual void Query_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -302,7 +301,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Query_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual void Query_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -317,7 +316,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void QueryAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -328,18 +327,18 @@ namespace PetaPoco.Tests.Integration.Databases
             await DB.QueryAsync<dynamic>(p => results.Add(p), sql, OrderStatus.Pending);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public async void QueryAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void QueryAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -351,18 +350,18 @@ namespace PetaPoco.Tests.Integration.Databases
             await DB.QueryAsync<dynamic>(p => results.Add(p), sql);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public async void QueryAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async void QueryAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -383,7 +382,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async void QueryAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -396,7 +395,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
             var results = new List<Order>();
-            await DB.QueryAsync<Order>(p => results.Add(p), sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            await DB.QueryAsync<Order>(p => results.Add(p), sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -410,7 +409,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async void QueryAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -431,7 +430,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async void QueryAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -446,7 +445,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async void QueryAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -462,7 +461,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void QueryAsyncReader_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -475,18 +474,18 @@ namespace PetaPoco.Tests.Integration.Databases
                     results.Add(asyncReader.Poco);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void QueryAsyncReader_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -501,18 +500,18 @@ namespace PetaPoco.Tests.Integration.Databases
 
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async void QueryAsyncReader_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -535,7 +534,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async void QueryAsyncReader_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -548,7 +547,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
             var results = new List<Order>();
-            using (var asyncReader = await DB.QueryAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null }))
+            using (var asyncReader = await DB.QueryAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null }))
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
 
@@ -564,7 +563,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async void QueryAsyncReader_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -588,7 +587,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async void QueryAsyncReader_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -606,7 +605,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void QueryAsyncReader_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async void QueryAsyncReader_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -625,7 +624,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Fetch_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual void Fetch_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -635,18 +634,18 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Fetch<dynamic>(sql, OrderStatus.Pending);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public void Fetch_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual void Fetch_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -657,18 +656,18 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = DB.Fetch<dynamic>(sql);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public void Fetch_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual void Fetch_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -679,7 +678,7 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = DB.Fetch<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            var results = DB.Fetch<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -693,7 +692,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Fetch_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual void Fetch_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -713,7 +712,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Fetch_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual void Fetch_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -733,7 +732,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Fetch_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual void Fetch_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -747,7 +746,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Fetch_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual void Fetch_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -762,7 +761,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void SkipAndTake_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual void SkipAndTake_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -774,7 +773,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void SkipAndTake_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual void SkipAndTake_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -787,7 +786,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void SkipAndTake_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual void SkipAndTake_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -798,12 +797,12 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = DB.SkipTake<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            var results = DB.SkipTake<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(1);
         }
 
         [Fact]
-        public void SkipAndTake_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual void SkipAndTake_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -814,7 +813,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void SkipAndTake_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual void SkipAndTake_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -825,7 +824,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void SkipAndTake_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual void SkipAndTake_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -838,7 +837,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void SkipAndTake_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual void SkipAndTake_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -852,7 +851,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -864,7 +863,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void FetchWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual void FetchWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -877,7 +876,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void FetchWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual void FetchWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -888,12 +887,12 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = DB.Fetch<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            var results = DB.Fetch<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(1);
         }
 
         [Fact]
-        public void FetchWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual void FetchWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -904,7 +903,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void FetchWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual void FetchWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -915,7 +914,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void FetchWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual void FetchWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -928,7 +927,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void FetchWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual void FetchWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -942,7 +941,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void FetchAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -952,18 +951,18 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = await DB.FetchAsync<dynamic>(sql, OrderStatus.Pending);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public async void FetchAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void FetchAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -974,18 +973,18 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = await DB.FetchAsync<dynamic>(sql);
             results.Count.ShouldBe(3);
 
-            var order = (IDictionary<string, object>) results.First();
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
+            var order = (IDictionary<string, object>)results.First();
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName]).ShouldStartWith("PO");
             Convert.ToInt32(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName])
                 .ShouldBeOneOf(Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray());
             order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName].ToString().ShouldNotBe(Guid.Empty.ToString());
             ConvertToDateTime(order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedOn").ColumnName])
                 .ShouldBeLessThanOrEqualTo(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc));
-            ((string) order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
+            ((string)order[pd.Columns.Values.First(c => c.PropertyInfo.Name == "CreatedBy").ColumnName]).ShouldStartWith("Harry");
         }
 
         [Fact]
-        public async void FetchAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async void FetchAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -996,7 +995,7 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = await DB.FetchAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            var results = await DB.FetchAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -1010,7 +1009,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async void FetchAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1030,7 +1029,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async void FetchAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1050,7 +1049,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async void FetchAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1064,7 +1063,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async void FetchAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1079,7 +1078,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1091,7 +1090,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1104,7 +1103,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1115,12 +1114,12 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = await DB.FetchAsync<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            var results = await DB.FetchAsync<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(1);
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1131,7 +1130,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async void FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1142,7 +1141,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async void FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1155,7 +1154,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async void FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1169,7 +1168,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1181,7 +1180,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async void SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1194,7 +1193,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async void SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1205,12 +1204,12 @@ namespace PetaPoco.Tests.Integration.Databases
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS NTEXT)");
 
-            var results = await DB.SkipTakeAsync<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string) null });
+            var results = await DB.SkipTakeAsync<Order>(2, 1, sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null });
             results.Count.ShouldBe(1);
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async void SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1221,7 +1220,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async void SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1232,7 +1231,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async void SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1245,7 +1244,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async void SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async void SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1310,7 +1309,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 var order = new Order
                 {
                     PoNumber = "PO" + i,
-                    Status = (OrderStatus) orderStatuses.GetValue(i % orderStatuses.Length),
+                    Status = (OrderStatus)orderStatuses.GetValue(i % orderStatuses.Length),
                     PersonId = people.Skip(i % 4).Take(1).Single().Id,
                     CreatedOn = new DateTime(1990 - (i % 4), 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     CreatedBy = "Harry" + i
@@ -1322,7 +1321,7 @@ namespace PetaPoco.Tests.Integration.Databases
                     DB.Insert(new OrderLine
                     {
                         OrderId = order.Id,
-                        Quantity = (short) j,
+                        Quantity = (short)j,
                         SellPrice = 9.99m * j
                     });
                 }
@@ -1331,7 +1330,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         public static DateTime ConvertToDateTime(object value)
         {
-            return value as DateTime? ?? new DateTime((long) value, DateTimeKind.Utc);
+            return value as DateTime? ?? new DateTime((long)value, DateTimeKind.Utc);
         }
     }
 }

@@ -9,12 +9,9 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqliteBuildDatabase.sql";
 
-        public IDatabase GetDatabase()
-        {
-            return Database;
-        }
+		public IDatabase GetDatabase() => Database;
 
-        protected override IDatabaseBuildConfiguration BuildFromConnectionName(string name)
+		protected override IDatabaseBuildConfiguration BuildFromConnectionName(string name)
         {
             return base.BuildFromConnectionName(name).UsingDefaultMapper<ConventionMapper>(m =>
             {
@@ -27,7 +24,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
                         switch (Type.GetTypeCode(type))
                         {
                             case TypeCode.DateTime:
-                                return o => new DateTime((long) o, DateTimeKind.Utc);
+                                return o => new DateTime((long)o, DateTimeKind.Utc);
                             default:
                                 return o => Convert.ChangeType(o, Type.GetTypeCode(type));
                         }
@@ -42,7 +39,7 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
                     switch (Type.GetTypeCode(type))
                     {
                         case TypeCode.DateTime:
-                            return o => ((DateTime?) o)?.Ticks;
+                            return o => ((DateTime?)o)?.Ticks;
                     }
 
                     return null;
