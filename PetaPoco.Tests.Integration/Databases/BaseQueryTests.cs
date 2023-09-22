@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,8 @@ using PetaPoco.Tests.Integration.Models;
 using PetaPoco.Utilities;
 using Shouldly;
 using Xunit;
+
+// FIXME: async void should be async Task
 
 namespace PetaPoco.Tests.Integration.Databases
 {

@@ -32,6 +32,6 @@ namespace PetaPoco.Providers
 #endif
 
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
-            => throw new NotSupportedException("The Access provider does not support paging.");
+            => throw new NotSupportedException("The MS Access provider does not support paging.");
     }
 }
