@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {
-                if (s.StartsWith("--"))
+                if (String.IsNullOrEmpty(s) || s.StartsWith("--"))
                     return;
 
                 if (s.StartsWith("DROP"))

@@ -47,7 +47,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {
-                if (s.StartsWith("--"))
+                if (String.IsNullOrEmpty(s) || s.StartsWith("--"))
                     return;
 
                 if (s.StartsWith("DROP"))
