@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +9,7 @@ using PetaPoco.Utilities;
 using Shouldly;
 using Xunit;
 
+// TODO: Finish labeling DB Features for tests with provider-specific features.
 // FIXME: async void should be async Task
 
 namespace PetaPoco.Tests.Integration.Databases
@@ -21,6 +22,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void PageCount_GivenSqlWithGroupBy_ShouldReturnEntireQueryCount()
         {
             // Add duplicate names
@@ -52,6 +54,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void Page_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
             AddPeople(15, 5);
@@ -68,6 +71,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void Page_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
             AddPeople(15, 5);
@@ -85,6 +89,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async Task PageAsync_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
             AddPeople(15, 5);
@@ -101,6 +106,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async Task PageAsync_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
             AddPeople(15, 5);
@@ -763,6 +769,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -775,6 +782,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -788,6 +796,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -804,6 +813,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -815,6 +825,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -826,6 +837,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -839,6 +851,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -853,6 +866,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -865,6 +879,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -878,6 +893,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -894,6 +910,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -905,6 +922,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -916,6 +934,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -929,6 +948,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -1080,6 +1100,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -1092,6 +1113,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -1105,6 +1127,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -1121,6 +1144,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -1132,6 +1156,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -1143,6 +1168,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -1156,6 +1182,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -1170,6 +1197,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -1182,6 +1210,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -1195,6 +1224,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -1211,6 +1241,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -1222,6 +1253,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -1233,6 +1265,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
@@ -1246,6 +1279,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+		[Trait("DBFeature", "Paging")]
         public virtual async void SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
