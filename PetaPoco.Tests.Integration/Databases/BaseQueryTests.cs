@@ -289,7 +289,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Order.PersonId)).ColumnName);
             var pFullName = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(Person.Name)).ColumnName);
 
-            var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} AS o INNER JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
+            var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} o INNER JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
 
             Should.Throw<InvalidOperationException>(() => DB.Fetch<ReadOnlyMultiPoco, Person>(sql).ToList());
         }

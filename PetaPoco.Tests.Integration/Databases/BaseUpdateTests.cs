@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using PetaPoco.Core;
@@ -302,7 +302,11 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETSTANDARD
+            ((int)DB.Update("People", "Id", (object)person)).ShouldBe(1);
+#else
             ((int)DB.Update("People", "Id", person)).ShouldBe(1);
+#endif
 
             var personOther = DB.Single<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
@@ -319,7 +323,11 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETSTANDARD
+            ((int)DB.Update("People", "Id", (object)person, _person.Id)).ShouldBe(1);
+#else
             ((int)DB.Update("People", "Id", person, _person.Id)).ShouldBe(1);
+#endif
 
             var personOther = DB.Single<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
@@ -327,27 +335,35 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("Issue", "667")]
-        public virtual void Update_GivenDynamicPoco_ShouldNotThrow()
+        public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
 			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
 			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            DB.Insert(_note);
+			DB.Insert(_note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
+#if !NETSTANDARD
+            Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
+#else
             Should.NotThrow(() => DB.Update("Note", "Id", entity));
+#endif
         }
 
         [Fact]
-        public virtual void Update_GivenDynamicPoco_ShouldUpdate()
+        public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
 			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
 			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            DB.Insert(_note);
+			DB.Insert(_note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
             entity.Text += " was updated";
+#if !NETSTANDARD
+            DB.Update("Note", "Id", (object)entity);
+#else
             DB.Update("Note", "Id", entity);
+#endif
 
             var entity2 = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
             ((string)entity2.Text).ShouldContain("updated");
@@ -399,7 +415,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async Task UpdateAsync_GivenPocoColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -609,7 +625,11 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETSTANDARD
+            ((int)await DB.UpdateAsync("People", "Id", (object)person)).ShouldBe(1);
+#else
             ((int)await DB.UpdateAsync("People", "Id", person)).ShouldBe(1);
+#endif
 
             var personOther = await DB.SingleAsync<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
@@ -626,7 +646,11 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETSTANDARD
+            ((int)await DB.UpdateAsync("People", "Id", (object)person, _person.Id)).ShouldBe(1);
+#else
             ((int)await DB.UpdateAsync("People", "Id", person, _person.Id)).ShouldBe(1);
+#endif
 
             var personOther = await DB.SingleAsync<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
@@ -634,27 +658,35 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("Issue", "667")]
-        public async Task UpdateAsync_GivenDynamicPoco_ShouldNotThrow()
+        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
 			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
 			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            await DB.InsertAsync(_note);
+			await DB.InsertAsync(_note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
+#if !NETSTANDARD
+            Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
+#else
             Should.NotThrow(() => DB.Update("Note", "Id", entity));
+#endif
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenDynamicPoco_ShouldUpdate()
+        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
 			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
 			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            await DB.InsertAsync(_note);
+			await DB.InsertAsync(_note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             entity.Text += " was updated";
+#if !NETSTANDARD
+            DB.Update("Note", "Id", (object)entity);
+#else
             DB.Update("Note", "Id", entity);
+#endif
 
             var entity2 = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
             ((string)entity2.Text).ShouldContain("updated");
