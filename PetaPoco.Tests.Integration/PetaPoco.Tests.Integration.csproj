@@ -17,6 +17,7 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <Compile Remove="Databases\MSAccess\**" />
     <Compile Remove="Databases\MSSQLCe\**" />
+    <Compile Remove="DataSources\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -84,6 +85,12 @@
     </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
+    <None Update="DataSources\petapoco.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
