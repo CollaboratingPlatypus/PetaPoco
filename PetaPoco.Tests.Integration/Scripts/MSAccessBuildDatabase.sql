@@ -8,7 +8,7 @@ DROP TABLE [TransactionLogs];
 DROP TABLE [Note];
 
 CREATE TABLE [People] (
-	[Id] GUID NOT NULL PRIMARY KEY,
+	[Id] TEXT NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE [People] (
 
 CREATE TABLE [Orders] (
 	[Id] AUTOINCREMENT PRIMARY KEY,
-	[PersonId] GUID CONSTRAINT FK_O_PersonId REFERENCES [People](Id),
+	[PersonId] TEXT CONSTRAINT FK_O_PersonId REFERENCES [People](Id),
 	[PoNumber] MEMO NOT NULL,
 	[OrderStatus] INTEGER NOT NULL,
 	[CreatedOn] Datetime NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE [OrderLines] (
 );
 
 CREATE TABLE [SpecificPeople] (
-	[Id] GUID NOT NULL PRIMARY KEY,
+	[Id] TEXT NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE [SpecificPeople] (
 
 CREATE TABLE [SpecificOrders] (
 	[Id] AUTOINCREMENT PRIMARY KEY,
-	[PersonId] GUID CONSTRAINT FK_SO_PersonId REFERENCES [SpecificPeople](Id),
+	[PersonId] TEXT CONSTRAINT FK_SO_PersonId REFERENCES [SpecificPeople](Id),
 	[PoNumber] MEMO NOT NULL,
 	[OrderStatus] INTEGER NOT NULL,
 	[CreatedOn] Datetime NOT NULL,
@@ -66,6 +66,28 @@ CREATE TABLE [Note] (
 	[Id] AUTOINCREMENT PRIMARY KEY,
 	[Text] MEMO NOT NULL,
 	[CreatedOn] Datetime NOT NULL
+);
+
+-- MSAccess Specific Tables;
+
+DROP TABLE [JoinableOrders];
+DROP TABLE [JoinablePeople];
+
+CREATE TABLE [JoinablePeople] (
+	[Id] GUID NOT NULL PRIMARY KEY,
+	[FullName] MEMO,
+	[Age] Long NOT NULL,
+	[Height] INTEGER NOT NULL,
+	[Dob] Datetime NULL
+);
+
+CREATE TABLE [JoinableOrders] (
+	[Id] AUTOINCREMENT PRIMARY KEY,
+	[JoinablePersonId] GUID CONSTRAINT FK_O_JoinablePersonId REFERENCES [JoinablePeople](Id),
+	[PoNumber] MEMO NOT NULL,
+	[OrderStatus] INTEGER NOT NULL,
+	[CreatedOn] Datetime NOT NULL,
+	[CreatedBy] MEMO NOT NULL
 );
 
 -- Investigation Tables;

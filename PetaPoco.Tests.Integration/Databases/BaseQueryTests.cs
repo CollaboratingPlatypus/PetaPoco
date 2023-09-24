@@ -249,7 +249,8 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public virtual void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
         {
-            AddOrders(1);
+			AddOrders(1);
+
             var pdOrder = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var pdPerson = PocoData.ForType(typeof(Person), DB.DefaultMapper);
 
@@ -275,7 +276,7 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public virtual void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
         {
-            AddOrders(1);
+			AddOrders(1);
 
             var pdOrder = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var pdPerson = PocoData.ForType(typeof(Person), DB.DefaultMapper);
