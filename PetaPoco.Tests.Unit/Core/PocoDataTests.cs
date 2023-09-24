@@ -12,7 +12,6 @@ namespace PetaPoco.Tests.Unit.Core
         public void GetFactory_GivenTypeWithNonPublicConstructor_ShouldThrow()
         {
             var pd = PocoData.ForObject(TestEntity.Instance, "Id", new ConventionMapper());
-
             Should.Throw<InvalidOperationException>(() => pd.GetFactory("", "", 1, 1, null, null));
         }
 

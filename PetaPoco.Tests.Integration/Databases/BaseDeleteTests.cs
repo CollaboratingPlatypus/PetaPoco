@@ -54,6 +54,8 @@ namespace PetaPoco.Tests.Integration.Databases
         {
         }
 
+        // TODO: Test with/without "WHERE" keyword in sql string produce identical statements
+
         [Fact]
         public virtual void Delete_GivenPoco_ShouldDeletePoco()
         {
@@ -65,6 +67,7 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(_orderLine);
             DB.Insert(_note);
 
+            // TODO: assert Delete returns 1
             // Act
             DB.Delete(_orderLine);
             DB.Delete(_order);
@@ -178,6 +181,7 @@ namespace PetaPoco.Tests.Integration.Databases
             await DB.InsertAsync(_orderLine);
             await DB.InsertAsync(_note);
 
+            // TODO: assert DeleteAsync returns 1
             // Act
             await DB.DeleteAsync(_orderLine);
             await DB.DeleteAsync(_order);

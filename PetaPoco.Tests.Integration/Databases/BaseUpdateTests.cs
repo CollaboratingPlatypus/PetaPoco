@@ -309,8 +309,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
 
-            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })
-                .ShouldBe(1);
+            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }).ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -321,8 +320,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert(_person);
 
-            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id)
-                .ShouldBe(1);
+            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id).ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -340,7 +338,7 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
-#if !NETSTANDARD
+#if !NETCOREAPP
             ((int)DB.Update("People", "Id", (object)person)).ShouldBe(1);
 #else
             ((int)DB.Update("People", "Id", person)).ShouldBe(1);
@@ -361,7 +359,7 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
-#if !NETSTANDARD
+#if !NETCOREAPP
             ((int)DB.Update("People", "Id", (object)person, _person.Id)).ShouldBe(1);
 #else
             ((int)DB.Update("People", "Id", person, _person.Id)).ShouldBe(1);
@@ -372,7 +370,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("Issue", "667")]
+        [Trait("Issue", "#667")]
         public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
             var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
@@ -380,7 +378,8 @@ namespace PetaPoco.Tests.Integration.Databases
 
             DB.Insert(_note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
-#if !NETSTANDARD
+
+#if !NETCOREAPP
             Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
 #else
             Should.NotThrow(() => DB.Update("Note", "Id", entity));
@@ -397,7 +396,8 @@ namespace PetaPoco.Tests.Integration.Databases
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
             entity.Text += " was updated";
-#if !NETSTANDARD
+
+#if !NETCOREAPP
             DB.Update("Note", "Id", (object)entity);
 #else
             DB.Update("Note", "Id", entity);
@@ -421,7 +421,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var personOther = await DB.SingleAsync<Person>(_person.Id);
             UpdateProperties(personOther);
             (await DB.UpdateAsync(personOther)).ShouldBe(1);
-            personOther = DB.Single<Person>(_person.Id);
+            personOther = await DB.SingleAsync<Person>(_person.Id);
 
             var orderOther = await DB.SingleAsync<Order>(_order.Id);
             UpdateProperties(orderOther);
@@ -632,8 +632,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             await DB.InsertAsync(_person);
 
-            (await DB.UpdateAsync("People", "Id",
-                new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })).ShouldBe(1);
+            (await DB.UpdateAsync("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })).ShouldBe(1);
             var personOther = await DB.SingleAsync<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -644,8 +643,7 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             await DB.InsertAsync(_person);
 
-            (await DB.UpdateAsync("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 },
-                _person.Id)).ShouldBe(1);
+            (await DB.UpdateAsync("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id)).ShouldBe(1);
             var personOther = await DB.SingleAsync<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -663,7 +661,7 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
-#if !NETSTANDARD
+#if !NETCOREAPP
             ((int)await DB.UpdateAsync("People", "Id", (object)person)).ShouldBe(1);
 #else
             ((int)await DB.UpdateAsync("People", "Id", person)).ShouldBe(1);
@@ -684,7 +682,7 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
-#if !NETSTANDARD
+#if !NETCOREAPP
             ((int)await DB.UpdateAsync("People", "Id", (object)person, _person.Id)).ShouldBe(1);
 #else
             ((int)await DB.UpdateAsync("People", "Id", person, _person.Id)).ShouldBe(1);
@@ -695,7 +693,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("Issue", "667")]
+        [Trait("Issue", "#667")]
         public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
             var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
@@ -703,10 +701,12 @@ namespace PetaPoco.Tests.Integration.Databases
 
             await DB.InsertAsync(_note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
-#if !NETSTANDARD
-            Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
+
+            // https://docs.shouldly.org/documentation/exceptions/throw#shouldthrowfuncoftask
+#if !NETCOREAPP
+            await Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
 #else
-            Should.NotThrow(() => DB.Update("Note", "Id", entity));
+            await Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
 #endif
         }
 
@@ -720,10 +720,11 @@ namespace PetaPoco.Tests.Integration.Databases
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             entity.Text += " was updated";
-#if !NETSTANDARD
-            DB.Update("Note", "Id", (object)entity);
+
+#if !NETCOREAPP
+            await DB.UpdateAsync("Note", "Id", (object)entity);
 #else
-            DB.Update("Note", "Id", entity);
+            await DB.UpdateAsync("Note", "Id", entity);
 #endif
 
             var entity2 = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();

@@ -86,9 +86,9 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
-            var personOther =
-                DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _person.Id);
+            var personOther = DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} " +
+                                                $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                                                _person.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -103,15 +103,12 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             DB.Insert("SpecificOrderLines", "Id", _orderLine);
 
-            var personOther =
-                DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _person.Id);
-            var orderOther =
-                DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _order.Id);
-            var orderLineOther =
-                DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _orderLine.Id);
+            var personOther = DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} " +
+                                                $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var orderOther = DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} " +
+                                              $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            var orderLineOther = DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} " +
+                                                      $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -135,6 +132,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#198")]
         public virtual void Insert_GivenNullByteArray_ShouldNotThrow()
         {
             DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[])null });
@@ -142,6 +140,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#198")]
         public virtual void Insert_GivenNonNullByteArray_ShouldNotThrow()
         {
             DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
@@ -280,9 +279,8 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
-            var personOther =
-                await DB.SingleAsync<Person>(
-                    $"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var personOther = await DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} " +
+														   $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -297,15 +295,12 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             await DB.InsertAsync("SpecificOrderLines", "Id", _orderLine);
 
-            var personOther =
-                await DB.SingleAsync<Person>(
-                    $"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
-            var orderOther =
-                await DB.SingleAsync<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _order.Id);
-            var orderLineOther =
-                await DB.SingleAsync<OrderLine>(
-                    $"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
+            var personOther = await DB.SingleAsync<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} " +
+														   $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var orderOther = await DB.SingleAsync<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} " +
+														 $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            var orderLineOther = await DB.SingleAsync<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} " +
+																 $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -329,6 +324,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#198")]
         public virtual async Task InsertAsync_GivenNullByteArray_ShouldNotThrow()
         {
             await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[])null });
@@ -336,6 +332,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#198")]
         public virtual async Task InsertAsync_GivenNonNullByteArray_ShouldNotThrow()
         {
             await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });

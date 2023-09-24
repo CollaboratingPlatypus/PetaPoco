@@ -9,16 +9,18 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
+    // TODO: Move PreExecute tests to Base class (either BaseExecuteTests or new BasePreExecuteTests)
+
     [Collection("MssqlMsData")]
     public class MssqlMsDataPreExecuteTests : BaseDatabase
     {
         public MssqlMsDataPreExecuteDatabaseProvider Provider => DB.Provider as MssqlMsDataPreExecuteDatabaseProvider;
 
-        public MssqlMsDataPreExecuteTests() : base(new MssqlMsDataPreExecuteDBTestProvider())
+        public MssqlMsDataPreExecuteTests()
+            : base(new MssqlMsDataPreExecuteDBTestProvider())
         {
             Provider.ThrowExceptions = true;
         }
-
 
         [Fact]
         public void Query_Calls_PreExecute()
@@ -92,9 +94,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
-
         [Fact]
-        public void QueryAsync_Calls_PreExecute()
+        public async Task QueryAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
             var sql = Sql.Builder
@@ -104,13 +105,13 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 
             async Task act() => await DB.QueryAsync<string>(sql).Result.ReadAsync();
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void ExecuteAsync_Calls_PreExecute()
+        public async Task ExecuteAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
             var sql = Sql.Builder
@@ -120,37 +121,37 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 
             async Task act() => await DB.ExecuteAsync(sql);
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void InsertAsync_Calls_PreExecute()
+        public async Task InsertAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
 
             async Task act() => await DB.InsertAsync("sometable", new { Foo = expected });
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void UpdateAsync_Calls_PreExecute()
+        public async Task UpdateAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
 
             async Task act() => await DB.UpdateAsync("sometable", "id", new { ID = 3, Foo = expected });
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(2);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void ExecuteScalarAsync_Calls_PreExecute()
+        public async Task ExecuteScalarAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
             var sql = Sql.Builder
@@ -160,11 +161,10 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 
             async Task act() => await DB.ExecuteScalarAsync<int>(sql);
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
-
 
         public class MssqlMsDataPreExecuteDBTestProvider : MssqlMsDataDBTestProvider
         {
@@ -195,6 +195,4 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 
         public class PreExecuteException : Exception { }
     }
-
-    
 }

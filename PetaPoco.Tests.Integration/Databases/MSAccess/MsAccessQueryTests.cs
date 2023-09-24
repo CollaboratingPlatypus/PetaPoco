@@ -104,25 +104,25 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         public override void FetchWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() { }
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
+        public override async Task FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
         public override void SkipAndTake_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection() { }
@@ -146,25 +146,25 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         public override void SkipAndTake_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() { }
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
-        public override async void SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
+        public override async Task SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
 
         #region Helpers
 

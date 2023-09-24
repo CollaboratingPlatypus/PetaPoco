@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
+
+// TODO: Use specific exception types when asserting thrown exceptions
 
 namespace PetaPoco.Tests.Integration.Databases
 {
@@ -53,6 +56,9 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             Should.Throw<Exception>(() => DB.Single<Person>(Guid.NewGuid()));
         }
+
+        // TODO: Add tests for other apis with/without filter keyword in string (WHERE)
+        // TODO: Check throw conditions for Single/SingleAsync, SingleOrDefault/SingleOrDefaultAsync, Exists/ExistsAsync, First/FirstAsync, FirstOrDefault/FirstOrDefaultAsync (doc comments were incorrect on a couple)
 
         [Fact]
         public virtual void Single_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
@@ -266,6 +272,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
         [Trait("Category", "Regression")]
+        // https://github.com/CollaboratingPlatypus/PetaPoco/commit/baa3bf78df57b5b2d5e637e7a1192ceceaba0e46
         public virtual void Exists_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
             DB.Insert(_person);
@@ -296,255 +303,256 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void ExistsAsync_GivenPrimaryKeyMatchingOneRecord_ShouldBeTrue()
+        public virtual async Task ExistsAsync_GivenPrimaryKeyMatchingOneRecord_ShouldBeTrue()
         {
-            var pk = DB.Insert(_person);
+            var pk = await DB.InsertAsync(_person);
             (await DB.ExistsAsync<Person>(pk)).ShouldBeTrue();
         }
 
         [Fact]
-        public virtual async void ExistsAsync_GivenPrimaryKeyMatchingNoRecord_ShouldBeFalse()
+        public virtual async Task ExistsAsync_GivenPrimaryKeyMatchingNoRecord_ShouldBeFalse()
         {
             (await DB.ExistsAsync<Person>(Guid.NewGuid())).ShouldBeFalse();
         }
 
         [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
         [Trait("Category", "Regression")]
-        public virtual async void ExistsAsync_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
+        // https://github.com/CollaboratingPlatypus/PetaPoco/commit/baa3bf78df57b5b2d5e637e7a1192ceceaba0e46
+        public virtual async Task ExistsAsync_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.ExistsAsync<Person>($"{DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeTrue();
         }
 
         [Fact]
-        public virtual async void ExistsAsync_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
+        public virtual async Task ExistsAsync_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeTrue();
         }
 
         [Fact]
-        public virtual async void ExistsAsync_GivenSqlStringMatchingMoreThanOneRecord_ShouldBeTrue()
+        public virtual async Task ExistsAsync_GivenSqlStringMatchingMoreThanOneRecord_ShouldBeTrue()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
             (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeTrue();
         }
 
         [Fact]
-        public virtual async void ExistsAsync_GivenSqlStringMatchingNoRecord_ShouldBeFalse()
+        public virtual async Task ExistsAsync_GivenSqlStringMatchingNoRecord_ShouldBeFalse()
         {
             (await DB.ExistsAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeFalse();
         }
 
         [Fact]
-        public virtual async void SingleAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task SingleAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
         {
-            var pk = DB.Insert(_person);
+            var pk = await DB.InsertAsync(_person);
             (await DB.SingleAsync<Person>(pk)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void SingleAsync_GivenPrimaryKeyMatchingNoRecord_ShouldThrow()
+        public virtual async Task SingleAsync_GivenPrimaryKeyMatchingNoRecord_ShouldThrow()
         {
-            Should.Throw<Exception>(DB.SingleAsync<Person>(Guid.NewGuid()));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>(Guid.NewGuid()));
         }
 
         [Fact]
-        public virtual async void SingleAsync_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task SingleAsync_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void SingleAsync_GivenSqlStringMatchingTwoRecords_ShouldThrow()
+        public virtual async Task SingleAsync_GivenSqlStringMatchingTwoRecords_ShouldThrow()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
-            Should.Throw<Exception>(DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
         }
 
         [Fact]
-        public virtual void SingleAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
+        public virtual async Task SingleAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
         {
-            Should.Throw<Exception>(DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
         }
 
         [Fact]
-        public virtual async void SingleAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task SingleAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void SingleAsync_GivenSqlMatchingTwoRecords_ShouldThrow()
+        public virtual async Task SingleAsync_GivenSqlMatchingTwoRecords_ShouldThrow()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
-            Should.Throw<Exception>(DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
         }
 
         [Fact]
-        public virtual void SingleAsync_GivenSqlMatchingNoRecord_ShouldThrow()
+        public virtual async Task SingleAsync_GivenSqlMatchingNoRecord_ShouldThrow()
         {
-            Should.Throw<Exception>(DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
         }
 
         [Fact]
-        public virtual async void SingleOrDefaultAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task SingleOrDefaultAsync_GivenPrimaryKeyMatchingOneRecord_ShouldReturnPoco()
         {
-            var pk = DB.Insert(_person);
+            var pk = await DB.InsertAsync(_person);
             (await DB.SingleOrDefaultAsync<Person>(pk)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void SingleOrDefaultAsync_GivenPrimaryKeyMatchingNoRecord_ShouldBeNull()
+        public virtual async Task SingleOrDefaultAsync_GivenPrimaryKeyMatchingNoRecord_ShouldBeNull()
         {
             (await DB.SingleOrDefaultAsync<Person>(Guid.NewGuid())).ShouldBeNull();
         }
 
         [Fact]
-        public virtual async void SingleOrDefaultAsync_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task SingleOrDefaultAsync_GivenSqlStringMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.SingleOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void SingleOrDefaultAsync_GivenSqlStringMatchingTwoRecords_ShouldThrow()
+        public virtual async Task SingleOrDefaultAsync_GivenSqlStringMatchingTwoRecords_ShouldThrow()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
-            Should.Throw<Exception>(DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
         }
 
         [Fact]
-        public virtual async void SingleOrDefaultAsync_GivenSqlStringMatchingNoRecord_ShouldBeNull()
+        public virtual async Task SingleOrDefaultAsync_GivenSqlStringMatchingNoRecord_ShouldBeNull()
         {
             (await DB.SingleOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldBeNull();
         }
 
         [Fact]
-        public virtual async void SingleOrDefaultAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task SingleOrDefaultAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.SingleOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void SingleOrDefaultAsync_GivenSqlMatchingTwoRecords_ShouldThrow()
+        public virtual async Task SingleOrDefaultAsync_GivenSqlMatchingTwoRecords_ShouldThrow()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
-            Should.Throw<Exception>(DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+            await Should.ThrowAsync<Exception>(() => DB.SingleAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
         }
 
         [Fact]
-        public virtual async void SingleOrDefaultAsync_GivenSqlMatchingNoRecord_ShouldBeNull()
+        public virtual async Task SingleOrDefaultAsync_GivenSqlMatchingNoRecord_ShouldBeNull()
         {
             (await DB.SingleOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldBeNull();
         }
 
         [Fact]
-        public virtual async void FirstAsync_GivenSqlStringAndMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task FirstAsync_GivenSqlStringAndMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void FirstAsync_GivenSqlStringAndMatchingTwoRecords_ShouldReturnFirstRecord()
+        public virtual async Task FirstAsync_GivenSqlStringAndMatchingTwoRecords_ShouldReturnFirstRecord()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
             (await DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void FirstAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
+        public virtual async Task FirstAsync_GivenSqlStringMatchingNoRecord_ShouldThrow()
         {
-            Should.Throw<Exception>(DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
+            await Should.ThrowAsync<Exception>(() => DB.FirstAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18));
         }
 
         [Fact]
-        public virtual async void FirstAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task FirstAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void FirstAsync_GivenSqlMatchingTwoRecords_ShouldReturnFirstPoco()
+        public virtual async Task FirstAsync_GivenSqlMatchingTwoRecords_ShouldReturnFirstPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
             (await DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual void FirstAsync_GivenSqlMatchingNoRecord_ShouldThrow()
+        public virtual async Task FirstAsync_GivenSqlMatchingNoRecord_ShouldThrow()
         {
-            Should.Throw<Exception>(DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
+            await Should.ThrowAsync<Exception>(() => DB.FirstAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)));
         }
 
         [Fact]
-        public virtual async void FirstOrDefaultAsync_GivenSqlStringAndMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task FirstOrDefaultAsync_GivenSqlStringAndMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.FirstOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void FirstOrDefaultAsync_GivenSqlStringAndMatchingTwoRecords_ShouldReturnFirstRecord()
+        public virtual async Task FirstOrDefaultAsync_GivenSqlStringAndMatchingTwoRecords_ShouldReturnFirstRecord()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
             (await DB.FirstOrDefaultAsync<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18)).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void FirstOrDefaultAsync_GivenSqlStringMatchingNoRecord_ShouldBeNull()
+        public virtual async Task FirstOrDefaultAsync_GivenSqlStringMatchingNoRecord_ShouldBeNull()
         {
             (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldBeNull();
         }
 
         [Fact]
-        public virtual async void FirstOrDefaultAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
+        public virtual async Task FirstOrDefaultAsync_GivenSqlMatchingOneRecord_ShouldReturnPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void FirstOrDefaultAsync_GivenSqlMatchingTwoRecords_ShouldReturnFirstPoco()
+        public virtual async Task FirstOrDefaultAsync_GivenSqlMatchingTwoRecords_ShouldReturnFirstPoco()
         {
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
             _person.Id = Guid.NewGuid();
-            DB.Insert(_person);
+            await DB.InsertAsync(_person);
 
             (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldNotBeNull();
         }
 
         [Fact]
-        public virtual async void FirstOrDefaultAsync_GivenSqlMatchingNoRecord_ShouldBeNull()
+        public virtual async Task FirstOrDefaultAsync_GivenSqlMatchingNoRecord_ShouldBeNull()
         {
             (await DB.FirstOrDefaultAsync<Person>(new Sql($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18))).ShouldBeNull();
         }

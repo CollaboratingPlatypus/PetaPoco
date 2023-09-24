@@ -10,7 +10,6 @@ using Shouldly;
 using Xunit;
 
 // TODO: Finish labeling DB Features for tests with provider-specific features.
-// FIXME: async void should be async Task
 
 namespace PetaPoco.Tests.Integration.Databases
 {
@@ -23,6 +22,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         #region Test Helpers
 
+        // FIXME: create AddPeopleAsync for async tests; AddPeople uses synchronous api
         protected void AddPeople(int petasToAdd, int sallysToAdd)
         {
             var c = petasToAdd > sallysToAdd ? petasToAdd : sallysToAdd;
@@ -52,6 +52,7 @@ namespace PetaPoco.Tests.Integration.Databases
             }
         }
 
+        // FIXME: create AddOrdersAsync for async tests; AddOrders uses synchronous api
         protected void AddOrders(int ordersToAdd)
         {
             var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
@@ -102,6 +103,7 @@ namespace PetaPoco.Tests.Integration.Databases
         #endregion
 
         [Fact]
+        [Trait("Issue", "#534")]
         [Trait("DBFeature", "Paging")]
         public virtual void PageCount_GivenSqlWithGroupBy_ShouldReturnEntireQueryCount()
         {
@@ -204,6 +206,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         public virtual void Query_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -225,6 +228,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         public virtual void Query_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -273,6 +277,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @Status AND @NullableProperty IS NULL";
 
+            // TODO: More elegant way to handle these provider-specific cases (find on page "Provider.GetType" for all instances)
             if (DB.Provider.GetType() == typeof(PostgreSQLDatabaseProvider))
                 sql = sql.Replace("@NullableProperty", "CAST(@NullableProperty AS CHAR)");
             else if (DB.Provider.GetType() == typeof(SqlServerCEDatabaseProviders))
@@ -405,7 +410,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        [Trait("Issue", "#243")]
+        public virtual async Task QueryAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -427,7 +433,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        [Trait("Issue", "#243")]
+        public virtual async Task QueryAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -450,7 +457,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task QueryAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -471,7 +478,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task QueryAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -498,7 +505,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async Task QueryAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -519,7 +526,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async Task QueryAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -534,7 +541,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async Task QueryAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -550,7 +557,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        [Trait("Issue", "#243")]
+        public virtual async Task QueryAsyncReader_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -559,8 +567,10 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<dynamic>();
             using (var asyncReader = await DB.QueryAsync<dynamic>(sql, OrderStatus.Pending))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
+            }
             results.Count.ShouldBe(3);
 
             var order = (IDictionary<string, object>)results.First();
@@ -574,7 +584,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        [Trait("Issue", "#243")]
+        public virtual async Task QueryAsyncReader_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -584,9 +595,10 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<dynamic>();
             using (var asyncReader = await DB.QueryAsync<dynamic>(sql))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
-
+            }
             results.Count.ShouldBe(3);
 
             var order = (IDictionary<string, object>)results.First();
@@ -600,7 +612,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task QueryAsyncReader_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -608,9 +620,10 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<Order>();
             using (var asyncReader = await DB.QueryAsync<Order>(sql, OrderStatus.Pending))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
-
+            }
             results.Count.ShouldBe(3);
             results.ForEach(o =>
             {
@@ -623,7 +636,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task QueryAsyncReader_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -637,9 +650,10 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<Order>();
             using (var asyncReader = await DB.QueryAsync<Order>(sql, new { Status = OrderStatus.Pending, NullableProperty = (string)null }))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
-
+            }
             results.Count.ShouldBe(3);
             results.ForEach(o =>
             {
@@ -652,7 +666,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async Task QueryAsyncReader_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -660,9 +674,10 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<Order>();
             using (var asyncReader = await DB.QueryAsync<Order>(sql))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
-
+            }
             results.Count.ShouldBe(3);
 
             results.ForEach(o =>
@@ -676,7 +691,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async Task QueryAsyncReader_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -686,15 +701,16 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<string>();
             using (var asyncReader = await DB.QueryAsync<string>(sql, OrderStatus.Pending))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
-
+            }
             results.Count.ShouldBe(3);
             results.ForEach(po => po.ShouldStartWith("PO"));
         }
 
         [Fact]
-        public virtual async void QueryAsyncReader_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async Task QueryAsyncReader_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -705,14 +721,16 @@ namespace PetaPoco.Tests.Integration.Databases
 
             var results = new List<string>();
             using (var asyncReader = await DB.QueryAsync<string>(sql))
+            {
                 while (await asyncReader.ReadAsync())
                     results.Add(asyncReader.Poco);
-
+            }
             results.Count.ShouldBe(3);
             results.ForEach(po => po.ShouldStartWith("PO"));
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         public virtual void Fetch_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -734,6 +752,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         public virtual void Fetch_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
@@ -850,6 +869,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
@@ -863,6 +883,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
         public virtual void SkipAndTake_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
@@ -947,6 +968,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
@@ -960,6 +982,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
         public virtual void FetchWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
@@ -1044,7 +1067,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        [Trait("Issue", "#243")]
+        public virtual async Task FetchAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1065,7 +1089,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        [Trait("Issue", "#243")]
+        public virtual async Task FetchAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1087,7 +1112,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task FetchAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1112,7 +1137,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task FetchAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1132,7 +1157,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async Task FetchAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1152,7 +1177,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async Task FetchAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1166,7 +1191,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void FetchAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async Task FetchAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1181,8 +1206,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async Task FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1194,8 +1220,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async Task FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1209,7 +1236,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task FetchAsyncWithPaging_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1226,7 +1253,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task FetchAsyncWithPaging_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1238,7 +1265,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async Task FetchAsyncWithPaging_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1250,7 +1277,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async Task FetchAsyncWithPaging_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1264,7 +1291,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async Task FetchAsyncWithPaging_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1278,8 +1305,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        public virtual async Task SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1291,8 +1319,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#243")]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        public virtual async Task SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1306,7 +1335,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task SkipAndTakeAsync_ForPocoGivenSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1323,7 +1352,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
+        public virtual async Task SkipAndTakeAsync_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1335,7 +1364,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
+        public virtual async Task SkipAndTakeAsync_ForPocoGivenSql_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1347,7 +1376,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
+        public virtual async Task SkipAndTakeAsync_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -1361,7 +1390,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("DBFeature", "Paging")]
-        public virtual async void SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
+        public virtual async Task SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);

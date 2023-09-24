@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
@@ -44,13 +45,13 @@ namespace PetaPoco.Tests.Integration.Databases
         #endregion
 
         [Fact]
-        public virtual void Execute_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
+        public virtual void Execute_GivenSqlAndParameterAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
-            var sql = $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0";
 
             var beforeCount = CountNotes();
-            var result = DB.Execute(sql, 1);
+            var result = DB.Execute($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0", 1);
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -59,13 +60,13 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual void Execute_GivenSqlAndArgumentsAffectsTwoRows_ShouldReturnTwo()
+        public virtual void Execute_GivenSqlAndParametersAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
             var beforeCount = CountNotes();
-            var result = DB.Execute(
-                $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0,@1)", 1, 2);
+            var result = DB.Execute($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0,@1)", 1, 2);
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -79,8 +80,8 @@ namespace PetaPoco.Tests.Integration.Databases
             InsertNotes(5);
 
             var beforeCount = CountNotes();
-            var result = DB.Execute(
-                $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = 1");
+            var result = DB.Execute($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                    $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = 1");
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -104,13 +105,13 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void ExecuteAsync_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
+        public virtual async Task ExecuteAsync_GivenSqlAndParameterAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
-            var sql = $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0";
 
             var beforeCount = CountNotes();
-            var result = await DB.ExecuteAsync(sql, 1);
+            var result = await DB.ExecuteAsync($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                               $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} = @0", 1);
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -119,13 +120,13 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void ExecuteAsync_GivenSqlAndArgumentsAffectsTwoRows_ShouldReturnTwo()
+        public virtual async Task ExecuteAsync_GivenSqlAndParametersAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
             var beforeCount = CountNotes();
-            var result = await DB.ExecuteAsync(
-                $"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0,@1)", 1, 2);
+            var result = await DB.ExecuteAsync($"DELETE FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                               $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0,@1)", 1, 2);
             var afterCount = CountNotes();
 
             beforeCount.ShouldBe(5);
@@ -134,7 +135,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void ExecuteAsync_GivenSqlAffectsOneRow_ShouldReturnOne()
+        public virtual async Task ExecuteAsync_GivenSqlAffectsOneRow_ShouldReturnOne()
         {
             InsertNotes(5);
 
@@ -149,7 +150,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void ExecuteAsync_GivenSqlAffectsTwoRows_ShouldReturnTwo()
+        public virtual async Task ExecuteAsync_GivenSqlAffectsTwoRows_ShouldReturnTwo()
         {
             InsertNotes(5);
 
@@ -176,9 +177,9 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             InsertNotes(4);
 
-            DB.ExecuteScalar<int>(
-                    $"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} <= @0", 2)
-                .ShouldBe(2);
+            DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                  $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} <= @0", 2)
+                                  .ShouldBe(2);
         }
 
         [Fact]
@@ -186,13 +187,13 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             InsertNotes(5);
 
-            DB.ExecuteScalar<int>(
-                $"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0, @1)", 1,
-                2).ShouldBe(2);
+            DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                  $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0, @1)", 1, 2)
+                                  .ShouldBe(2);
         }
 
         [Fact]
-        public virtual async void ExecuteScalarAsync_GivenSql_ReturnShouldBeValid()
+        public virtual async Task ExecuteScalarAsync_GivenSql_ReturnShouldBeValid()
         {
             InsertNotes(3);
 
@@ -200,23 +201,23 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void ExecuteScalarAsync_GivenSqlAndParameter_ReturnShouldBeValid()
+        public virtual async Task ExecuteScalarAsync_GivenSqlAndParameter_ReturnShouldBeValid()
         {
             InsertNotes(4);
 
-            (await DB.ExecuteScalarAsync<int>(
-                    $"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} <= @0", 2))
-                .ShouldBe(2);
+            (await DB.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                              $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} <= @0", 2))
+                                              .ShouldBe(2);
         }
 
         [Fact]
-        public virtual async void ExecuteScalarAsync_GivenSqlAndParameters_ReturnShouldBeValid()
+        public virtual async Task ExecuteScalarAsync_GivenSqlAndParameters_ReturnShouldBeValid()
         {
             InsertNotes(5);
 
-            (await DB.ExecuteScalarAsync<int>(
-                $"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0, @1)", 1,
-                2)).ShouldBe(2);
+            (await DB.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" +
+                                              $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0, @1)", 1, 2))
+                                              .ShouldBe(2);
         }
     }
 }

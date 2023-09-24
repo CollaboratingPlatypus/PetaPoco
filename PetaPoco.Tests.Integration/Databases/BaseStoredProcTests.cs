@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
@@ -130,7 +131,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryProcAsync_NoParam_ShouldReturnAll()
+        public virtual async Task QueryProcAsync_NoParam_ShouldReturnAll()
         {
             var results = new List<Person>();
             await DB.QueryProcAsync<Person>(p => results.Add(p), "SelectPeople");
@@ -138,7 +139,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryProcAsync_WithParam_ShouldReturnSome()
+        public virtual async Task QueryProcAsync_WithParam_ShouldReturnSome()
         {
             var results = new List<Person>();
             await DB.QueryProcAsync<Person>(p => results.Add(p), "SelectPeopleWithParam", new { age = 20 });
@@ -146,7 +147,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryProcAsync_WithDbParam_ShouldReturnSome()
+        public virtual async Task QueryProcAsync_WithDbParam_ShouldReturnSome()
         {
             var results = new List<Person>();
             await DB.QueryProcAsync<Person>(p => results.Add(p), "SelectPeopleWithParam", GetDataParameter());
@@ -154,93 +155,99 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void QueryProcAsyncReader_NoParam_ShouldReturnAll()
+        public virtual async Task QueryProcAsyncReader_NoParam_ShouldReturnAll()
         {
             var results = new List<Person>();
             using (var reader = await DB.QueryProcAsync<Person>("SelectPeople"))
+            {
                 while (await reader.ReadAsync())
                     results.Add(reader.Poco);
+            }
             results.Count.ShouldBe(6);
         }
 
         [Fact]
-        public virtual async void QueryProcAsyncReader_WithParam_ShouldReturnSome()
+        public virtual async Task QueryProcAsyncReader_WithParam_ShouldReturnSome()
         {
             var results = new List<Person>();
             using (var reader = await DB.QueryProcAsync<Person>("SelectPeopleWithParam", new { age = 20 }))
+            {
                 while (await reader.ReadAsync())
                     results.Add(reader.Poco);
+            }
             results.Count.ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void QueryProcAsyncReader_WithDbParam_ShouldReturnSome()
+        public virtual async Task QueryProcAsyncReader_WithDbParam_ShouldReturnSome()
         {
             var results = new List<Person>();
             using (var reader = await DB.QueryProcAsync<Person>("SelectPeopleWithParam", GetDataParameter()))
+            {
                 while (await reader.ReadAsync())
                     results.Add(reader.Poco);
+            }
             results.Count.ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void FetchProcAsync_NoParam_ShouldReturnAll()
+        public virtual async Task FetchProcAsync_NoParam_ShouldReturnAll()
         {
             var results = await DB.FetchProcAsync<Person>("SelectPeople");
             results.Count.ShouldBe(6);
         }
 
         [Fact]
-        public virtual async void FetchProcAsync_WithParam_ShouldReturnSome()
+        public virtual async Task FetchProcAsync_WithParam_ShouldReturnSome()
         {
             var results = await DB.FetchProcAsync<Person>("SelectPeopleWithParam", new { age = 20 });
             results.Count.ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void FetchProcAsync_WithDbParam_ShouldReturnSome()
+        public virtual async Task FetchProcAsync_WithDbParam_ShouldReturnSome()
         {
             var results = await DB.FetchProcAsync<Person>("SelectPeopleWithParam", GetDataParameter());
             results.Count.ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void ScalarProcAsync_NoParam_ShouldReturnAll()
+        public virtual async Task ScalarProcAsync_NoParam_ShouldReturnAll()
         {
             var count = await DB.ExecuteScalarProcAsync<int>("CountPeople");
             count.ShouldBe(6);
         }
 
         [Fact]
-        public virtual async void ScalarProcAsync_WithParam_ShouldReturnSome()
+        public virtual async Task ScalarProcAsync_WithParam_ShouldReturnSome()
         {
             var count = await DB.ExecuteScalarProcAsync<int>("CountPeopleWithParam", new { age = 20 });
             count.ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void ScalarProcAsync_WithDbParam_ShouldReturnSome()
+        public virtual async Task ScalarProcAsync_WithDbParam_ShouldReturnSome()
         {
             var count = await DB.ExecuteScalarProcAsync<int>("CountPeopleWithParam", GetDataParameter());
             count.ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void NonQueryProcAsync_NoParam_ShouldUpdateAll()
+        public virtual async Task NonQueryProcAsync_NoParam_ShouldUpdateAll()
         {
             await DB.ExecuteNonQueryProcAsync("UpdatePeople");
             DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(6);
         }
 
         [Fact]
-        public virtual async void NonQueryProcAsync_WithParam_ShouldUpdateSome()
+        public virtual async Task NonQueryProcAsync_WithParam_ShouldUpdateSome()
         {
             await DB.ExecuteNonQueryProcAsync("UpdatePeopleWithParam", new { age = 20 });
             DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(3);
         }
 
         [Fact]
-        public virtual async void NonQueryProcAsync_WithDbParam_ShouldUpdateSome()
+        public virtual async Task NonQueryProcAsync_WithDbParam_ShouldUpdateSome()
         {
             await DB.ExecuteNonQueryProcAsync("UpdatePeopleWithParam", GetDataParameter());
             DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(3);

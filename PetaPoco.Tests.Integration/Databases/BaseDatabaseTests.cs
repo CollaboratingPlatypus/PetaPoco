@@ -118,6 +118,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("DBFeature", "Transaction")]
+        [Trait("DBFeature", "IsolationLevel")]
         public virtual void IsolationLevel_WhenChangedDuringTransaction_ShouldThrow()
         {
             using (DB.GetTransaction())
@@ -149,7 +151,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public virtual async void OpenSharedConnectionAsync_WhenCalled_ShouldBeValid()
+        public virtual async Task OpenSharedConnectionAsync_WhenCalled_ShouldBeValid()
         {
             DB.Connection.ShouldBeNull();
             await DB.OpenSharedConnectionAsync();
@@ -287,6 +289,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("LibFeature", "Events")]
+        [Trait("DBFeature", "Transaction")]
         public virtual void BeginTransaction_AfterBeingCalled_ShouldInvokeOnBeginTransaction()
         {
             bool eventInvoked = false;
@@ -299,6 +302,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("LibFeature", "Events")]
+        [Trait("DBFeature", "Transaction")]
         public virtual async Task BeginTransactionAsync_AfterBeingCalled_ShouldInvokeOnBeginTransaction()
         {
             bool eventInvoked = false;
@@ -311,6 +315,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("LibFeature", "Events")]
+        [Trait("DBFeature", "Transaction")]
         public virtual void CompleteTransaction_WhenCalled_ShouldInvokeOnEndTransaction()
         {
             bool eventInvoked = false;
@@ -323,6 +328,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("LibFeature", "Events")]
+        [Trait("DBFeature", "Transaction")]
         public virtual async Task CompleteTransactionAsync_WhenCalled_ShouldInvokeOnEndTransaction()
         {
             bool eventInvoked = false;
@@ -336,6 +342,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("LibFeature", "Events")]
+        [Trait("DBFeature", "Transaction")]
         public virtual void AbortTransaction_WhenCalled_ShouldInvokeOnEndTransaction()
         {
             bool eventInvoked = false;
@@ -348,6 +355,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         [Fact]
         [Trait("LibFeature", "Events")]
+        [Trait("DBFeature", "Transaction")]
         public virtual async Task AbortTransactionAsync_WhenCalled_ShouldInvokeOnEndTransaction()
         {
             bool eventInvoked = false;
