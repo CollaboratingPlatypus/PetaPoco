@@ -32,7 +32,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 
         public override IDatabase Execute()
         {
-            if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "DataSources", "petapoco.sdf")))
+            if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
             {
                 using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
                 {

@@ -317,6 +317,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#664")]
         public virtual void Query_ForPocoWithPropertyMissingSetMethod_ShouldThrow()
         {
             AddPeople(1, 1);
@@ -332,6 +333,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#617")]
+        [Trait("Category", "Regresion")]
         public virtual void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
         {
             AddOrders(1);
@@ -359,6 +362,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#664")]
         public virtual void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
         {
             AddOrders(1);
