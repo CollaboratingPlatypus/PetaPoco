@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;

@@ -31,10 +31,10 @@ namespace PetaPoco.Tests.Integration.Models.Postgres
             dynamic j2 = JObject.Parse(Json2);
             dynamic jo2 = JObject.Parse(other.Json2);
 
-            ((string) j1.firstName).ShouldBe((string) jo1.firstName);
-            ((string) j1.lastName).ShouldBe((string) jo1.lastName);
-            ((string) j2.firstName).ShouldBe((string) jo2.firstName);
-            ((string) j2.lastName).ShouldBe((string) jo2.lastName);
+            ((string)j1.firstName).ShouldBe((string)jo1.firstName);
+            ((string)j1.lastName).ShouldBe((string)jo1.lastName);
+            ((string)j2.firstName).ShouldBe((string)jo2.firstName);
+            ((string)j2.lastName).ShouldBe((string)jo2.lastName);
         }
 
         public void ShouldNotBe(JsonTypesPoco other, bool sameId)
@@ -53,10 +53,10 @@ namespace PetaPoco.Tests.Integration.Models.Postgres
             dynamic j2 = JObject.Parse(Json2);
             dynamic jo2 = JObject.Parse(other.Json2);
 
-            ((string) j1.firstName).ShouldNotBe((string) jo1.firstName);
-            ((string) j1.lastName).ShouldNotBe((string) jo1.lastName);
-            ((string) j2.firstName).ShouldNotBe((string) jo2.firstName);
-            ((string) j2.lastName).ShouldNotBe((string) jo2.lastName);
+            ((string)j1.firstName).ShouldNotBe((string)jo1.firstName);
+            ((string)j1.lastName).ShouldNotBe((string)jo1.lastName);
+            ((string)j2.firstName).ShouldNotBe((string)jo2.firstName);
+            ((string)j2.lastName).ShouldNotBe((string)jo2.lastName);
         }
     }
 }

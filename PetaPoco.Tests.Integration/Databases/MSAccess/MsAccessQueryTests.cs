@@ -33,56 +33,56 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         [Fact(Skip = "Paging not supported by provider.")]
         public override async Task PageAsync_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
-		[Fact]
-		public override void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
-		{
-			AddJoinableOrders(1);
+        [Fact]
+        public override void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()
+        {
+            AddJoinableOrders(1);
 
-			var pdOrder = PocoData.ForType(typeof(JoinableOrder), DB.DefaultMapper);
-			var pdPerson = PocoData.ForType(typeof(JoinablePerson), DB.DefaultMapper);
+            var pdOrder = PocoData.ForType(typeof(JoinableOrder), DB.DefaultMapper);
+            var pdPerson = PocoData.ForType(typeof(JoinablePerson), DB.DefaultMapper);
 
-			var orderTable = DB.Provider.EscapeTableName(pdOrder.TableInfo.TableName);
-			var personTable = DB.Provider.EscapeTableName(pdPerson.TableInfo.TableName);
+            var orderTable = DB.Provider.EscapeTableName(pdOrder.TableInfo.TableName);
+            var personTable = DB.Provider.EscapeTableName(pdPerson.TableInfo.TableName);
 
-			var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinableOrder.JoinablePersonId)).ColumnName);
-			var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinablePerson.Id)).ColumnName);
-			var randColumn = DB.Provider.EscapeSqlIdentifier("SomeRandomColumn");
+            var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinableOrder.JoinablePersonId)).ColumnName);
+            var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinablePerson.Id)).ColumnName);
+            var randColumn = DB.Provider.EscapeSqlIdentifier("SomeRandomColumn");
 
-			var testQuery = $"SELECT * FROM {orderTable} o INNER JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
+            var testQuery = $"SELECT * FROM {orderTable} o INNER JOIN {personTable} p ON o.{oPersonId} = p.{pId}";
 
-			var results = DB.Query<JoinableOrder, JoinablePerson>(testQuery).ToList();
-			results.ShouldNotBeEmpty();
+            var results = DB.Query<JoinableOrder, JoinablePerson>(testQuery).ToList();
+            results.ShouldNotBeEmpty();
 
-			var execStmt = $"ALTER TABLE {orderTable} ADD {randColumn} INT NULL";
-			DB.Execute(execStmt);
+            var execStmt = $"ALTER TABLE {orderTable} ADD {randColumn} INT NULL";
+            DB.Execute(execStmt);
 
-			results = DB.Query<JoinableOrder, JoinablePerson>(testQuery).ToList();
-			results.ShouldNotBeEmpty();
-		}
+            results = DB.Query<JoinableOrder, JoinablePerson>(testQuery).ToList();
+            results.ShouldNotBeEmpty();
+        }
 
-		[Fact]
-		public override void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
-		{
-			AddJoinableOrders(1);
+        [Fact]
+        public override void Query_ForMultiPocoWithPropertyMissingSetMethod_ShouldThrow()
+        {
+            AddJoinableOrders(1);
 
-			var pdOrder = PocoData.ForType(typeof(JoinableOrder), DB.DefaultMapper);
-			var pdPerson = PocoData.ForType(typeof(JoinablePerson), DB.DefaultMapper);
+            var pdOrder = PocoData.ForType(typeof(JoinableOrder), DB.DefaultMapper);
+            var pdPerson = PocoData.ForType(typeof(JoinablePerson), DB.DefaultMapper);
 
-			var dbOrders = DB.Provider.EscapeTableName(pdOrder.TableInfo.TableName);
-			var dbPeople = DB.Provider.EscapeTableName(pdPerson.TableInfo.TableName);
+            var dbOrders = DB.Provider.EscapeTableName(pdOrder.TableInfo.TableName);
+            var dbPeople = DB.Provider.EscapeTableName(pdPerson.TableInfo.TableName);
 
-			var oId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinableOrder.Id)).ColumnName);
-			var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinablePerson.Id)).ColumnName);
+            var oId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinableOrder.Id)).ColumnName);
+            var pId = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinablePerson.Id)).ColumnName);
 
-			var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinableOrder.JoinablePersonId)).ColumnName);
-			var pFullName = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinablePerson.Name)).ColumnName);
+            var oPersonId = DB.Provider.EscapeSqlIdentifier(pdOrder.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinableOrder.JoinablePersonId)).ColumnName);
+            var pFullName = DB.Provider.EscapeSqlIdentifier(pdPerson.Columns.Values.Single(c => c.PropertyInfo.Name == nameof(JoinablePerson.Name)).ColumnName);
 
-			var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} o INNER JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
+            var sql = new Sql($"SELECT o.{oId}, p.* FROM {dbOrders} o INNER JOIN {dbPeople} p ON o.{oPersonId} = p.{pId}");
 
-			Should.Throw<InvalidOperationException>(() => DB.Fetch<ReadOnlyMultiPoco, JoinablePerson>(sql).ToList());
-		}
+            Should.Throw<InvalidOperationException>(() => DB.Fetch<ReadOnlyMultiPoco, JoinablePerson>(sql).ToList());
+        }
 
-		[Fact(Skip = "Paging not supported by provider.")]
+        [Fact(Skip = "Paging not supported by provider.")]
         public override void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection() { }
 
         [Fact(Skip = "Paging not supported by provider.")]
@@ -139,7 +139,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         [Fact(Skip = "Paging not supported by provider.")]
         public override void SkipAndTake_ForPocoGivenSql_ShouldReturnValidPocoCollection() { }
 
-		[Fact(Skip = "Paging not supported by provider.")]
+        [Fact(Skip = "Paging not supported by provider.")]
         public override void SkipAndTake_ForValueTypeGivenSqlStringAndParameters_ShouldReturnValidValueTypeCollection() { }
 
         [Fact(Skip = "Paging not supported by provider.")]
@@ -166,36 +166,40 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         [Fact(Skip = "Paging not supported by provider.")]
         public override async void SkipAndTakeAsync_ForValueTypeGivenSql_ShouldReturnValidValueTypeCollection() => await Task.CompletedTask;
 
-		protected void AddJoinableOrders(int ordersToAdd)
-		{
-			var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
-			var people = new List<JoinablePerson>(4);
+        #region Helpers
 
-			for (var i = 0; i < 4; i++)
-			{
-				var p = new JoinablePerson
-				{
-					Id = Guid.NewGuid(),
-					Name = "Peta" + i,
-					Age = 18 + i,
-					Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
-				};
-				DB.Insert(p);
-				people.Add(p);
-			}
+        protected void AddJoinableOrders(int ordersToAdd)
+        {
+            var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
+            var people = new List<JoinablePerson>(4);
 
-			for (var i = 0; i < ordersToAdd; i++)
-			{
-				var order = new JoinableOrder
-				{
-					PoNumber = "PO" + i,
-					Status = (OrderStatus)orderStatuses.GetValue(i % orderStatuses.Length),
-					JoinablePersonId = people.Skip(i % 4).Take(1).Single().Id,
-					CreatedOn = new DateTime(1990 - (i % 4), 1, 1, 0, 0, 0, DateTimeKind.Utc),
-					CreatedBy = "Harry" + i
-				};
-				DB.Insert(order);
-			}
-		}
-	}
+            for (var i = 0; i < 4; i++)
+            {
+                var p = new JoinablePerson
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Peta" + i,
+                    Age = 18 + i,
+                    Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                };
+                DB.Insert(p);
+                people.Add(p);
+            }
+
+            for (var i = 0; i < ordersToAdd; i++)
+            {
+                var order = new JoinableOrder
+                {
+                    PoNumber = "PO" + i,
+                    Status = (OrderStatus)orderStatuses.GetValue(i % orderStatuses.Length),
+                    JoinablePersonId = people.Skip(i % 4).Take(1).Single().Id,
+                    CreatedOn = new DateTime(1990 - (i % 4), 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "Harry" + i
+                };
+                DB.Insert(order);
+            }
+        }
+
+        #endregion
+    }
 }

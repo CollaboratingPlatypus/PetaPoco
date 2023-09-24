@@ -3,10 +3,6 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 
-#if NETCOREAPP
-using System.Linq;
-#endif
-
 namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class DBTestProvider : IDisposable

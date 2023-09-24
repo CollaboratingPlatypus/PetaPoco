@@ -122,9 +122,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-		[Trait("DBFeature", "Transaction")]
-		[Trait("DBFeature", "IsolationLevel")]
-		public virtual void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
+        [Trait("DBFeature", "Transaction")]
+        [Trait("DBFeature", "IsolationLevel")]
+        public virtual void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
         {
             DB.IsolationLevel = IsolationLevel.Serializable;
             using (var t = DB.GetTransaction())

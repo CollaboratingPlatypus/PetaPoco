@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
@@ -9,9 +9,9 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqliteBuildDatabase.sql";
 
-		public IDatabase GetDatabase() => Database;
+        public IDatabase GetDatabase() => Database;
 
-		protected override IDatabaseBuildConfiguration BuildFromConnectionName(string name)
+        protected override IDatabaseBuildConfiguration BuildFromConnectionName(string name)
         {
             return base.BuildFromConnectionName(name).UsingDefaultMapper<ConventionMapper>(m =>
             {

@@ -192,7 +192,9 @@ namespace PetaPoco.Tests.Integration.Databases
                 2)).ShouldBe(2);
         }
 
-        private int CountNotes()
+		#region Helpers
+
+		private int CountNotes()
         {
             return DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}");
         }
@@ -208,5 +210,7 @@ namespace PetaPoco.Tests.Integration.Databases
                 });
             }
         }
-    }
+
+		#endregion
+	}
 }

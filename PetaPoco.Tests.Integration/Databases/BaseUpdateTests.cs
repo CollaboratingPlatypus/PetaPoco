@@ -337,10 +337,10 @@ namespace PetaPoco.Tests.Integration.Databases
         [Trait("Issue", "667")]
         public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
-			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
-			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-			DB.Insert(_note);
+            DB.Insert(_note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 #if !NETSTANDARD
             Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
@@ -352,10 +352,10 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
-			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
-			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-			DB.Insert(_note);
+            DB.Insert(_note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
             entity.Text += " was updated";
@@ -660,10 +660,10 @@ namespace PetaPoco.Tests.Integration.Databases
         [Trait("Issue", "667")]
         public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
-			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
-			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-			await DB.InsertAsync(_note);
+            await DB.InsertAsync(_note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 #if !NETSTANDARD
             Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
@@ -675,10 +675,10 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
-			var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
-			var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-			await DB.InsertAsync(_note);
+            await DB.InsertAsync(_note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             entity.Text += " was updated";
@@ -692,13 +692,15 @@ namespace PetaPoco.Tests.Integration.Databases
             ((string)entity2.Text).ShouldContain("updated");
         }
 
-        private Person SinglePersonOther(Guid id)
+		#region Helpers
+
+		protected Person SinglePersonOther(Guid id)
             => DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
 
-        private Task<Person> SinglePersonOtherAsync(Guid id)
+		protected Task<Person> SinglePersonOtherAsync(Guid id)
             => DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
 
-        private static void UpdateProperties(Person person)
+		protected static void UpdateProperties(Person person)
         {
             person.Name = "Feta";
             person.Age = 19;
@@ -706,7 +708,7 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Height = 190;
         }
 
-        private static void UpdateProperties(Order order)
+		protected static void UpdateProperties(Order order)
         {
             order.PoNumber = "Feta's Order";
             order.Status = OrderStatus.Pending;
@@ -714,11 +716,13 @@ namespace PetaPoco.Tests.Integration.Databases
             order.CreatedBy = "Jen";
         }
 
-        private static void UpdateProperties(OrderLine orderLine)
+		protected static void UpdateProperties(OrderLine orderLine)
         {
             orderLine.Quantity = 6;
             orderLine.SellPrice = 5.99m;
             orderLine.Status = OrderLineStatus.Allocated;
         }
+
+        #endregion
     }
 }

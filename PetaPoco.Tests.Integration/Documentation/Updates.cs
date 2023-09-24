@@ -153,11 +153,11 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
-	                         DROP TABLE dbo.[TBL_UnconventionalPocos]
+                             DROP TABLE dbo.[TBL_UnconventionalPocos]
 
                          CREATE TABLE dbo.[TBL_UnconventionalPocos] (
-	                         [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
-	                         [Text] NTEXT NOT NULL
+                             [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
+                             [Text] NTEXT NOT NULL
                          )");
 
             // This POCO is unconventional because, when using the default conventional mapper, PetaPoco won't understand how this poco maps to the database.
@@ -186,16 +186,16 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
-	                         DROP TABLE dbo.[TBL_UnconventionalPocos]
+                             DROP TABLE dbo.[TBL_UnconventionalPocos]
 
                          CREATE TABLE dbo.[TBL_UnconventionalPocos] (
                              [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
-	                         [Text] NTEXT NOT NULL
+                             [Text] NTEXT NOT NULL
                          )");
 
             // Reconfigure the convention mapper
             // Note: I can't think of a valid reason, other than for a purpose such as this, where you would configure the convention mapper in this way.
-            ((ConventionMapper) DB.DefaultMapper).MapPrimaryKey = (ti, t) =>
+            ((ConventionMapper)DB.DefaultMapper).MapPrimaryKey = (ti, t) =>
             {
                 var prop = t.GetProperties().FirstOrDefault(p => p.Name == "PrimaryKey");
 
@@ -203,10 +203,10 @@ namespace PetaPoco.Tests.Integration.Documentation
                     return false;
 
                 ti.PrimaryKey = prop.Name;
-                ti.AutoIncrement = ((ConventionMapper) DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
+                ti.AutoIncrement = ((ConventionMapper)DB.DefaultMapper).IsPrimaryKeyAutoIncrement(prop.PropertyType);
                 return true;
             };
-            ((ConventionMapper) DB.DefaultMapper).InflectTableName = (i, tn) => "TBL_" + tn + "s";
+            ((ConventionMapper)DB.DefaultMapper).InflectTableName = (i, tn) => "TBL_" + tn + "s";
 
             // Create the POCO
             var poco = new UnconventionalPoco { Text = "PetaPoco" };
@@ -238,11 +238,11 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
-	                         DROP TABLE dbo.[XFiles]
+                             DROP TABLE dbo.[XFiles]
 
                          CREATE TABLE dbo.[XFiles] (
                              [Id] INT IDENTITY(1,1) PRIMARY KEY,
-	                         [FileName] VARCHAR(255) NOT NULL
+                             [FileName] VARCHAR(255) NOT NULL
                          )");
 
             // Anonymous type are friend of PetaPoco
@@ -262,8 +262,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they are the same
-            id.ShouldBe((int) clone.Id);
-            xfile.FileName.ShouldBe((string) clone.FileName);
+            id.ShouldBe((int)clone.Id);
+            xfile.FileName.ShouldBe((string)clone.FileName);
         }
 
         [Fact]
@@ -271,11 +271,11 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
-	                         DROP TABLE dbo.[XFiles]
+                             DROP TABLE dbo.[XFiles]
 
                          CREATE TABLE dbo.[XFiles] (
                              [Id] INT IDENTITY(1,1) PRIMARY KEY,
-	                         [FileName] VARCHAR(255) NOT NULL
+                             [FileName] VARCHAR(255) NOT NULL
                          )");
 
             // Dynamic types are PetaPoco's friend
@@ -283,21 +283,21 @@ namespace PetaPoco.Tests.Integration.Documentation
             xfile.FileName = "Agent Mulder.sec";
 
             // Tell PetaPoco to insert it
-            var id = DB.Insert("XFiles", "Id", true, (object) xfile);
+            var id = DB.Insert("XFiles", "Id", true, (object)xfile);
 
             // Update the poco
             xfile.FileName = "Agent Mulder.sec";
 
             // Update the database with the poco's changes
-            DB.Update("XFiles", "Id", (object) xfile);
+            DB.Update("XFiles", "Id", (object)xfile);
 
             // Get a clone/copy from the DB
             // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // See, they are the same
-            id.ShouldBe((int) clone.Id);
-            ((string) xfile.FileName).ShouldBe((string) clone.FileName);
+            id.ShouldBe((int)clone.Id);
+            ((string)xfile.FileName).ShouldBe((string)clone.FileName);
         }
     }
 }
