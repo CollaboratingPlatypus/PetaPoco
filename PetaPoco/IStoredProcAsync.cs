@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetaPoco
 {
+#if ASYNC
     public interface IStoredProcAsync
     {
         /// <summary>
@@ -57,4 +58,5 @@ namespace PetaPoco
         /// </summary>
         Task<int> ExecuteNonQueryProcAsync(CancellationToken cancellationToken, string storedProcedureName, params object[] args);
     }
+#endif
 }

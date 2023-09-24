@@ -704,9 +704,9 @@ namespace PetaPoco.Tests.Integration.Databases
 
             // https://docs.shouldly.org/documentation/exceptions/throw#shouldthrowfuncoftask
 #if !NETCOREAPP
-            await Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
+            Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", (object)entity)));
 #else
-            await Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
+            Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
 #endif
         }
 

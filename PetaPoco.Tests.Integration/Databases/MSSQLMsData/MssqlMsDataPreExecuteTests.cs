@@ -103,7 +103,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
                 .From("sometable")
                 .Where("foo = @0", expected);
 
-            async Task act() => await DB.QueryAsync<string>(sql).Result.ReadAsync();
+            async Task act() => await DB.QueryAsync<string>(sql);
 
             await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
