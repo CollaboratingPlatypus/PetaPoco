@@ -21,6 +21,86 @@ namespace PetaPoco.Tests.Integration.Databases
         {
         }
 
+        #region Test Helpers
+
+        protected void AddPeople(int petasToAdd, int sallysToAdd)
+        {
+            var c = petasToAdd > sallysToAdd ? petasToAdd : sallysToAdd;
+            for (var i = 0; i < c; i++)
+            {
+                if (petasToAdd > i)
+                {
+                    DB.Insert(new Person
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Peta" + i,
+                        Age = 18 + i,
+                        Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                    });
+                }
+
+                if (sallysToAdd > i)
+                {
+                    DB.Insert(new Person
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Sally" + i,
+                        Age = 18 + i,
+                        Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                    });
+                }
+            }
+        }
+
+        protected void AddOrders(int ordersToAdd)
+        {
+            var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
+            var people = new List<Person>(4);
+
+            for (var i = 0; i < 4; i++)
+            {
+                var p = new Person
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Peta" + i,
+                    Age = 18 + i,
+                    Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                };
+                DB.Insert(p);
+                people.Add(p);
+            }
+
+            for (var i = 0; i < ordersToAdd; i++)
+            {
+                var order = new Order
+                {
+                    PoNumber = "PO" + i,
+                    Status = (OrderStatus)orderStatuses.GetValue(i % orderStatuses.Length),
+                    PersonId = people.Skip(i % 4).Take(1).Single().Id,
+                    CreatedOn = new DateTime(1990 - (i % 4), 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedBy = "Harry" + i
+                };
+                DB.Insert(order);
+
+                for (var j = 1; j <= 2; j++)
+                {
+                    DB.Insert(new OrderLine
+                    {
+                        OrderId = order.Id,
+                        Quantity = (short)j,
+                        SellPrice = 9.99m * j
+                    });
+                }
+            }
+        }
+
+        protected static DateTime ConvertToDateTime(object value)
+        {
+            return value as DateTime? ?? new DateTime((long)value, DateTimeKind.Utc);
+        }
+
+        #endregion
+
         [Fact]
         [Trait("DBFeature", "Paging")]
         public virtual void PageCount_GivenSqlWithGroupBy_ShouldReturnEntireQueryCount()
@@ -1293,85 +1373,5 @@ namespace PetaPoco.Tests.Integration.Databases
             var results = await DB.SkipTakeAsync<string>(2, 1, sql);
             results.Count.ShouldBe(1);
         }
-
-        #region Helpers
-
-        protected void AddPeople(int petasToAdd, int sallysToAdd)
-        {
-            var c = petasToAdd > sallysToAdd ? petasToAdd : sallysToAdd;
-            for (var i = 0; i < c; i++)
-            {
-                if (petasToAdd > i)
-                {
-                    DB.Insert(new Person
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Peta" + i,
-                        Age = 18 + i,
-                        Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
-                    });
-                }
-
-                if (sallysToAdd > i)
-                {
-                    DB.Insert(new Person
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = "Sally" + i,
-                        Age = 18 + i,
-                        Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
-                    });
-                }
-            }
-        }
-
-        protected void AddOrders(int ordersToAdd)
-        {
-            var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().ToArray();
-            var people = new List<Person>(4);
-
-            for (var i = 0; i < 4; i++)
-            {
-                var p = new Person
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Peta" + i,
-                    Age = 18 + i,
-                    Dob = new DateTime(1980 - (18 + 1), 1, 1, 1, 1, 1, DateTimeKind.Utc),
-                };
-                DB.Insert(p);
-                people.Add(p);
-            }
-
-            for (var i = 0; i < ordersToAdd; i++)
-            {
-                var order = new Order
-                {
-                    PoNumber = "PO" + i,
-                    Status = (OrderStatus)orderStatuses.GetValue(i % orderStatuses.Length),
-                    PersonId = people.Skip(i % 4).Take(1).Single().Id,
-                    CreatedOn = new DateTime(1990 - (i % 4), 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                    CreatedBy = "Harry" + i
-                };
-                DB.Insert(order);
-
-                for (var j = 1; j <= 2; j++)
-                {
-                    DB.Insert(new OrderLine
-                    {
-                        OrderId = order.Id,
-                        Quantity = (short)j,
-                        SellPrice = 9.99m * j
-                    });
-                }
-            }
-        }
-
-        protected static DateTime ConvertToDateTime(object value)
-        {
-            return value as DateTime? ?? new DateTime((long)value, DateTimeKind.Utc);
-        }
-
-        #endregion
     }
 }

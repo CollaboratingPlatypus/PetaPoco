@@ -7,6 +7,9 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseQueryLinqTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
         private readonly Order _order = new Order
         {
             PoNumber = "Peta's Order",
@@ -30,6 +33,8 @@ namespace PetaPoco.Tests.Integration.Databases
             Height = 180,
             Name = "Peta"
         };
+
+        #endregion
 
         protected BaseQueryLinqTests(DBTestProvider provider)
             : base(provider)
@@ -259,10 +264,8 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Exists<Person>(Guid.NewGuid()).ShouldBeFalse();
         }
 
-        /// <summary>
-        ///     Support the older syntax of starting with a WHERE clause.
-        /// </summary>
-        [Fact]
+        [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
+        [Trait("Category", "Regression")]
         public virtual void Exists_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
             DB.Insert(_person);
@@ -305,10 +308,8 @@ namespace PetaPoco.Tests.Integration.Databases
             (await DB.ExistsAsync<Person>(Guid.NewGuid())).ShouldBeFalse();
         }
 
-        /// <summary>
-        ///     Support the older syntax of starting with a WHERE clause.
-        /// </summary>
-        [Fact]
+        [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
+        [Trait("Category", "Regression")]
         public virtual async void ExistsAsync_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
             DB.Insert(_person);

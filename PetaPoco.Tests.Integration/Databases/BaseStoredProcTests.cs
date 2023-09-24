@@ -18,6 +18,33 @@ namespace PetaPoco.Tests.Integration.Databases
             AddPeople(6);
         }
 
+        #region Test Helpers
+
+        protected void AddPeople(int peopleToAdd)
+        {
+            for (var i = 0; i < peopleToAdd; i++)
+            {
+                var p = new Person
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Peta" + i,
+                    Age = 18 + i,
+                    Dob = new DateTime(1980 - (18 + i), 1, 1, 1, 1, 1, DateTimeKind.Utc),
+                };
+                DB.Insert(p);
+            }
+        }
+
+        protected IDataParameter GetDataParameter()
+        {
+            var param = Activator.CreateInstance(DataParameterType) as IDataParameter;
+            param.ParameterName = "age";
+            param.Value = 20;
+            return param;
+        }
+
+        #endregion
+
         [Fact]
         public virtual void QueryProc_NoParam_ShouldReturnAll()
         {
@@ -218,32 +245,5 @@ namespace PetaPoco.Tests.Integration.Databases
             await DB.ExecuteNonQueryProcAsync("UpdatePeopleWithParam", GetDataParameter());
             DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(3);
         }
-
-		#region Helpers
-
-		protected void AddPeople(int peopleToAdd)
-        {
-            for (var i = 0; i < peopleToAdd; i++)
-            {
-                var p = new Person
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Peta" + i,
-                    Age = 18 + i,
-                    Dob = new DateTime(1980 - (18 + i), 1, 1, 1, 1, 1, DateTimeKind.Utc),
-                };
-                DB.Insert(p);
-            }
-        }
-
-        protected IDataParameter GetDataParameter()
-        {
-            var param = Activator.CreateInstance(DataParameterType) as IDataParameter;
-            param.ParameterName = "age";
-            param.Value = 20;
-            return param;
-        }
-
-		#endregion
     }
 }

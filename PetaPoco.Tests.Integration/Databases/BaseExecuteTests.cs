@@ -8,13 +8,40 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseExecuteTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
+        // TODO: Make this a protected accessor from the base test class
         private readonly PocoData _pd;
+
+        #endregion
 
         protected BaseExecuteTests(DBTestProvider provider)
             : base(provider)
         {
             _pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
         }
+
+        #region Test Helpers
+
+        private int CountNotes()
+        {
+            return DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}");
+        }
+
+        private void InsertNotes(int numberToInsert)
+        {
+            for (var i = 0; i < numberToInsert; i++)
+            {
+                DB.Insert(new Note
+                {
+                    CreatedOn = new DateTime(1928, 2, 17, 1, 1, 1, DateTimeKind.Utc).AddDays(i),
+                    Text = "Note " + i
+                });
+            }
+        }
+
+        #endregion
 
         [Fact]
         public virtual void Execute_GivenSqlAndArgumentAffectsOneRow_ShouldReturnOne()
@@ -191,26 +218,5 @@ namespace PetaPoco.Tests.Integration.Databases
                 $"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}" + $"WHERE {DB.Provider.EscapeSqlIdentifier(_pd.TableInfo.PrimaryKey)} IN(@0, @1)", 1,
                 2)).ShouldBe(2);
         }
-
-		#region Helpers
-
-		private int CountNotes()
-        {
-            return DB.ExecuteScalar<int>($"SELECT COUNT(*) FROM {DB.Provider.EscapeTableName(_pd.TableInfo.TableName)}");
-        }
-
-        private void InsertNotes(int numberToInsert)
-        {
-            for (var i = 0; i < numberToInsert; i++)
-            {
-                DB.Insert(new Note
-                {
-                    CreatedOn = new DateTime(1928, 2, 17, 1, 1, 1, DateTimeKind.Utc).AddDays(i),
-                    Text = "Note " + i
-                });
-            }
-        }
-
-		#endregion
-	}
+    }
 }

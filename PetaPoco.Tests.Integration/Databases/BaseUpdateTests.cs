@@ -10,6 +10,9 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseUpdateTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
         private Order _order = new Order
         {
             PoNumber = "Peta's Order",
@@ -40,10 +43,45 @@ namespace PetaPoco.Tests.Integration.Databases
             Text = "Peta's Note",
         };
 
+        #endregion
+
         protected BaseUpdateTests(DBTestProvider provider)
             : base(provider)
         {
         }
+
+        #region Test Helpers
+
+        protected Person SinglePersonOther(Guid id)
+            => DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
+
+        protected Task<Person> SinglePersonOtherAsync(Guid id)
+            => DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
+
+        protected static void UpdateProperties(Person person)
+        {
+            person.Name = "Feta";
+            person.Age = 19;
+            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
+            person.Height = 190;
+        }
+
+        protected static void UpdateProperties(Order order)
+        {
+            order.PoNumber = "Feta's Order";
+            order.Status = OrderStatus.Pending;
+            order.CreatedOn = new DateTime(1949, 1, 11, 4, 2, 4, DateTimeKind.Utc);
+            order.CreatedBy = "Jen";
+        }
+
+        protected static void UpdateProperties(OrderLine orderLine)
+        {
+            orderLine.Quantity = 6;
+            orderLine.SellPrice = 5.99m;
+            orderLine.Status = OrderLineStatus.Allocated;
+        }
+
+        #endregion
 
         [Fact]
         public virtual void Update_GivenPoco_ShouldBeValid()
@@ -691,38 +729,5 @@ namespace PetaPoco.Tests.Integration.Databases
             var entity2 = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
             ((string)entity2.Text).ShouldContain("updated");
         }
-
-		#region Helpers
-
-		protected Person SinglePersonOther(Guid id)
-            => DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
-
-		protected Task<Person> SinglePersonOtherAsync(Guid id)
-            => DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
-
-		protected static void UpdateProperties(Person person)
-        {
-            person.Name = "Feta";
-            person.Age = 19;
-            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
-            person.Height = 190;
-        }
-
-		protected static void UpdateProperties(Order order)
-        {
-            order.PoNumber = "Feta's Order";
-            order.Status = OrderStatus.Pending;
-            order.CreatedOn = new DateTime(1949, 1, 11, 4, 2, 4, DateTimeKind.Utc);
-            order.CreatedBy = "Jen";
-        }
-
-		protected static void UpdateProperties(OrderLine orderLine)
-        {
-            orderLine.Quantity = 6;
-            orderLine.SellPrice = 5.99m;
-            orderLine.Status = OrderLineStatus.Allocated;
-        }
-
-        #endregion
     }
 }

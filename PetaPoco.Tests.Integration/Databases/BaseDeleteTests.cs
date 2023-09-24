@@ -8,6 +8,9 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseDeleteTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
         private Note _note = new Note
         {
             Text = "A test note",
@@ -43,6 +46,8 @@ namespace PetaPoco.Tests.Integration.Databases
             Height = 180,
             Name = "Peta"
         };
+
+        #endregion
 
         protected BaseDeleteTests(DBTestProvider provider)
             : base(provider)

@@ -33,10 +33,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             DB.Exists<StorePerson>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18).ShouldBeTrue();
         }
 
-        /// <summary>
-        ///     Support the older syntax of starting witha WHERE clause.
-        /// </summary>
-        [Fact]
+        [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
+        [Trait("Category", "Regression")]
         public void Exists_Regression_GivenSqlStringMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
         {
             DB.Insert(_storePerson);
