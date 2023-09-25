@@ -86,3 +86,17 @@ CREATE TABLE [BugInvestigation_3F489XV0] (
 	[TC3] INT NOT NULL,
 	[TC4] INT NOT NULL
 );
+
+DROP TABLE [BugInvestigation_64O6LT8U];
+
+CREATE TABLE BugInvestigation_64O6LT8U (
+	[ColumnA] NVARCHAR(20),
+	[Column2] NVARCHAR(20)
+);
+
+DROP TABLE [BugInvestigation_5TN5C4U4];
+
+CREATE TABLE BugInvestigation_5TN5C4U4 (
+	[ColumnA] NVARCHAR(20),
+	[Column2] NVARCHAR(20)
+);

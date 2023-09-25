@@ -38,4 +38,26 @@ namespace PetaPoco.Tests.Integration.Models
             Column4.ShouldBe(c4);
         }
     }
+
+    [ExplicitColumns]
+    [TableName("BugInvestigation_64O6LT8U")]
+    public class PocoOverlapPoco1
+    {
+        [Column("ColumnA")]
+        public string Column1 { get; set; }
+
+        [Column]
+        public string Column2 { get; set; }
+    }
+
+    [ExplicitColumns]
+    [TableName("BugInvestigation_5TN5C4U4")]
+    public class PocoOverlapPoco2
+    {
+        [Column("ColumnA")]
+        public string Column1 { get; set; }
+
+        [Column]
+        public string Column2 { get; set; }
+    }
 }

@@ -317,6 +317,30 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#268")]
+        [Trait("Issue", "#309")]
+        public void Query_ForPocoGivenDbColumnPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        {
+            DB.Insert(new PocoOverlapPoco1 { Column1 = "A", Column2 = "B" });
+            DB.Insert(new PocoOverlapPoco2 { Column1 = "B", Column2 = "A" });
+
+            var sql = @"FROM BugInvestigation_64O6LT8U
+                        JOIN BugInvestigation_5TN5C4U4 ON BugInvestigation_64O6LT8U.[ColumnA] = BugInvestigation_5TN5C4U4.[Column2]";
+
+            var poco1 = DB.Query<PocoOverlapPoco1>(sql).ToList().Single();
+
+            sql = @"FROM BugInvestigation_5TN5C4U4
+                    JOIN BugInvestigation_64O6LT8U ON BugInvestigation_64O6LT8U.[ColumnA] = BugInvestigation_5TN5C4U4.[Column2]";
+            var poco2 = DB.Query<PocoOverlapPoco2>(sql).ToList().Single();
+
+            poco1.Column1.ShouldBe("A");
+            poco1.Column2.ShouldBe("B");
+
+            poco2.Column1.ShouldBe("B");
+            poco2.Column2.ShouldBe("A");
+        }
+
+        [Fact]
         [Trait("Issue", "#664")]
         public virtual void Query_ForPocoWithPropertyMissingSetMethod_ShouldThrow()
         {

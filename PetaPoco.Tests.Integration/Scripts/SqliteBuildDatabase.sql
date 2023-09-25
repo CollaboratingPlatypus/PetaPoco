@@ -90,3 +90,17 @@ CREATE TABLE [BugInvestigation_3F489XV0] (
 	[TC3] INTEGER NOT NULL,
 	[TC4] INTEGER NOT NULL
 );
+
+DROP TABLE IF EXISTS BugInvestigation_64O6LT8U;
+
+CREATE TABLE BugInvestigation_64O6LT8U (
+	[ColumnA] TEXT,
+	[Column2] TEXT
+);
+
+DROP TABLE IF EXISTS BugInvestigation_5TN5C4U4;
+
+CREATE TABLE BugInvestigation_5TN5C4U4 (
+	[ColumnA] TEXT,
+	[Column2] TEXT
+);

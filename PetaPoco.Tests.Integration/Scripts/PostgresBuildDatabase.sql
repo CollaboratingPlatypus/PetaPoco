@@ -109,6 +109,20 @@ CREATE TABLE "BugInvestigation_3F489XV0" (
 	"TC4" INT NOT NULL
 );
 
+DROP TABLE IF EXISTS BugInvestigation_64O6LT8U;
+
+CREATE TABLE BugInvestigation_64O6LT8U (
+	"ColumnA" VARCHAR(20),
+	"Column2" VARCHAR(20)
+);
+
+DROP TABLE IF EXISTS BugInvestigation_5TN5C4U4;
+
+CREATE TABLE BugInvestigation_5TN5C4U4 (
+	"ColumnA" VARCHAR(20),
+	"Column2" VARCHAR(20)
+);
+
 -- Stored Procedures
 
 CREATE FUNCTION SelectPeople()
