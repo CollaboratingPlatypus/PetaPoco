@@ -100,6 +100,18 @@ CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
 	[TestColumn1] VARBINARY(32)
 )
 
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_3F489XV0')
+	DROP TABLE dbo.[BugInvestigation_3F489XV0]
+
+CREATE TABLE dbo.[BugInvestigation_3F489XV0] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TC1] INT NOT NULL,
+	[TC2] INT NOT NULL,
+	[TC3] INT NOT NULL,
+	[TC4] INT NOT NULL
+)
+GO
+
 IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_64O6LT8U')
 	DROP TABLE dbo.[BugInvestigation_64O6LT8U]
 
@@ -115,7 +127,6 @@ CREATE TABLE dbo.[BugInvestigation_5TN5C4U4] (
 	[ColumnA] VARCHAR(20),
 	[Column2] VARCHAR(20),
 )
-GO
 
 -- Stored procedures
 
