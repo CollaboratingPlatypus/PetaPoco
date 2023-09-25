@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 
+#if MSSQLCE_TESTS_ENABLED
 namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     public class MssqlCeDBTestProvider : DBTestProvider
@@ -68,3 +69,4 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         }
     }
 }
+#endif
