@@ -3,9 +3,9 @@
 namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
 {
     [Collection("MySqlConnector")]
-    public class MySqlConnectorDatabaseTests : BaseDatabaseTests
+    public class MySqlConnectorTriageTests : BaseTriageTests
     {
-        public MySqlConnectorDatabaseTests()
+        public MySqlConnectorTriageTests()
             : base(new MySqlConnectorDBTestProvider())
         {
         }

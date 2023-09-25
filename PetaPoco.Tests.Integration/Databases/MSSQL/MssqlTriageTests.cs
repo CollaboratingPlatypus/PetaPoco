@@ -3,9 +3,9 @@
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
     [Collection("Mssql")]
-    public class MssqlDatabaseTests : BaseDatabaseTests
+    public class MssqlTriageTests : BaseTriageTests
     {
-        public MssqlDatabaseTests()
+        public MssqlTriageTests()
             : base(new MssqlDBTestProvider())
         {
         }

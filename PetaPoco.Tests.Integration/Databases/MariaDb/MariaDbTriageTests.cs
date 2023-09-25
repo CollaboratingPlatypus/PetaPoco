@@ -3,9 +3,9 @@
 namespace PetaPoco.Tests.Integration.Databases.MariaDb
 {
     [Collection("MariaDb")]
-    public class MariaDbDatabaseTests : BaseDatabaseTests
+    public class MariaDbTriageTests : BaseTriageTests
     {
-        public MariaDbDatabaseTests()
+        public MariaDbTriageTests()
             : base(new MariaDbDBTestProvider())
         {
         }

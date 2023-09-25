@@ -3,9 +3,9 @@
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     [Collection("Firebird")]
-    public class FirebirdDatabaseTests : BaseDatabaseTests
+    public class FirebirdTriageTests : BaseTriageTests
     {
-        public FirebirdDatabaseTests()
+        public FirebirdTriageTests()
             : base(new FirebirdDBTestProvider())
         {
         }
