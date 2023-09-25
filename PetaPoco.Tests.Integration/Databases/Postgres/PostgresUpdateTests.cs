@@ -12,7 +12,9 @@ namespace PetaPoco.Tests.Integration.Databases.Postgres
         {
         }
 
+        // TODO: Issue still open since 2016: https://github.com/CollaboratingPlatypus/PetaPoco/issues/318
         [Fact]
+        [Trait("Issue", "#318")]
         public void Update_GivenPocoWithJsonTypes_ShouldBeValid()
         {
             var poco = new JsonTypesPoco();

@@ -80,6 +80,16 @@ CREATE TABLE "Note" (
 	"CreatedOn" TIMESTAMP NOT NULL
 );
 
+-- MSAccess Specific Tables;
+
+DROP TABLE IF EXISTS "BugInvestigation_7K2TX4VR";
+
+CREATE TABLE "BugInvestigation_7K2TX4VR" (
+	"Id" SERIAL PRIMARY KEY NOT NULL,
+	"Json1" JSON NOT NULL,
+	"Json2" JSONB NOT NULL
+);
+
 -- Investigation Tables
 
 DROP TABLE IF EXISTS "BugInvestigation_10R9LZYK";
@@ -97,14 +107,6 @@ CREATE TABLE "BugInvestigation_3F489XV0" (
 	"TC2" INT NOT NULL,
 	"TC3" INT NOT NULL,
 	"TC4" INT NOT NULL
-);
-
-DROP TABLE IF EXISTS "BugInvestigation_7K2TX4VR";
-
-CREATE TABLE "BugInvestigation_7K2TX4VR" (
-	"Id" SERIAL PRIMARY KEY NOT NULL,
-	"Json1" JSON NOT NULL,
-	"Json2" JSONB NOT NULL
 );
 
 -- Stored Procedures
