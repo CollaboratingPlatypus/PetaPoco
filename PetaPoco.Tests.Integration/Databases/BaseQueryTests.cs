@@ -324,13 +324,14 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(new PocoOverlapPoco1 { Column1 = "A", Column2 = "B" });
             DB.Insert(new PocoOverlapPoco2 { Column1 = "B", Column2 = "A" });
 
-            var sql = @"FROM BugInvestigation_64O6LT8U
-                        JOIN BugInvestigation_5TN5C4U4 ON BugInvestigation_64O6LT8U.[ColumnA] = BugInvestigation_5TN5C4U4.[Column2]";
-
+            var sql = $@"FROM {DB.Provider.EscapeTableName("BugInvestigation_64O6LT8U")}
+						 INNER JOIN {DB.Provider.EscapeTableName("BugInvestigation_5TN5C4U4")}
+						 ON {DB.Provider.EscapeSqlIdentifier("BugInvestigation_64O6LT8U")}.{DB.Provider.EscapeSqlIdentifier("ColumnA")} = {DB.Provider.EscapeSqlIdentifier("BugInvestigation_5TN5C4U4")}.{DB.Provider.EscapeSqlIdentifier("Column2")}";
             var poco1 = DB.Query<PocoOverlapPoco1>(sql).ToList().Single();
 
-            sql = @"FROM BugInvestigation_5TN5C4U4
-                    JOIN BugInvestigation_64O6LT8U ON BugInvestigation_64O6LT8U.[ColumnA] = BugInvestigation_5TN5C4U4.[Column2]";
+            sql = $@"FROM {DB.Provider.EscapeTableName("BugInvestigation_5TN5C4U4")}
+					 INNER JOIN {DB.Provider.EscapeTableName("BugInvestigation_64O6LT8U")}
+					 ON {DB.Provider.EscapeSqlIdentifier("BugInvestigation_64O6LT8U")}.{DB.Provider.EscapeSqlIdentifier("ColumnA")} = {DB.Provider.EscapeSqlIdentifier("BugInvestigation_5TN5C4U4")}.{DB.Provider.EscapeSqlIdentifier("Column2")}";
             var poco2 = DB.Query<PocoOverlapPoco2>(sql).ToList().Single();
 
             poco1.Column1.ShouldBe("A");
