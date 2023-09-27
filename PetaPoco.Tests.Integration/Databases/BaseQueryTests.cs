@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -176,11 +176,11 @@ namespace PetaPoco.Tests.Integration.Databases
         {
             AddPeople(15, 5);
 
-            var page = DB.Page<Person>(1, 5, "WHERE 1 = 1 ORDER BY [FullName]");
+            var page = DB.Page<Person>(1, 5, $"WHERE 1 = 1 ORDER BY {DB.Provider.EscapeSqlIdentifier("FullName")}");
             page.CurrentPage.ShouldBe(1);
             page.TotalPages.ShouldBe(4);
 
-            page = DB.Page<Person>(2, 5, "WHERE 1 = 1 ORDER BY [FullName]");
+            page = DB.Page<Person>(2, 5, $"WHERE 1 = 1 ORDER BY {DB.Provider.EscapeSqlIdentifier("FullName")}");
             page.CurrentPage.ShouldBe(2);
             page.TotalPages.ShouldBe(4);
         }
