@@ -111,7 +111,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
         }
 
         // FIXME: Firebird does not support multiple statements in a single command? Any solution without resorting to stored procedures or execute blocks?
-        [Fact]
+        [Fact(Skip = "Limited support for QueryMultiple by provider due to need for multiple statements in a single command.")]
         public override void QueryMultiple_ForMultiResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(1);
@@ -146,7 +146,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
         }
 
         // FIXME: Firebird does not support multiple statements in a single command? Any solution without resorting to stored procedures or execute blocks?
-        [Fact]
+        [Fact(Skip = "Limited support for QueryMultiple by provider due to need for multiple statements in a single command.")]
         public override void QueryMultiple_ForMultiResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);

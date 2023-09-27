@@ -119,7 +119,6 @@ namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
             order.Person.Age.ShouldBe(18);
         }
 
-        // FIXME: firstOrderLine.Quantity.ToString() should be "1" but was "2"
         [Fact]
         public override void QueryMultiple_ForMultiResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
@@ -130,6 +129,7 @@ namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
             var old = PocoData.ForType(typeof(OrderLine), DB.DefaultMapper);
             var pdId = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
             var odId = od.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
+            var oldId = old.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
             var odPersonId = od.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName;
             var oldOrderId = old.Columns.Values.First(c => c.PropertyInfo.Name == "OrderId").ColumnName;
 
@@ -137,7 +137,7 @@ namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
                          INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
                          ORDER BY o.{DB.Provider.EscapeSqlIdentifier(odId)} ASC;
                          SELECT * FROM {DB.Provider.EscapeTableName(old.TableInfo.TableName)} ol
-                         ORDER BY ol.{DB.Provider.EscapeSqlIdentifier(oldOrderId)} ASC;";
+                         ORDER BY ol.{DB.Provider.EscapeSqlIdentifier(oldOrderId)} ASC, ol.{DB.Provider.EscapeSqlIdentifier(oldId)} ASC;";
 
             List<Order> results;
             using (var multi = DB.QueryMultiple(sql))
