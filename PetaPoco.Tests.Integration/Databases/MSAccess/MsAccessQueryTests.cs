@@ -28,10 +28,15 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         public override void Page_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection() { }
 
         [Fact(Skip = "Paging not supported by provider.")]
+        public override void Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection() { }
+
+        [Fact(Skip = "Paging not supported by provider.")]
         public override async Task PageAsync_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
 
         [Fact(Skip = "Paging not supported by provider.")]
         public override async Task PageAsync_ForPocoGivenSqlWithOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection() => await Task.CompletedTask;
+
+        // TODO: Async version of Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection
 
         [Fact]
         public override void Query_ForMultiPocoWithWildcard_ShouldReturnValidPocoCollectionAfterColumnAdded()

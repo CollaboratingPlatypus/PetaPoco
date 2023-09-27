@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using PetaPoco.Core;
@@ -17,20 +17,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
-        public void Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection()
-        {
-            AddPeople(15, 5);
-
-            var page = DB.Page<Person>(1, 5, "WHERE 1 = 1 ORDER BY [FullName]");
-            page.CurrentPage.ShouldBe(1);
-            page.TotalPages.ShouldBe(4);
-
-            page = DB.Page<Person>(2, 5, "WHERE 1 = 1 ORDER BY [FullName]");
-            page.CurrentPage.ShouldBe(2);
-            page.TotalPages.ShouldBe(4);
-        }
-
-        [Fact]
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
         public void Query_ForPocoGivenSqlString_GivenSqlStartingWithSet__ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -52,6 +40,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
         public void Query_ForPocoGivenSqlString_GivenSqlStartingWithDeclare__ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
@@ -73,7 +63,9 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         }
 
         [Fact]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithWith__ShouldReturnValidPocoCollection()
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
+        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithWith_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);

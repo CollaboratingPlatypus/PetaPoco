@@ -169,6 +169,25 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#268")]
+        [Trait("Issue", "#309")]
+        [Trait("DBFeature", "Paging")]
+        public virtual void Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection()
+        {
+            AddPeople(15, 5);
+
+            var page = DB.Page<Person>(1, 5, "WHERE 1 = 1 ORDER BY [FullName]");
+            page.CurrentPage.ShouldBe(1);
+            page.TotalPages.ShouldBe(4);
+
+            page = DB.Page<Person>(2, 5, "WHERE 1 = 1 ORDER BY [FullName]");
+            page.CurrentPage.ShouldBe(2);
+            page.TotalPages.ShouldBe(4);
+        }
+
+        // TODO: Async version of Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection
+
+        [Fact]
         [Trait("DBFeature", "Paging")]
         public virtual async Task PageAsync_ForPocoGivenSqlWithoutOrderByParameterPageItemAndPerPage_ShouldReturnValidPocoCollection()
         {
@@ -269,6 +288,8 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
         public virtual void Query_ForPocoGivenSqlStringAndNamedParameters_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
