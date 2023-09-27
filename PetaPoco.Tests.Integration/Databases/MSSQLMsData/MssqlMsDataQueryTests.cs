@@ -16,6 +16,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
         {
         }
 
+        // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
@@ -39,6 +40,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             });
         }
 
+        // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
@@ -62,6 +64,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             });
         }
 
+        // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
