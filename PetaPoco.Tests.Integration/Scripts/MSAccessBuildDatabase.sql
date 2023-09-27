@@ -70,11 +70,12 @@ CREATE TABLE [Note] (
 
 -- MSAccess Specific Tables;
 
+DROP TABLE [JoinableOrderLines];
 DROP TABLE [JoinableOrders];
 DROP TABLE [JoinablePeople];
 
 CREATE TABLE [JoinablePeople] (
-	[Id] GUID NOT NULL PRIMARY KEY,
+	[Id] INTEGER NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
@@ -83,11 +84,19 @@ CREATE TABLE [JoinablePeople] (
 
 CREATE TABLE [JoinableOrders] (
 	[Id] AUTOINCREMENT PRIMARY KEY,
-	[JoinablePersonId] GUID CONSTRAINT FK_O_JoinablePersonId REFERENCES [JoinablePeople](Id),
+	[JoinablePersonId] INTEGER CONSTRAINT FK_O_JoinablePersonId REFERENCES [JoinablePeople](Id),
 	[PoNumber] MEMO NOT NULL,
 	[OrderStatus] INTEGER NOT NULL,
 	[CreatedOn] Datetime NOT NULL,
 	[CreatedBy] MEMO NOT NULL
+);
+
+CREATE TABLE [JoinableOrderLines] (
+	[Id] AUTOINCREMENT PRIMARY KEY,
+	[JoinableOrderId] INTEGER NOT NULL CONSTRAINT FK_OL_JoinableOrderId REFERENCES [JoinableOrders](Id),
+	[Qty] INTEGER NOT NULL,
+	[Status] INTEGER NOT NULL,
+	[SellPrice] NUMERIC(10, 4) NOT NULL
 );
 
 -- Investigation Tables;

@@ -8,7 +8,7 @@ namespace PetaPoco.Tests.Integration.Models.MSAccess
     public class JoinablePerson
     {
         [Column]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Column(Name = "FullName")]
         public string Name { get; set; }
