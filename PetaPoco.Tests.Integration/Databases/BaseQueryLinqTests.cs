@@ -270,9 +270,10 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Exists<Person>(Guid.NewGuid()).ShouldBeFalse();
         }
 
-        [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
+        [Fact(DisplayName = "Exists: Support the older syntax of starting with a WHERE clause.")]
         [Trait("Category", "Regression")]
-        // https://github.com/CollaboratingPlatypus/PetaPoco/commit/baa3bf78df57b5b2d5e637e7a1192ceceaba0e46
+        [Trait("Issue", "#237")]
+        [Trait("Issue", "#238")]
         public virtual void Exists_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
             DB.Insert(_person);
@@ -315,9 +316,10 @@ namespace PetaPoco.Tests.Integration.Databases
             (await DB.ExistsAsync<Person>(Guid.NewGuid())).ShouldBeFalse();
         }
 
-        [Fact(DisplayName = "Support the older syntax of starting with a WHERE clause.")]
+        [Fact(DisplayName = "Exists: Support the older syntax of starting with a WHERE clause.")]
         [Trait("Category", "Regression")]
-        // https://github.com/CollaboratingPlatypus/PetaPoco/commit/baa3bf78df57b5b2d5e637e7a1192ceceaba0e46
+        [Trait("Issue", "#237")]
+        [Trait("Issue", "#238")]
         public virtual async Task ExistsAsync_Regression_GivenSqlStringMatchingOneRecord_ShouldBeTrue()
         {
             await DB.InsertAsync(_person);

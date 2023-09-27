@@ -76,6 +76,8 @@ CREATE TABLE dbo.[Note] (
 	[CreatedOn] DATETIME2 NOT NULL
 )
 
+-- MSSQL Specific Tables
+
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'store')
 BEGIN
 	EXEC('CREATE SCHEMA store')
