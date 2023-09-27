@@ -338,7 +338,7 @@ namespace PetaPoco.Tests.Integration.Databases
         [Fact]
         [Trait("Issue", "#268")]
         [Trait("Issue", "#309")]
-        public void Query_ForPocoGivenDbColumnPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenDbColumnPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
         {
             DB.Insert(new PocoOverlapPoco1 { Column1 = "A", Column2 = "B" });
             DB.Insert(new PocoOverlapPoco2 { Column1 = "B", Column2 = "A" });
@@ -1452,8 +1452,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "MultiResultsSet")]
-        public virtual void Query_MultiResultsSet_SingleResultsSetSinglePoco__ShouldReturnValidPocoCollection()
+        public virtual void QueryMultiple_ForSingleResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddPeople(1, 0);
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
@@ -1475,8 +1474,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "MultiResultsSet")]
-        public virtual void Query_MultiResultsSet_SingleResultsSetMultiPoco__ShouldReturnValidPocoCollection()
+        public virtual void QueryMultiple_ForSingleResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(1);
 
@@ -1511,8 +1509,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "MultiResultsSet")]
-        public virtual void Query_MultiResultsSet_MultiResultSetSinglePoco__ShouldReturnValidPocoCollection()
+        public virtual void QueryMultiple_ForMultiResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(1);
 
@@ -1541,8 +1538,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "MultiResultsSet")]
-        public virtual void Query_MultiResultsSet_MultiResultSetMultiPoco__ShouldReturnValidPocoCollection()
+        public virtual void QueryMultiple_ForMultiResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
 

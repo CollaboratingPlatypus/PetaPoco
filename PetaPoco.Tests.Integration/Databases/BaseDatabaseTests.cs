@@ -160,7 +160,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual void OpenSharedConnection_WhenCalled_ShouldInvokeOnConnectionOpening()
         {
             bool eventInvoked = false;
@@ -175,7 +175,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual async Task OpenSharedConnectionAsync_WhenCalled_ShouldInvokeOnConnectionOpening()
         {
             bool eventInvoked = false;
@@ -190,7 +190,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual void OpenSharedConnection_AfterBeingCalled_ShouldInvokeOnConnectionOpened()
         {
             bool eventInvoked = false;
@@ -204,7 +204,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual async Task OpenSharedConnectionAsync_AfterBeingCalled_ShouldInvokeOnConnectionOpened()
         {
             bool eventInvoked = false;
@@ -218,7 +218,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual void CloseSharedConnection_WhenCalled_ShouldInvokeOnConnectionClosing()
         {
             bool eventInvoked = false;
@@ -232,7 +232,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual void CommandHelper_WhenCalled_ShouldInvokeOnExecutingCommand()
         {
             bool eventInvoked = false;
@@ -246,7 +246,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual async Task CommandHelperAsync_WhenCalled_ShouldInvokeOnExecutingCommand()
         {
             bool eventInvoked = false;
@@ -260,7 +260,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual void CommandHelper_AfterBeingCalled_ShouldInvokeOnExecutedCommand()
         {
             bool eventInvoked = false;
@@ -274,7 +274,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         public virtual async Task CommandHelperAsync_AfterBeingCalled_ShouldInvokeOnExecutedCommand()
         {
             bool eventInvoked = false;
@@ -288,7 +288,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         [Trait("DBFeature", "Transaction")]
         public virtual void BeginTransaction_AfterBeingCalled_ShouldInvokeOnBeginTransaction()
         {
@@ -301,7 +301,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         [Trait("DBFeature", "Transaction")]
         public virtual async Task BeginTransactionAsync_AfterBeingCalled_ShouldInvokeOnBeginTransaction()
         {
@@ -314,7 +314,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         [Trait("DBFeature", "Transaction")]
         public virtual void CompleteTransaction_WhenCalled_ShouldInvokeOnEndTransaction()
         {
@@ -327,7 +327,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         [Trait("DBFeature", "Transaction")]
         public virtual async Task CompleteTransactionAsync_WhenCalled_ShouldInvokeOnEndTransaction()
         {
@@ -341,7 +341,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         [Trait("DBFeature", "Transaction")]
         public virtual void AbortTransaction_WhenCalled_ShouldInvokeOnEndTransaction()
         {
@@ -354,7 +354,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        [Trait("LibFeature", "Events")]
+        [Trait("LibFeature", "Event")]
         [Trait("DBFeature", "Transaction")]
         public virtual async Task AbortTransactionAsync_WhenCalled_ShouldInvokeOnEndTransaction()
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
@@ -19,7 +18,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithSet__ShouldReturnValidPocoCollection()
+        public void Query_ForPocoGivenSqlStringStartingWithSet_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -42,7 +41,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithDeclare__ShouldReturnValidPocoCollection()
+        public void Query_ForPocoGivenSqlStringStartingWithDeclare_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -65,7 +64,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithWith_ShouldReturnValidPocoCollection()
+        public void Query_ForPocoGivenSqlStringStartingWithWith_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
