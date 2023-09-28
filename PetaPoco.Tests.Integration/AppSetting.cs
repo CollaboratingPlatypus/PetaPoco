@@ -22,7 +22,7 @@ namespace PetaPoco.Tests.Integration
                 .AddJsonFile("appsettings.json");
 
             var config = builder.Build();
-                
+
             var app = new AppSetting();
             config.GetSection("App").Bind(app);
             _instance = app;

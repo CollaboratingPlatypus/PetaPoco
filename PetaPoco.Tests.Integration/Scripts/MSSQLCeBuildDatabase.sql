@@ -75,4 +75,28 @@ DROP TABLE [BugInvestigation_10R9LZYK];
 CREATE TABLE [BugInvestigation_10R9LZYK] (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY,
 	[TestColumn1] BINARY(32)
-)
+);
+
+DROP TABLE [BugInvestigation_3F489XV0];
+
+CREATE TABLE [BugInvestigation_3F489XV0] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TC1] INT NOT NULL,
+	[TC2] INT NOT NULL,
+	[TC3] INT NOT NULL,
+	[TC4] INT NOT NULL
+);
+
+DROP TABLE [BugInvestigation_64O6LT8U];
+
+CREATE TABLE BugInvestigation_64O6LT8U (
+	[ColumnA] NVARCHAR(20),
+	[Column2] NVARCHAR(20)
+);
+
+DROP TABLE [BugInvestigation_5TN5C4U4];
+
+CREATE TABLE BugInvestigation_5TN5C4U4 (
+	[ColumnA] NVARCHAR(20),
+	[Column2] NVARCHAR(20)
+);

@@ -27,7 +27,7 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
-        public void Append_GivenSignleArgument_ShouldBeValid()
+        public void Append_GivenSingleArgument_ShouldBeValid()
         {
             _sql.Append("arg @0", "a1");
 
@@ -168,7 +168,7 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
-        public void Append_GivenSqLInstance_ShouldBeValid()
+        public void Append_GivenSqlInstance_ShouldBeValid()
         {
             _sql = new Sql("l0 @0", "a0");
             var sql1 = new Sql("l1 @0", "a1");

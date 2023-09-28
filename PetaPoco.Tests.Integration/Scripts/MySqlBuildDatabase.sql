@@ -1,4 +1,6 @@
-﻿DROP TABLE IF EXISTS `OrderLines`;
+﻿SET NAMES utf8mb4;
+
+DROP TABLE IF EXISTS `OrderLines`;
 DROP TABLE IF EXISTS `Orders`;
 DROP TABLE IF EXISTS `People`;
 DROP TABLE IF EXISTS `SpecificOrderLines`;
@@ -91,14 +93,28 @@ CREATE TABLE `BugInvestigation_3F489XV0` (
 	`TC4` INT NOT NULL
 ) ENGINE=INNODB;
 
+DROP TABLE IF EXISTS `BugInvestigation_64O6LT8U`;
+
+CREATE TABLE `BugInvestigation_64O6LT8U` (
+	`ColumnA` VARCHAR(20),
+	`Column2` VARCHAR(20)
+) ENGINE=INNODB;
+
+DROP TABLE IF EXISTS `BugInvestigation_5TN5C4U4`;
+
+CREATE TABLE `BugInvestigation_5TN5C4U4` (
+	`ColumnA` VARCHAR(20),
+	`Column2` VARCHAR(20)
+) ENGINE=INNODB;
+
 -- Stored Procedures
+
 DROP PROCEDURE IF EXISTS `SelectPeople`;
 DROP PROCEDURE IF EXISTS `SelectPeopleWithParam`;
 DROP PROCEDURE IF EXISTS `CountPeople`;
 DROP PROCEDURE IF EXISTS `CountPeopleWithParam`;
 DROP PROCEDURE IF EXISTS `UpdatePeople`;
 DROP PROCEDURE IF EXISTS `UpdatePeopleWithParam`;
-
 
 CREATE PROCEDURE `SelectPeople` ()
 	SELECT * FROM `People`;

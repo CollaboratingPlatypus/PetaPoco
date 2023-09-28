@@ -8,6 +8,9 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseInsertTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
         private readonly Note _note = new Note
         {
             Text = "PetaPoco's note",
@@ -38,13 +41,15 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
+        #endregion
+
         protected BaseInsertTests(DBTestProvider provider)
             : base(provider)
         {
         }
 
         [Fact]
-        public void Insert_GivenPoco_ShouldBeValid()
+        public virtual void Insert_GivenPoco_ShouldBeValid()
         {
             var id = DB.Insert(_person);
 
@@ -56,7 +61,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_WhenInsertingRelatedPocosAndGivenPoco_ShouldInsertPocos()
+        public virtual void Insert_WhenInsertingRelatedPocosAndGivenPoco_ShouldInsertPocos()
         {
             DB.Insert(_person);
             _order.PersonId = _person.Id;
@@ -77,20 +82,20 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPocoTableNameAndColumnName_ShouldInsertPoco()
+        public virtual void Insert_GivenPocoTableNameAndColumnName_ShouldInsertPoco()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
-            var personOther =
-                DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _person.Id);
+            var personOther = DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} " +
+                                                $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
+                                                _person.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
         }
 
         [Fact]
-        public void Insert_WhenInsertingRelatedPocosGivenPocoTableNameAndColumnName_ShouldInsertPocos()
+        public virtual void Insert_WhenInsertingRelatedPocosGivenPocoTableNameAndColumnName_ShouldInsertPocos()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
             _order.PersonId = _person.Id;
@@ -98,15 +103,12 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             DB.Insert("SpecificOrderLines", "Id", _orderLine);
 
-            var personOther =
-                DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _person.Id);
-            var orderOther =
-                DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _order.Id);
-            var orderLineOther =
-                DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _orderLine.Id);
+            var personOther = DB.Single<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} " +
+                                                $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var orderOther = DB.Single<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} " +
+                                              $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            var orderLineOther = DB.Single<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} " +
+                                                      $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -117,7 +119,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenTableNameAndAnonymousType_ShouldInsertPoco()
+        public virtual void Insert_GivenTableNameAndAnonymousType_ShouldInsertPoco()
         {
             var log = new { Description = "Test log", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
@@ -130,21 +132,23 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenNullByteArray_ShouldNotThrow()
+        [Trait("Issue", "#198")]
+        public virtual void Insert_GivenNullByteArray_ShouldNotThrow()
         {
-            DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[]) null });
+            DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[])null });
             DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
         }
 
         [Fact]
-        public void Insert_GivenNonNullByteArray_ShouldNotThrow()
+        [Trait("Issue", "#198")]
+        public virtual void Insert_GivenNonNullByteArray_ShouldNotThrow()
         {
             DB.Insert("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
             DB.ExecuteScalar<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}").ShouldBe(1);
         }
 
         [Fact]
-        public void Insert_GivenPocoWithNullDateTime_ShouldNotThrow()
+        public virtual void Insert_GivenPocoWithNullDateTime_ShouldNotThrow()
         {
             _person.Dob = null;
             var id = DB.Insert(_person);
@@ -157,7 +161,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenConventionalPocoWithTable_ShouldInsertPoco()
+        public virtual void Insert_GivenConventionalPocoWithTable_ShouldInsertPoco()
         {
             var id = DB.Insert("People", _person);
 
@@ -169,7 +173,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenConventionalPocoWithTableAndPrimaryKey_ShouldInsertPoco()
+        public virtual void Insert_GivenConventionalPocoWithTableAndPrimaryKey_ShouldInsertPoco()
         {
             var id = DB.Insert("People", "Id", _person);
 
@@ -181,7 +185,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenPocoWithPrimaryNullableValueType_ShouldBeValid()
+        public virtual void Insert_GivenPocoWithPrimaryNullableValueType_ShouldBeValid()
         {
             var note = new NoteNullablePrimary() { Text = _note.Text, CreatedOn = _note.CreatedOn };
 
@@ -195,7 +199,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldInsertPoco()
+        public virtual void Insert_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldInsertPoco()
         {
             var note = new { Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
@@ -208,9 +212,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithNullablePrimaryKey_ShouldInsertPoco()
+        public virtual void Insert_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithNullablePrimaryKey_ShouldInsertPoco()
         {
-            var note = new { Id = (int?) null, Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+            var note = new { Id = (int?)null, Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
             var id = DB.Insert("Note", "Id", note);
             var otherNote = DB.Single<Note>(id);
@@ -221,7 +225,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Insert_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithStaticPrimaryKey_ShouldInsertPoco()
+        public virtual void Insert_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithStaticPrimaryKey_ShouldInsertPoco()
         {
             var person = new { Id = Guid.NewGuid(), Age = 18, Dob = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 180, FullName = "Peta" };
 
@@ -238,7 +242,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenPoco_ShouldBeValid()
+        public virtual async Task InsertAsync_GivenPoco_ShouldBeValid()
         {
             var id = await DB.InsertAsync(_person);
 
@@ -250,7 +254,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_WhenInsertingRelatedPocosAndGivenPoco_ShouldInsertPocos()
+        public virtual async Task InsertAsync_WhenInsertingRelatedPocosAndGivenPoco_ShouldInsertPocos()
         {
             await DB.InsertAsync(_person);
             _order.PersonId = _person.Id;
@@ -271,20 +275,19 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenPocoTableNameAndColumnName_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenPocoTableNameAndColumnName_ShouldInsertPoco()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
-            var personOther =
-                await DB.SingleAsync<Person>(
-                    $"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var personOther = await DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} " +
+                                                           $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
         }
 
         [Fact]
-        public async Task InsertAsync_WhenInsertingRelatedPocosGivenPocoTableNameAndColumnName_ShouldInsertPocos()
+        public virtual async Task InsertAsync_WhenInsertingRelatedPocosGivenPocoTableNameAndColumnName_ShouldInsertPocos()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
             _order.PersonId = _person.Id;
@@ -292,15 +295,12 @@ namespace PetaPoco.Tests.Integration.Databases
             _orderLine.OrderId = _order.Id;
             await DB.InsertAsync("SpecificOrderLines", "Id", _orderLine);
 
-            var personOther =
-                await DB.SingleAsync<Person>(
-                    $"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
-            var orderOther =
-                await DB.SingleAsync<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0",
-                    _order.Id);
-            var orderLineOther =
-                await DB.SingleAsync<OrderLine>(
-                    $"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
+            var personOther = await DB.SingleAsync<Person>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificPeople")} " +
+                                                           $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _person.Id);
+            var orderOther = await DB.SingleAsync<Order>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrders")} " +
+                                                         $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            var orderLineOther = await DB.SingleAsync<OrderLine>($"SELECT * FROM {DB.Provider.EscapeTableName("SpecificOrderLines")} " +
+                                                                 $"WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _orderLine.Id);
 
             personOther.ShouldNotBeNull();
             personOther.ShouldBe(_person);
@@ -311,7 +311,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenTableNameAndAnonymousType_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenTableNameAndAnonymousType_ShouldInsertPoco()
         {
             var log = new { Description = "Test log", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
@@ -324,21 +324,23 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenNullByteArray_ShouldNotThrow()
+        [Trait("Issue", "#198")]
+        public virtual async Task InsertAsync_GivenNullByteArray_ShouldNotThrow()
         {
-            await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[]) null });
+            await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = (byte[])null });
             (await DB.ExecuteScalarAsync<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
         }
 
         [Fact]
-        public async Task InsertAsync_GivenNonNullByteArray_ShouldNotThrow()
+        [Trait("Issue", "#198")]
+        public virtual async Task InsertAsync_GivenNonNullByteArray_ShouldNotThrow()
         {
             await DB.InsertAsync("BugInvestigation_10R9LZYK", "Id", true, new { TestColumn1 = new byte[] { 1, 2, 3 } });
             (await DB.ExecuteScalarAsync<int>($"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_10R9LZYK")}")).ShouldBe(1);
         }
 
         [Fact]
-        public async Task InsertAsync_GivenPocoWithNullDateTime_ShouldNotThrow()
+        public virtual async Task InsertAsync_GivenPocoWithNullDateTime_ShouldNotThrow()
         {
             _person.Dob = null;
             var id = await DB.InsertAsync(_person);
@@ -351,7 +353,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenConventionalPocoWithTable_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenConventionalPocoWithTable_ShouldInsertPoco()
         {
             var id = await DB.InsertAsync("People", _person);
 
@@ -363,7 +365,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenConventionalPocoWithTableAndPrimaryKey_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenConventionalPocoWithTableAndPrimaryKey_ShouldInsertPoco()
         {
             var id = await DB.InsertAsync("People", "Id", _person);
 
@@ -375,7 +377,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenPocoWithPrimaryNullableValueType_ShouldBeValid()
+        public virtual async Task InsertAsync_GivenPocoWithPrimaryNullableValueType_ShouldBeValid()
         {
             var note = new NoteNullablePrimary { Text = _note.Text, CreatedOn = _note.CreatedOn };
 
@@ -389,7 +391,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousType_ShouldInsertPoco()
         {
             var note = new { Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
@@ -402,9 +404,9 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithNullablePrimaryKey_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithNullablePrimaryKey_ShouldInsertPoco()
         {
-            var note = new { Id = (int?) null, Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
+            var note = new { Id = (int?)null, Text = "Test note", CreatedOn = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc) };
 
             var id = await DB.InsertAsync("Note", "Id", note);
             var otherNote = await DB.SingleAsync<Note>(id);
@@ -415,7 +417,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithStaticPrimaryKey_ShouldInsertPoco()
+        public virtual async Task InsertAsync_GivenTableNamePrimaryKeyNameAndAnonymousTypeWithStaticPrimaryKey_ShouldInsertPoco()
         {
             var person = new { Id = Guid.NewGuid(), Age = 18, Dob = new DateTime(1945, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 180, FullName = "Peta" };
 

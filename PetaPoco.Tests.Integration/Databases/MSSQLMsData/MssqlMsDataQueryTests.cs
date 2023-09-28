@@ -16,44 +16,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
         {
         }
 
+        // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
-        public void Query_ForPocoGivenDbColumPocoOverlapSqlStringAndParameters_ShouldReturnValidPocoCollection()
-        {
-            DB.Insert(new PocoOverlapPoco1 { Column1 = "A", Column2 = "B" });
-            DB.Insert(new PocoOverlapPoco2 { Column1 = "B", Column2 = "A" });
-
-            var sql = @"FROM BugInvestigation_64O6LT8U
-                        JOIN BugInvestigation_5TN5C4U4 ON BugInvestigation_64O6LT8U.[ColumnA] = BugInvestigation_5TN5C4U4.[Column2]";
-
-            var poco1 = DB.Query<PocoOverlapPoco1>(sql).ToList().Single();
-
-            sql = @"FROM BugInvestigation_5TN5C4U4
-                    JOIN BugInvestigation_64O6LT8U ON BugInvestigation_64O6LT8U.[ColumnA] = BugInvestigation_5TN5C4U4.[Column2]";
-            var poco2 = DB.Query<PocoOverlapPoco2>(sql).ToList().Single();
-
-            poco1.Column1.ShouldBe("A");
-            poco1.Column2.ShouldBe("B");
-
-            poco2.Column1.ShouldBe("B");
-            poco2.Column2.ShouldBe("A");
-        }
-
-        [Fact]
-        public void Page_ForPocoGivenSqlStringWithEscapedOrderByColumn_ShouldReturnValidPocoCollection()
-        {
-            AddPeople(15, 5);
-
-            var page = DB.Page<Person>(1, 5, "WHERE 1 = 1 ORDER BY [FullName]");
-            page.CurrentPage.ShouldBe(1);
-            page.TotalPages.ShouldBe(4);
-
-            page = DB.Page<Person>(2, 5, "WHERE 1 = 1 ORDER BY [FullName]");
-            page.CurrentPage.ShouldBe(2);
-            page.TotalPages.ShouldBe(4);
-        }
-
-        [Fact]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithSet__ShouldReturnValidPocoCollection()
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
+        public void Query_ForPocoGivenSqlStringStartingWithSet_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -73,8 +40,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             });
         }
 
+        // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithDeclare__ShouldReturnValidPocoCollection()
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
+        public void Query_ForPocoGivenSqlStringStartingWithDeclare_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -94,8 +64,11 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             });
         }
 
+        // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
-        public void Query_ForPocoGivenSqlString_GivenSqlStartingWithWith__ShouldReturnValidPocoCollection()
+        [Trait("Issue", "#250")]
+        [Trait("Issue", "#251")]
+        public void Query_ForPocoGivenSqlStringStartingWithWith_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -123,12 +96,17 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
         }
 
         [Fact]
-        public void Query_MultiResultsSet_SingleResultsSetSinglePoco__ShouldReturnValidPocoCollection()
+        public override void QueryMultiple_ForSingleResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddPeople(1, 0);
+
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
-            var sql = "SET CONCAT_NULL_YIELDS_NULL ON;" +
-                      $"SELECT * FROM [{pd.TableInfo.TableName}] WHERE [{pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName}] LIKE @0 + '%'";
+            var pdName = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName;
+
+            var sql = $@"SET CONCAT_NULL_YIELDS_NULL ON;
+                         SELECT *
+                         FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}
+                         WHERE {DB.Provider.EscapeSqlIdentifier(pdName)} LIKE @0 + '%';";
 
             List<Person> result;
             using (var multi = DB.QueryMultiple(sql, "Peta"))
@@ -137,22 +115,29 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             }
 
             result.Count.ShouldBe(1);
-            var person = result.First();
 
+            var person = result.First();
             person.Id.ShouldNotBe(Guid.Empty);
             person.Name.ShouldStartWith("Peta");
             person.Age.ShouldBe(18);
         }
 
         [Fact]
-        public void Query_MultiResultsSet_SingleResultsSetMultiPoco__ShouldReturnValidPocoCollection()
+        public override void QueryMultiple_ForSingleResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(1);
 
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
             var od = PocoData.ForType(typeof(Order), DB.DefaultMapper);
-            var sql = "SET CONCAT_NULL_YIELDS_NULL ON;" +
-                      $"SELECT TOP 1 * FROM [{od.TableInfo.TableName}] o INNER JOIN [{pd.TableInfo.TableName}] p ON p.[{pd.Columns.Values.First(p => p.PropertyInfo.Name == "Id").ColumnName}] = o.[{od.Columns.Values.First(p => p.PropertyInfo.Name == "PersonId").ColumnName}] WHERE [{pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName}] = @0 ORDER BY 1 DESC";
+            var pdId = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
+            var pdName = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName;
+            var odPersonId = od.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName;
+
+            var sql = $@"SET CONCAT_NULL_YIELDS_NULL ON;
+                         SELECT TOP 1 * FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+                         INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
+                         WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
+                         ORDER BY 1 DESC;";
 
             List<Order> result;
             using (var multi = DB.QueryMultiple(sql, "Peta0"))
@@ -165,6 +150,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             }
 
             result.Count.ShouldBe(1);
+
             var order = result.First();
 
             order.PoNumber.ShouldStartWith("PO");
@@ -180,14 +166,20 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
         }
 
         [Fact]
-        public void Query_MultiResultsSet_MultiResultSetSinglePoco__ShouldReturnValidPocoCollection()
+        public override void QueryMultiple_ForMultiResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(1);
 
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
             var od = PocoData.ForType(typeof(Order), DB.DefaultMapper);
-            var sql =
-                $"SET CONCAT_NULL_YIELDS_NULL ON;SELECT * FROM [{od.TableInfo.TableName}] o WHERE [{od.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName}] = @0;SELECT * FROM [{pd.TableInfo.TableName}] p WHERE [{pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName}] = @1;";
+            var pdName = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName;
+            var odId = od.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
+
+            var sql = $@"SET CONCAT_NULL_YIELDS_NULL ON;
+                         SELECT * FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+                         WHERE o.{DB.Provider.EscapeSqlIdentifier(odId)} = @0;
+                         SELECT * FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p
+                         WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @1;";
 
             Order order;
             using (var multi = DB.QueryMultiple(sql, "1", "Peta0"))
@@ -209,15 +201,24 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
         }
 
         [Fact]
-        public void Query_MultiResultsSet_MultiResultSetMultiPoco__ShouldReturnValidPocoCollection()
+        public override void QueryMultiple_ForMultiResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
 
             var pd = PocoData.ForType(typeof(Person), DB.DefaultMapper);
             var od = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var old = PocoData.ForType(typeof(OrderLine), DB.DefaultMapper);
-            var sql = "SET CONCAT_NULL_YIELDS_NULL ON;" +
-                      $"SELECT * FROM [{od.TableInfo.TableName}] o INNER JOIN [{pd.TableInfo.TableName}] p ON p.[{pd.Columns.Values.First(p => p.PropertyInfo.Name == "Id").ColumnName}] = o.[{od.Columns.Values.First(p => p.PropertyInfo.Name == "PersonId").ColumnName}] ORDER BY o.[{od.Columns.Values.First(p => p.PropertyInfo.Name == "Id").ColumnName}] ASC;SELECT * FROM [{old.TableInfo.TableName}] ol ORDER BY ol.[{old.Columns.Values.First(c => c.PropertyInfo.Name == "OrderId").ColumnName}] ASC";
+            var pdId = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
+            var odId = od.Columns.Values.First(c => c.PropertyInfo.Name == "Id").ColumnName;
+            var odPersonId = od.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName;
+            var oldOrderId = old.Columns.Values.First(c => c.PropertyInfo.Name == "OrderId").ColumnName;
+
+            var sql = $@"SET CONCAT_NULL_YIELDS_NULL ON;
+                         SELECT * FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+                         INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
+                         ORDER BY o.{DB.Provider.EscapeSqlIdentifier(odId)} ASC;
+                         SELECT * FROM {DB.Provider.EscapeTableName(old.TableInfo.TableName)} ol
+                         ORDER BY ol.{DB.Provider.EscapeSqlIdentifier(oldOrderId)} ASC;";
 
             List<Order> results;
             using (var multi = DB.QueryMultiple(sql))
@@ -227,12 +228,10 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
                     o.Person = p;
                     return o;
                 }).ToList();
-                var orderLines = multi.Read<OrderLine>().ToList();
 
+                var orderLines = multi.Read<OrderLine>().ToList();
                 foreach (var order in results)
-                {
                     order.OrderLines = orderLines.Where(ol => ol.OrderId == order.Id).ToList();
-                }
             }
 
             results.Count.ShouldBe(12);
@@ -251,35 +250,15 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
                 o.Person.Age.ShouldBeGreaterThanOrEqualTo(18);
 
                 o.OrderLines.Count.ShouldBe(2);
+
                 var firstOrderLine = o.OrderLines.First();
                 firstOrderLine.Quantity.ToString().ShouldBe("1");
                 firstOrderLine.SellPrice.ShouldBe(9.99m);
+
                 var secondOrderLine = o.OrderLines.Skip(1).First();
                 secondOrderLine.Quantity.ToString().ShouldBe("2");
                 secondOrderLine.SellPrice.ShouldBe(19.98m);
             });
-        }
-
-        [ExplicitColumns]
-        [TableName("BugInvestigation_64O6LT8U")]
-        public class PocoOverlapPoco1
-        {
-            [Column("ColumnA")]
-            public string Column1 { get; set; }
-
-            [Column]
-            public string Column2 { get; set; }
-        }
-
-        [ExplicitColumns]
-        [TableName("BugInvestigation_5TN5C4U4")]
-        public class PocoOverlapPoco2
-        {
-            [Column("ColumnA")]
-            public string Column1 { get; set; }
-
-            [Column]
-            public string Column2 { get; set; }
         }
     }
 }

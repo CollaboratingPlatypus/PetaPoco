@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
@@ -20,8 +20,8 @@ namespace PetaPoco.Tests.Integration.Databases.Sqlite
         }
 
         /// <remarks>
-        ///     This is required because we can't use the Mapper.* methods, as we're testing many different databases and it would
-        ///     apply Sqlite logic incorrectly.
+        /// This is required because we can't use the Mapper.* methods, as we're testing many different databases and it would apply Sqlite
+        /// logic incorrectly.
         /// </remarks>
         protected override void AfterDbCreate(Database db)
         {

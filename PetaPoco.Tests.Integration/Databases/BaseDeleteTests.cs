@@ -8,6 +8,9 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseDeleteTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
         private Note _note = new Note
         {
             Text = "A test note",
@@ -44,13 +47,17 @@ namespace PetaPoco.Tests.Integration.Databases
             Name = "Peta"
         };
 
+        #endregion
+
         protected BaseDeleteTests(DBTestProvider provider)
             : base(provider)
         {
         }
 
+        // TODO: Test with/without "WHERE" keyword in sql string produce identical statements
+
         [Fact]
-        public void Delete_GivenPoco_ShouldDeletePoco()
+        public virtual void Delete_GivenPoco_ShouldDeletePoco()
         {
             // Arrange
             DB.Insert(_person);
@@ -60,6 +67,7 @@ namespace PetaPoco.Tests.Integration.Databases
             DB.Insert(_orderLine);
             DB.Insert(_note);
 
+            // TODO: assert Delete returns 1
             // Act
             DB.Delete(_orderLine);
             DB.Delete(_order);
@@ -79,7 +87,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenPocoOrPrimaryKey_ShouldDeletePoco()
+        public virtual void Delete_GivenPocoOrPrimaryKey_ShouldDeletePoco()
         {
             DB.Insert(_note);
             DB.Insert(_note2);
@@ -99,7 +107,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenTableNamePrimaryKeyNameAndPoco_ShouldDeletePoco()
+        public virtual void Delete_GivenTableNamePrimaryKeyNameAndPoco_ShouldDeletePoco()
         {
             DB.Insert(_person);
             DB.Insert(_note);
@@ -115,7 +123,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldDeletePoco()
+        public virtual void Delete_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldDeletePoco()
         {
             DB.Insert(_person);
             DB.Insert(_note);
@@ -131,7 +139,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenSqlAndArgs_ShouldDeletePoco()
+        public virtual void Delete_GivenSqlAndArgs_ShouldDeletePoco()
         {
             DB.Insert(_note);
             DB.Insert(_person);
@@ -147,7 +155,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Delete_GivenSql_ShouldDeletePoco()
+        public virtual void Delete_GivenSql_ShouldDeletePoco()
         {
             DB.Insert(_note);
             DB.Insert(_person);
@@ -163,7 +171,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task DeleteAsync_GivenPoco_ShouldDeletePoco()
+        public virtual async Task DeleteAsync_GivenPoco_ShouldDeletePoco()
         {
             // Arrange
             await DB.InsertAsync(_person);
@@ -173,6 +181,7 @@ namespace PetaPoco.Tests.Integration.Databases
             await DB.InsertAsync(_orderLine);
             await DB.InsertAsync(_note);
 
+            // TODO: assert DeleteAsync returns 1
             // Act
             await DB.DeleteAsync(_orderLine);
             await DB.DeleteAsync(_order);
@@ -192,7 +201,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task DeleteAsync_GivenPocoOrPrimaryKey_ShouldDeletePoco()
+        public virtual async Task DeleteAsync_GivenPocoOrPrimaryKey_ShouldDeletePoco()
         {
             await DB.InsertAsync(_note);
             await DB.InsertAsync(_note2);
@@ -212,7 +221,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task DeleteAsync_GivenTableNamePrimaryKeyNameAndPoco_ShouldDeletePoco()
+        public virtual async Task DeleteAsync_GivenTableNamePrimaryKeyNameAndPoco_ShouldDeletePoco()
         {
             await DB.InsertAsync(_person);
             await DB.InsertAsync(_note);
@@ -228,7 +237,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task DeleteAsync_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldDeletePoco()
+        public virtual async Task DeleteAsync_GivenTableNamePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldDeletePoco()
         {
             await DB.InsertAsync(_person);
             await DB.InsertAsync(_note);
@@ -244,7 +253,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task DeleteAsync_GivenSqlAndArgs_ShouldDeletePoco()
+        public virtual async Task DeleteAsync_GivenSqlAndArgs_ShouldDeletePoco()
         {
             await DB.InsertAsync(_note);
             await DB.InsertAsync(_person);
@@ -260,7 +269,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task DeleteAsync_GivenSql_ShouldDeletePoco()
+        public virtual async Task DeleteAsync_GivenSql_ShouldDeletePoco()
         {
             await DB.InsertAsync(_note);
             await DB.InsertAsync(_person);

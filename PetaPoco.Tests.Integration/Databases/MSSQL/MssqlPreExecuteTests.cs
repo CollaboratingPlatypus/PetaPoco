@@ -1,25 +1,26 @@
-﻿using PetaPoco.Providers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Xunit;
+using PetaPoco.Providers;
 using Shouldly;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
+    // TODO: Move PreExecute tests to Base class (either BaseExecuteTests or new BasePreExecuteTests)
+
     [Collection("Mssql")]
     public class MssqlPreExecuteTests : BaseDatabase
     {
         public MsssqlPreExecuteDatabaseProvider Provider => DB.Provider as MsssqlPreExecuteDatabaseProvider;
 
-        public MssqlPreExecuteTests() : base(new MssqlPreExecuteDBTestProvider())
+        public MssqlPreExecuteTests()
+            : base(new MssqlPreExecuteDBTestProvider())
         {
             Provider.ThrowExceptions = true;
         }
-
 
         [Fact]
         public void Query_Calls_PreExecute()
@@ -93,9 +94,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
-
         [Fact]
-        public void QueryAsync_Calls_PreExecute()
+        public async Task QueryAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
             var sql = Sql.Builder
@@ -103,15 +103,15 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
                 .From("sometable")
                 .Where("foo = @0", expected);
 
-            async Task act() => await DB.QueryAsync<string>(sql).Result.ReadAsync();
+            async Task act() => await DB.QueryAsync<string>(sql);
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void ExecuteAsync_Calls_PreExecute()
+        public async Task ExecuteAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
             var sql = Sql.Builder
@@ -121,37 +121,37 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
             async Task act() => await DB.ExecuteAsync(sql);
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void InsertAsync_Calls_PreExecute()
+        public async Task InsertAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
 
             async Task act() => await DB.InsertAsync("sometable", new { Foo = expected });
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void UpdateAsync_Calls_PreExecute()
+        public async Task UpdateAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
 
             async Task act() => await DB.UpdateAsync("sometable", "id", new { ID = 3, Foo = expected });
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(2);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
         [Fact]
-        public void ExecuteScalarAsync_Calls_PreExecute()
+        public async Task ExecuteScalarAsync_Calls_PreExecute()
         {
             var expected = Guid.NewGuid().ToString();
             var sql = Sql.Builder
@@ -161,7 +161,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
             async Task act() => await DB.ExecuteScalarAsync<int>(sql);
 
-            Should.Throw<PreExecuteException>(act);
+            await Should.ThrowAsync<PreExecuteException>(act);
             Provider.Parameters.Count().ShouldBe(1);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
@@ -196,6 +196,4 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
 
         public class PreExecuteException : Exception { }
     }
-
-    
 }

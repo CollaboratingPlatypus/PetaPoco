@@ -8,6 +8,7 @@ using PetaPoco.Utilities;
 
 namespace PetaPoco.Providers
 {
+    // TODO: Plural class name? There may be multiple providers this handles, but each instance is still only one.
     public class SqlServerCEDatabaseProviders : DatabaseProvider
     {
         public override DbProviderFactory GetFactory()

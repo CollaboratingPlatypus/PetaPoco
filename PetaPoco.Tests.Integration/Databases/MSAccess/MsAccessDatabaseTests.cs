@@ -1,4 +1,4 @@
-using Xunit;
+﻿using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
@@ -10,9 +10,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         {
         }
 
-        public override void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel()
-        {
-            // Not supported by provider.
-        }
+        [Fact(Skip = "Isolation Levels not supported by provider.")]
+        public override void BeginTransaction_WhenIsolationLevelIsSet_ShouldBeOfIsolationLevel() { }
     }
 }

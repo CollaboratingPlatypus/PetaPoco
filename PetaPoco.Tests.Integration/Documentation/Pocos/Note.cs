@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -8,7 +8,7 @@ namespace PetaPoco.Tests.Integration.Documentation.Pocos
     {
         public int Id { get; set; }
 
-        [DateTime2ConverterAttribute]
+        [DateTime2Converter]
         public DateTime CreatedOn { get; set; }
 
         public string Text { get; set; }
@@ -24,5 +24,5 @@ namespace PetaPoco.Tests.Integration.Documentation.Pocos
             };
 
         public override object ConvertFromDb(object value) => value;
-    } 
+    }
 }

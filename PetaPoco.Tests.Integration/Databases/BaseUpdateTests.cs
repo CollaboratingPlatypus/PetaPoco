@@ -10,6 +10,9 @@ namespace PetaPoco.Tests.Integration.Databases
 {
     public abstract class BaseUpdateTests : BaseDatabase
     {
+        // TODO: Move to base class, combine with other test data
+        #region Test Data
+
         private Order _order = new Order
         {
             PoNumber = "Peta's Order",
@@ -40,13 +43,48 @@ namespace PetaPoco.Tests.Integration.Databases
             Text = "Peta's Note",
         };
 
+        #endregion
+
         protected BaseUpdateTests(DBTestProvider provider)
             : base(provider)
         {
         }
 
+        #region Test Helpers
+
+        protected Person SinglePersonOther(Guid id)
+            => DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
+
+        protected Task<Person> SinglePersonOtherAsync(Guid id)
+            => DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
+
+        protected static void UpdateProperties(Person person)
+        {
+            person.Name = "Feta";
+            person.Age = 19;
+            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
+            person.Height = 190;
+        }
+
+        protected static void UpdateProperties(Order order)
+        {
+            order.PoNumber = "Feta's Order";
+            order.Status = OrderStatus.Pending;
+            order.CreatedOn = new DateTime(1949, 1, 11, 4, 2, 4, DateTimeKind.Utc);
+            order.CreatedBy = "Jen";
+        }
+
+        protected static void UpdateProperties(OrderLine orderLine)
+        {
+            orderLine.Quantity = 6;
+            orderLine.SellPrice = 5.99m;
+            orderLine.Status = OrderLineStatus.Allocated;
+        }
+
+        #endregion
+
         [Fact]
-        public void Update_GivenPoco_ShouldBeValid()
+        public virtual void Update_GivenPoco_ShouldBeValid()
         {
             // Arrange
             DB.Insert(_person);
@@ -78,7 +116,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoAndNullColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoAndNullColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -91,7 +129,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -108,7 +146,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoAndPrimaryKey_ShouldBeValid()
+        public virtual void Update_GivenPocoAndPrimaryKey_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -121,7 +159,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -134,7 +172,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -151,7 +189,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoAndEmptyColumns_ShouldBeValid()
+        public virtual void Update_GivenPocoAndEmptyColumns_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -168,7 +206,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -181,7 +219,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -194,7 +232,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -211,7 +249,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
         {
             DB.Insert("SpecificPeople", "Id", false, _person);
 
@@ -228,7 +266,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenSqlAndParameters_ShouldBeValid()
+        public virtual void Update_GivenSqlAndParameters_ShouldBeValid()
         {
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -243,7 +281,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenPocoUpdateSql_ShouldUpdateThePoco()
+        public virtual void Update_GivenPocoUpdateSql_ShouldUpdateThePoco()
         {
             DB.Insert(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -259,7 +297,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenNoPocoExists_ShouldBeValid()
+        public virtual void Update_GivenNoPocoExists_ShouldBeValid()
         {
             var rowEffected = DB.Update(_person);
 
@@ -267,31 +305,29 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
         {
             DB.Insert(_person);
 
-            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })
-                .ShouldBe(1);
+            DB.Update("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }).ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert(_person);
 
-            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id)
-                .ShouldBe(1);
+            DB.Update("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id).ShouldBe(1);
             var personOther = DB.Single<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -302,14 +338,18 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETCOREAPP
+            ((int)DB.Update("People", "Id", (object)person)).ShouldBe(1);
+#else
             ((int)DB.Update("People", "Id", person)).ShouldBe(1);
+#endif
 
             var personOther = DB.Single<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
         }
 
         [Fact]
-        public void Update_GivenTablePrimaryKeyNameDynamicTypeAndPrimaryKeyValue_ShouldBeValid()
+        public virtual void Update_GivenTablePrimaryKeyNameDynamicTypeAndPrimaryKeyValue_ShouldBeValid()
         {
             DB.Insert(_person);
 
@@ -319,36 +359,56 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETCOREAPP
+            ((int)DB.Update("People", "Id", (object)person, _person.Id)).ShouldBe(1);
+#else
             ((int)DB.Update("People", "Id", person, _person.Id)).ShouldBe(1);
+#endif
 
             var personOther = DB.Single<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
         }
 
         [Fact]
-        [Trait("Issue", "667")]
-        public void Update_GivenDynamicPoco_ShouldNotThrow()
+        [Trait("Issue", "#667")]
+        public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             DB.Insert(_note);
-            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
+
+#if !NETCOREAPP
+            Should.NotThrow(() => DB.Update("Note", "Id", (object)entity));
+#else
             Should.NotThrow(() => DB.Update("Note", "Id", entity));
+#endif
         }
 
         [Fact]
-        public void Update_GivenDynamicPoco_ShouldUpdate()
+        public virtual void Update_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             DB.Insert(_note);
-            var entity = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+            var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
             entity.Text += " was updated";
-            DB.Update("Note", "Id", entity);
 
-            var entity2 = DB.Fetch<dynamic>("SELECT * FROM Note").First();
+#if !NETCOREAPP
+            DB.Update("Note", "Id", (object)entity);
+#else
+            DB.Update("Note", "Id", entity);
+#endif
+
+            var entity2 = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
             ((string)entity2.Text).ShouldContain("updated");
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPoco_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPoco_ShouldBeValid()
         {
             // Arrange
             await DB.InsertAsync(_person);
@@ -361,7 +421,7 @@ namespace PetaPoco.Tests.Integration.Databases
             var personOther = await DB.SingleAsync<Person>(_person.Id);
             UpdateProperties(personOther);
             (await DB.UpdateAsync(personOther)).ShouldBe(1);
-            personOther = DB.Single<Person>(_person.Id);
+            personOther = await DB.SingleAsync<Person>(_person.Id);
 
             var orderOther = await DB.SingleAsync<Order>(_order.Id);
             UpdateProperties(orderOther);
@@ -380,7 +440,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoAndNullColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndNullColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -393,7 +453,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -410,7 +470,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoAndPrimaryKey_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndPrimaryKey_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -423,7 +483,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoPrimaryKeyAndNullColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -436,7 +496,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoPrimaryKeyAndColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -452,7 +512,7 @@ namespace PetaPoco.Tests.Integration.Databases
             personOther.Height.ShouldNotBe(_person.Height);
         }
         [Fact]
-        public async Task UpdateAsync_GivenPocoAndEmptyColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenPocoAndEmptyColumns_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
@@ -469,7 +529,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValue_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -482,7 +542,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndNullColumns_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -495,7 +555,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndColumns_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -512,7 +572,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNamePocoAndPrimaryKeyValueAndEmptyColumns_ShouldBeValid()
         {
             await DB.InsertAsync("SpecificPeople", "Id", false, _person);
 
@@ -529,7 +589,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenSqlAndParameters_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenSqlAndParameters_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -544,7 +604,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenPocoUpdateSql_ShouldUpdateThePoco()
+        public virtual async Task UpdateAsync_GivenPocoUpdateSql_ShouldUpdateThePoco()
         {
             await DB.InsertAsync(_person);
             var pd = PocoData.ForType(_person.GetType(), new ConventionMapper());
@@ -560,7 +620,7 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenNoPocoExists_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenNoPocoExists_ShouldBeValid()
         {
             var rowEffected = await DB.UpdateAsync(_person);
 
@@ -568,24 +628,22 @@ namespace PetaPoco.Tests.Integration.Databases
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNameAndAnonymousType_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
-            (await DB.UpdateAsync("People", "Id",
-                new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })).ShouldBe(1);
+            (await DB.UpdateAsync("People", "Id", new { _person.Id, FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 })).ShouldBe(1);
             var personOther = await DB.SingleAsync<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNameAnonymousTypeAndPrimaryKeyValue_ShouldBeValid()
         {
             await DB.InsertAsync(_person);
 
-            (await DB.UpdateAsync("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 },
-                _person.Id)).ShouldBe(1);
+            (await DB.UpdateAsync("People", "Id", new { FullName = "Feta", Age = 19, Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc), Height = 190 }, _person.Id)).ShouldBe(1);
             var personOther = await DB.SingleAsync<Person>(_person.Id);
 
             personOther.ShouldNotBe(_person, true);
@@ -603,7 +661,11 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETCOREAPP
+            ((int)await DB.UpdateAsync("People", "Id", (object)person)).ShouldBe(1);
+#else
             ((int)await DB.UpdateAsync("People", "Id", person)).ShouldBe(1);
+#endif
 
             var personOther = await DB.SingleAsync<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
@@ -620,61 +682,53 @@ namespace PetaPoco.Tests.Integration.Databases
             person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
             person.Height = 190;
 
+#if !NETCOREAPP
+            ((int)await DB.UpdateAsync("People", "Id", (object)person, _person.Id)).ShouldBe(1);
+#else
             ((int)await DB.UpdateAsync("People", "Id", person, _person.Id)).ShouldBe(1);
+#endif
 
             var personOther = await DB.SingleAsync<Person>(_person.Id);
             personOther.ShouldNotBe(_person, true);
         }
 
         [Fact]
-        [Trait("Issue", "667")]
-        public async Task UpdateAsync_GivenDynamicPoco_ShouldNotThrow()
+        [Trait("Issue", "#667")]
+        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             await DB.InsertAsync(_note);
-            var entity = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
-            Should.NotThrow(() => DB.Update("Note", "Id", entity));
+            var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
+
+            // https://docs.shouldly.org/documentation/exceptions/throw#shouldthrowfuncoftask
+#if !NETCOREAPP
+            Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", (object)entity)));
+#else
+            Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
+#endif
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenDynamicPoco_ShouldUpdate()
+        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
+            var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
+            var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
+
             await DB.InsertAsync(_note);
-            var entity = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+            var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             entity.Text += " was updated";
-            DB.Update("Note", "Id", entity);
 
-            var entity2 = (await DB.FetchAsync<dynamic>("SELECT * FROM Note")).First();
+#if !NETCOREAPP
+            await DB.UpdateAsync("Note", "Id", (object)entity);
+#else
+            await DB.UpdateAsync("Note", "Id", entity);
+#endif
+
+            var entity2 = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
             ((string)entity2.Text).ShouldContain("updated");
-        }
-
-        private Person SinglePersonOther(Guid id)
-            => DB.Single<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
-
-        private Task<Person> SinglePersonOtherAsync(Guid id)
-            => DB.SingleAsync<Person>($"SELECT * From {DB.Provider.EscapeTableName("SpecificPeople")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", id);
-
-        private static void UpdateProperties(Person person)
-        {
-            person.Name = "Feta";
-            person.Age = 19;
-            person.Dob = new DateTime(1946, 1, 12, 5, 9, 4, DateTimeKind.Utc);
-            person.Height = 190;
-        }
-
-        private static void UpdateProperties(Order order)
-        {
-            order.PoNumber = "Feta's Order";
-            order.Status = OrderStatus.Pending;
-            order.CreatedOn = new DateTime(1949, 1, 11, 4, 2, 4, DateTimeKind.Utc);
-            order.CreatedBy = "Jen";
-        }
-
-        private static void UpdateProperties(OrderLine orderLine)
-        {
-            orderLine.Quantity = 6;
-            orderLine.SellPrice = 5.99m;
-            orderLine.Status = OrderLineStatus.Allocated;
         }
     }
 }

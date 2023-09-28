@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 
+#if MSSQLCE_TESTS_ENABLED
 namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     public class MssqlCeDBTestProvider : DBTestProvider
@@ -14,7 +15,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 
         public MssqlCeDBTestProvider()
         {
-            // Hack: Nuget package is old and dones't support newer content
+            // Hack: Nuget package is old and doesn't support newer content
             // ReSharper disable AssignNullToNotNullAttribute
             var codeBase = typeof(SqlCeConnection).Assembly.CodeBase;
             var uri = new UriBuilder(codeBase);
@@ -33,10 +34,12 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         public override IDatabase Execute()
         {
             if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
+            {
                 using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
                 {
                     engine.CreateDatabase();
                 }
+            }
 
             return base.Execute();
         }
@@ -45,7 +48,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {
-                if (s.StartsWith("--"))
+                if (String.IsNullOrEmpty(s) || s.StartsWith("--"))
                     return;
 
                 if (s.StartsWith("DROP"))
@@ -66,3 +69,4 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         }
     }
 }
+#endif

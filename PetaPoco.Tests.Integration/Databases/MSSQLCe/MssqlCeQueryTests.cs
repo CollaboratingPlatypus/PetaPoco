@@ -2,6 +2,7 @@
 using Shouldly;
 using Xunit;
 
+#if MSSQLCE_TESTS_ENABLED
 namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     [Collection("MssqlCe")]
@@ -12,6 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         {
         }
 
+        // TODO: Maybe move Query_ForEnumWithUnderlyingType_ShouldConvertValues to Base class
         [Fact]
         public virtual void Query_ForEnumWithUnderlyingType_ShouldConvertValues()
         {
@@ -28,6 +30,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
             }
         }
 
+        // TODO: Maybe move Query_ForNullableTypes_ShouldConvertValues to Base class
         [Fact]
         public virtual void Query_ForNullableTypes_ShouldConvertValues()
         {
@@ -67,37 +70,28 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         }
     }
 
-    internal enum E1 : byte
-    {
-    }
+    internal enum E1 : byte { }
 
     internal class T1
     {
         public E1 C { get; set; }
     }
 
-    internal enum E2 : short
-    {
-    }
+    internal enum E2 : short { }
 
     internal class T2
     {
         public E2 C { get; set; }
     }
 
-    internal enum E3 : int
-    {
-        Hello = 1,
-    }
+    internal enum E3 : int { Hello = 1, }
 
     internal class T3
     {
         public E3 C { get; set; }
     }
 
-    internal enum E4 : long
-    {
-    }
+    internal enum E4 : long { }
 
     internal class T4
     {
@@ -112,3 +106,4 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         public int? IntValue { get; set; }
     }
 }
+#endif

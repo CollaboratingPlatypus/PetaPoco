@@ -1,9 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace PetaPoco
 {
+#if ASYNC
     public interface IAlterPocoAsync
     {
         /// <summary>
@@ -227,4 +228,5 @@ namespace PetaPoco
         /// </summary>
         Task SaveAsync(CancellationToken cancellationToken, object poco);
     }
+#endif
 }

@@ -17,10 +17,11 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <Compile Remove="Databases\MSAccess\**" />
     <Compile Remove="Databases\MSSQLCe\**" />
+    <Compile Remove="DataSources\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\FirebirdDbBuildDatabase.sql" />
+    <None Remove="Scripts\FirebirdBuildDatabase.sql" />
     <None Remove="Scripts\MariaDbBuildDatabase.sql" />
     <None Remove="Scripts\MSAccessBuildDatabase.sql" />
     <None Remove="Scripts\MSSQLBuildDatabase.sql" />
@@ -31,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\FirebirdDbBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\FirebirdBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSSQLBuildDatabase.sql" />
@@ -87,8 +88,10 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
+  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
+    <None Update="DataSources\petapoco.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

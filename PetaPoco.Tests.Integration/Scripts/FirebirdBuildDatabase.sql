@@ -36,10 +36,6 @@ END!!
 SET TERM ; !!
 
 
-
-
-
-
 SET TERM !! ;
 EXECUTE BLOCK AS BEGIN
 	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'OrderLines'))	then execute statement 'DROP TABLE "OrderLines";';
@@ -243,6 +239,8 @@ BEGIN
 END!!
 SET TERM ; !!
 
+-- Investigation Tables
+
 SET TERM !! ;
 EXECUTE BLOCK AS BEGIN
 	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'BugInvestigation_10R9LZYK'))	then execute statement 'DROP TABLE "BugInvestigation_10R9LZYK";';
@@ -273,7 +271,63 @@ END!!
 SET TERM ; !!
 
 
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'BugInvestigation_3F489XV0'))	then execute statement 'DROP TABLE "BugInvestigation_3F489XV0";';
+END!!
+SET TERM ; !!
+
+CREATE TABLE "BugInvestigation_3F489XV0" (
+	"Id" INT PRIMARY KEY NOT NULL,
+	"TC1" INT NOT NULL,
+	"TC2" INT NOT NULL,
+	"TC3" INT NOT NULL,
+	"TC4" INT NOT NULL
+);
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$generators WHERE rdb$generator_name = 'GEN_BI_3F489XV0_ID')) then execute statement 'DROP SEQUENCE GEN_BI_3F489XV0_ID;';
+END!!
+SET TERM ; !!
+
+CREATE SEQUENCE GEN_BI_3F489XV0_ID;
+ALTER SEQUENCE GEN_BI_3F489XV0_ID RESTART WITH 0;
+
+SET TERM !! ;
+CREATE TRIGGER trigger_gen_BI_3F489XV0_id FOR "BugInvestigation_3F489XV0"
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+	IF (NEW."Id" is NULL) THEN NEW."Id" = GEN_ID(GEN_BI_3F489XV0_ID, 1);
+END!!
+SET TERM ; !!
+
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'BugInvestigation_64O6LT8U'))	then execute statement 'DROP TABLE "BugInvestigation_64O6LT8U";';
+END!!
+SET TERM ; !!
+
+CREATE TABLE "BugInvestigation_64O6LT8U" (
+	"ColumnA" VARCHAR(20),
+	"Column2" VARCHAR(20)
+);
+
+SET TERM !! ;
+EXECUTE BLOCK AS BEGIN
+	if (exists(SELECT 1 FROM rdb$relations WHERE rdb$relation_name = 'BugInvestigation_5TN5C4U4'))	then execute statement 'DROP TABLE "BugInvestigation_5TN5C4U4";';
+END!!
+SET TERM ; !!
+
+CREATE TABLE "BugInvestigation_5TN5C4U4" (
+	"ColumnA" VARCHAR(20),
+	"Column2" VARCHAR(20)
+);
+
 -- Stored procedures
+
 SET TERM !! ;
 CREATE PROCEDURE SelectPeople
 RETURNS (id varchar(100), fullname varchar(100), age integer)

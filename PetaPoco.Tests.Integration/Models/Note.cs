@@ -7,15 +7,15 @@ namespace PetaPoco.Tests.Integration.Models
     {
         public int Id { get; set; }
 
-        public DateTime CreatedOn { get; set; }
-
         public string Text { get; set; }
+
+        public DateTime CreatedOn { get; set; }
 
         public void ShouldBe(Note other)
         {
             Id.ShouldBe(other.Id);
-            CreatedOn.ShouldBe(other.CreatedOn);
             Text.ShouldBe(other.Text);
+            CreatedOn.ShouldBe(other.CreatedOn);
         }
 
         public void ShouldNotBe(Note other, bool sameIds)
@@ -25,8 +25,8 @@ namespace PetaPoco.Tests.Integration.Models
             else
                 Id.ShouldNotBe(other.Id);
 
-            CreatedOn.ShouldNotBe(other.CreatedOn);
             Text.ShouldNotBe(other.Text);
+            CreatedOn.ShouldNotBe(other.CreatedOn);
         }
     }
 }
