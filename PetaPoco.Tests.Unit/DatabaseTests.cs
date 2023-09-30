@@ -157,7 +157,12 @@ namespace PetaPoco.Tests.Unit
         {
             Should.Throw<ArgumentNullException>(() => DB.IsNew(null));
             Should.Throw<ArgumentNullException>(() => DB.IsNew(null, null));
+            Should.Throw<ArgumentNullException>(() => DB.IsNew(null, default));
+            Should.Throw<ArgumentNullException>(() => DB.IsNew(null, null));
+            Should.Throw<ArgumentNullException>(() => DB.IsNew("PrimaryKey", null));
 
+            Should.Throw<ArgumentException>(() => DB.IsNew(string.Empty, null));
+            Should.Throw<ArgumentException>(() => DB.IsNew(string.Empty, default));
             Should.Throw<ArgumentException>(() => DB.IsNew("MissingId", new { }));
 
             Should.Throw<InvalidOperationException>(() => DB.IsNew(new TransactionLog()));

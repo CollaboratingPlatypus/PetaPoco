@@ -2733,11 +2733,12 @@ namespace PetaPoco
         }
 
         /// <inheritdoc/>
-        /// <exception cref="ArgumentException"><paramref name="primaryKeyName"/> is null or empty.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="poco"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="primaryKeyName"/> is empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="poco"/> or <paramref name="primaryKeyName"/> is null.</exception>
         public bool IsNew(string primaryKeyName, object poco)
         {
-            // TODO: Inconsistent use of `ArgumentNullException` vs `ArgumentException` for null/empty string params.
+            if (primaryKeyName == null)
+                throw new ArgumentNullException(nameof(primaryKeyName));
             if (string.IsNullOrEmpty(primaryKeyName))
                 throw new ArgumentException(nameof(primaryKeyName));
             if (poco == null)
