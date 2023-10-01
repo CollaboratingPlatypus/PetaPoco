@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace PetaPoco
 {
     /// <summary>
-    /// Specifies a set of methods for executing SQL queries and returning the result set as lists, enumerables, single POCOs, multi-POCOs, or paged results.
+    /// Specifies a set of methods for executing SQL queries and returning the result set as lists, enumerables, single POCOs, multi-POCOs,
+    /// or paged results.
     /// </summary>
     public interface IQuery
     {

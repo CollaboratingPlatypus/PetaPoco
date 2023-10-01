@@ -11,7 +11,9 @@ namespace PetaPoco.Utilities
         /// Gets the regular expression used for matching the <c>SELECT</c> clause.
         /// </summary>
         /// <remarks>
-        /// <para>Beginning at the start of the string, this expression matches the keyword <c>SELECT</c> (inclusive), followed by one or more spaces, capturing everything in front of the word <c>FROM</c> (exclusive), accounting for special handling of nested parentheses, aggregate functions, etc.</para>
+        /// <para>Beginning at the start of the string, this expression matches the keyword <c>SELECT</c> (inclusive), followed by one or
+        /// more spaces, capturing everything in front of the word <c>FROM</c> (exclusive), accounting for special handling of nested
+        /// parentheses, aggregate functions, etc.</para>
         /// <c><u>SELECT column1, column2</u> FROM tbl;</c><br/>
         /// <c><u>SELECT SUM(column1) AS sum_col1, column2</u> FROM tbl;</c>
         /// </remarks>
@@ -23,7 +25,8 @@ namespace PetaPoco.Utilities
         /// Gets the regular expression used for matching the <c>DISTINCT</c> keyword.
         /// </summary>
         /// <remarks>
-        /// <para>Starting at the beginning of the string, this expression performs a simple match for the <c>DISTINCT</c> keyword in a SQL statement, followed by a space. Everything after is excluded.</para>
+        /// <para>Starting at the beginning of the string, this expression performs a simple match for the <c>DISTINCT</c> keyword in an SQL
+        /// statement, followed by a space. Everything after is excluded.</para>
         /// <c>SELECT <u>DISTINCT</u> * FROM tbl;</c><br/>
         /// <c>SELECT <u>DISTINCT</u> column1 FROM tbl;</c>
         /// </remarks>
@@ -34,7 +37,9 @@ namespace PetaPoco.Utilities
         /// Gets the regular expression used for matching the <c>ORDER BY</c> clause.
         /// </summary>
         /// <remarks>
-        /// <para>This expression matches the <c>ORDER BY</c> clause, followed by one or more column names as well as the accompanying optional sort order modifier keywords, <c>ASC</c> and <c>DESC</c>, for each (inclusive). <c>AS</c> alias declarations are excluded from the match.</para>
+        /// <para>This expression matches the <c>ORDER BY</c> clause, followed by one or more column names as well as the accompanying
+        /// optional sort order modifier keywords, <c>ASC</c> and <c>DESC</c>, for each (inclusive). <c>AS</c> alias declarations are
+        /// excluded from the match.</para>
         /// <c>SELECT * FROM tbl <u>ORDER BY column1, column2 DESC;</u></c><br/>
         /// <c>SELECT column1, column2 AS col2 <u>ORDER BY SUM(column1) ASC, col2;</u></c><br/>
         /// </remarks>
@@ -46,7 +51,8 @@ namespace PetaPoco.Utilities
         /// Gets the regular expression used for matching the <c>ORDER BY</c> keyword.
         /// </summary>
         /// <remarks>
-        /// <para>This expression performs a simple match for the <c>ORDER BY</c> keyword in a SQL statement, followed by a space. Everything after is excluded.</para>
+        /// <para>This expression performs a simple match for the <c>ORDER BY</c> keyword in a SQL statement, followed by a space.
+        /// Everything after is excluded.</para>
         /// <c>SELECT * FROM tbl <u>ORDER BY</u> column1, column2 DESC;</c><br/>
         /// <c>SELECT column1, column2 AS col2 <u>ORDER BY</u> SUM(column1) ASC, col2;</c>
         /// </remarks>
@@ -57,7 +63,8 @@ namespace PetaPoco.Utilities
         /// Gets the regular expression used for matching the <c>GROUP BY</c> clause.
         /// </summary>
         /// <remarks>
-        /// <para>Matches the <c>GROUP BY</c> clause, followed by one or more column names along with any aggregate functions or expressions. <c>AS</c> alias declarations are excluded from the match.</para>
+        /// <para>Matches the <c>GROUP BY</c> clause, followed by one or more column names along with any aggregate functions or
+        /// expressions. <c>AS</c> alias declarations are excluded from the match.</para>
         /// <c>SELECT * FROM tbl <u>GROUP BY column1, column2</u>;</c><br/>
         /// <c>SELECT column1, column2 <u>GROUP BY SUM(column1), column2</u>;</c><br/>
         /// <c>SELECT column1 AS col1 FROM tbl <u>GROUP BY col1</u> ORDER BY col1;</c>
@@ -70,7 +77,8 @@ namespace PetaPoco.Utilities
         /// Gets the regular expression used for matching the <c>GROUP BY</c> keyword.
         /// </summary>
         /// <remarks>
-        /// <para>This expression performs a simple match for the <c>GROUP BY</c> keyword in a SQL statement, followed by a space. Everything after is excluded.</para>
+        /// <para>This expression performs a simple match for the <c>GROUP BY</c> keyword in a SQL statement, followed by a space.
+        /// Everything after is excluded.</para>
         /// <c>SELECT * FROM tbl <u>GROUP BY</u> column1, column2;</c><br/>
         /// <c>SELECT column1, COUNT(column2) AS count_col2 FROM tbl <u>GROUP BY</u> column1 ORDER BY column1;</c>
         /// </remarks>
