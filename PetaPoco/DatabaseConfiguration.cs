@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace PetaPoco
 {
     /// <summary>
-    ///     A helper class which enables fluent configuration.
+    /// A helper class which enables fluent configuration.
     /// </summary>
     public class DatabaseConfiguration : IDatabaseBuildConfiguration, IBuildConfigurationSettings, IHideObjectMethods
     {
         private readonly IDictionary<string, object> _settings = new Dictionary<string, object>();
 
         /// <summary>
-        ///     Private constructor to force usage of static build method.
+        /// Private constructor to force usage of static build method.
         /// </summary>
         private DatabaseConfiguration()
         {
@@ -26,19 +26,19 @@ namespace PetaPoco
                 _settings.Remove(key);
         }
 
-        void IBuildConfigurationSettings.TryGetSetting<T>(string key, Action<T> setSetting, Action onFail)
+        void IBuildConfigurationSettings.TryGetSetting<T>(string key, Action<T> onGetAction, Action onFailAction)
         {
             // Note: no argument checking because, pref, enduser unlikely and handled by RT/FW
             if (_settings.TryGetValue(key, out var setting))
-                setSetting((T) setting);
+                onGetAction((T) setting);
             else
-                onFail?.Invoke();
+                onFailAction?.Invoke();
         }
 
         /// <summary>
-        ///     Starts a new PetaPoco build configuration.
+        /// Starts a new PetaPoco build configuration.
         /// </summary>
-        /// <returns>An instance of <see cref="IDatabaseBuildConfiguration" /> to form a fluent interface.</returns>
+        /// <returns>An instance of <see cref="IDatabaseBuildConfiguration"/> to form a fluent interface.</returns>
         public static IDatabaseBuildConfiguration Build()
         {
             return new DatabaseConfiguration();

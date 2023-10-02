@@ -1,47 +1,46 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 
 namespace PetaPoco
 {
     /// <summary>
-    ///     Use by IMapper to override table bindings for an object
+    /// A class used by <see cref="IMapper"/> to override table bindings for a POCO object.
     /// </summary>
     public class TableInfo
     {
         /// <summary>
-        ///     The database table name
+        /// Gets or sets the database table name.
         /// </summary>
         public string TableName { get; set; }
 
         /// <summary>
-        ///     The name of the primary key column of the table
+        /// Gets or sets the name of the table's primary key column.
         /// </summary>
         public string PrimaryKey { get; set; }
 
         /// <summary>
-        ///     True if the primary key column is an auto-incrementing
+        /// Gets or sets whether the primary key column is auto-incrementing.
         /// </summary>
         public bool AutoIncrement { get; set; }
 
         /// <summary>
-        ///     The name of the sequence used for auto-incrementing Oracle primary key fields
+        /// Gets or sets the name of the sequence used for auto-incrementing Oracle primary key fields.
         /// </summary>
         public string SequenceName { get; set; }
 
         /// <summary>
-        ///     Creates and populates a TableInfo from the attributes of a POCO
+        /// Constructs and initializes a TableInfo instance from the attributes of the specified POCO type.
         /// </summary>
-        /// <param name="t">The POCO type</param>
-        /// <returns>A TableInfo instance</returns>
-        public static TableInfo FromPoco(Type t)
+        /// <param name="pocoType">The POCO type representing a single result record in the associated database table.</param>
+        /// <returns>The TableInfo instance.</returns>
+        public static TableInfo FromPoco(Type pocoType)
         {
             var ti = new TableInfo();
-            PopulateTableNameFromPoco(t, ref ti, out _);
-            PopulatePrimaryKeyFromPoco(t, ref ti, out _, out _);
+            PopulateTableNameFromPoco(pocoType, ref ti, out _);
+            PopulatePrimaryKeyFromPoco(pocoType, ref ti, out _, out _);
             return ti;
         }
-
 
         internal static void PopulateTableNameFromPoco(Type t, ref TableInfo ti, out TableNameAttribute tblAttr)
         {
@@ -59,7 +58,7 @@ namespace PetaPoco
             ti.PrimaryKey = pkAttr?.Value;
             ti.SequenceName = pkAttr?.SequenceName;
             ti.AutoIncrement = pkAttr?.AutoIncrement ?? false;
-            
+
             if (String.IsNullOrWhiteSpace(ti.PrimaryKey))
             {
                 bool isIdProp(PropertyInfo p)

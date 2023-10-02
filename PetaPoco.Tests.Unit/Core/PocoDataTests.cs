@@ -9,7 +9,7 @@ namespace PetaPoco.Tests.Unit.Core
     public class PocoDataTests
     {
         [Fact]
-        public void GetFactory_GivenTypeWithNonPublicConstructor_ShouldThrow()
+        public void GetFactory_GivenTypeWithNoPublicConstructor_ShouldThrow()
         {
             var pd = PocoData.ForObject(TestEntity.Instance, "Id", new ConventionMapper());
             Should.Throw<InvalidOperationException>(() => pd.GetFactory("", "", 1, 1, null, null));

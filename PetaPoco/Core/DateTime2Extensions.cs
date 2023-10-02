@@ -2,19 +2,24 @@
 
 namespace PetaPoco
 {
+    /// <summary>
+    /// Provides extension methods for the <see cref="DateTime2"/> class.
+    /// </summary>
     public static class DateTime2Extensions
     {
         /// <summary>
-        /// Converts an DateTime to its <see cref="DateTime2"/> representation
+        /// Converts a <see cref="DateTime"/> to its <see cref="DateTime2"/> representation.
         /// </summary>
-        /// <param name="dt">The DateTime to be converted</param>
-        /// <returns></returns>
-        public static DateTime2 ToDateTime2(this DateTime dt) => new DateTime2(dt);
+        /// <param name="value">The DateTime object to be converted.</param>
+        /// <returns>A <see cref="DateTime2"/> object containing the converted <paramref name="value"/>.</returns>
+        public static DateTime2 ToDateTime2(this DateTime value) => new DateTime2(value);
+
         /// <summary>
-        /// Parse a string to its <see cref="DateTime2"/> representation
+        /// Parses a string to its <see cref="DateTime2"/> representation.
         /// </summary>
-        /// <param name="inputStr">The string to be converted</param>
-        /// <returns></returns>
-        public static DateTime2 ToDateTime2(this string inputStr) => new DateTime2(DateTime.Parse(inputStr));
+        /// <param name="value">The string representing a date and time to be converted.</param>
+        /// <returns>A <see cref="DateTime2"/> object containing the parsed <paramref name="value"/>.</returns>
+        /// <inheritdoc cref="DateTime.Parse(string)"/>
+        public static DateTime2 ToDateTime2(this string value) => new DateTime2(DateTime.Parse(value));
     }
 }

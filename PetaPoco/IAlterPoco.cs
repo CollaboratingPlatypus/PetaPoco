@@ -2,232 +2,233 @@ using System.Collections.Generic;
 
 namespace PetaPoco
 {
+    /// <summary>
+    /// Specifies a set of methods for performing SQL operations on POCOs such as Insert, Update, Delete, and Save.
+    /// </summary>
     public interface IAlterPoco
     {
-        /// <summary>
-        ///     Performs an SQL Insert.
-        /// </summary>
-        /// <param name="tableName">The name of the table to insert into.</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
-        object Insert(string tableName, object poco);
+        #region Insert
 
         /// <summary>
-        ///     Performs an SQL Insert.
+        /// Inserts a new record and returns the primary key of the newly inserted record.
         /// </summary>
-        /// <param name="tableName">The name of the table to insert into.</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table.</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
+        /// <inheritdoc cref="Insert(string, object)"/>
+        object Insert(object poco);
+
+        /// <remarks>
+        /// If a mapped primary key column is auto-incrementing and <see cref="TableInfo.AutoIncrement"/> is <see langword="true"/>, the
+        /// primary key property of the POCO will be updated with the new record's auto-incremented ID.
+        /// </remarks>
+        /// <inheritdoc cref="Insert(string, string, bool, object)"/>
+        object Insert(string tableName, object poco);
+
+        /// <remarks>
+        /// If <paramref name="primaryKeyName"/> represents an auto-incrementing column and <see cref="TableInfo.AutoIncrement"/> is <see
+        /// langword="true"/>, the primary key property of the POCO will be updated with the new record's auto-incremented ID.
+        /// </remarks>
+        /// <inheritdoc cref="Insert(string, string, bool, object)"/>
         object Insert(string tableName, string primaryKeyName, object poco);
 
         /// <summary>
-        ///     Performs an SQL Insert.
+        /// Inserts a new record into the specified table and returns the primary key of the newly inserted record.
         /// </summary>
-        /// <param name="tableName">The name of the table to insert into.</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table.</param>
-        /// <param name="autoIncrement">True if the primary key is automatically allocated by the DB.</param>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
         /// <remarks>
-        ///     Inserts a POCO into a table. If the POCO has a property with the same name
-        ///     as the primary key, the id of the new record is assigned to it. Either way,
-        ///     the new id is returned.
+        /// If <paramref name="autoIncrement"/> is <see langword="true"/>, the primary key property of the POCO will be updated with the new
+        /// record's auto-incremented ID.
         /// </remarks>
+        /// <param name="tableName">The name of the table where the record will be inserted.</param>
+        /// <param name="primaryKeyName">The table's primary key column name.</param>
+        /// <param name="autoIncrement">Specifies whether the primary key column in the database is auto-incrementing.</param>
+        /// <param name="poco">The POCO instance to insert.</param>
+        /// <returns>The primary key of the new record if the table has a primary key column; otherwise, <see langword="null"/>.</returns>
         object Insert(string tableName, string primaryKeyName, bool autoIncrement, object poco);
 
-        /// <summary>
-        ///     Performs an SQL Insert.
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be inserted.</param>
-        /// <returns>The auto allocated primary key of the new record, or null for non-auto-increment tables.</returns>
-        /// <remarks>
-        ///     The name of the table, its primary key and whether it's an auto-allocated primary key are retrieved
-        ///     from the POCO's attributes
-        /// </remarks>
-        object Insert(object poco);
+        #endregion
+
+        #region Update
 
         /// <summary>
-        ///     Performs an SQL update
+        /// Updates a record and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected records</returns>
-        int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue);
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
-        int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns);
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
-        int Update(string tableName, string primaryKeyName, object poco);
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="tableName">The name of the table to update</param>
-        /// <param name="primaryKeyName">The name of the primary key column of the table</param>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
-        int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns);
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
-        int Update(object poco, IEnumerable<string> columns);
-
-        /// <summary>
-        ///     Performs an SQL update
-        /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
         int Update(object poco);
 
         /// <summary>
-        ///     Performs an SQL update
+        /// Updates the specified columns of a record and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
+        int Update(object poco, IEnumerable<string> columns);
+
+        /// <summary>
+        /// Updates a record with the given ID and returns the number of rows affected by the update operation.
+        /// </summary>
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
         int Update(object poco, object primaryKeyValue);
 
         /// <summary>
-        ///     Performs an SQL update
+        /// Updates the specified columns of a record with the given ID and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <param name="poco">The POCO object that specifies the column values to be updated</param>
-        /// <param name="primaryKeyValue">The primary key of the record to be updated</param>
-        /// <param name="columns">The column names of the columns to be updated, or null for all</param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
         int Update(object poco, object primaryKeyValue, IEnumerable<string> columns);
 
         /// <summary>
-        ///     Performs an SQL update
+        /// Updates a record in the provided table and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">The SQL update and condition clause (ie: everything after "UPDATE tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
-        int Update<T>(string sql, params object[] args);
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
+        int Update(string tableName, string primaryKeyName, object poco);
 
         /// <summary>
-        ///     Performs an SQL update
+        /// Updates the specified columns of a record in the provided table and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to update</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL update and condition clause (ie: everything after "UPDATE
-        ///     tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
+        int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns);
+
+        /// <summary>
+        /// Updates a record with the given ID in the provided table and returns the number of rows affected by the update operation.
+        /// </summary>
+        /// <inheritdoc cref="Update(string, string, object, object, IEnumerable{string})"/>
+        int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue);
+
+        /// <summary>
+        /// Updates the specified columns of a record with the given ID in the provided table and returns the number of rows affected by the
+        /// update operation.
+        /// </summary>
+        /// <param name="tableName">The name of the table to update.</param>
+        /// <param name="primaryKeyName">The table's primary key column name.</param>
+        /// <param name="poco">The POCO instance containing the column values to update.</param>
+        /// <param name="primaryKeyValue">The primary key value identifying the record to update.</param>
+        /// <param name="columns">A list of column names to update, or <see langword="null"/> to update all columns.</param>
+        /// <returns>The number of rows affected by the update operation.</returns>
+        int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns);
+
+        /// <summary>
+        /// Executes an SQL update and returns the number of rows affected by the update operation.
+        /// </summary>
+        /// <typeparam name="T">The POCO type associated with the table to update.</typeparam>
+        /// <param name="sql">An SQL builder instance representing the condition portion of the WHERE clause identifying the row to update
+        /// (everything after <c>UPDATE tablename</c>) and its parameters.</param>
+        /// <returns>The number of rows affected by the update operation.</returns>
         int Update<T>(Sql sql);
 
         /// <summary>
-        ///     Performs an SQL Delete
+        /// Executes an SQL update and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <param name="tableName">The name of the table to delete from</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object whose primary key value will be used to delete the row</param>
-        /// <returns>The number of rows affected</returns>
-        int Delete(string tableName, string primaryKeyName, object poco);
+        /// <typeparam name="T">The POCO type associated with the table to update.</typeparam>
+        /// <param name="sql">The SQL string representing the condition portion of the WHERE clause identifying the row to update
+        /// (everything after <c>UPDATE tablename</c>).</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>The number of rows affected by the update operation.</returns>
+        int Update<T>(string sql, params object[] args);
+
+        #endregion
+
+        #region Delete
 
         /// <summary>
-        ///     Performs an SQL Delete
+        /// Deletes a record and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <param name="tableName">The name of the table to delete from</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">
-        ///     The POCO object whose primary key value will be used to delete the row (or null to use the supplied
-        ///     primary key value)
-        /// </param>
-        /// <param name="primaryKeyValue">
-        ///     The value of the primary key identifing the record to be deleted (or null, or get this
-        ///     value from the POCO instance)
-        /// </param>
-        /// <returns>The number of rows affected</returns>
-        int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue);
-
-        /// <summary>
-        ///     Performs an SQL Delete
-        /// </summary>
-        /// <param name="poco">The POCO object specifying the table name and primary key value of the row to be deleted</param>
-        /// <returns>The number of rows affected</returns>
+        /// <param name="poco">The POCO instance representing the record to delete.</param>
+        /// <returns>The number of rows affected by the delete operation.</returns>
         int Delete(object poco);
 
         /// <summary>
-        ///     Performs an SQL Delete
+        /// Deletes a record in the provided table and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes identify the table and primary key to be used in the delete</typeparam>
-        /// <param name="pocoOrPrimaryKey">The value of the primary key of the row to delete</param>
-        /// <returns></returns>
-        int Delete<T>(object pocoOrPrimaryKey);
+        /// <param name="tableName">The name of the table containing the record to delete.</param>
+        /// <param name="primaryKeyName">The table's primary key column name.</param>
+        /// <param name="poco">The POCO instance representing the record to delete.</param>
+        /// <returns>The number of rows affected by the delete operation.</returns>
+        int Delete(string tableName, string primaryKeyName, object poco);
 
         /// <summary>
-        ///     Performs an SQL Delete
+        /// Deletes a record with the given ID in the provided table and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to delete from</typeparam>
-        /// <param name="sql">The SQL condition clause identifying the row to delete (ie: everything after "DELETE FROM tablename"</param>
-        /// <param name="args">Arguments to any embedded parameters in the SQL</param>
-        /// <returns>The number of affected rows</returns>
-        int Delete<T>(string sql, params object[] args);
+        /// <param name="tableName">The name of the table containing the record to delete.</param>
+        /// <param name="primaryKeyName">The table's primary key column name.</param>
+        /// <param name="poco">The POCO instance representing the record to delete, or <see langword="null"/> to use the provided <paramref
+        /// name="primaryKeyValue"/>.</param>
+        /// <param name="primaryKeyValue">The primary key value identifying the record to delete, used if <paramref name="poco"/> is <see
+        /// langword="null"/>.</param>
+        /// <returns>The number of rows affected by the delete operation.</returns>
+        int Delete(string tableName, string primaryKeyName, object poco, object primaryKeyValue);
 
         /// <summary>
-        ///     Performs an SQL Delete
+        /// Deletes a record and returns the number of rows affected by the update operation.
         /// </summary>
-        /// <typeparam name="T">The POCO class whose attributes specify the name of the table to delete from</typeparam>
-        /// <param name="sql">
-        ///     An SQL builder object representing the SQL condition clause identifying the row to delete (ie:
-        ///     everything after "UPDATE tablename"
-        /// </param>
-        /// <returns>The number of affected rows</returns>
+        /// <typeparam name="T">The POCO type associated with the table to delete.</typeparam>
+        /// <param name="pocoOrPrimaryKeyValue">The primary key value, or a POCO containing an assigned primary key value.</param>
+        /// <returns>The number of rows affected by the delete operation.</returns>
+        int Delete<T>(object pocoOrPrimaryKeyValue);
+
+        /// <summary>
+        /// Executes an SQL delete and returns the number of rows affected by the delete operation.
+        /// </summary>
+        /// <typeparam name="T">The POCO type associated with the table to delete.</typeparam>
+        /// <param name="sql">An SQL builder instance representing the condition portion of the WHERE clause identifying the row to delete
+        /// (everything after <c>DELETE FROM tablename</c>) and its parameters.</param>
+        /// <returns>The number of rows affected by the delete operation.</returns>
         int Delete<T>(Sql sql);
 
         /// <summary>
-        ///     Check if a poco represents a new row
+        /// Executes an SQL delete and returns the number of rows affected by the delete operation.
         /// </summary>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has a non-default value.</remarks>
-        bool IsNew(string primaryKeyName, object poco);
+        /// <typeparam name="T">The POCO type associated with the table to delete.</typeparam>
+        /// <param name="sql">The SQL string representing the condition portion of the WHERE clause identifying the row to delete
+        /// (everything after <c>DELETE FROM tablename</c>).</param>
+        /// <param name="args">The parameters to embed in the SQL string.</param>
+        /// <returns>The number of rows affected by the delete operation.</returns>
+        int Delete<T>(string sql, params object[] args);
 
-        /// <summary>
-        ///     Check if a poco represents a new row
-        /// </summary>
-        /// <param name="poco">The object instance whose "newness" is to be tested</param>
-        /// <returns>True if the POCO represents a record already in the database</returns>
-        /// <remarks>This method simply tests if the POCO's primary key column property has a non-default value.</remarks>
+        #endregion
+
+        #region IsNew
+
+        /// <remarks>
+        /// A POCO instance is considered "new" if the <paramref name="poco"/> property that maps to the associated table's primary key
+        /// column contains a default value.
+        /// </remarks>
+        /// <inheritdoc cref="IsNew(string, object)"/>
         bool IsNew(object poco);
 
         /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
+        /// Determines whether the specified POCO represents a new record that has not yet been saved to the database.
         /// </summary>
-        /// <param name="tableName">The name of the table to be updated</param>
-        /// <param name="primaryKeyName">The name of the primary key column</param>
-        /// <param name="poco">The POCO object to be saved</param>
-        void Save(string tableName, string primaryKeyName, object poco);
+        /// <remarks>
+        /// A POCO instance is considered "new" if the <paramref name="poco"/> property that maps to the associated table's provided column
+        /// name contains a default value.
+        /// </remarks>
+        /// <param name="primaryKeyName">The table's primary key column name.</param>
+        /// <param name="poco">The POCO instance to check.</param>
+        /// <returns><see langword="true"/> if the POCO represents a new record; otherwise, <see langword="false"/>.</returns>
+        bool IsNew(string primaryKeyName, object poco);
+
+        #endregion
+
+        #region Save
+
+        /// <remarks>
+        /// Performs an <see cref="Insert(object)"/> operation if the POCO is new (as determined by <see cref="IsNew(object)"/>), and an
+        /// <see cref="Update(object)"/> operation otherwise.
+        /// <para>If an Insert operation is performed, and a mapped primary key column is auto-incrementing, the primary key property of the
+        /// POCO will be updated with the new record's auto-incremented ID.</para>
+        /// </remarks>
+        /// <inheritdoc cref="Save(string, string, object)"/>
+        void Save(object poco);
 
         /// <summary>
-        ///     Saves a POCO by either performing either an SQL Insert or SQL Update
+        /// Saves the specified POCO to the database by performing either an insert or an update operation, as appropriate.
         /// </summary>
-        /// <param name="poco">The POCO object to be saved</param>
-        void Save(object poco);
+        /// <remarks>
+        /// Performs an <see cref="Insert(string, string, object)"/> operation if the POCO is new (as determined by <see cref="IsNew(string,
+        /// object)"/>), and an <see cref="Update(string, string, object)"/> operation otherwise.
+        /// <para>If an Insert operation is performed, and <paramref name="primaryKeyName"/> represents an auto-incrementing column, the
+        /// primary key property of the POCO will be updated with the new record's auto-incremented ID.</para>
+        /// </remarks>
+        /// <param name="tableName">The name of the table where the POCO will be saved.</param>
+        /// <param name="primaryKeyName">The table's primary key column name.</param>
+        /// <param name="poco">The POCO instance to save.</param>
+        void Save(string tableName, string primaryKeyName, object poco);
+
+        #endregion
     }
 }

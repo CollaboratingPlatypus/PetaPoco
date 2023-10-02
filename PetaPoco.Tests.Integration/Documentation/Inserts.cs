@@ -36,7 +36,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // See, they are the same
             clone.ShouldBe(person);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
+            // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
             person.Equals(clone).ShouldBeFalse();
         }
 
@@ -68,7 +68,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // See, they are the same
             clone.ShouldBe(order);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
+            // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
             order.Equals(clone).ShouldBeFalse();
         }
 
@@ -98,16 +98,13 @@ namespace PetaPoco.Tests.Integration.Documentation
             // See, they are the same
             clone.ShouldBe(person);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
+            // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
             person.Equals(clone).ShouldBeFalse();
         }
 
         [Fact]
         public void InsertConventionalPoco()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
             // Insert some notes using all APIs
 
             // Each of the API usuages here are effectively the same, as PetaPoco is providing the correct unknown values.
@@ -132,7 +129,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
-                             DROP TABLE dbo.[TBL_UnconventionalPocos]
+                         DROP TABLE dbo.[TBL_UnconventionalPocos]
 
                          CREATE TABLE dbo.[TBL_UnconventionalPocos] (
                              [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
@@ -152,7 +149,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // See, they are the same
             clone.ShouldBe(poco);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
+            // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
             poco.Equals(clone).ShouldBeFalse();
         }
 
@@ -161,7 +158,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the UnconventionalPocos table
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TBL_UnconventionalPocos')
-                             DROP TABLE dbo.[TBL_UnconventionalPocos]
+                         DROP TABLE dbo.[TBL_UnconventionalPocos]
 
                          CREATE TABLE dbo.[TBL_UnconventionalPocos] (
                              [PrimaryKey] INT IDENTITY(1,1) PRIMARY KEY,
@@ -195,7 +192,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // See, they are the same
             clone.ShouldBe(poco);
 
-            // But, they're not not reference equals as PetaPoco doesn't cache because it's a MircoORM.
+            // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
             poco.Equals(clone).ShouldBeFalse();
         }
 
@@ -204,7 +201,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
-                             DROP TABLE dbo.[XFiles]
+                         DROP TABLE dbo.[XFiles]
 
                          CREATE TABLE dbo.[XFiles] (
                              [Id] INT IDENTITY(1,1) PRIMARY KEY,
@@ -231,7 +228,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         {
             // Create the table for our unknown but conventional POCO
             DB.Execute(@"IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'XFiles')
-                             DROP TABLE dbo.[XFiles]
+                         DROP TABLE dbo.[XFiles]
 
                          CREATE TABLE dbo.[XFiles] (
                              [Id] INT IDENTITY(1,1) PRIMARY KEY,

@@ -9,11 +9,16 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
     // TODO: Plural class name? There may be multiple providers this handles, but each instance is still only one.
+    /// <summary>
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for SQL Server CE.
+    /// </summary>
     public class SqlServerCEDatabaseProviders : DatabaseProvider
     {
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Culture=neutral, PublicKeyToken=89845dcd8080cc91");
 
+        /// <inheritdoc/>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             if (string.IsNullOrEmpty(parts.SqlOrderBy))
@@ -23,6 +28,7 @@ namespace PetaPoco.Providers
             return sqlPage;
         }
 
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             ExecuteNonQueryHelper(db, cmd);
@@ -30,6 +36,7 @@ namespace PetaPoco.Providers
         }
 
 #if ASYNC
+        /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             await ExecuteNonQueryHelperAsync(cancellationToken, db, cmd);

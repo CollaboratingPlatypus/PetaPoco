@@ -3,24 +3,24 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents an attribute, which when applied to a POCO class, specifies the the DB table name which it maps to
+    /// The TableNameAttribute class defines an attribute for POCO classes to specify a custom database table name that class should map to.
     /// </summary>
+    /// <remarks>
+    /// When decorating a class, the provided table name overrides the default inflected name of the active mapper.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class)]
     public class TableNameAttribute : Attribute
     {
         /// <summary>
-        ///     The table nane of the database that this entity maps to.
+        /// Gets the database table name this POCO maps to.
         /// </summary>
-        /// <returns>
-        ///     The table nane of the database that this entity maps to.
-        /// </returns>
+        /// <value>Overrides this class's inflected table name from the mapper.</value>
         public string Value { get; }
 
         /// <summary>
-        ///     Constructs a new instance of the <seealso cref="TableNameAttribute" />.
+        /// Initializes a new instance of the <see cref="TableNameAttribute"/> class with the specified table name.
         /// </summary>
-        /// <param name="tableName">The table nane of the database that this entity maps to.</param>
-        public TableNameAttribute(string tableName)
-            => Value = tableName;
+        /// <param name="tableName">The database table name this class maps to.</param>
+        public TableNameAttribute(string tableName) => Value = tableName;
     }
 }

@@ -20,9 +20,6 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void Save_Insert()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
             // Add a note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Save(note);
@@ -46,9 +43,6 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void Save_Update()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
             // Add a note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Save(note);

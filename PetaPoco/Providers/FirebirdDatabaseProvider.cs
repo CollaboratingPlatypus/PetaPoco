@@ -11,11 +11,16 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
 	// TODO: It irks the ¢®@₱ out of me that the Firebird DBProvider class name is the only one that improperly appends "Db" after the provider name.
-	public class FirebirdDbDatabaseProvider : DatabaseProvider
+    /// <summary>
+    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Firebird.
+    /// </summary>
+    public class FirebirdDbDatabaseProvider : DatabaseProvider
     {
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
             => GetFactory("FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient");
 
+        /// <inheritdoc/>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             var sql = $"{parts.Sql}\nROWS @{args.Length} TO @{args.Length + 1}";
@@ -23,17 +28,19 @@ namespace PetaPoco.Providers
             return sql;
         }
 
-        public override object ExecuteInsert(Database database, IDbCommand cmd, string primaryKeyName)
+        /// <inheritdoc/>
+        public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             PrepareInsert(cmd, primaryKeyName);
-            return ExecuteScalarHelper(database, cmd);
+            return ExecuteScalarHelper(db, cmd);
         }
 
 #if ASYNC
-        public override Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database database, IDbCommand cmd, string primaryKeyName)
+        /// <inheritdoc/>
+        public override Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             PrepareInsert(cmd, primaryKeyName);
-            return ExecuteScalarHelperAsync(cancellationToken, database, cmd);
+            return ExecuteScalarHelperAsync(cancellationToken, db, cmd);
         }
 #endif
 
@@ -47,7 +54,7 @@ namespace PetaPoco.Providers
             cmd.CommandText += " RETURNING " + EscapeSqlIdentifier(primaryKeyName) + ";";
         }
 
-        public override string EscapeSqlIdentifier(string sqlIdentifier)
-            => $"\"{sqlIdentifier}\"";
+        /// <inheritdoc/>
+        public override string EscapeSqlIdentifier(string sqlIdentifier) => $"\"{sqlIdentifier}\"";
     }
 }

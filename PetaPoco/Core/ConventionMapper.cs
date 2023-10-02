@@ -6,61 +6,60 @@ using PetaPoco.Core.Inflection;
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents a configurable convention mapper.
+    /// The ConventionMapper class represents a configurable convention mapper.
     /// </summary>
     /// <remarks>
-    ///     By default this mapper replaces <see cref="StandardMapper" /> without change, which means backwards compatibility
-    ///     is kept.
+    /// By default this mapper replaces the original <see cref="StandardMapper"/> without change, ensuring backwards compatibility.
     /// </remarks>
     public class ConventionMapper : IMapper
     {
         /// <summary>
-        ///     Gets or sets the get sequence name logic.
+        /// Gets or sets the sequence name logic (for Oracle).
         /// </summary>
         public Func<Type, PropertyInfo, string> GetSequenceName { get; set; }
 
         /// <summary>
-        ///     Gets or sets the inflect column name logic.
+        /// Gets or sets the inflected column name logic.
         /// </summary>
         public Func<IInflector, string, string> InflectColumnName { get; set; }
 
         /// <summary>
-        ///     Gets or sets the inflect table name logic.
+        /// Gets or sets the inflected table name logic.
         /// </summary>
         public Func<IInflector, string, string> InflectTableName { get; set; }
 
         /// <summary>
-        ///     Gets or sets the is primary key auto increment logic.
+        /// Gets or sets the primary key auto-increment logic.
         /// </summary>
         public Func<Type, bool> IsPrimaryKeyAutoIncrement { get; set; }
 
         /// <summary>
-        ///     Gets or sets the map column logic.
+        /// Gets or sets the map column logic.
         /// </summary>
         public Func<ColumnInfo, Type, PropertyInfo, bool> MapColumn { get; set; }
 
         /// <summary>
-        ///     Gets or set the map primary key logic.
+        /// Gets or sets the map primary key logic.
         /// </summary>
         public Func<TableInfo, Type, bool> MapPrimaryKey { get; set; }
 
         /// <summary>
-        ///     Gets or sets the map table logic.
+        /// Gets or sets the map table logic.
         /// </summary>
         public Func<TableInfo, Type, bool> MapTable { get; set; }
 
         /// <summary>
-        ///     Gets or sets the from db convert logic.
+        /// Gets or sets the from db convert logic.
         /// </summary>
         public Func<PropertyInfo, Type, Func<object, object>> FromDbConverter { get; set; }
 
         /// <summary>
-        ///     Gets or sets the to db converter logic.
+        /// Gets or sets the to db converter logic.
         /// </summary>
         public Func<PropertyInfo, Func<object, object>> ToDbConverter { get; set; }
 
         /// <summary>
-        ///     Constructs a new instance of convention mapper.
+        /// Constructs a new instance of convention mapper.
         /// </summary>
         public ConventionMapper()
         {
@@ -113,12 +112,12 @@ namespace PetaPoco
             MapColumn = (ci, t, pi) =>
             {
                 ColumnInfo.PopulateFromProperty(pi, ref ci, out var columnAttr);
-                
+
                 if (ci == null)
                     return false;
                 else
                 {
-                    // If there's no colAttr.Name, then we got the name 
+                    // If there's no colAttr.Name, then we got the name
                     // from pi, so inflect it
                     if (columnAttr?.Name == null)
                         ci.ColumnName = InflectColumnName(Inflector.Instance, pi.Name);
@@ -150,56 +149,27 @@ namespace PetaPoco
             };
         }
 
-        /// <summary>
-        ///     Get information about the table associated with a POCO class
-        /// </summary>
-        /// <param name="pocoType">The poco type.</param>
-        /// <returns>A TableInfo instance</returns>
-        /// <remarks>
-        ///     This method must return a valid TableInfo.
-        ///     To create a TableInfo from a POCO's attributes, use TableInfo.FromPoco
-        /// </remarks>
+        /// <inheritdoc/>
         public virtual TableInfo GetTableInfo(Type pocoType)
         {
             var ti = new TableInfo();
             return MapTable(ti, pocoType) ? ti : null;
         }
 
-        /// <summary>
-        ///     Get information about the column associated with a property of a POCO
-        /// </summary>
-        /// <param name="pocoProperty">The PropertyInfo of the property being queried</param>
-        /// <returns>A reference to a ColumnInfo instance, or null to ignore this property</returns>
-        /// <remarks>
-        ///     To create a ColumnInfo from a property's attributes, use PropertyInfo.FromProperty
-        /// </remarks>
+        /// <inheritdoc/>
         public virtual ColumnInfo GetColumnInfo(PropertyInfo pocoProperty)
         {
             var ci = new ColumnInfo();
             return MapColumn(ci, pocoProperty.DeclaringType, pocoProperty) ? ci : null;
         }
 
-        /// <summary>
-        ///     Supply a function to convert a database value to the correct property value
-        /// </summary>
-        /// <param name="targetProperty">The target property</param>
-        /// <param name="sourceType">The type of data returned by the DB</param>
-        /// <returns>A Func that can do the conversion, or null for no conversion</returns>
+        /// <inheritdoc/>
         public virtual Func<object, object> GetFromDbConverter(PropertyInfo targetProperty, Type sourceType)
         {
             return FromDbConverter?.Invoke(targetProperty, sourceType);
         }
 
-        /// <summary>
-        ///     Supply a function to convert a property value into a database value
-        /// </summary>
-        /// <param name="sourceProperty">The property to be converted</param>
-        /// <returns>A Func that can do the conversion</returns>
-        /// <remarks>
-        ///     This conversion is only used for converting values from POCOs that are
-        ///     being Inserted or Updated.
-        ///     Conversion is not available for parameter values passed directly to queries.
-        /// </remarks>
+        /// <inheritdoc/>
         public virtual Func<object, object> GetToDbConverter(PropertyInfo sourceProperty)
         {
             return ToDbConverter?.Invoke(sourceProperty);

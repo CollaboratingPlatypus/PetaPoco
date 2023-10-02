@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -9,33 +9,71 @@ using PetaPoco.Internal;
 
 namespace PetaPoco.Core
 {
+    /// <summary>
+    /// Represents the core data structure for PetaPoco's database operations.
+    /// </summary>
     public class PocoData
     {
+        private static readonly object _converterLock = new object();
+
         private static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
         private static List<Func<object, object>> _converters = new List<Func<object, object>>();
-        private static object _converterLock = new object();
         private static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) });
         private static MethodInfo fnIsDBNull = typeof(IDataRecord).GetMethod("IsDBNull");
         private static FieldInfo fldConverters = typeof(PocoData).GetField("_converters", BindingFlags.Static | BindingFlags.GetField | BindingFlags.NonPublic);
         private static MethodInfo fnListGetItem = typeof(List<Func<object, object>>).GetProperty("Item").GetGetMethod();
         private static MethodInfo fnInvoke = typeof(Func<object, object>).GetMethod("Invoke");
         private Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
-        public Type Type;
+
+        /// <summary>
+        /// Gets or sets the type of the POCO class represented by the PocoData instance.
+        /// </summary>
+        public Type Type { get; set; }
+
+        /// <summary>
+        /// Gets the array of all queryable database column names used by auto-select for query operations when <see
+        /// cref="IDatabase.EnableAutoSelect"/> is enabled.
+        /// </summary>
+        /// <remarks>
+        /// Column names are returned unescaped. Escaping should be applied based on the configured <see cref="IDatabase.Provider"/> if
+        /// accessing this list to construct an SQL query. To access all
+        /// <para>Excluded columns include: columns decorated with the <see cref="IgnoreAttribute"/>, unannotated columns in a POCO marked
+        /// with the <see cref="ExplicitColumnsAttribute"/>, and any <see cref="ColumnInfo.ResultColumn"/> that has opted out of auto-select
+        /// by setting <see cref="ResultColumnAttribute.IncludeInAutoSelect"/> to <see cref="IncludeInAutoSelect.No"/> or through the <see
+        /// cref="ColumnInfo.AutoSelectedResultColumn"/> property.</para>
+        /// </remarks>
         public string[] QueryColumns { get; private set; }
 
-        public string[] UpdateColumns
-        {
-            // No need to cache as it's not used by PetaPoco internally
-            get { return (from c in Columns where !c.Value.ResultColumn && c.Value.ColumnName != TableInfo.PrimaryKey select c.Key).ToArray(); }
-        }
+        /// <summary>
+        /// Gets the array of column names used for update operations, excluding result columns and the primary key.
+        /// </summary>
+        public string[] UpdateColumns // No need to cache as it's not used by PetaPoco internally
+            => (from c in Columns
+                where !c.Value.ResultColumn && c.Value.ColumnName != TableInfo.PrimaryKey
+                select c.Key).ToArray();
 
+        /// <summary>
+        /// Gets the metadata about the database table associated with the POCO class.
+        /// </summary>
         public TableInfo TableInfo { get; private set; }
+
+        /// <summary>
+        /// Gets the dictionary of PocoColumn objects, containing column metadata for the database table mapped to the POCO class.
+        /// </summary>
         public Dictionary<string, PocoColumn> Columns { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the PocoData class with default values.
+        /// </summary>
         public PocoData()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the PocoData class with the specified type and mapper.
+        /// </summary>
+        /// <param name="type">The type of the POCO class.</param>
+        /// <param name="defaultMapper">The default mapper to use for the POCO type.</param>
         public PocoData(Type type, IMapper defaultMapper)
         {
             Type = type;
@@ -69,10 +107,34 @@ namespace PetaPoco.Core
                 Columns.Add(pc.ColumnName, pc);
             }
 
-            // Build column list for automatic select
-            QueryColumns = (from c in Columns where !c.Value.ResultColumn || c.Value.AutoSelectedResultColumn select c.Key).ToArray();
+            // Build column list for auto-select queries
+            QueryColumns = (from c in Columns
+                            where !c.Value.ResultColumn || c.Value.AutoSelectedResultColumn
+                            select c.Key).ToArray();
         }
 
+        /// <summary>
+        /// Creates a new PocoData instance for the specified class type and mapper.
+        /// </summary>
+        /// <param name="type">The type to create a PocoData instance for.</param>
+        /// <param name="defaultMapper">The default mapper to use for the type.</param>
+        /// <returns>A new PocoData instance for the specified type.</returns>
+        /// <exception cref="InvalidOperationException">Trying to use dynamic types with this method.</exception>
+        public static PocoData ForType(Type type, IMapper defaultMapper)
+        {
+            if (type == typeof(System.Dynamic.ExpandoObject))
+                throw new InvalidOperationException("Cannot use dynamic types with this method");
+
+            return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
+        }
+
+        /// <summary>
+        /// Creates a new PocoData instance for the specified object, specifically a <see cref="System.Dynamic.ExpandoObject"/>.
+        /// </summary>
+        /// <param name="obj">The object to create a PocoData instance for.</param>
+        /// <param name="primaryKeyName">The name of the primary key for the object.</param>
+        /// <param name="defaultMapper">The default mapper to use for the object.</param>
+        /// <returns>A new PocoData instance for the specified object.</returns>
         public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
         {
             var t = obj.GetType();
@@ -96,42 +158,41 @@ namespace PetaPoco.Core
             return ForType(t, defaultMapper);
         }
 
-        public static PocoData ForType(Type type, IMapper defaultMapper)
+        /// <summary>
+        /// Creates a factory function to generate and cache a POCO from a data reader record at runtime. Subsequent reads attempt to locate
+        /// the object in the <see cref="Cache{TKey, TValue}"/> for performance gains.
+        /// </summary>
+        /// <param name="sql">The SQL statement.</param>
+        /// <param name="connectionString">The connection string.</param>
+        /// <param name="firstColumn">The index of the first column in the record's database table.</param>
+        /// <param name="columnCount">The number of columns in the record's database table.</param>
+        /// <param name="reader">The data reader instance.</param>
+        /// <param name="defaultMapper">The default mapper to use for the POCO.</param>
+        /// <returns>A delegate that can convert an <see cref="IDataReader"/> record into a POCO.</returns>
+        /// <exception cref="InvalidOperationException">The POCO type is a value type, or the POCO type has no default constructor, or the
+        /// POCO type is an interface or abstract class.</exception>
+        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int columnCount, IDataReader reader, IMapper defaultMapper)
         {
-            if (type == typeof(System.Dynamic.ExpandoObject))
-                throw new InvalidOperationException("Can't use dynamic types with this method");
+            // Create key for cache lookup
+            var key = Tuple.Create(sql, connectionString, firstColumn, columnCount);
 
-            return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
-        }
-
-        private static bool IsIntegralType(Type type)
-        {
-            var tc = Type.GetTypeCode(type);
-            return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
-        }
-
-        // Create factory function that can convert a IDataReader record into a POCO
-        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int countColumns, IDataReader reader, IMapper defaultMapper)
-        {
             // Check cache
-            var key = Tuple.Create<string, string, int, int>(sql, connectionString, firstColumn, countColumns);
-
             return PocoFactories.GetOrAdd(key, () =>
             {
                 // Create the method
-                var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), Type, new Type[] { typeof(IDataReader) }, true);
+                var m = new DynamicMethod("petapoco_factory_" + PocoFactories.Count.ToString(), returnType: Type, new Type[] { typeof(IDataReader) }, true);
                 var il = m.GetILGenerator();
                 var mapper = Mappers.GetMapper(Type, defaultMapper);
 
                 if (Type == typeof(object))
                 {
-                    // var poco=new T()
+                    // var poco = new T()
                     il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes)); // obj
 
                     MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
 
                     // Enumerate all fields generating a set assignment for the column
-                    for (int i = firstColumn; i < firstColumn + countColumns; i++)
+                    for (int i = firstColumn; i < firstColumn + columnCount; i++)
                     {
                         var srcType = reader.GetFieldType(i);
 
@@ -139,12 +200,11 @@ namespace PetaPoco.Core
                         il.Emit(OpCodes.Ldstr, reader.GetName(i)); // obj, obj, fieldname
 
                         // Get the converter
-                        Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo) null, srcType);
+                        Func<object, object> converter = mapper.GetFromDbConverter((PropertyInfo)null, srcType);
+                        // TODO: No null check for converter?
 
-                        /*
-						if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
-							converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
-						 */
+                        // if (ForceDateTimesToUtc && converter == null && srcType == typeof(DateTime))
+                        //     converter = delegate(object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
 
                         // Setup stack for call to converter
                         AddConverterToStack(il, converter);
@@ -213,15 +273,15 @@ namespace PetaPoco.Core
                 }
                 else
                 {
-                    // var poco=new T()
+                    // var poco = new T()
                     var ctor = Type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new Type[0], null);
                     if (ctor == null)
-                        throw new InvalidOperationException("Type [" + Type.FullName + "] should have default public or non-public constructor");
+                        throw new InvalidOperationException("Type [" + Type.FullName + "] should have a default public or non-public constructor");
 
                     il.Emit(OpCodes.Newobj, ctor);
 
-                    // Enumerate all fields generating a set assignment for the column
-                    for (int i = firstColumn; i < firstColumn + countColumns; i++)
+                    // Enumerate all fields generating a `Set` assignment for the column
+                    for (int i = firstColumn; i < firstColumn + columnCount; i++)
                     {
                         // Get the PocoColumn for this db column, ignore if not known
                         PocoColumn pc;
@@ -345,7 +405,7 @@ namespace PetaPoco.Core
             // Standard DateTime->Utc mapper
             if (pc != null && pc.ForceToUtc && srcType == typeof(DateTime) && (dstType == typeof(DateTime) || dstType == typeof(DateTime?)))
             {
-                return delegate(object src) { return new DateTime(((DateTime) src).Ticks, DateTimeKind.Utc); };
+                return delegate (object src) { return new DateTime(((DateTime)src).Ticks, DateTimeKind.Utc); };
             }
 
             // unwrap nullable types
@@ -362,34 +422,40 @@ namespace PetaPoco.Core
                 if (underlyingDstType != null)
                 {
                     // if dstType is Nullable<Enum>, convert to enum value
-                    return delegate(object src) { return Enum.ToObject(dstType, src); };
+                    return delegate (object src) { return Enum.ToObject(dstType, src); };
                 }
                 else if (srcType != backingDstType)
                 {
-                    return delegate(object src) { return Convert.ChangeType(src, backingDstType, null); };
+                    return delegate (object src) { return Convert.ChangeType(src, backingDstType, null); };
                 }
             }
             else if (!dstType.IsAssignableFrom(srcType))
             {
                 if (dstType.IsEnum && srcType == typeof(string))
                 {
-                    return delegate(object src) { return EnumMapper.EnumFromString(dstType, (string) src); };
+                    return delegate (object src) { return EnumMapper.EnumFromString(dstType, (string)src); };
                 }
 
                 if (dstType == typeof(Guid) && srcType == typeof(string))
                 {
-                    return delegate(object src) { return Guid.Parse((string) src); };
+                    return delegate (object src) { return Guid.Parse((string)src); };
                 }
 
                 if (dstType == typeof(string) && srcType == typeof(Guid))
                 {
-                    return delegate(object src) { return Convert.ToString(src); };
+                    return delegate (object src) { return Convert.ToString(src); };
                 }
 
-                return delegate(object src) { return Convert.ChangeType(src, dstType, null); };
+                return delegate (object src) { return Convert.ChangeType(src, dstType, null); };
             }
 
             return null;
+        }
+
+        private static bool IsIntegralType(Type type)
+        {
+            var tc = Type.GetTypeCode(type);
+            return tc >= TypeCode.SByte && tc <= TypeCode.UInt64;
         }
 
         private static T RecurseInheritedTypes<T>(Type t, Func<Type, T> cb)
@@ -405,12 +471,22 @@ namespace PetaPoco.Core
             return default(T);
         }
 
+        /// <summary>
+        /// Clears all cached PocoData instances.
+        /// </summary>
+        /// <remarks>
+        /// Call if you have modified a POCO class and need to reset PetaPoco's internal cache.
+        /// </remarks>
         public static void FlushCaches()
             => _pocoDatas.Flush();
 
+        /// <summary>
+        /// Gets the column name that is mapped to the given property name using a string comparison.
+        /// </summary>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <returns>The column name that maps to the given property name.</returns>
+        /// <exception cref="ArgumentNullException">No mapped column exists for <paramref name="propertyName"/>.</exception>
         public string GetColumnName(string propertyName)
-        {
-            return Columns.Values.First(c => c.PropertyInfo.Name.Equals(propertyName)).ColumnName;
-        }
+            => Columns.Values.First(c => c.PropertyInfo.Name.Equals(propertyName)).ColumnName;
     }
 }

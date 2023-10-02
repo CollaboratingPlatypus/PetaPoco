@@ -3,9 +3,17 @@
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents the attribute which decorates a POCO class to state all columns must be explicitly mapped using either a
-    ///     <seealso cref="ColumnAttribute" /> or <seealso cref="ResultColumnAttribute" />.
+    /// The ExplicitColumnsAttribute class defines an attribute for POCO classes specifying that only explicitly-marked properties should be
+    /// mapped to columns in the database table.
     /// </summary>
+    /// <remarks>
+    /// When using this attribute, any properties <i>not</i> decorated with one of the following attributes are ignored by the mapper:
+    /// <list type="bullet">
+    /// <item><see cref="ColumnAttribute"/></item>
+    /// <item><see cref="ResultColumnAttribute"/></item>
+    /// </list>
+    /// </remarks>
+    /// <seealso cref="IgnoreAttribute"/>
     [AttributeUsage(AttributeTargets.Class)]
     public class ExplicitColumnsAttribute : Attribute
     {
