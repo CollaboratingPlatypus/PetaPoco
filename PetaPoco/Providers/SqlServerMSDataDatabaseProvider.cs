@@ -3,6 +3,7 @@ using PetaPoco.Core;
 
 namespace PetaPoco.Providers
 {
+    // TODO: Rename class: SqlServerMSDataDatabaseProvider
     /// <summary>
     /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Microsoft.Data.SqlClient.
     /// </summary>

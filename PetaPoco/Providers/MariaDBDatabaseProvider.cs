@@ -4,6 +4,7 @@ using PetaPoco.Core;
 
 namespace PetaPoco.Providers
 {
+    // TODO: Rename class: MariaDBDatabaseProvider
     /// <summary>
     /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for MariaDB.
     /// </summary>

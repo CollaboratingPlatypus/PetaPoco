@@ -8,7 +8,7 @@ using PetaPoco.Utilities;
 
 namespace PetaPoco.Providers
 {
-    // TODO: Plural class name? There may be multiple providers this handles, but each instance is still only one.
+    // TODO: Rename class: SqlServerCeDatabaseProvider
     /// <summary>
     /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for SQL Server CE.
     /// </summary>

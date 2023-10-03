@@ -10,6 +10,7 @@ using PetaPoco.Utilities;
 
 namespace PetaPoco.Providers
 {
+    // TODO: Rename class: MSAccessDatabaseProvider
     /// <summary>
     /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Microsoft Access.
     /// </summary>

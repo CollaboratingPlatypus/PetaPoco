@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace PetaPoco.Providers
 {
+    // TODO: Rename class: PostgresDatabaseProvider
     /// <summary>
     /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for PostgreSQL.
     /// </summary>
