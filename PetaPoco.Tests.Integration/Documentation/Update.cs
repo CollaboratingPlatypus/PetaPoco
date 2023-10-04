@@ -10,7 +10,7 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("Documentation")]
-    public class UpdateTests : BaseDatabase
+    public class UpdateTests : BaseDbContext
     {
         public UpdateTests()
             : base(new MssqlDBTestProvider())

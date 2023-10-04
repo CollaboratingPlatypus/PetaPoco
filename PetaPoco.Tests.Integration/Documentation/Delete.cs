@@ -9,7 +9,7 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("Documentation")]
-    public class DeleteTests : BaseDatabase
+    public class DeleteTests : BaseDbContext
     {
         public DeleteTests()
             : base(new MssqlDBTestProvider())
