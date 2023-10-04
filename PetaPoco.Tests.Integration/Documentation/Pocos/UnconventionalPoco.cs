@@ -8,7 +8,7 @@ namespace PetaPoco.Tests.Integration.Documentation.Pocos
 
         public string Text { get; set; }
 
-        public void ShouldBe(UnconventionalPoco other)
+        public void PropertiesShouldBe(UnconventionalPoco other)
         {
             PrimaryKey.ShouldBe(other.PrimaryKey);
             Text.ShouldBe(other.Text);

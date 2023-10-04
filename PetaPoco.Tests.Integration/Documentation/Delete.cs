@@ -9,9 +9,9 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("Documentation")]
-    public class Deletes : BaseDatabase
+    public class DeleteTests : BaseDatabase
     {
-        public Deletes()
+        public DeleteTests()
             : base(new MssqlDBTestProvider())
         {
             PocoData.FlushCaches();

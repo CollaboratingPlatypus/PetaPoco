@@ -9,9 +9,9 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("Documentation")]
-    public class Save : BaseDatabase
+    public class SaveTests : BaseDatabase
     {
-        public Save()
+        public SaveTests()
             : base(new MssqlDBTestProvider())
         {
             PocoData.FlushCaches();
@@ -34,7 +34,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Fetch a new copy of note
             var noteFromDb = DB.Single<Note>(note.Id);
 
-            // They are the same
+            // The values in noteFromDb's column-mapped properties should be equal to the original poco's
             note.Id.ShouldBe(noteFromDb.Id);
             note.Text.ShouldBe(noteFromDb.Text);
             note.CreatedOn.Ticks.ShouldBe(noteFromDb.CreatedOn.Ticks);
@@ -54,7 +54,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Fetch a new copy of note
             var noteFromDb = DB.Single<Note>(note.Id);
 
-            // The note text is the same
+            // The values in noteFromDb's column-mapped properties should be equal to the original poco's
             note.Text.ShouldBe(noteFromDb.Text);
             note.Text.ShouldContain(" and this is my update");
         }

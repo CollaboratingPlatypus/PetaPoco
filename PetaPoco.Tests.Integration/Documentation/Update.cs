@@ -10,9 +10,9 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("Documentation")]
-    public class Updates : BaseDatabase
+    public class UpdateTests : BaseDatabase
     {
-        public Updates()
+        public UpdateTests()
             : base(new MssqlDBTestProvider())
         {
             PocoData.FlushCaches();
@@ -214,8 +214,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.SingleOrDefault<UnconventionalPoco>(id);
 
-            // See, they are the same
-            clone.ShouldBe(poco);
+            // The values in clone's column-mapped properties should be equal to the original poco's
+            clone.PropertiesShouldBe(poco);
 
             // Update the original poco
             poco.Text += " some more text";
@@ -258,7 +258,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they are the same
+            // The values in clone's column-mapped properties should be equal to the original poco's
             id.ShouldBe((int) clone.Id);
             xfile.FileName.ShouldBe((string) clone.FileName);
         }
@@ -292,7 +292,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they are the same
+            // The values in clone's column-mapped properties should be equal to the original poco's
             id.ShouldBe((int) clone.Id);
             ((string) xfile.FileName).ShouldBe((string) clone.FileName);
         }

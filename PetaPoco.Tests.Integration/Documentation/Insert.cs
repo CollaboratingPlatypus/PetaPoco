@@ -10,9 +10,9 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Documentation
 {
     [Collection("Documentation")]
-    public class Inserts : BaseDatabase
+    public class InsertTests : BaseDatabase
     {
-        public Inserts()
+        public InsertTests()
             : base(new MssqlDBTestProvider())
         {
             PocoData.FlushCaches();
@@ -33,11 +33,11 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.Single<Person>(id);
 
-            // See, they are the same
-            clone.ShouldBe(person);
+            // The values in noteFromDb's column-mapped properties should be equal to the original poco's
+            clone.PropertiesShouldBe(person);
 
             // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
-            person.Equals(clone).ShouldBeFalse();
+            person.ShouldNotBeSameAs(clone);
         }
 
         [Fact]
@@ -65,11 +65,11 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.Single<Order>(id);
 
-            // See, they are the same
-            clone.ShouldBe(order);
+            // The values in clone's column-mapped properties should be equal to the original poco's
+            clone.PropertiesShouldBe(order);
 
             // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
-            order.Equals(clone).ShouldBeFalse();
+            order.ShouldNotBeSameAs(clone);
         }
 
         [Fact]
@@ -95,11 +95,11 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: we can't use auto select builder here because PetaPoco would create columns such as People.Id
             clone = DB.Query<Person>("SELECT * FROM [SpecificPeople] sp WHERE sp.[Id] = @0", id).Single();
 
-            // See, they are the same
-            clone.ShouldBe(person);
+            // The values in clone's column-mapped properties should be equal to the original poco's
+            clone.PropertiesShouldBe(person);
 
             // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
-            person.Equals(clone).ShouldBeFalse();
+            person.ShouldNotBeSameAs(clone);
         }
 
         [Fact]
@@ -146,11 +146,11 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.Query<UnconventionalPoco>("SELECT * FROM [TBL_UnconventionalPocos] WHERE [PrimaryKey] = @0", id).Single();
 
-            // See, they are the same
-            clone.ShouldBe(poco);
+            // The values in clone's column-mapped properties should be equal to the original poco's
+            clone.PropertiesShouldBe(poco);
 
             // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
-            poco.Equals(clone).ShouldBeFalse();
+            poco.ShouldNotBeSameAs(clone);
         }
 
         [Fact]
@@ -189,11 +189,11 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Get a clone/copy from the DB
             var clone = DB.SingleOrDefault<UnconventionalPoco>(id);
 
-            // See, they are the same
-            clone.ShouldBe(poco);
+            // The values in clone's column-mapped properties should be equal to the original poco's
+            clone.PropertiesShouldBe(poco);
 
             // But they are not ReferenceEquals, as PetaPoco doesn't cache because it's a Micro-ORM.
-            poco.Equals(clone).ShouldBeFalse();
+            poco.ShouldNotBeSameAs(clone);
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they are the same
+            // The values in clone's column-mapped properties should be equal to the original poco's
             id.ShouldBe((int)clone.Id);
             xfile.FileName.ShouldBe((string)clone.FileName);
         }
@@ -246,7 +246,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Note: Check out the named parameters - cool eh?
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
-            // See, they are the same
+            // The values in clone's column-mapped properties should be equal to the original poco's
             id.ShouldBe((int)clone.Id);
             ((string)xfile.FileName).ShouldBe((string)clone.FileName);
         }
