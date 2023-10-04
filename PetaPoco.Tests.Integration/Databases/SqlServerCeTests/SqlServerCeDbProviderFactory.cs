@@ -1,17 +1,17 @@
-﻿using System;
+﻿#if MSSQLCE_TESTS_ENABLED
+using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 
-#if MSSQLCE_TESTS_ENABLED
 namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
     public class MssqlCeDBTestProvider : DBTestProvider
     {
-        protected override string ConnectionName => "mssqlce";
+        protected override string ConnectionName => "SqlServerCe";
 
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLCeBuildDatabase.sql";
+        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqlServerCeBuildDatabase.sql";
 
         public MssqlCeDBTestProvider()
         {
@@ -35,7 +35,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         {
             if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "petapoco.sdf")))
             {
-                using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["mssqlce"].ConnectionString))
+                using (var engine = new SqlCeEngine(ConfigurationManager.ConnectionStrings["SqlServerCe"].ConnectionString))
                 {
                     engine.CreateDatabase();
                 }

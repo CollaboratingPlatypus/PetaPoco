@@ -11,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
     // TODO: Move PreExecute tests to Base class (either BaseExecuteTests or new BasePreExecuteTests)
 
-    [Collection("MssqlMsData")]
+    [Collection("SqlServerMSData")]
     public class MssqlMsDataPreExecuteTests : BaseDbContext
     {
         public MssqlMsDataPreExecuteDatabaseProvider Provider => DB.Provider as MssqlMsDataPreExecuteDatabaseProvider;

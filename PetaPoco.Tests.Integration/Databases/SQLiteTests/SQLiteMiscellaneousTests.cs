@@ -2,7 +2,7 @@
 
 namespace PetaPoco.Tests.Integration.Databases.Sqlite
 {
-    [Collection("Sqlite")]
+    [Collection("SQLite")]
     public class SqliteMiscellaneousTests : BaseMiscellaneousTests
     {
         public SqliteMiscellaneousTests()

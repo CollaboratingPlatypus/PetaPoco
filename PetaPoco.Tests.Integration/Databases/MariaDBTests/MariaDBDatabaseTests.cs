@@ -2,7 +2,7 @@
 
 namespace PetaPoco.Tests.Integration.Databases.MariaDb
 {
-    [Collection("MariaDb")]
+    [Collection("MariaDB")]
     public class MariaDbDatabaseTests : BaseDatabaseTests
     {
         public MariaDbDatabaseTests()

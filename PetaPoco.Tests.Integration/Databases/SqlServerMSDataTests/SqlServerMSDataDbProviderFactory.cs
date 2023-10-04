@@ -5,10 +5,10 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
     public class MssqlMsDataDBTestProvider : BaseDbProviderFactory
     {
-        private string _connectionName = "mssqlmsdata";
+        private string _connectionName = "SqlServerMSData";
         protected override string ConnectionName => _connectionName;
 
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSSQLBuildDatabase.sql";
+        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqlServerBuildDatabase.sql";
 
         public override IDatabase Execute()
         {
@@ -23,9 +23,9 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 
         private void EnsureDatabaseExists()
         {
-            _connectionName = "mssqlmsdata_builder";
+            _connectionName = "SqlServerMSData_Builder";
             Database.Execute("IF(db_id(N'PetaPocoMsData') IS NULL) BEGIN CREATE DATABASE [PetaPocoMsData] END");
-            _connectionName = "mssqlmsdata";
+            _connectionName = "SqlServerMSData";
         }
     }
 }

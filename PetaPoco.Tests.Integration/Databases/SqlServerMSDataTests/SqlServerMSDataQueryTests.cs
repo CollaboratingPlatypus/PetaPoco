@@ -8,7 +8,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 {
-    [Collection("MssqlMsData")]
+    [Collection("SqlServerMSData")]
     public class MssqlMsDataQueryTests : BaseQueryTests
     {
         public MssqlMsDataQueryTests()

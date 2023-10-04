@@ -2,7 +2,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
-    [Collection("Mssql")]
+    [Collection("SqlServer")]
     public class MssqlUpdateTests : BaseUpdateTests
     {
         public MssqlUpdateTests()

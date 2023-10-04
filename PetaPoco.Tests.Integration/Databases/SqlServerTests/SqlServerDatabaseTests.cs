@@ -2,7 +2,7 @@
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
-    [Collection("Mssql")]
+    [Collection("SqlServer")]
     public class MssqlDatabaseTests : BaseDatabaseTests
     {
         public MssqlDatabaseTests()

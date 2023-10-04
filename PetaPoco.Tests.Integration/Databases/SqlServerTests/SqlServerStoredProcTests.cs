@@ -4,7 +4,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSSQL
 {
-    [Collection("Mssql")]
+    [Collection("SqlServer")]
     public class MssqlStoredProcTests : BaseStoredProcTests
     {
         protected override Type DataParameterType => typeof(SqlParameter);

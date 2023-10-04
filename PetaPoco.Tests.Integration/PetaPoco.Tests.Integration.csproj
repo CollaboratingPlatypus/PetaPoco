@@ -15,31 +15,34 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <Compile Remove="Databases\MSAccess\**" />
-    <Compile Remove="Databases\MSSQLCe\**" />
+    <Compile Remove="Databases\MSAccessTests\**" />
     <Compile Remove="DataSources\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Databases\SqlServerCeTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Scripts\FirebirdBuildDatabase.sql" />
-    <None Remove="Scripts\MariaDbBuildDatabase.sql" />
+    <None Remove="Scripts\MariaDBBuildDatabase.sql" />
     <None Remove="Scripts\MSAccessBuildDatabase.sql" />
-    <None Remove="Scripts\MSSQLBuildDatabase.sql" />
-    <None Remove="Scripts\MSSQLCeBuildDatabase.sql" />
     <None Remove="Scripts\MySqlBuildDatabase.sql" />
     <None Remove="Scripts\PostgresBuildDatabase.sql" />
-    <None Remove="Scripts\SqliteBuildDatabase.sql" />
+    <None Remove="Scripts\SQLiteBuildDatabase.sql" />
+    <None Remove="Scripts\SqlServerBuildDatabase.sql" />
+    <None Remove="Scripts\SqlServerCeBuildDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\FirebirdBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\MariaDBBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MSSQLBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MSSQLCeBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MySqlBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\SqliteBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>

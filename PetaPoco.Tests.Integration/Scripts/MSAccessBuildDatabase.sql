@@ -8,7 +8,7 @@ DROP TABLE [TransactionLogs];
 DROP TABLE [Note];
 
 CREATE TABLE [People] (
-	[Id] TEXT NOT NULL PRIMARY KEY,
+	[Id] MEMO NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE [People] (
 
 CREATE TABLE [Orders] (
 	[Id] AUTOINCREMENT PRIMARY KEY,
-	[PersonId] TEXT CONSTRAINT FK_O_PersonId REFERENCES [People](Id),
+	[PersonId] MEMO CONSTRAINT FK_O_PersonId REFERENCES [People](Id),
 	[PoNumber] MEMO NOT NULL,
 	[OrderStatus] INTEGER NOT NULL,
 	[CreatedOn] Datetime NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE [OrderLines] (
 );
 
 CREATE TABLE [SpecificPeople] (
-	[Id] TEXT NOT NULL PRIMARY KEY,
+	[Id] MEMO NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
 	[Age] Long NOT NULL,
 	[Height] INTEGER NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE [SpecificPeople] (
 
 CREATE TABLE [SpecificOrders] (
 	[Id] AUTOINCREMENT PRIMARY KEY,
-	[PersonId] TEXT CONSTRAINT FK_SO_PersonId REFERENCES [SpecificPeople](Id),
+	[PersonId] MEMO CONSTRAINT FK_SO_PersonId REFERENCES [SpecificPeople](Id),
 	[PoNumber] MEMO NOT NULL,
 	[OrderStatus] INTEGER NOT NULL,
 	[CreatedOn] Datetime NOT NULL,

@@ -5,7 +5,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     public class MsAccessDBTestProvider : BaseDbProviderFactory
     {
-        protected override string ConnectionName => "msaccess";
+        protected override string ConnectionName => "MSAccess";
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSAccessBuildDatabase.sql";
 

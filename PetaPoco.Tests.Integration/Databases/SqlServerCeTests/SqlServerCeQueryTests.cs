@@ -1,11 +1,11 @@
-﻿using System;
+﻿#if MSSQLCE_TESTS_ENABLED
+using System;
 using Shouldly;
 using Xunit;
 
-#if MSSQLCE_TESTS_ENABLED
 namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
 {
-    [Collection("MssqlCe")]
+    [Collection("SqlServerCe")]
     public class MssqlCeQueryTests : BaseQueryTests
     {
         public MssqlCeQueryTests()

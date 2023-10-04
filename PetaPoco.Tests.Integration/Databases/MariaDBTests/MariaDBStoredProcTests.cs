@@ -4,7 +4,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MariaDb
 {
-    [Collection("MariaDb")]
+    [Collection("MariaDB")]
     public class MariaDbStoredProcTests : BaseStoredProcTests
     {
         protected override Type DataParameterType => typeof(MySqlParameter);
