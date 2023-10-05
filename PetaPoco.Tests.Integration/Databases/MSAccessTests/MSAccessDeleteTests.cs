@@ -3,10 +3,10 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     [Collection("MSAccess")]
-    public class MsAccessDeleteTests : BaseDeleteTests
+    public class MSAccessDeleteTests : DeleteTests
     {
-        public MsAccessDeleteTests()
-            : base(new MsAccessDBTestProvider())
+        public MSAccessDeleteTests()
+            : base(new MSAccessDbProviderFactory())
         {
         }
     }

@@ -7,17 +7,17 @@ using PetaPoco.Providers;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQL
+namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     // TODO: Move PreExecute tests to Base class (either BaseExecuteTests or new BasePreExecuteTests)
 
     [Collection("SqlServer")]
-    public class MssqlPreExecuteTests : BaseDbContext
+    public class SqlServerPreExecuteTests : BaseDbContext
     {
-        public MsssqlPreExecuteDatabaseProvider Provider => DB.Provider as MsssqlPreExecuteDatabaseProvider;
+        public SqlServerPreExecuteDatabaseProvider Provider => DB.Provider as SqlServerPreExecuteDatabaseProvider;
 
-        public MssqlPreExecuteTests()
-            : base(new MssqlPreExecuteDBTestProvider())
+        public SqlServerPreExecuteTests()
+            : base(new SqlServerPreExecuteDBTestProvider())
         {
             Provider.ThrowExceptions = true;
         }
@@ -166,18 +166,17 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQL
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
-
-        public class MssqlPreExecuteDBTestProvider : MssqlDBTestProvider
+        public class SqlServerPreExecuteDBTestProvider : SqlServerDbProviderFactory
         {
             protected override IDatabase LoadFromConnectionName(string name)
             {
                 var config = BuildFromConnectionName(name);
-                config.UsingProvider<MsssqlPreExecuteDatabaseProvider>();
+                config.UsingProvider<SqlServerPreExecuteDatabaseProvider>();
                 return config.Create();
             }
         }
 
-        public class MsssqlPreExecuteDatabaseProvider : SqlServerDatabaseProvider
+        public class SqlServerPreExecuteDatabaseProvider : SqlServerDatabaseProvider
         {
             public bool ThrowExceptions { get; set; }
             public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();

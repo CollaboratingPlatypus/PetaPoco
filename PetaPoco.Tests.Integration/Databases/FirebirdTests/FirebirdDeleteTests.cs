@@ -3,10 +3,10 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     [Collection("Firebird")]
-    public class FirebirdDeleteTests : BaseDeleteTests
+    public class FirebirdDeleteTests : DeleteTests
     {
         public FirebirdDeleteTests()
-            : base(new FirebirdDBTestProvider())
+            : base(new FirebirdDbProviderFactory())
         {
         }
     }

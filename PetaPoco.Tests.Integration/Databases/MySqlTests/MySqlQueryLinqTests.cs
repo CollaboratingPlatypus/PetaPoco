@@ -1,12 +1,12 @@
 ﻿using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MySQL
+namespace PetaPoco.Tests.Integration.Databases.MySql
 {
     [Collection("MySql")]
-    public class MySqlQueryLinqTests : BaseQueryLinqTests
+    public class MySqlQueryLinqTests : QueryLinqTests
     {
         public MySqlQueryLinqTests()
-            : base(new MySqlDBTestProvider())
+            : base(new MySqlDbProviderFactory())
         {
         }
     }

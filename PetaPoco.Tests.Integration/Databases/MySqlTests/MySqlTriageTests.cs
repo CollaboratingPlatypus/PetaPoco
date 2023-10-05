@@ -1,12 +1,12 @@
 ﻿using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MySQL
+namespace PetaPoco.Tests.Integration.Databases.MySql
 {
     [Collection("MySql")]
-    public class MySqlTriageTests : BaseTriageTests
+    public class MySqlTriageTests : TriageTests
     {
         public MySqlTriageTests()
-            : base(new MySqlDBTestProvider())
+            : base(new MySqlDbProviderFactory())
         {
         }
     }

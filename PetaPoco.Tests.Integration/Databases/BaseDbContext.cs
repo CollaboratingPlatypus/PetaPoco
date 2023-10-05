@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
     public abstract class BaseDbContext : IDisposable
     {

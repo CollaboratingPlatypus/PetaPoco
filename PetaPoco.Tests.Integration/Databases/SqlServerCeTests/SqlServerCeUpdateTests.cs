@@ -1,15 +1,13 @@
-#if MSSQLCE_TESTS_ENABLED
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
+namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
 {
     [Collection("SqlServerCe")]
-    public class MssqlCeUpdateTests : BaseUpdateTests
+    public class SqlServerCeUpdateTests : UpdateTests
     {
-        public MssqlCeUpdateTests()
-            : base(new MssqlCeDBTestProvider())
+        public SqlServerCeUpdateTests()
+            : base(new SqlServerCeDbProviderFactory())
         {
         }
     }
 }
-#endif

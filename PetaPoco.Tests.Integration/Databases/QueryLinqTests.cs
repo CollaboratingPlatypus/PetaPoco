@@ -6,9 +6,9 @@ using Xunit;
 
 // TODO: Use specific exception types when asserting thrown exceptions
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseQueryLinqTests : BaseDbContext
+    public abstract class QueryLinqTests : BaseDbContext
     {
         // TODO: Move to base class, combine with other test data
         #region Test Data
@@ -39,7 +39,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         #endregion
 
-        protected BaseQueryLinqTests(BaseDbProviderFactory provider)
+        protected QueryLinqTests(BaseDbProviderFactory provider)
             : base(provider)
         {
         }

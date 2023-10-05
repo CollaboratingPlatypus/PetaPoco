@@ -3,10 +3,10 @@
 namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
 {
     [Collection("MySqlConnector")]
-    public class MySqlConnectorQueryLinqTests : BaseQueryLinqTests
+    public class MySqlConnectorQueryLinqTests : QueryLinqTests
     {
         public MySqlConnectorQueryLinqTests()
-            : base(new MySqlConnectorDBTestProvider())
+            : base(new MySqlConnectorDbProviderFactory())
         {
         }
     }

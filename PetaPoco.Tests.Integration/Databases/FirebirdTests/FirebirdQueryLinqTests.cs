@@ -3,10 +3,10 @@
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     [Collection("Firebird")]
-    public class FirebirdQueryLinqTests : BaseQueryLinqTests
+    public class FirebirdQueryLinqTests : QueryLinqTests
     {
         public FirebirdQueryLinqTests()
-            : base(new FirebirdDBTestProvider())
+            : base(new FirebirdDbProviderFactory())
         {
         }
     }

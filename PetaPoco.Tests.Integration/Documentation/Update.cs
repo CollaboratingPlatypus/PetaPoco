@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 using PetaPoco.Core;
-using PetaPoco.Tests.Integration.Databases;
-using PetaPoco.Tests.Integration.Databases.MSSQL;
+using PetaPoco.Tests.Integration.Databases.SqlServer;
 using PetaPoco.Tests.Integration.Documentation.Pocos;
 using Shouldly;
 using Xunit;
@@ -13,7 +12,7 @@ namespace PetaPoco.Tests.Integration.Documentation
     public class UpdateTests : BaseDbContext
     {
         public UpdateTests()
-            : base(new MssqlDBTestProvider())
+            : base(new SqlServerDbProviderFactory())
         {
             PocoData.FlushCaches();
         }
@@ -259,8 +258,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // The values in clone's column-mapped properties should be equal to the original poco's
-            id.ShouldBe((int) clone.Id);
-            xfile.FileName.ShouldBe((string) clone.FileName);
+            id.ShouldBe((int)clone.Id);
+            xfile.FileName.ShouldBe((string)clone.FileName);
         }
 
         [Fact]
@@ -293,8 +292,8 @@ namespace PetaPoco.Tests.Integration.Documentation
             var clone = DB.Query<dynamic>("SELECT * FROM [XFiles] WHERE [Id] = @Id", new { Id = id }).Single();
 
             // The values in clone's column-mapped properties should be equal to the original poco's
-            id.ShouldBe((int) clone.Id);
-            ((string) xfile.FileName).ShouldBe((string) clone.FileName);
+            id.ShouldBe((int)clone.Id);
+            ((string)xfile.FileName).ShouldBe((string)clone.FileName);
         }
     }
 }

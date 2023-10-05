@@ -6,13 +6,13 @@ using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQL
+namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     [Collection("SqlServer")]
-    public class MssqlQueryTests : BaseQueryTests
+    public class SqlServerQueryTests : QueryTests
     {
-        public MssqlQueryTests()
-            : base(new MssqlDBTestProvider())
+        public SqlServerQueryTests()
+            : base(new SqlServerDbProviderFactory())
         {
         }
 

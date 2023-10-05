@@ -3,10 +3,10 @@
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     [Collection("MSAccess")]
-    public class MsAccessDatabaseTests : BaseDatabaseTests
+    public class MSAccessDatabaseTests : DatabaseTests
     {
-        public MsAccessDatabaseTests()
-            : base(new MsAccessDBTestProvider())
+        public MSAccessDatabaseTests()
+            : base(new MSAccessDbProviderFactory())
         {
         }
 

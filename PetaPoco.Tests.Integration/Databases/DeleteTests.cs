@@ -4,9 +4,9 @@ using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseDeleteTests : BaseDbContext
+    public abstract class DeleteTests : BaseDbContext
     {
         // TODO: Move to base class, combine with other test data
         #region Test Data
@@ -49,7 +49,7 @@ namespace PetaPoco.Tests.Integration.Databases
 
         #endregion
 
-        protected BaseDeleteTests(BaseDbProviderFactory provider)
+        protected DeleteTests(BaseDbProviderFactory provider)
             : base(provider)
         {
         }

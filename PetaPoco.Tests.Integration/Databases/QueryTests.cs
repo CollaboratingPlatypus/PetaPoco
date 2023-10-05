@@ -9,11 +9,11 @@ using PetaPoco.Utilities;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseQueryTests : BaseDbContext
+    public abstract class QueryTests : BaseDbContext
     {
-        protected BaseQueryTests(BaseDbProviderFactory provider)
+        protected QueryTests(BaseDbProviderFactory provider)
             : base(provider)
         {
         }

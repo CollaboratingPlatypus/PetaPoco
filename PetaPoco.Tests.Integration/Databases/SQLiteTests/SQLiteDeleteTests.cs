@@ -1,12 +1,12 @@
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.Sqlite
+namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
     [Collection("SQLite")]
-    public class SqliteDeleteTests : BaseDeleteTests
+    public class SQLiteDeleteTests : DeleteTests
     {
-        public SqliteDeleteTests()
-            : base(new SqliteDBTestProvider())
+        public SQLiteDeleteTests()
+            : base(new SQLiteDbProviderFactory())
         {
         }
     }

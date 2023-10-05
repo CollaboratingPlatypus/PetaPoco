@@ -6,13 +6,13 @@ using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MySQL
+namespace PetaPoco.Tests.Integration.Databases.MySql
 {
     [Collection("MySql")]
-    public class MySqlQueryTests : BaseQueryTests
+    public class MySqlQueryTests : QueryTests
     {
         public MySqlQueryTests()
-            : base(new MySqlDBTestProvider())
+            : base(new MySqlDbProviderFactory())
         {
         }
 

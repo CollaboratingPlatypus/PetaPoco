@@ -1,12 +1,8 @@
-﻿using PetaPoco.Tests.Integration.Models;
-using Shouldly;
-using Xunit;
-
-namespace PetaPoco.Tests.Integration.Databases
+﻿namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseTriageTests : BaseDbContext
+    public abstract class TriageTests : BaseDbContext
     {
-        protected BaseTriageTests(BaseDbProviderFactory provider)
+        protected TriageTests(BaseDbProviderFactory provider)
             : base(provider)
         {
         }

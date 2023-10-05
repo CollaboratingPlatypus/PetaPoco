@@ -5,12 +5,12 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
     [Collection("Firebird")]
-    public class FirebirdStoredProcTests : BaseStoredProcTests
+    public class FirebirdStoredProcTests : StoredProcTests
     {
         protected override Type DataParameterType => typeof(FbParameter);
 
         public FirebirdStoredProcTests()
-            : base(new FirebirdDBTestProvider())
+            : base(new FirebirdDbProviderFactory())
         {
         }
     }

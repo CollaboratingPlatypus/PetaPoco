@@ -5,10 +5,10 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
     [Collection("Postgres")]
-    public class PostgresInsertTests : BaseInsertTests
+    public class PostgresInsertTests : InsertTests
     {
         public PostgresInsertTests()
-            : base(new PostgresDBTestProvider())
+            : base(new PostgresDbProviderFactory())
         {
         }
 

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
-    public class MsAccessDBTestProvider : BaseDbProviderFactory
+    public class MSAccessDbProviderFactory : BaseDbProviderFactory
     {
         protected override string ConnectionName => "MSAccess";
 

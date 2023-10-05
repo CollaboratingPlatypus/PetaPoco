@@ -1,19 +1,18 @@
-﻿#if MSSQLCE_TESTS_ENABLED
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
+namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
 {
-    public class MssqlCeDBTestProvider : DBTestProvider
+    public class SqlServerCeDbProviderFactory : BaseDbProviderFactory
     {
         protected override string ConnectionName => "SqlServerCe";
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqlServerCeBuildDatabase.sql";
 
-        public MssqlCeDBTestProvider()
+        public SqlServerCeDbProviderFactory()
         {
             // Hack: Nuget package is old and doesn't support newer content
             // ReSharper disable AssignNullToNotNullAttribute
@@ -69,4 +68,3 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         }
     }
 }
-#endif

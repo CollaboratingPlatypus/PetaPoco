@@ -6,13 +6,13 @@ using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.Sqlite
+namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
     [Collection("SQLite")]
-    public class SqliteQueryTests : BaseQueryTests
+    public class SQLiteQueryTests : QueryTests
     {
-        public SqliteQueryTests()
-            : base(new SqliteDBTestProvider())
+        public SQLiteQueryTests()
+            : base(new SQLiteDbProviderFactory())
         {
         }
 

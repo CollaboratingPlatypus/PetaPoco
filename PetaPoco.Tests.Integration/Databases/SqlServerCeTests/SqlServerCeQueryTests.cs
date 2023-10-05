@@ -1,15 +1,14 @@
-﻿#if MSSQLCE_TESTS_ENABLED
-using System;
+﻿using System;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
+namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
 {
     [Collection("SqlServerCe")]
-    public class MssqlCeQueryTests : BaseQueryTests
+    public class SqlServerCeQueryTests : QueryTests
     {
-        public MssqlCeQueryTests()
-            : base(new MssqlCeDBTestProvider())
+        public SqlServerCeQueryTests()
+            : base(new SqlServerCeDbProviderFactory())
         {
         }
 
@@ -106,4 +105,3 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLCe
         public int? IntValue { get; set; }
     }
 }
-#endif

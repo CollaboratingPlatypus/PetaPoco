@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
+namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
 {
-    public class MssqlMsDataDBTestProvider : BaseDbProviderFactory
+    public class SqlServerMSDataDbProviderFactory : BaseDbProviderFactory
     {
         private string _connectionName = "SqlServerMSData";
         protected override string ConnectionName => _connectionName;

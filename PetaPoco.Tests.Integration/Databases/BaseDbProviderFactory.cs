@@ -3,7 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
     public abstract class BaseDbProviderFactory : IDisposable
     {

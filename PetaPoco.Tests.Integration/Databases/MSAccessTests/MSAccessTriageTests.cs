@@ -3,10 +3,10 @@
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
     [Collection("MSAccess")]
-    public class MsAccessTriageTests : BaseTriageTests
+    public class MSAccessTriageTests : TriageTests
     {
-        public MsAccessTriageTests()
-            : base(new MsAccessDBTestProvider())
+        public MSAccessTriageTests()
+            : base(new MSAccessDbProviderFactory())
         {
         }
     }

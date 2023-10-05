@@ -1,12 +1,12 @@
 ﻿using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQL
+namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     [Collection("SqlServer")]
-    public class MssqlTriageTests : BaseTriageTests
+    public class SqlServerTriageTests : TriageTests
     {
-        public MssqlTriageTests()
-            : base(new MssqlDBTestProvider())
+        public SqlServerTriageTests()
+            : base(new SqlServerDbProviderFactory())
         {
         }
     }

@@ -1,19 +1,19 @@
 ﻿using System.Reflection;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.Sqlite
+namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
     [Collection("SQLite")]
-    public class SqliteDatabaseTests : BaseDatabaseTests
+    public class SQLiteDatabaseTests : DatabaseTests
     {
-        private readonly SqliteDBTestProvider _provider;
+        private readonly SQLiteDbProviderFactory _provider;
 
-        public SqliteDatabaseTests()
-            : this(new SqliteDBTestProvider())
+        public SQLiteDatabaseTests()
+            : this(new SQLiteDbProviderFactory())
         {
         }
 
-        private SqliteDatabaseTests(SqliteDBTestProvider provider)
+        private SQLiteDatabaseTests(SQLiteDbProviderFactory provider)
             : base(provider)
         {
             _provider = provider;

@@ -1,12 +1,12 @@
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MySQL
+namespace PetaPoco.Tests.Integration.Databases.MySql
 {
     [Collection("MySql")]
-    public class MySqlDeleteTests : BaseDeleteTests
+    public class MySqlDeleteTests : DeleteTests
     {
         public MySqlDeleteTests()
-            : base(new MySqlDBTestProvider())
+            : base(new MySqlDbProviderFactory())
         {
         }
     }

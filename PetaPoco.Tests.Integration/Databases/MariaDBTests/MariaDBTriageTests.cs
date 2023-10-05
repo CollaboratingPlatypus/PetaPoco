@@ -1,12 +1,12 @@
 ﻿using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MariaDb
+namespace PetaPoco.Tests.Integration.Databases.MariaDB
 {
     [Collection("MariaDB")]
-    public class MariaDbTriageTests : BaseTriageTests
+    public class MariaDBTriageTests : TriageTests
     {
-        public MariaDbTriageTests()
-            : base(new MariaDbDBTestProvider())
+        public MariaDBTriageTests()
+            : base(new MariaDBDbProviderFactory())
         {
         }
     }

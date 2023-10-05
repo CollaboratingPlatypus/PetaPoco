@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Shouldly;
+﻿using Shouldly;
 
 namespace PetaPoco.Tests.Integration.Models.MSAccess
 {

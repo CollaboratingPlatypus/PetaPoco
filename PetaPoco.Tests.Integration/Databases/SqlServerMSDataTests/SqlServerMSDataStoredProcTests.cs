@@ -2,15 +2,15 @@
 using Microsoft.Data.SqlClient;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
+namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
 {
     [Collection("SqlServerMSData")]
-    public class MssqlMsDataStoredProcTests : BaseStoredProcTests
+    public class SqlServerMSDataStoredProcTests : StoredProcTests
     {
         protected override Type DataParameterType => typeof(SqlParameter);
 
-        public MssqlMsDataStoredProcTests()
-            : base(new MssqlMsDataDBTestProvider())
+        public SqlServerMSDataStoredProcTests()
+            : base(new SqlServerMSDataDbProviderFactory())
         {
         }
     }

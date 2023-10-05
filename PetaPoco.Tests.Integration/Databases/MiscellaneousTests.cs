@@ -1,11 +1,11 @@
 ﻿using PetaPoco.Tests.Integration.Models;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseMiscellaneousTests : BaseDbContext
+    public abstract class MiscellaneousTests : BaseDbContext
     {
-        protected BaseMiscellaneousTests(BaseDbProviderFactory provider)
+        protected MiscellaneousTests(BaseDbProviderFactory provider)
             : base(provider)
         {
         }

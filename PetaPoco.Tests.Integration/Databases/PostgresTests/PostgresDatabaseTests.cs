@@ -3,10 +3,10 @@
 namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
     [Collection("Postgres")]
-    public class PostgresDatabaseTests : BaseDatabaseTests
+    public class PostgresDatabaseTests : DatabaseTests
     {
         public PostgresDatabaseTests()
-            : base(new PostgresDBTestProvider())
+            : base(new PostgresDbProviderFactory())
         {
         }
     }

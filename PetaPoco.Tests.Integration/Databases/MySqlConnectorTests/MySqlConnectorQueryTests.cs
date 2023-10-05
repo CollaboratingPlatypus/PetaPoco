@@ -9,10 +9,10 @@ using Xunit;
 namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
 {
     [Collection("MySqlConnector")]
-    public class MySqlConnectorQueryTests : BaseQueryTests
+    public class MySqlConnectorQueryTests : QueryTests
     {
         public MySqlConnectorQueryTests()
-            : base(new MySqlConnectorDBTestProvider())
+            : base(new MySqlConnectorDbProviderFactory())
         {
         }
 

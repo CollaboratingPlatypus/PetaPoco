@@ -1,7 +1,6 @@
 ﻿using System;
 using PetaPoco.Core;
-using PetaPoco.Tests.Integration.Databases;
-using PetaPoco.Tests.Integration.Databases.MSSQL;
+using PetaPoco.Tests.Integration.Databases.SqlServer;
 using PetaPoco.Tests.Integration.Documentation.Pocos;
 using Shouldly;
 using Xunit;
@@ -12,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Documentation
     public class DeleteTests : BaseDbContext
     {
         public DeleteTests()
-            : base(new MssqlDBTestProvider())
+            : base(new SqlServerDbProviderFactory())
         {
             PocoData.FlushCaches();
         }

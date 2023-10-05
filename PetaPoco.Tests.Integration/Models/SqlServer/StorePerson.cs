@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PetaPoco.Tests.Integration.Models.MSSQL
+namespace PetaPoco.Tests.Integration.Models.SqlServer
 {
     [TableName("store.People")]
     [PrimaryKey("Id", AutoIncrement = false)]

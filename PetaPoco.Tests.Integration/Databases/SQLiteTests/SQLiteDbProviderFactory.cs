@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-namespace PetaPoco.Tests.Integration.Databases.Sqlite
+namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
-    public class SqliteDBTestProvider : BaseDbProviderFactory
+    public class SQLiteDbProviderFactory : BaseDbProviderFactory
     {
         protected override string ConnectionName => "SQLite";
 

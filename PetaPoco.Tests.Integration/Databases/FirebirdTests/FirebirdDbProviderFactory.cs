@@ -5,7 +5,7 @@ using FirebirdSql.Data.Isql;
 
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
-    public class FirebirdDBTestProvider : BaseDbProviderFactory
+    public class FirebirdDbProviderFactory : BaseDbProviderFactory
     {
         protected override string ConnectionName => "Firebird";
 

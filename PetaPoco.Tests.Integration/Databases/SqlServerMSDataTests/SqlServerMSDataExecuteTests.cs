@@ -1,12 +1,12 @@
 ﻿using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
+namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
 {
     [Collection("SqlServerMSData")]
-    public class MssqlMsDataExecuteTests : BaseExecuteTests
+    public class SqlServerMSDataExecuteTests : ExecuteTests
     {
-        public MssqlMsDataExecuteTests()
-            : base(new MssqlMsDataDBTestProvider())
+        public SqlServerMSDataExecuteTests()
+            : base(new SqlServerMSDataDbProviderFactory())
         {
         }
     }

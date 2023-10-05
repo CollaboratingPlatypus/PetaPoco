@@ -1,12 +1,12 @@
 ﻿using System;
-using PetaPoco.Tests.Integration.Models.MSSQL;
+using PetaPoco.Tests.Integration.Models.SqlServer;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
+namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
 {
     [Collection("SqlServerMSData")]
-    public class MssqlMsDataQueryLinqTests : BaseQueryLinqTests
+    public class SqlServerMSDataQueryLinqTests : QueryLinqTests
     {
         #region Test Data
 
@@ -19,8 +19,8 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
 
         #endregion
 
-        public MssqlMsDataQueryLinqTests()
-            : base(new MssqlMsDataDBTestProvider())
+        public SqlServerMSDataQueryLinqTests()
+            : base(new SqlServerMSDataDbProviderFactory())
         {
         }
 

@@ -7,13 +7,13 @@ using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases
+namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseStoredProcTests : BaseDbContext
+    public abstract class StoredProcTests : BaseDbContext
     {
         protected abstract Type DataParameterType { get; }
 
-        protected BaseStoredProcTests(BaseDbProviderFactory provider)
+        protected StoredProcTests(BaseDbProviderFactory provider)
             : base(provider)
         {
             AddPeople(6);

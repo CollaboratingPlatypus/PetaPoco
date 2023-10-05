@@ -7,17 +7,17 @@ using PetaPoco.Providers;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
+namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
 {
     // TODO: Move PreExecute tests to Base class (either BaseExecuteTests or new BasePreExecuteTests)
 
     [Collection("SqlServerMSData")]
-    public class MssqlMsDataPreExecuteTests : BaseDbContext
+    public class SqlServerMSDataPreExecuteTests : BaseDbContext
     {
-        public MssqlMsDataPreExecuteDatabaseProvider Provider => DB.Provider as MssqlMsDataPreExecuteDatabaseProvider;
+        public SqlServerMSDataPreExecuteDatabaseProvider Provider => DB.Provider as SqlServerMSDataPreExecuteDatabaseProvider;
 
-        public MssqlMsDataPreExecuteTests()
-            : base(new MssqlMsDataPreExecuteDBTestProvider())
+        public SqlServerMSDataPreExecuteTests()
+            : base(new SqlServerMSDataPreExecuteDBTestProvider())
         {
             Provider.ThrowExceptions = true;
         }
@@ -166,17 +166,17 @@ namespace PetaPoco.Tests.Integration.Databases.MSSQLMsData
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
 
-        public class MssqlMsDataPreExecuteDBTestProvider : MssqlMsDataDBTestProvider
+        public class SqlServerMSDataPreExecuteDBTestProvider : SqlServerMSDataDbProviderFactory
         {
             protected override IDatabase LoadFromConnectionName(string name)
             {
                 var config = BuildFromConnectionName(name);
-                config.UsingProvider<MssqlMsDataPreExecuteDatabaseProvider>();
+                config.UsingProvider<SqlServerMSDataPreExecuteDatabaseProvider>();
                 return config.Create();
             }
         }
 
-        public class MssqlMsDataPreExecuteDatabaseProvider : SqlServerDatabaseProvider
+        public class SqlServerMSDataPreExecuteDatabaseProvider : SqlServerDatabaseProvider
         {
             public bool ThrowExceptions { get; set; }
             public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();

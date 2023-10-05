@@ -2,15 +2,15 @@
 using MySql.Data.MySqlClient;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MariaDb
+namespace PetaPoco.Tests.Integration.Databases.MariaDB
 {
     [Collection("MariaDB")]
-    public class MariaDbStoredProcTests : BaseStoredProcTests
+    public class MariaDBStoredProcTests : StoredProcTests
     {
         protected override Type DataParameterType => typeof(MySqlParameter);
 
-        public MariaDbStoredProcTests()
-            : base(new MariaDbDBTestProvider())
+        public MariaDBStoredProcTests()
+            : base(new MariaDBDbProviderFactory())
         {
         }
     }

@@ -1,12 +1,12 @@
 ﻿using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MSSQL
+namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     [Collection("SqlServer")]
-    public class MssqlDatabaseTests : BaseDatabaseTests
+    public class SqlServerDatabaseTests : DatabaseTests
     {
-        public MssqlDatabaseTests()
-            : base(new MssqlDBTestProvider())
+        public SqlServerDatabaseTests()
+            : base(new SqlServerDbProviderFactory())
         {
         }
     }

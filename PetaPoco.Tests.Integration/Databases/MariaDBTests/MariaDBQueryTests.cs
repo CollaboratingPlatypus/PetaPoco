@@ -6,13 +6,13 @@ using PetaPoco.Tests.Integration.Models;
 using Shouldly;
 using Xunit;
 
-namespace PetaPoco.Tests.Integration.Databases.MariaDb
+namespace PetaPoco.Tests.Integration.Databases.MariaDB
 {
     [Collection("MariaDB")]
-    public class MariaDbQueryTests : BaseQueryTests
+    public class MariaDBQueryTests : QueryTests
     {
-        public MariaDbQueryTests()
-            : base(new MariaDbDBTestProvider())
+        public MariaDBQueryTests()
+            : base(new MariaDBDbProviderFactory())
         {
         }
 

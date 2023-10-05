@@ -1,6 +1,6 @@
-namespace PetaPoco.Tests.Integration.Databases.MariaDb
+namespace PetaPoco.Tests.Integration.Databases.MariaDB
 {
-    public class MariaDbDBTestProvider : BaseDbProviderFactory
+    public class MariaDBDbProviderFactory : BaseDbProviderFactory
     {
         protected override string ConnectionName => "MariaDB";
 
