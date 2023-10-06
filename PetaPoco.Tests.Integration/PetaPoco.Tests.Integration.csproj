@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
@@ -17,7 +17,6 @@
   <ItemGroup>
     <Compile Remove="Databases\SqlServerCeTests\**" />
     <Compile Remove="Databases\MSAccessTests\**" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
-    <Compile Remove="DataSources\**" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +39,18 @@
     <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
+    <COMReference Include="ADOX">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>6</VersionMajor>
+      <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -85,12 +96,6 @@
     </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
-    <None Update="DataSources\petapoco.accdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
