@@ -38,28 +38,28 @@ namespace PetaPoco.Tests.Integration
             database.Execute(script);
         }
 
-        protected virtual IDatabaseBuildConfiguration BuildFromConnectionName(string name)
+        protected virtual IDatabase LoadFromConnectionName(string connectionName)
+        {
+            return BuildFromConnectionName(connectionName).Create();
+        }
+
+        protected virtual IDatabaseBuildConfiguration BuildFromConnectionName(string connectionName)
         {
 #if NETCOREAPP
             return DatabaseConfiguration.Build()
-                .UsingConnectionString(AppSetting.Instance.ConnectionStringFor(name).ConnectionString)
-                .UsingProviderName(AppSetting.Instance.ConnectionStringFor(name).ProviderName);
+                .UsingConnectionString(AppSetting.Instance.ConnectionStringFor(connectionName).ConnectionString)
+                .UsingProviderName(AppSetting.Instance.ConnectionStringFor(connectionName).ProviderName);
 #else
-            return DatabaseConfiguration.Build().UsingConnectionStringName(name);
+            return DatabaseConfiguration.Build().UsingConnectionStringName(connectionName);
 #endif
         }
 
-        protected virtual IDatabase LoadFromConnectionName(string name)
-        {
-            return BuildFromConnectionName(name).Create();
-        }
-
-        public string GetProviderName(string name)
+        protected string GetProviderName(string connectionName)
         {
 #if NETCOREAPP
-            return AppSetting.Instance.ConnectionStringFor(name).ProviderName;
+            return AppSetting.Instance.ConnectionStringFor(connectionName).ProviderName;
 #else
-            return ConfigurationManager.ConnectionStrings[name].ProviderName;
+            return ConfigurationManager.ConnectionStrings[connectionName].ProviderName;
 #endif
         }
     }

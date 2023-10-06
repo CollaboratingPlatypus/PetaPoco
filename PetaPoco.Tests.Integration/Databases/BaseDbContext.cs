@@ -18,13 +18,10 @@ namespace PetaPoco.Tests.Integration
 
         public void Dispose()
         {
-            if (DB != null)
-            {
-                _provider.Dispose();
-                _provider = null;
-                DB.Dispose();
-                DB = null;
-            }
+            _provider?.Dispose();
+            _provider = null;
+            DB?.Dispose();
+            DB = null;
         }
     }
 }

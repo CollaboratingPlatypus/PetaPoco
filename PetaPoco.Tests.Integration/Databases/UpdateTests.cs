@@ -706,7 +706,7 @@ namespace PetaPoco.Tests.Integration
 #if !NETCOREAPP
             Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", (object)entity)));
 #else
-            Should.NotThrow(async () => await Task.Run(() => DB.UpdateAsync("Note", "Id", entity)));
+            await Should.NotThrowAsync(() => DB.UpdateAsync("Note", "Id", entity));
 #endif
         }
 
