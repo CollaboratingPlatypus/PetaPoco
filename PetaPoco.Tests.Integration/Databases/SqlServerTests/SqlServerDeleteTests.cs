@@ -2,12 +2,28 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
-    [Collection("SqlServer")]
-    public class SqlServerDeleteTests : DeleteTests
+    public abstract partial class SqlServerDeleteTests : DeleteTests
     {
-        public SqlServerDeleteTests()
-            : base(new SqlServerDbProviderFactory())
+        protected SqlServerDeleteTests(BaseDbProviderFactory provider)
+            : base(provider)
+        { }
+
+        [Collection("SqlServer.SystemData")]
+        public class SystemData : SqlServerDeleteTests
         {
+            public SystemData()
+                : base(new SqlServerSystemDataDbProviderFactory())
+            {
+            }
+        }
+
+        [Collection("SqlServer.MicrosoftData")]
+        public class MicrosoftData : SqlServerDeleteTests
+        {
+            public MicrosoftData()
+                : base(new SqlServerMSDataDbProviderFactory())
+            {
+            }
         }
     }
 }

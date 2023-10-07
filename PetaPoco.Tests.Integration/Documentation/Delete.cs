@@ -11,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Documentation
     public class DeleteTests : BaseDbContext
     {
         public DeleteTests()
-            : base(new SqlServerDbProviderFactory())
+            : base(new SqlServerSystemDataDbProviderFactory())
         {
             PocoData.FlushCaches();
         }

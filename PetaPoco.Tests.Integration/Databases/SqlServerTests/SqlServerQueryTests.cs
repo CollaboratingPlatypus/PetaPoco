@@ -8,19 +8,17 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
-    [Collection("SqlServer")]
-    public class SqlServerQueryTests : QueryTests
+    public abstract partial class SqlServerQueryTests : QueryTests
     {
-        public SqlServerQueryTests()
-            : base(new SqlServerDbProviderFactory())
-        {
-        }
+        protected SqlServerQueryTests(BaseDbProviderFactory provider)
+            : base(provider)
+        { }
 
         // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
-        public void Query_ForPocoGivenSqlStringStartingWithSet_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenSqlStringStartingWithSet_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -44,7 +42,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
-        public void Query_ForPocoGivenSqlStringStartingWithDeclare_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenSqlStringStartingWithDeclare_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -68,7 +66,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         [Fact]
         [Trait("Issue", "#250")]
         [Trait("Issue", "#251")]
-        public void Query_ForPocoGivenSqlStringStartingWithWith_ShouldReturnValidPocoCollection()
+        public virtual void Query_ForPocoGivenSqlStringStartingWithWith_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
@@ -259,6 +257,25 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
                 secondOrderLine.Quantity.ToString().ShouldBe("2");
                 secondOrderLine.SellPrice.ShouldBe(19.98m);
             });
+        }
+
+    
+        [Collection("SqlServer.SystemData")]
+        public class SystemData : SqlServerQueryTests
+        {
+            public SystemData()
+                : base(new SqlServerSystemDataDbProviderFactory())
+            {
+            }
+        }
+
+        [Collection("SqlServer.MicrosoftData")]
+        public class MicrosoftData : SqlServerQueryTests
+        {
+            public MicrosoftData()
+                : base(new SqlServerMSDataDbProviderFactory())
+            {
+            }
         }
     }
 }

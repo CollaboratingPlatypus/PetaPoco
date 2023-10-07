@@ -5,8 +5,7 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
-    [Collection("SqlServer")]
-    public class SqlServerQueryLinqTests : QueryLinqTests
+    public abstract partial class SqlServerQueryLinqTests : QueryLinqTests
     {
         #region Test Data
 
@@ -19,15 +18,14 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
 
         #endregion
 
-        public SqlServerQueryLinqTests()
-            : base(new SqlServerDbProviderFactory())
-        {
-        }
+        protected SqlServerQueryLinqTests(BaseDbProviderFactory provider)
+            : base(provider)
+        { }
 
         [Fact]
         [Trait("Issue", "#242")]
         [Trait("DBFeature", "Schema")]
-        public void Exists_GivenPrimaryKeyMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
+        public virtual void Exists_GivenPrimaryKeyMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
         {
             var pk = DB.Insert(_storePerson);
             DB.Exists<StorePerson>(pk).ShouldBeTrue();
@@ -36,7 +34,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         [Fact]
         [Trait("Issue", "#242")]
         [Trait("DBFeature", "Schema")]
-        public void Exists_GivenSqlStringMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
+        public virtual void Exists_GivenSqlStringMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
         {
             DB.Insert(_storePerson);
             DB.Exists<StorePerson>($"WHERE {DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18).ShouldBeTrue();
@@ -48,10 +46,29 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         [Trait("Issue", "#238")]
         [Trait("Issue", "#242")]
         [Trait("DBFeature", "Schema")]
-        public void Exists_Regression_GivenSqlStringMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
+        public virtual void Exists_Regression_GivenSqlStringMatchingOneRecordAndPocoWithSchema_ShouldBeTrue()
         {
             DB.Insert(_storePerson);
             DB.Exists<StorePerson>($"{DB.Provider.EscapeSqlIdentifier("Age")} = @0", 18).ShouldBeTrue();
+        }
+
+
+        [Collection("SqlServer.SystemData")]
+        public class SystemData : SqlServerQueryLinqTests
+        {
+            public SystemData()
+                : base(new SqlServerSystemDataDbProviderFactory())
+            {
+            }
+        }
+
+        [Collection("SqlServer.MicrosoftData")]
+        public class MicrosoftData : SqlServerQueryLinqTests
+        {
+            public MicrosoftData()
+                : base(new SqlServerMSDataDbProviderFactory())
+            {
+            }
         }
     }
 }

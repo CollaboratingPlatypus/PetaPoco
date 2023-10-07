@@ -12,7 +12,7 @@ namespace PetaPoco.Tests.Integration.Documentation
     public class InsertTests : BaseDbContext
     {
         public InsertTests()
-            : base(new SqlServerDbProviderFactory())
+            : base(new SqlServerSystemDataDbProviderFactory())
         {
             PocoData.FlushCaches();
         }

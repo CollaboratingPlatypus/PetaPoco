@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 
-namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
+namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
-    public class SqlServerMSDataDbProviderFactory : BaseDbProviderFactory
+    public class SqlServerSystemDataDbProviderFactory : BaseDbProviderFactory
     {
-        private string _connectionName = "SqlServerMSData";
+        private string _connectionName = "SqlServer";
         protected override string ConnectionName => _connectionName;
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqlServerBuildDatabase.sql";
@@ -23,9 +23,9 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServerMSData
 
         private void EnsureDatabaseExists()
         {
-            _connectionName = "SqlServerMSData_Builder";
-            Database.Execute("IF(db_id(N'PetaPocoMsData') IS NULL) BEGIN CREATE DATABASE [PetaPocoMsData] END");
-            _connectionName = "SqlServerMSData";
+            _connectionName = "SqlServer_Builder";
+            Database.Execute("IF(db_id(N'PetaPoco') IS NULL) BEGIN CREATE DATABASE[PetaPoco] END");
+            _connectionName = "SqlServer";
         }
     }
 }

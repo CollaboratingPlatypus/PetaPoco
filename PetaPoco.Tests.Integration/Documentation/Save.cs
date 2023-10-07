@@ -11,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Documentation
     public class SaveTests : BaseDbContext
     {
         public SaveTests()
-            : base(new SqlServerDbProviderFactory())
+            : base(new SqlServerSystemDataDbProviderFactory())
         {
             PocoData.FlushCaches();
         }

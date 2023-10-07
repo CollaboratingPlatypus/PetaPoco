@@ -9,13 +9,8 @@ namespace PetaPoco.Tests.Integration
 {
     public abstract class ExecuteTests : BaseDbContext
     {
-        // TODO: Move to base class, combine with other test data
-        #region Test Data
-
         // TODO: Make this a protected accessor from the base test class
         private readonly PocoData _pd;
-
-        #endregion
 
         protected ExecuteTests(BaseDbProviderFactory provider)
             : base(provider)

@@ -2,12 +2,28 @@
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
-    [Collection("SqlServer")]
-    public class SqlServerExecuteTests : ExecuteTests
+    public abstract partial class SqlServerExecuteTests : ExecuteTests
     {
-        public SqlServerExecuteTests()
-            : base(new SqlServerDbProviderFactory())
+        protected SqlServerExecuteTests(BaseDbProviderFactory provider)
+            : base(provider)
+        { }
+
+        [Collection("SqlServer.SystemData")]
+        public class SystemData : SqlServerExecuteTests
         {
+            public SystemData()
+                : base(new SqlServerSystemDataDbProviderFactory())
+            {
+            }
+        }
+
+        [Collection("SqlServer.MicrosoftData")]
+        public class MicrosoftData : SqlServerExecuteTests
+        {
+            public MicrosoftData()
+                : base(new SqlServerMSDataDbProviderFactory())
+            {
+            }
         }
     }
 }
