@@ -1,5 +1,6 @@
 ﻿using System;
 using Npgsql;
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Postgres
@@ -10,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases.Postgres
         protected override Type DataParameterType => typeof(NpgsqlParameter);
 
         public PostgresStoredProcTests()
-            : base(new PostgresDbProviderFactory())
+            : base(new PostgresTestProvider())
         {
         }
     }

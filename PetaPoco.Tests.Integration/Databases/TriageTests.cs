@@ -2,7 +2,7 @@
 {
     public abstract class TriageTests : BaseDbContext
     {
-        protected TriageTests(BaseDbProviderFactory provider)
+        protected TriageTests(TestProvider provider)
             : base(provider)
         {
         }

@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Configuration;
 using System.Runtime.InteropServices;
 
-namespace PetaPoco.Tests.Integration.Databases.MSAccess
+namespace PetaPoco.Tests.Integration.Providers
 {
-    public class MSAccessDbProviderFactory : BaseDbProviderFactory
+    public class MSAccessTestProvider : TestProvider
     {
         protected override string ConnectionName => "MSAccess";
 
@@ -17,10 +17,10 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
             if (!File.Exists(Path.Combine(Environment.CurrentDirectory, "PetaPoco.accdb")))
             {
                 var catalog = new ADOX.Catalog();
-                
+
                 try
                 {
-                    catalog.Create(ConfigurationManager.ConnectionStrings["MSAccess"].ConnectionString);
+                    catalog.Create(ConfigurationManager.ConnectionStrings[ConnectionName].ConnectionString);
                 }
                 finally
                 {
@@ -35,7 +35,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {
-                if (String.IsNullOrEmpty(s) || s.StartsWith("--"))
+                if (string.IsNullOrEmpty(s) || s.StartsWith("--"))
                     return;
 
                 if (s.StartsWith("DROP"))

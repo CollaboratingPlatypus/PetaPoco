@@ -39,7 +39,7 @@ namespace PetaPoco.Tests.Integration
 
         #endregion
 
-        protected QueryLinqTests(BaseDbProviderFactory provider)
+        protected QueryLinqTests(TestProvider provider)
             : base(provider)
         {
         }

@@ -1,10 +1,11 @@
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     public abstract partial class SqlServerUpdateTests : UpdateTests
     {
-        protected SqlServerUpdateTests(BaseDbProviderFactory provider)
+        protected SqlServerUpdateTests(TestProvider provider)
             : base(provider)
         { }
 
@@ -12,7 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class SystemData : SqlServerUpdateTests
         {
             public SystemData()
-                : base(new SqlServerSystemDataDbProviderFactory())
+                : base(new SqlServerSystemDataTestProvider())
             {
             }
         }
@@ -21,7 +22,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class MicrosoftData : SqlServerUpdateTests
         {
             public MicrosoftData()
-                : base(new SqlServerMSDataDbProviderFactory())
+                : base(new SqlServerMSDataTestProvider())
             {
             }
         }

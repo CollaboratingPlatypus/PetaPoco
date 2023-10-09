@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
 {
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
     public class SqlServerCeDeleteTests : DeleteTests
     {
         public SqlServerCeDeleteTests()
-            : base(new SqlServerCeDbProviderFactory())
+            : base(new SqlServerCeTestProvider())
         {
         }
     }

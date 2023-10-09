@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Integration
 {
     public abstract class QueryTests : BaseDbContext
     {
-        protected QueryTests(BaseDbProviderFactory provider)
+        protected QueryTests(TestProvider provider)
             : base(provider)
         {
         }

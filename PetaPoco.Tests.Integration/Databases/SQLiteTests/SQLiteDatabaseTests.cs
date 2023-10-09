@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SQLite
@@ -6,14 +7,14 @@ namespace PetaPoco.Tests.Integration.Databases.SQLite
     [Collection("SQLite")]
     public class SQLiteDatabaseTests : DatabaseTests
     {
-        private readonly SQLiteDbProviderFactory _provider;
+        private readonly SQLiteTestProvider _provider;
 
         public SQLiteDatabaseTests()
-            : this(new SQLiteDbProviderFactory())
+            : this(new SQLiteTestProvider())
         {
         }
 
-        private SQLiteDatabaseTests(SQLiteDbProviderFactory provider)
+        private SQLiteDatabaseTests(SQLiteTestProvider provider)
             : base(provider)
         {
             _provider = provider;

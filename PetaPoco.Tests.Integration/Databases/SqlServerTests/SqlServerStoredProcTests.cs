@@ -1,11 +1,12 @@
 ﻿using System;
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     public abstract partial class SqlServerStoredProcTests : StoredProcTests
     {
-        protected SqlServerStoredProcTests(BaseDbProviderFactory provider)
+        protected SqlServerStoredProcTests(TestProvider provider)
             : base(provider)
         { }
 
@@ -15,7 +16,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
             protected override Type DataParameterType => typeof(System.Data.SqlClient.SqlParameter);
 
             public SystemData()
-                : base(new SqlServerSystemDataDbProviderFactory())
+                : base(new SqlServerSystemDataTestProvider())
             {
             }
         }
@@ -26,7 +27,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
             protected override Type DataParameterType => typeof(Microsoft.Data.SqlClient.SqlParameter);
 
             public MicrosoftData()
-                : base(new SqlServerMSDataDbProviderFactory())
+                : base(new SqlServerMSDataTestProvider())
             {
             }
         }

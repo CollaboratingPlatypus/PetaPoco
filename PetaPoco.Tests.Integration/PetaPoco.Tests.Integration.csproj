@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
@@ -16,7 +16,12 @@
 
   <ItemGroup>
     <Compile Remove="Databases\SqlServerCeTests\**" />
-    <Compile Remove="Databases\MSAccessTests\**" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
+    <Compile Remove="Providers\SqlServerCeTestProvider.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <Compile Remove="Databases\MSAccessTests\**" />
+    <Compile Remove="Providers\MSAccessTestProvider.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,7 +43,7 @@
     <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">

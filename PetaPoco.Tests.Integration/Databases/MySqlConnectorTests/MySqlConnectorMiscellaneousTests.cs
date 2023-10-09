@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
 {
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
     public class MySqlConnectorMiscellaneousTests : MiscellaneousTests
     {
         public MySqlConnectorMiscellaneousTests()
-            : base(new MySqlConnectorDbProviderFactory())
+            : base(new MySqlConnectorTestProvider())
         {
         }
     }

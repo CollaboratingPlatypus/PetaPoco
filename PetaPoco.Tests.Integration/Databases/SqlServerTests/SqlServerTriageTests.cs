@@ -1,10 +1,11 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     public abstract partial class SqlServerTriageTests : TriageTests
     {
-        protected SqlServerTriageTests(BaseDbProviderFactory provider)
+        protected SqlServerTriageTests(TestProvider provider)
             : base(provider)
         { }
 
@@ -12,7 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class SystemData : SqlServerTriageTests
         {
             public SystemData()
-                : base(new SqlServerSystemDataDbProviderFactory())
+                : base(new SqlServerSystemDataTestProvider())
             {
             }
         }
@@ -21,7 +22,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class MicrosoftData : SqlServerTriageTests
         {
             public MicrosoftData()
-                : base(new SqlServerMSDataDbProviderFactory())
+                : base(new SqlServerMSDataTestProvider())
             {
             }
         }

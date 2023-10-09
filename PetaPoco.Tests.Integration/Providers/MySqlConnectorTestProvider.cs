@@ -1,6 +1,6 @@
-namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
+namespace PetaPoco.Tests.Integration.Providers
 {
-    public class MySqlConnectorDbProviderFactory : BaseDbProviderFactory
+    public class MySqlConnectorTestProvider : TestProvider
     {
         protected override string ConnectionName => "MySqlConnector";
 

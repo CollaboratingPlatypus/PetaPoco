@@ -1,3 +1,4 @@
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
     public class SqlServerCeUpdateTests : UpdateTests
     {
         public SqlServerCeUpdateTests()
-            : base(new SqlServerCeDbProviderFactory())
+            : base(new SqlServerCeTestProvider())
         {
         }
     }

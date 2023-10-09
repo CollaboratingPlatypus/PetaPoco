@@ -1,5 +1,6 @@
 ﻿using System;
 using PetaPoco.Tests.Integration.Models.SqlServer;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
 
         #endregion
 
-        protected SqlServerQueryLinqTests(BaseDbProviderFactory provider)
+        protected SqlServerQueryLinqTests(TestProvider provider)
             : base(provider)
         { }
 
@@ -57,7 +58,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class SystemData : SqlServerQueryLinqTests
         {
             public SystemData()
-                : base(new SqlServerSystemDataDbProviderFactory())
+                : base(new SqlServerSystemDataTestProvider())
             {
             }
         }
@@ -66,7 +67,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class MicrosoftData : SqlServerQueryLinqTests
         {
             public MicrosoftData()
-                : base(new SqlServerMSDataDbProviderFactory())
+                : base(new SqlServerMSDataTestProvider())
             {
             }
         }

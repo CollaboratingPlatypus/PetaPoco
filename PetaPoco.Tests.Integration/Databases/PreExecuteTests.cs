@@ -9,7 +9,7 @@ namespace PetaPoco.Tests.Integration
     {
         protected abstract IExceptionDatabaseProvider Provider { get; }
 
-        protected PreExecuteTests(BaseDbProviderFactory provider)
+        protected PreExecuteTests(TestProvider provider)
             : base(provider)
         {
         }

@@ -1,4 +1,5 @@
 using PetaPoco.Tests.Integration.Models.Postgres;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace PetaPoco.Tests.Integration.Databases.Postgres
     public class PostgresUpdateTests : UpdateTests
     {
         public PostgresUpdateTests()
-            : base(new PostgresDbProviderFactory())
+            : base(new PostgresTestProvider())
         {
         }
 

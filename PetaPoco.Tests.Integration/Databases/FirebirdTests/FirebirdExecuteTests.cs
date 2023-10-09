@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Firebird
 {
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.Firebird
     public class FirebirdExecuteTests : ExecuteTests
     {
         public FirebirdExecuteTests()
-            : base(new FirebirdDbProviderFactory())
+            : base(new FirebirdTestProvider())
         {
         }
     }

@@ -1,6 +1,6 @@
-namespace PetaPoco.Tests.Integration.Databases.Postgres
+namespace PetaPoco.Tests.Integration.Providers
 {
-    public class PostgresDbProviderFactory : BaseDbProviderFactory
+    public class PostgresTestProvider : TestProvider
     {
         protected override string ConnectionName => "Postgres";
 

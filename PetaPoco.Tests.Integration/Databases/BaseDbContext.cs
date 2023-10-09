@@ -4,12 +4,12 @@ namespace PetaPoco.Tests.Integration
 {
     public abstract class BaseDbContext : IDisposable
     {
-        private BaseDbProviderFactory _provider;
+        private TestProvider _provider;
 
         protected IDatabase DB { get; set; }
         protected string ProviderName { get; private set; }
 
-        protected BaseDbContext(BaseDbProviderFactory provider)
+        protected BaseDbContext(TestProvider provider)
         {
             _provider = provider;
             DB = _provider.Execute();

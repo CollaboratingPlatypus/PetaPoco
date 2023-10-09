@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MariaDB
 {
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.MariaDB
     public class MariaDBMiscellaneousTests : MiscellaneousTests
     {
         public MariaDBMiscellaneousTests()
-            : base(new MariaDBDbProviderFactory())
+            : base(new MariaDBTestProvider())
         {
         }
     }

@@ -2,13 +2,14 @@
 using System.Data;
 using System.Linq;
 using PetaPoco.Providers;
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     public abstract partial class SqlServerPreExecuteTests : PreExecuteTests
     {
-        protected SqlServerPreExecuteTests(BaseDbProviderFactory provider)
+        protected SqlServerPreExecuteTests(TestProvider provider)
             : base(provider)
         { }
 
@@ -23,7 +24,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
                 Provider.ThrowExceptions = true;
             }
 
-            public class SqlServerPreExecuteDbProviderFactory : SqlServerSystemDataDbProviderFactory
+            public class SqlServerPreExecuteDbProviderFactory : SqlServerSystemDataTestProvider
             {
                 protected override IDatabase LoadFromConnectionName(string name)
                 {
@@ -62,7 +63,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
                 Provider.ThrowExceptions = true;
             }
 
-            public class SqlServerPreExecuteDbProviderFactory : SqlServerMSDataDbProviderFactory
+            public class SqlServerPreExecuteDbProviderFactory : SqlServerMSDataTestProvider
             {
                 protected override IDatabase LoadFromConnectionName(string name)
                 {

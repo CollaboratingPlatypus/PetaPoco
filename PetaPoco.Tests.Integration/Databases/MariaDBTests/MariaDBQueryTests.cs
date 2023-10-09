@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -12,7 +13,7 @@ namespace PetaPoco.Tests.Integration.Databases.MariaDB
     public class MariaDBQueryTests : QueryTests
     {
         public MariaDBQueryTests()
-            : base(new MariaDBDbProviderFactory())
+            : base(new MariaDBTestProvider())
         {
         }
 

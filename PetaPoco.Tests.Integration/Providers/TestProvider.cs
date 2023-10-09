@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PetaPoco.Tests.Integration
 {
-    public abstract class BaseDbProviderFactory : IDisposable
+    public abstract class TestProvider : IDisposable
     {
         public string ProviderName => GetProviderName(ConnectionName);
 

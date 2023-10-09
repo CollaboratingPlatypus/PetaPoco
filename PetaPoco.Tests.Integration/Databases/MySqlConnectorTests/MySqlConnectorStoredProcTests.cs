@@ -1,5 +1,6 @@
 ﻿using System;
 using MySqlConnector;
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
@@ -10,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases.MySqlConnector
         protected override Type DataParameterType => typeof(MySqlParameter);
 
         public MySqlConnectorStoredProcTests()
-            : base(new MySqlConnectorDbProviderFactory())
+            : base(new MySqlConnectorTestProvider())
         {
         }
     }

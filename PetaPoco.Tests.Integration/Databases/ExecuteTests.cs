@@ -12,7 +12,7 @@ namespace PetaPoco.Tests.Integration
         // TODO: Make this a protected accessor from the base test class
         private readonly PocoData _pd;
 
-        protected ExecuteTests(BaseDbProviderFactory provider)
+        protected ExecuteTests(TestProvider provider)
             : base(provider)
         {
             _pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);

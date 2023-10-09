@@ -23,7 +23,7 @@ namespace PetaPoco.Tests.Integration
 
         #endregion
 
-        protected DatabaseTests(BaseDbProviderFactory provider)
+        protected DatabaseTests(TestProvider provider)
             : base(provider)
         {
         }

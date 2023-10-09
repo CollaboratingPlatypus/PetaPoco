@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
 using PetaPoco.Tests.Integration.Models.MSAccess;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -14,7 +15,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
     public class MSAccessQueryTests : QueryTests
     {
         public MSAccessQueryTests()
-            : base(new MSAccessDbProviderFactory())
+            : base(new MSAccessTestProvider())
         {
         }
 

@@ -13,7 +13,7 @@ namespace PetaPoco.Tests.Integration
     {
         protected abstract Type DataParameterType { get; }
 
-        protected StoredProcTests(BaseDbProviderFactory provider)
+        protected StoredProcTests(TestProvider provider)
             : base(provider)
         {
             AddPeople(6);

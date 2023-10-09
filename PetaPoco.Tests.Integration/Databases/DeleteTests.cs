@@ -49,7 +49,7 @@ namespace PetaPoco.Tests.Integration
 
         #endregion
 
-        protected DeleteTests(BaseDbProviderFactory provider)
+        protected DeleteTests(TestProvider provider)
             : base(provider)
         {
         }

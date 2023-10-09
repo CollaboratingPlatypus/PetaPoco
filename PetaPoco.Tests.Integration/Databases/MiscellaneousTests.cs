@@ -5,7 +5,7 @@ namespace PetaPoco.Tests.Integration
 {
     public abstract class MiscellaneousTests : BaseDbContext
     {
-        protected MiscellaneousTests(BaseDbProviderFactory provider)
+        protected MiscellaneousTests(TestProvider provider)
             : base(provider)
         {
         }

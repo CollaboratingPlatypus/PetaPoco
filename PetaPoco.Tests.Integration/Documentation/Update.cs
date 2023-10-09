@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using PetaPoco.Core;
-using PetaPoco.Tests.Integration.Databases.SqlServer;
 using PetaPoco.Tests.Integration.Documentation.Pocos;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace PetaPoco.Tests.Integration.Documentation
     public class UpdateTests : BaseDbContext
     {
         public UpdateTests()
-            : base(new SqlServerSystemDataDbProviderFactory())
+            : base(new SqlServerSystemDataTestProvider())
         {
             PocoData.FlushCaches();
         }

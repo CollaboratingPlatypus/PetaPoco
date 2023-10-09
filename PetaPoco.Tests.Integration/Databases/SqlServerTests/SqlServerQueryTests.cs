@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
 {
     public abstract partial class SqlServerQueryTests : QueryTests
     {
-        protected SqlServerQueryTests(BaseDbProviderFactory provider)
+        protected SqlServerQueryTests(TestProvider provider)
             : base(provider)
         { }
 
@@ -264,7 +265,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class SystemData : SqlServerQueryTests
         {
             public SystemData()
-                : base(new SqlServerSystemDataDbProviderFactory())
+                : base(new SqlServerSystemDataTestProvider())
             {
             }
         }
@@ -273,7 +274,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         public class MicrosoftData : SqlServerQueryTests
         {
             public MicrosoftData()
-                : base(new SqlServerMSDataDbProviderFactory())
+                : base(new SqlServerMSDataTestProvider())
             {
             }
         }

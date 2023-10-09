@@ -1,4 +1,5 @@
 ﻿using System;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
     public class SqlServerCeQueryTests : QueryTests
     {
         public SqlServerCeQueryTests()
-            : base(new SqlServerCeDbProviderFactory())
+            : base(new SqlServerCeTestProvider())
         {
         }
 

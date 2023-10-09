@@ -1,5 +1,6 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
+using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MariaDB
@@ -10,7 +11,7 @@ namespace PetaPoco.Tests.Integration.Databases.MariaDB
         protected override Type DataParameterType => typeof(MySqlParameter);
 
         public MariaDBStoredProcTests()
-            : base(new MariaDBDbProviderFactory())
+            : base(new MariaDBTestProvider())
         {
         }
     }

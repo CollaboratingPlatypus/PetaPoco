@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.MSAccess
 {
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.MSAccess
     public class MSAccessDatabaseTests : DatabaseTests
     {
         public MSAccessDatabaseTests()
-            : base(new MSAccessDbProviderFactory())
+            : base(new MSAccessTestProvider())
         {
         }
 

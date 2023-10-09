@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using PetaPoco.Tests.Integration.Providers;
+using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Postgres
 {
@@ -6,7 +7,7 @@ namespace PetaPoco.Tests.Integration.Databases.Postgres
     public class PostgresTriageTests : TriageTests
     {
         public PostgresTriageTests()
-            : base(new PostgresDbProviderFactory())
+            : base(new PostgresTestProvider())
         {
         }
     }

@@ -4,15 +4,15 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 
-namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
+namespace PetaPoco.Tests.Integration.Providers
 {
-    public class SqlServerCeDbProviderFactory : BaseDbProviderFactory
+    public class SqlServerCeTestProvider : TestProvider
     {
         protected override string ConnectionName => "SqlServerCe";
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SqlServerCeBuildDatabase.sql";
 
-        public SqlServerCeDbProviderFactory()
+        public SqlServerCeTestProvider()
         {
             // Hack: Nuget package is old and doesn't support newer content
             // ReSharper disable AssignNullToNotNullAttribute
@@ -47,7 +47,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServerCe
         {
             script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
             {
-                if (String.IsNullOrEmpty(s) || s.StartsWith("--"))
+                if (string.IsNullOrEmpty(s) || s.StartsWith("--"))
                     return;
 
                 if (s.StartsWith("DROP"))
