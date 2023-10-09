@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using PetaPoco.Providers;
 using PetaPoco.Tests.Integration.Providers;
 using Xunit;
 
@@ -16,25 +15,21 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         [Collection("SqlServer.SystemData")]
         public class SystemData : SqlServerPreExecuteTests
         {
-            protected override IExceptionDatabaseProvider Provider => DB.Provider as SqlServerSystemDataPreExecuteDatabaseProvider;
+            protected override IPreExecuteDatabaseProvider Provider => DB.Provider as PreExecuteDatabaseProvider;
 
             public SystemData()
-                : base(new SqlServerPreExecuteDbProviderFactory())
+                : base(new PreExecuteTestProvider())
             {
                 Provider.ThrowExceptions = true;
             }
 
-            public class SqlServerPreExecuteDbProviderFactory : SqlServerSystemDataTestProvider
+            protected class PreExecuteTestProvider : SqlServerSystemDataTestProvider
             {
                 protected override IDatabase LoadFromConnectionName(string name)
-                {
-                    var config = BuildFromConnectionName(name);
-                    config.UsingProvider<SqlServerSystemDataPreExecuteDatabaseProvider>();
-                    return config.Create();
-                }
+                    => BuildFromConnectionName(name).UsingProvider<PreExecuteDatabaseProvider>().Create();
             }
 
-            public class SqlServerSystemDataPreExecuteDatabaseProvider : SqlServerDatabaseProvider, IExceptionDatabaseProvider
+            protected class PreExecuteDatabaseProvider : PetaPoco.Providers.SqlServerDatabaseProvider, IPreExecuteDatabaseProvider
             {
                 public bool ThrowExceptions { get; set; }
                 public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();
@@ -55,25 +50,21 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
         [Collection("SqlServer.MicrosoftData")]
         public class MicrosoftData : SqlServerPreExecuteTests
         {
-            protected override IExceptionDatabaseProvider Provider => DB.Provider as SqlServerMSDataPreExecuteDatabaseProvider;
+            protected override IPreExecuteDatabaseProvider Provider => DB.Provider as PreExecuteDatabaseProvider;
 
             public MicrosoftData()
-                : base(new SqlServerPreExecuteDbProviderFactory())
+                : base(new PreExecuteTestProvider())
             {
                 Provider.ThrowExceptions = true;
             }
 
-            public class SqlServerPreExecuteDbProviderFactory : SqlServerMSDataTestProvider
+            protected class PreExecuteTestProvider : SqlServerMSDataTestProvider
             {
                 protected override IDatabase LoadFromConnectionName(string name)
-                {
-                    var config = BuildFromConnectionName(name);
-                    config.UsingProvider<SqlServerMSDataPreExecuteDatabaseProvider>();
-                    return config.Create();
-                }
+                    => BuildFromConnectionName(name).UsingProvider<PreExecuteDatabaseProvider>().Create();
             }
 
-            public class SqlServerMSDataPreExecuteDatabaseProvider : SqlServerMsDataDatabaseProvider, IExceptionDatabaseProvider
+            protected class PreExecuteDatabaseProvider : PetaPoco.Providers.SqlServerMsDataDatabaseProvider, IPreExecuteDatabaseProvider
             {
                 public bool ThrowExceptions { get; set; }
                 public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();

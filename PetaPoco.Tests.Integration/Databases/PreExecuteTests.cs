@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
+
 namespace PetaPoco.Tests.Integration
 {
     public abstract class PreExecuteTests : BaseDbContext
     {
-        protected abstract IExceptionDatabaseProvider Provider { get; }
+        protected abstract IPreExecuteDatabaseProvider Provider { get; }
 
         protected PreExecuteTests(TestProvider provider)
             : base(provider)
@@ -157,5 +160,15 @@ namespace PetaPoco.Tests.Integration
             Provider.Parameters.Count().ShouldBe(2);
             Provider.Parameters.First().Value.ShouldBe(expected);
         }
+
+        public interface IPreExecuteDatabaseProvider
+        {
+            bool ThrowExceptions { get; set; }
+            List<IDataParameter> Parameters { get; set; }
+
+            void PreExecute(IDbCommand cmd);
+        }
+
+        public class PreExecuteException : Exception { }
     }
 }
