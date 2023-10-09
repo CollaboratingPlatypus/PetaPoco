@@ -316,7 +316,7 @@ namespace PetaPoco.Tests.Integration
             (await DB.ExistsAsync<Person>(Guid.NewGuid())).ShouldBeFalse();
         }
 
-        [Fact(DisplayName = "Exists: Support the older syntax of starting with a WHERE clause.")]
+        [Fact(DisplayName = "ExistsAsync: Support the older syntax of starting with a WHERE clause.")]
         [Trait("Category", "Regression")]
         [Trait("Issue", "#237")]
         [Trait("Issue", "#238")]

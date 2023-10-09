@@ -13,7 +13,8 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
     {
         protected SqlServerQueryTests(TestProvider provider)
             : base(provider)
-        { }
+        {
+        }
 
         // TODO: Check dbms support and usage for SET/WITH/DECLARE keywords, possibly move to base or other derived classes
         [Fact]
@@ -260,7 +261,7 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
             });
         }
 
-    
+
         [Collection("SqlServer.SystemData")]
         public class SystemData : SqlServerQueryTests
         {

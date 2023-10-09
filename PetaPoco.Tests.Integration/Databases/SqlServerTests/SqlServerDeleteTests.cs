@@ -7,7 +7,8 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
     {
         protected SqlServerDeleteTests(TestProvider provider)
             : base(provider)
-        { }
+        {
+        }
 
         [Collection("SqlServer.SystemData")]
         public class SystemData : SqlServerDeleteTests

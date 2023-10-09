@@ -24,7 +24,7 @@ namespace PetaPoco.Tests.Integration.Providers
         private void EnsureDatabaseExists()
         {
             _connectionName = "SqlServerMSData_Builder";
-            Database.Execute("IF(db_id(N'PetaPocoMsData') IS NULL) BEGIN CREATE DATABASE [PetaPocoMsData] END");
+            Database.Execute("IF(db_id(N'PetaPocoMSData') IS NULL) BEGIN CREATE DATABASE [PetaPocoMSData] END");
             _connectionName = "SqlServerMSData";
         }
     }

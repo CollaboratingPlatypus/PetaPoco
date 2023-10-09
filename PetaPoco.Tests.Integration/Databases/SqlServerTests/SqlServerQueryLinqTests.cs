@@ -21,7 +21,8 @@ namespace PetaPoco.Tests.Integration.Databases.SqlServer
 
         protected SqlServerQueryLinqTests(TestProvider provider)
             : base(provider)
-        { }
+        {
+        }
 
         [Fact]
         [Trait("Issue", "#242")]
