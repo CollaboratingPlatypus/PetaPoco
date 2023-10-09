@@ -5,8 +5,11 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for MySQL using the MySqlConnector library.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for MySQL databases using the MySqlConnector library.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "MySqlConnector" ADO.NET driver for data access.
+    /// </remarks>
     public class MySqlConnectorDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>

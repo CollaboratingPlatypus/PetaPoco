@@ -5,13 +5,13 @@ using System.Reflection;
 namespace PetaPoco
 {
     /// <summary>
-    /// Pprovides an implementation of <see cref="DbProviderFactory"/> for early versions of the Oracle drivers that don't include it.
+    /// Provides an implementation of <see cref="DbProviderFactory"/> for Oracle databases using the unmanaged Oracle Data Provider.
     /// </summary>
     /// <remarks>
-    /// For later versions of Oracle, the standard OracleProviderFactory class should work fine.
-    /// Uses reflection to load Oracle.DataAccess assembly and in-turn create connections and commands.
-    /// <para>Thanks to Adam Schroder (@schotime) for this.</para>
-    /// <para><i>Currently untested.</i></para>
+    /// This provider uses the "Oracle.DataAccess.Client" ADO.NET driver for data access. For later versions of Oracle, the managed <see
+    /// cref="Providers.OracleDatabaseProvider"/> class should work fine. Uses reflection to load "Oracle.DataAccess" assembly and in-turn
+    /// create connections and commands.
+    /// <para>Thanks to Adam Schroder (@schotime) for this. <i>Currently untested.</i></para>
     /// </remarks>
     /// <example>
     /// <code language="cs" title="OracleProvider Usage">
@@ -69,7 +69,7 @@ namespace PetaPoco
         /// <returns>A new <see cref="DbConnection"/>.</returns>
         public override DbConnection CreateConnection()
         {
-            return (DbConnection) Activator.CreateInstance(_connectionType);
+            return (DbConnection)Activator.CreateInstance(_connectionType);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace PetaPoco
         /// <returns>A new <see cref="DbCommand"/>.</returns>
         public override DbCommand CreateCommand()
         {
-            DbCommand command = (DbCommand) Activator.CreateInstance(_commandType);
+            DbCommand command = (DbCommand)Activator.CreateInstance(_commandType);
 
             var oracleCommandBindByName = _commandType.GetProperty("BindByName");
             oracleCommandBindByName.SetValue(command, true, null);

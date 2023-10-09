@@ -11,9 +11,13 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
     // TODO: Rename class: FirebirdDatabaseProvider
+
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Firebird.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for Firebird databases.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "FirebirdSql.Data.FirebirdClient" ADO.NET driver for data access.
+    /// </remarks>
     public class FirebirdDbDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>

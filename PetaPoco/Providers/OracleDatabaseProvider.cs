@@ -12,8 +12,11 @@ using System.Threading.Tasks;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Oracle.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for Oracle databases using the managed Oracle Data Provider.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "Oracle.ManagedDataAccess.Client" ADO.NET driver for data access.
+    /// </remarks>
     public class OracleDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>

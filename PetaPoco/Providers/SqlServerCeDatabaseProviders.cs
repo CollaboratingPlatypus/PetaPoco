@@ -9,9 +9,14 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
     // TODO: Rename class: SqlServerCeDatabaseProvider
+
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for SQL Server CE.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for Microsoft SQL Server Compact Edition databases.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "System.Data.SqlServerCe" ADO.NET driver for data access. Note that this driver is end-of-life (<a
+    /// href="https://learn.microsoft.com/en-us/lifecycle/products/microsoft-sql-server-compact-40/">reference</a>).
+    /// </remarks>
     public class SqlServerCEDatabaseProviders : DatabaseProvider
     {
         /// <inheritdoc/>

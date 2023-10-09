@@ -11,9 +11,13 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Providers
 {
     // TODO: Rename class: MSAccessDatabaseProvider
+
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Microsoft Access.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for Microsoft Access databases.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "System.Data.OleDb" ADO.NET driver for data access.
+    /// </remarks>
     public class MsAccessDbDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>
@@ -39,10 +43,10 @@ namespace PetaPoco.Providers
 #endif
 
         /// <summary>
-        /// Page queries are not supported by MsAccess database.
+        /// Page queries are not supported by MS Access database.
         /// </summary>
         /// <returns>This method always throws a <see cref="NotSupportedException"/>.</returns>
-        /// <exception cref="NotSupportedException">The MsAccess provider does not support paging.</exception>
+        /// <exception cref="NotSupportedException">The MS Access provider does not support paging.</exception>
         /// <inheritdoc/>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
             => throw new NotSupportedException("The MS Access provider does not support paging.");

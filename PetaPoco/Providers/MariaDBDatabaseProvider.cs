@@ -5,11 +5,12 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     // TODO: Rename class: MariaDBDatabaseProvider
+
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for MariaDB.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for MariaDB databases.
     /// </summary>
     /// <remarks>
-    /// This class uses the <see cref="MySqlDatabaseProvider"/> provider.
+    /// This provider uses the "MySql.Data.MySqlClient" ADO.NET driver for data access.
     /// </remarks>
     public class MariaDbDatabaseProvider : DatabaseProvider
     {

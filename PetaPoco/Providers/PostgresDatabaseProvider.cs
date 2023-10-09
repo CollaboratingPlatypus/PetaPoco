@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 namespace PetaPoco.Providers
 {
     // TODO: Rename class: PostgresDatabaseProvider
+
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for PostgreSQL.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for PostgreSQL databases.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "Npgsql" ADO.NET driver for data access.
+    /// </remarks>
     public class PostgreSQLDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>
