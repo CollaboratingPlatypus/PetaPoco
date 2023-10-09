@@ -3,12 +3,29 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
-    [Collection("SQLite")]
-    public class SQLiteMiscellaneousTests : MiscellaneousTests
+    public abstract partial class SQLiteMiscellaneousTests : MiscellaneousTests
     {
-        public SQLiteMiscellaneousTests()
-            : base(new SQLiteTestProvider())
+        protected SQLiteMiscellaneousTests(TestProvider provider)
+            : base(provider)
         {
+        }
+
+        [Collection("SQLite.SystemData")]
+        public class SystemData : SQLiteMiscellaneousTests
+        {
+            public SystemData()
+                : base(new SQLiteSystemDataTestProvider())
+            {
+            }
+        }
+
+        [Collection("SQLite.MicrosoftData")]
+        public class MicrosoftData : SQLiteMiscellaneousTests
+        {
+            public MicrosoftData()
+                : base(new SQLiteMSDataTestProvider())
+            {
+            }
         }
     }
 }

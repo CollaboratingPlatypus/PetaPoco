@@ -3,12 +3,8 @@ using System.Linq;
 
 namespace PetaPoco.Tests.Integration.Providers
 {
-    public class SQLiteTestProvider : TestProvider
+    public abstract class SQLiteTestProvider : TestProvider
     {
-        protected override string ConnectionName => "SQLite";
-
-        protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.SQLiteBuildDatabase.sql";
-
         public IDatabase GetDatabase() => Database;
 
         protected override IDatabaseBuildConfiguration BuildFromConnectionName(string name)

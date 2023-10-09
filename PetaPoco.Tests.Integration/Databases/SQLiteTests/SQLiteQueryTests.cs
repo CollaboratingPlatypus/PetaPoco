@@ -9,11 +9,10 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
-    [Collection("SQLite")]
-    public class SQLiteQueryTests : QueryTests
+    public abstract partial class SQLiteQueryTests : QueryTests
     {
-        public SQLiteQueryTests()
-            : base(new SQLiteTestProvider())
+        protected SQLiteQueryTests(TestProvider provider)
+            : base(provider)
         {
         }
 
@@ -178,6 +177,24 @@ namespace PetaPoco.Tests.Integration.Databases.SQLite
                 secondOrderLine.Quantity.ToString().ShouldBe("2");
                 secondOrderLine.SellPrice.ShouldBe(19.98m);
             });
+        }
+
+        [Collection("SQLite.SystemData")]
+        public class SystemData : SQLiteQueryTests
+        {
+            public SystemData()
+                : base(new SQLiteSystemDataTestProvider())
+            {
+            }
+        }
+
+        [Collection("SQLite.MicrosoftData")]
+        public class MicrosoftData : SQLiteQueryTests
+        {
+            public MicrosoftData()
+                : base(new SQLiteMSDataTestProvider())
+            {
+            }
         }
     }
 }

@@ -4,17 +4,11 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.SQLite
 {
-    [Collection("SQLite")]
-    public class SQLiteDatabaseTests : DatabaseTests
+    public abstract partial class SQLiteDatabaseTests : DatabaseTests
     {
         private readonly SQLiteTestProvider _provider;
 
-        public SQLiteDatabaseTests()
-            : this(new SQLiteTestProvider())
-        {
-        }
-
-        private SQLiteDatabaseTests(SQLiteTestProvider provider)
+        protected SQLiteDatabaseTests(SQLiteTestProvider provider)
             : base(provider)
         {
             _provider = provider;
@@ -30,6 +24,24 @@ namespace PetaPoco.Tests.Integration.Databases.SQLite
 
             // ReSharper disable once PossibleNullReferenceException
             db.GetType().GetField("_defaultMapper", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(db, _provider.GetDatabase().DefaultMapper);
+        }
+
+        [Collection("SQLite.SystemData")]
+        public class SystemData : SQLiteDatabaseTests
+        {
+            public SystemData()
+                : base(new SQLiteSystemDataTestProvider())
+            {
+            }
+        }
+
+        [Collection("SQLite.MicrosoftData")]
+        public class MicrosoftData : SQLiteDatabaseTests
+        {
+            public MicrosoftData()
+                : base(new SQLiteMSDataTestProvider())
+            {
+            }
         }
     }
 }
