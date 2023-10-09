@@ -8,21 +8,14 @@
     <Product>PetaPoco</Product>
     <Copyright>Collaborating Platypus</Copyright>
     <OutputType>Library</OutputType>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Databases\SqlServerCeTests\**" />
-    <Compile Remove="Providers\SqlServerCeTestProvider.cs" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <Compile Remove="Databases\MSAccessTests\**" />
-    <Compile Remove="Providers\MSAccessTestProvider.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Scripts\FirebirdBuildDatabase.sql" />
@@ -43,7 +36,19 @@
     <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
+    <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Databases\SqlServerCeTests\**" />
+    <Compile Remove="Providers\SqlServerCeTestProvider.cs" />
+    <EmbeddedResource Remove="Scripts\SqlServerCeBuildDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <Compile Remove="Databases\MSAccessTests\**" />
+    <Compile Remove="Providers\MSAccessTestProvider.cs" />
+    <EmbeddedResource Remove="Scripts\MSAccessBuildDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
@@ -59,10 +64,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Moq" Version="[4.8.2,4.20)" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Shouldly" Version="4.0.0" />
@@ -76,19 +81,14 @@
     <PackageReference Include="xunit.extensibility.execution" Version="2.5.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
 
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
-
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.6" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-
+    <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
     <PackageReference Include="MySql.Data" Version="8.0.21" />
     <PackageReference Include="MySqlConnector" Version="1.0.1" />
-
     <PackageReference Include="Npgsql" Version="4.1.4" />
-
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
-
-    <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
   </ItemGroup>
 
   <ItemGroup>
