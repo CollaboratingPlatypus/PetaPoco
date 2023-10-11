@@ -14,9 +14,13 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Core
 {
     /// <summary>
-    /// The DatabaseProvider class defines a base implementation for database Provider classes, and provides common defaults used by
-    /// different database management systems.
+    /// Provides an abstract base class for database providers. This class implements common functionality and provides default behavior for
+    /// specialized database providers.
     /// </summary>
+    /// <remarks>
+    /// This class includes methods for database-specific operations like parameter handling, SQL escaping, and paging, among others.
+    /// Derived classes should override these methods to implement behavior specific to the database they target.
+    /// </remarks>
     public abstract class DatabaseProvider : IProvider
     {
         private static readonly ConcurrentDictionary<string, IProvider> customProviders = new ConcurrentDictionary<string, IProvider>();
@@ -101,7 +105,7 @@ namespace PetaPoco.Core
             if (ft == null)
                 throw new ArgumentException($"Could not load the {GetType().Name} DbProviderFactory.");
 
-            return (DbProviderFactory) ft.GetField("Instance").GetValue(null);
+            return (DbProviderFactory)ft.GetField("Instance").GetValue(null);
         }
 
         /// <summary>

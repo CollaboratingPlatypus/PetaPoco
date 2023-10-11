@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
@@ -8,71 +8,87 @@
     <Product>PetaPoco</Product>
     <Copyright>Collaborating Platypus</Copyright>
     <OutputType>Library</OutputType>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <Compile Remove="Databases\MSAccess\**" />
-    <Compile Remove="Databases\MSSQLCe\**" />
-    <Compile Remove="DataSources\**" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Remove="Scripts\FirebirdBuildDatabase.sql" />
-    <None Remove="Scripts\MariaDbBuildDatabase.sql" />
+    <None Remove="Scripts\MariaDBBuildDatabase.sql" />
     <None Remove="Scripts\MSAccessBuildDatabase.sql" />
-    <None Remove="Scripts\MSSQLBuildDatabase.sql" />
-    <None Remove="Scripts\MSSQLCeBuildDatabase.sql" />
     <None Remove="Scripts\MySqlBuildDatabase.sql" />
     <None Remove="Scripts\PostgresBuildDatabase.sql" />
-    <None Remove="Scripts\SqliteBuildDatabase.sql" />
+    <None Remove="Scripts\SQLiteBuildDatabase.sql" />
+    <None Remove="Scripts\SqlServerBuildDatabase.sql" />
+    <None Remove="Scripts\SqlServerCeBuildDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\FirebirdBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MariaDbBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\MariaDBBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MSSQLBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\MSSQLCeBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MySqlBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\SqliteBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\SqlServerCeBuildDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Databases\SqlServerCeTests\**" />
+    <Compile Remove="Providers\SqlServerCeTestProvider.cs" />
+    <EmbeddedResource Remove="Scripts\SqlServerCeBuildDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <Compile Remove="Databases\MSAccessTests\**" />
+    <Compile Remove="Providers\MSAccessTestProvider.cs" />
+    <EmbeddedResource Remove="Scripts\MSAccessBuildDatabase.sql" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
+    <COMReference Include="ADOX">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>6</VersionMajor>
+      <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Moq" Version="[4.8.2,4.20)" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Shouldly" Version="4.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit" Version="2.5.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-    <PackageReference Include="xunit.analyzers" Version="0.10.0" />
-    <PackageReference Include="xunit.assert" Version="2.4.1" />
-    <PackageReference Include="xunit.core" Version="2.4.1" />
-    <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
-    <PackageReference Include="xunit.extensibility.execution" Version="2.4.1" />
+    <PackageReference Include="xunit.analyzers" Version="1.3.0" />
+    <PackageReference Include="xunit.assert" Version="2.5.1" />
+    <PackageReference Include="xunit.core" Version="2.5.1" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.5.1" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.5.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
 
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
-
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.6" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-
+    <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
     <PackageReference Include="MySql.Data" Version="8.0.21" />
     <PackageReference Include="MySqlConnector" Version="1.0.1" />
-
     <PackageReference Include="Npgsql" Version="4.1.4" />
-
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="7.5.0" />
-
-    <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" Condition="'$(TargetFramework)' != 'netcoreapp2.1'" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,12 +101,6 @@
     </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp2.1'">
-    <None Update="DataSources\petapoco.accdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

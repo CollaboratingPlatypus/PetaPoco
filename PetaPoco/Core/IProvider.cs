@@ -9,7 +9,7 @@ using PetaPoco.Utilities;
 namespace PetaPoco.Core
 {
     /// <summary>
-    /// Represents a contract for a database type provider.
+    /// Defines the contract for database providers that expose functionality for connecting to various types of databases.
     /// </summary>
     public interface IProvider
     {

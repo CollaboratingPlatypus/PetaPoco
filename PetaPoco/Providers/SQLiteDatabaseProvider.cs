@@ -7,8 +7,11 @@ using PetaPoco.Core;
 namespace PetaPoco.Providers
 {
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for SQLite.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for SQLite databases.
     /// </summary>
+    /// <remarks>
+    /// This provider can use either the "System.Data.SQLite" or "Microsoft.Data.Sqlite" ADO.NET drivers for data access.
+    /// </remarks>
     public class SQLiteDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>
@@ -19,7 +22,7 @@ namespace PetaPoco.Providers
         public override object MapParameterValue(object value)
         {
             if (value is uint u)
-                return (long) u;
+                return (long)u;
 
             return base.MapParameterValue(value);
         }

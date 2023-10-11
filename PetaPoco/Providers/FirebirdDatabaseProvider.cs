@@ -10,10 +10,14 @@ using PetaPoco.Utilities;
 
 namespace PetaPoco.Providers
 {
-	// TODO: It irks the ¢®@₱ out of me that the Firebird DBProvider class name is the only one that improperly appends "Db" after the provider name.
+    // TODO: Rename class: FirebirdDatabaseProvider
+
     /// <summary>
-    /// Provides a specific implementation of the <see cref="DatabaseProvider"/> class for Firebird.
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for Firebird databases.
     /// </summary>
+    /// <remarks>
+    /// This provider uses the "FirebirdSql.Data.FirebirdClient" ADO.NET driver for data access.
+    /// </remarks>
     public class FirebirdDbDatabaseProvider : DatabaseProvider
     {
         /// <inheritdoc/>
