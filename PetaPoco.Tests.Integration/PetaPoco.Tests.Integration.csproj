@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
@@ -11,6 +11,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -22,6 +23,8 @@
     <None Remove="Scripts\MariaDBBuildDatabase.sql" />
     <None Remove="Scripts\MSAccessBuildDatabase.sql" />
     <None Remove="Scripts\MySqlBuildDatabase.sql" />
+    <None Remove="Scripts\OracleBuildDatabase.sql" />
+    <None Remove="Scripts\OracleSetupDatabase.sql" />
     <None Remove="Scripts\PostgresBuildDatabase.sql" />
     <None Remove="Scripts\SQLiteBuildDatabase.sql" />
     <None Remove="Scripts\SqlServerBuildDatabase.sql" />
@@ -33,6 +36,8 @@
     <EmbeddedResource Include="Scripts\MariaDBBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MySqlBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\OracleBuildDatabase.sql" />
+    <EmbeddedResource Include="Scripts\OracleSetupDatabase.sql" />
     <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
@@ -70,6 +75,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.0" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
     <PackageReference Include="Moq" Version="[4.8.2,4.20)" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="21.12.0" />
     <PackageReference Include="Shouldly" Version="4.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.5.1" />

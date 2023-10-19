@@ -62,5 +62,11 @@ namespace PetaPoco.Tests.Integration
             return ConfigurationManager.ConnectionStrings[connectionName].ProviderName;
 #endif
         }
+
+        public enum ExecutionPhase
+        {
+            Setup = 0,
+            Build = 1
+        }
     }
 }
