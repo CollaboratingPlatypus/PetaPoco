@@ -10,7 +10,6 @@ namespace PetaPoco.Tests.Integration.Providers
 {
     public class OracleTestProvider : TestProvider
     {
-        private static readonly string[] _splitComma = new[] { "," };
         private static readonly string[] _splitSemiColon = new[] { ";" };
         private static readonly string[] _splitNewLine = new[] { Environment.NewLine };
         private static readonly string[] _splitSlash = new[] { Environment.NewLine + "/" };
