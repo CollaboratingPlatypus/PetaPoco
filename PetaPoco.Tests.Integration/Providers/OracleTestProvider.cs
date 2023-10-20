@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 
-/* Converted SqlServerBuildDatabase.sql scripts using MSSQLTips.com to modify datatypes like for like
- * Link: https://www.mssqltips.com/sqlservertip/2944/comparing-sql-server-and-oracle-datatypes/#:~:text=SQL%20Server's%20is%20called%20XML,can%20handle%20up%20to%206GB.
- * 
+/* 
+ * Converted build scripts from SqlServerBuildDatabase.sql using MSSQLTips.com for datatype conversions
+ * Link: https://www.mssqltips.com/sqlservertip/2944/comparing-sql-server-and-oracle-datatypes
  */
 
 namespace PetaPoco.Tests.Integration.Providers
