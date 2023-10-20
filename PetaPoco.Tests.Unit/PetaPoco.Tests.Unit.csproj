@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
     <AssemblyTitle>PetaPoco.Tests.Unit</AssemblyTitle>
     <Description>A Tiny ORMish thing for your POCO's.</Description>
     <Company>Collaborating Platypus</Company>
@@ -17,7 +17,7 @@
     <PackageReference Include="Castle.Core" Version="4.2.1" />
     <PackageReference Include="Moq" Version="[4.8.2,4.20)" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" Condition="'$(TargetFramework)' == 'netcoreapp2.1'" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" Condition="'$(TargetFramework)' == 'netcoreapp3.1'" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.5.1" />
