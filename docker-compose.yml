@@ -10,6 +10,10 @@ x-mssql-environment: &mssql-environment
   ACCEPT_EULA: Y
   SA_PASSWORD: pAtAp0c8
 
+x-oracle-environment: &oracle-environment
+  ORACLE_PWD: petapoco
+  ORACLE_CHARACTERSET: AL32UTF8
+
 services:
   postgres:
     image: postgres:latest
@@ -73,11 +77,12 @@ services:
     environment:
       <<: *mssql-environment
 
-  #oracledb:
-  #  image: sath89/oracle-12c:latest
-  #  container_name: oracledb_petapoco
-  #  ports:
-  #    - "5008:1521"
-  #    - "5009:8008"
+  oracledb:
+    image: container-registry.oracle.com/database/free:latest
+    container_name: oracledb_petapoco
+    ports:
+      - "5008:1521"
+    environment:
+      <<: *oracle-environment
 
   # TODO: teradata

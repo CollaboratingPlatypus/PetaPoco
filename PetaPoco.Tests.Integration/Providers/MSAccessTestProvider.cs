@@ -8,6 +8,9 @@ namespace PetaPoco.Tests.Integration.Providers
 {
     public class MSAccessTestProvider : TestProvider
     {
+        private static readonly string[] _splitSemiColon = new[] { ";" };
+        private static readonly string[] _splitNewLine = new[] { Environment.NewLine };
+
         protected override string ConnectionName => "MSAccess";
 
         protected override string ScriptResourceName => "PetaPoco.Tests.Integration.Scripts.MSAccessBuildDatabase.sql";
@@ -33,26 +36,34 @@ namespace PetaPoco.Tests.Integration.Providers
 
         public override void ExecuteBuildScript(IDatabase database, string script)
         {
-            script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList().ForEach(s =>
-            {
-                if (string.IsNullOrEmpty(s) || s.StartsWith("--"))
-                    return;
-
-                if (s.StartsWith("DROP"))
+            script.Split(_splitSemiColon, StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => StripLineComments(s).Trim()).ToList()
+                .ForEach(s =>
                 {
-                    try
+                    if (string.IsNullOrEmpty(s)) return;
+
+                    if (s.StartsWith("DROP"))
                     {
-                        base.ExecuteBuildScript(database, s);
-                    }
-                    catch
-                    {
+                        try
+                        {
+                            base.ExecuteBuildScript(database, s);
+                        }
+                        catch
+                        {
+                        }
+
+                        return;
                     }
 
-                    return;
-                }
+                    base.ExecuteBuildScript(database, s);
+                });
+        }
 
-                base.ExecuteBuildScript(database, s);
-            });
+        private string StripLineComments(string script)
+        {
+            var parts = script.Split(_splitNewLine, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => !s.Trim().StartsWith("--"));
+            return string.Join(_splitNewLine[0], parts);
         }
     }
 }

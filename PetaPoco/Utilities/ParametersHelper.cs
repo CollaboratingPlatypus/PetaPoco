@@ -170,9 +170,8 @@ namespace PetaPoco.Internal
                 else
                 {
                     var type = arg.GetType();
-                    // TODO: Include second param `paramName: nameof(args)` in thrown ArgumentException
                     if (type.IsValueType || type == typeof(string))
-                        throw new ArgumentException($"Value type or string passed as stored procedure argument: {arg}");
+                        throw new ArgumentException($"Value type or string passed as stored procedure argument: {arg}", nameof(args));
                     var readableProps = type.GetProperties().Where(p => p.CanRead);
                     foreach (var prop in readableProps)
                     {

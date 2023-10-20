@@ -80,7 +80,7 @@ CREATE TABLE "Note" (
 	"CreatedOn" TIMESTAMP NOT NULL
 );
 
--- MSAccess Specific Tables;
+-- Postgres Specific Tables;
 
 DROP TABLE IF EXISTS "BugInvestigation_7K2TX4VR";
 
