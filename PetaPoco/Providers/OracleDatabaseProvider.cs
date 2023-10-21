@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Text.RegularExpressions;
 using PetaPoco.Core;
 using PetaPoco.Internal;
