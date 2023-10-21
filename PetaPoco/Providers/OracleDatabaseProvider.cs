@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using PetaPoco.Core;
 using PetaPoco.Internal;
 using PetaPoco.Utilities;
@@ -19,6 +20,13 @@ namespace PetaPoco.Providers
     /// </remarks>
     public class OracleDatabaseProvider : DatabaseProvider
     {
+        //An ordinary identifier must begin with a letter and contain only letters, underscore characters (_), and digits.
+        //The permitted letters and digits include all Unicode letters and digits.
+        //A delimited identifier is surrounded by double quotation marks and can contain any characters within the double quotation marks.
+        //Maximum two identifiers can be joined, separated by a dot (.)
+        private static readonly Regex _ordinaryIdentifierRegex = new Regex(@"^[\p{L}]+[\p{L}\d_]*(?:\.[\p{L}]+[\p{L}\d_]*)?$", RegexOptions.Compiled);
+        private static readonly Regex _delimitedIdentifierRegex = new Regex(@"^""[^""]*(?:""\.""[^""]*)?""$", RegexOptions.Compiled);
+
         /// <inheritdoc/>
         public override string GetParameterPrefix(string connectionString) => ":";
 
@@ -50,7 +58,22 @@ namespace PetaPoco.Providers
         }
 
         /// <inheritdoc/>
-        public override string EscapeSqlIdentifier(string sqlIdentifier) => $"\"{sqlIdentifier.ToUpperInvariant()}\"";
+        public override string EscapeSqlIdentifier(string sqlIdentifier)
+        {
+            return sqlIdentifier;
+
+            //TODO: Below code determines whether it is required to wrap the identifier in double quotes or not.
+            //      Included for convenience while fixing failing tests until we're sure it's not required.
+
+            //If already quoted, leave as-is
+            if (_delimitedIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier;
+
+            //If no quotes required, leave as-is (could also uppercase)
+            if (_ordinaryIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier; //.ToUpperInvariant();
+
+            //If not valid, wrap in quotes, but don't allow use of double quotes in identifier
+            return "\"" + sqlIdentifier.Replace("\"", "").Replace(".", "\".\"") + "\"";
+        }
 
         /// <inheritdoc/>
         public override string GetAutoIncrementExpression(TableInfo ti) => !string.IsNullOrEmpty(ti.SequenceName) ? $"{ti.SequenceName}.nextval" : null;
