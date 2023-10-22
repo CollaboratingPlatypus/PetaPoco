@@ -108,11 +108,15 @@ namespace PetaPoco.Utilities
                 return false;
 
             // Look for the last "ORDER BY <whatever>" clause not part of a ROW_NUMBER expression
-            var orderByMatch = RegexOrderBy.Match(sql);
-            if (orderByMatch.Success)
+            // when the query does not contain an "order by", it is very slow
+            if (SimpleRegexOrderBy.IsMatch(sql))
             {
-                parts.SqlOrderBy = orderByMatch.Value;
-                parts.SqlCount = sql.Replace(orderByMatch.Value, string.Empty);
+                var orderByMatch = RegexOrderBy.Match(sql);
+                if (orderByMatch.Success)
+                {
+                    parts.SqlOrderBy = orderByMatch.Value;
+                    parts.SqlCount = sql.Replace(orderByMatch.Value, string.Empty);
+                }
             }
 
             // Save column list and replace with COUNT(*)
