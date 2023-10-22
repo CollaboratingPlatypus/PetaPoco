@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PetaPoco.Core;
 using PetaPoco.Tests.Integration.Models;
 using PetaPoco.Tests.Integration.Providers;
@@ -18,6 +19,107 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
         }
 
         [Fact]
+        public override async Task FetchAsyncWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+
+            var sql = new Sql(
+                $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
+
+            var results = await DB.FetchAsync<dynamic>(2, 1, sql);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override async Task FetchAsyncWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = await DB.FetchAsync<dynamic>(2, 1, sql, OrderStatus.Pending);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override void FetchWithPaging_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql(
+                $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
+
+            var results = DB.Fetch<dynamic>(2, 1, sql);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override void FetchWithPaging_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                      $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = DB.Fetch<dynamic>(2, 1, sql, OrderStatus.Pending);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override void SkipAndTake_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql(
+                $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
+
+            var results = DB.SkipTake<dynamic>(2, 1, sql);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override void SkipAndTake_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                      $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = DB.SkipTake<dynamic>(2, 1, sql, OrderStatus.Pending);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override async Task SkipAndTakeAsync_ForDynamicTypeGivenSql_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = new Sql(
+                $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
+
+            var results = await DB.SkipTakeAsync<dynamic>(2, 1, sql);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public override async Task SkipAndTakeAsync_ForDynamicTypeGivenSqlStringAndParameters_ShouldReturnValidDynamicTypeCollection()
+        {
+            AddOrders(12);
+            var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
+            var sql = $"SELECT t.* FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} t " +
+                $"WHERE t.{DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
+
+            var results = await DB.SkipTakeAsync<dynamic>(2, 1, sql, OrderStatus.Pending);
+            results.Count.ShouldBe(1);
+        }
+
+        [Fact]
         public override void QueryMultiple_ForSingleResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddPeople(1, 0);
@@ -26,8 +128,8 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             var pdName = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName;
 
             var sql = $@"SELECT *
-                         FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}
-                         WHERE {DB.Provider.EscapeSqlIdentifier(pdName)} LIKE @0 || '%';";
+    FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}
+    WHERE {DB.Provider.EscapeSqlIdentifier(pdName)} LIKE @0 || '%'";
 
             List<Person> result;
             using (var multi = DB.QueryMultiple(sql, "Peta"))
@@ -54,11 +156,22 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             var pdName = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName;
             var odPersonId = od.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName;
 
-            var sql = $@"SELECT * FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
-                         INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
-                         WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
-                         ORDER BY 1 DESC
-                         LIMIT 1;";
+            //Oracle 12c and above only
+    //        var sql = $@"SELECT *
+    //FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+    //    INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
+    //WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
+    //ORDER BY 1 DESC
+    //FETCH FIRST 1 ROWS ONLY";
+
+            var sql = $@"SELECT *
+    FROM (SELECT *
+        FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+            INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p
+                ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
+        WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
+        ORDER BY 1 DESC)
+    WHERE ROWNUM <= 1";
 
             List<Order> result;
             using (var multi = DB.QueryMultiple(sql, "Peta0"))
@@ -86,7 +199,8 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             order.Person.Age.ShouldBe(18);
         }
 
-        [Fact]
+        // FIXME: Oracle.ManagedDataAccess.Client.OracleException : ORA-03048: SQL reserved word ';' is not syntactically valid following '...ORDER BY o.Id ASC'
+        [Fact(Skip = "Limited support for QueryMultiple by provider due to need for multiple statements in a single command.")]
         public override void QueryMultiple_ForMultiResultsSetWithSinglePoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(1);
@@ -120,7 +234,8 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             order.Person.Age.ShouldBe(18);
         }
 
-        [Fact]
+        // FIXME: Oracle.ManagedDataAccess.Client.OracleException : ORA-03048: SQL reserved word ';' is not syntactically valid following '...ORDER BY o.Id ASC'
+        [Fact(Skip = "Limited support for QueryMultiple by provider due to need for multiple statements in a single command.")]
         public override void QueryMultiple_ForMultiResultsSetWithMultiPoco_ShouldReturnValidPocoCollection()
         {
             AddOrders(12);
