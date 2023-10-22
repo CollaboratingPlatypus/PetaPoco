@@ -3,8 +3,8 @@ using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using PetaPoco.Core;
-using PetaPoco.Internal;
 using PetaPoco.Utilities;
+using System.Linq;
 #if ASYNC
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +35,23 @@ namespace PetaPoco.Providers
         {
             cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
             cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
+            
+            if (cmd.CommandType == CommandType.StoredProcedure)
+            {
+                //Oracle stored procedure parameter names do not use the parameter prefix
+                //They also need to match the db exactly, so it's up to the consumer to specify the correct name
+                //In Database.AddParameter, the parameter prefix is prepended and it didn't seem right to cater for this case there...
+                //...so we need to undo those changes here
+                var paramPrefix = GetParameterPrefix(null);
+                var enumerator = cmd.Parameters.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    var parameter = (IDataParameter)enumerator.Current;
+
+                    if (parameter.ParameterName.StartsWith(paramPrefix, StringComparison.OrdinalIgnoreCase))
+                        parameter.ParameterName = parameter.ParameterName.Substring(paramPrefix.Length);
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -44,8 +61,31 @@ namespace PetaPoco.Providers
             if (parts.SqlSelectRemoved.StartsWith("*"))
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
 
-            // Same deal as SQL Server
-            return Singleton<SqlServerDatabaseProvider>.Instance.BuildPageQuery(skip, take, parts, ref args);
+            //Supported by Oracle v12c and above only
+            //var sql = $"{parts.Sql}\nOFFSET @{args.Length} ROWS FETCH NEXT @{args.Length + 1} ROWS ONLY";
+            //args = args.Concat(new object[] { skip, take }).ToArray();
+            //return sql;
+
+            //Similar to SqlServerProvider with the exception of SELECT NULL FROM DUAL vs SELECT NULL
+            var helper = (PagingHelper)PagingUtility;
+            // when the query does not contain an "order by", it is very slow
+            if (helper.SimpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
+            {
+                var m = helper.SimpleRegexOrderBy.Match(parts.SqlSelectRemoved);
+                if (m.Success)
+                {
+                    var g = m.Groups[0];
+                    parts.SqlSelectRemoved = parts.SqlSelectRemoved.Substring(0, g.Index);
+                }
+            }
+
+            if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
+                parts.SqlSelectRemoved = "peta_inner.* FROM (SELECT " + parts.SqlSelectRemoved + ") peta_inner";
+
+            var sqlPage =
+                $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({parts.SqlOrderBy ?? "ORDER BY (SELECT NULL FROM DUAL)"}) peta_rn, {parts.SqlSelectRemoved}) peta_paged WHERE peta_rn > @{args.Length} AND peta_rn <= @{args.Length + 1}";
+            args = args.Concat(new object[] { skip, skip + take }).ToArray();
+            return sqlPage;
         }
 
         /// <inheritdoc/>
