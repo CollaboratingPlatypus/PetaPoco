@@ -153,7 +153,7 @@ CREATE PROCEDURE SelectPeopleWithParam
     p_out_cursor OUT SYS_REFCURSOR) AS
 BEGIN
 	OPEN p_out_cursor FOR
-	SELECT * FROM People WHERE Age > age;
+	SELECT * FROM People WHERE Age > SelectPeopleWithParam.age;
 END;
 /
 
@@ -171,7 +171,7 @@ CREATE PROCEDURE CountPeopleWithParam
     p_out_cursor OUT SYS_REFCURSOR) AS
 BEGIN
 	OPEN p_out_cursor FOR
-	SELECT COUNT(*) FROM People WHERE Age > age;
+	SELECT COUNT(*) FROM People WHERE Age > CountPeopleWithParam.age;
 END;
 /
 
@@ -184,6 +184,6 @@ END;
 CREATE PROCEDURE UpdatePeopleWithParam
 	(age IN NUMERIC DEFAULT 0) AS
 BEGIN
-	UPDATE People SET FullName = 'Updated' WHERE Age > age;
+	UPDATE People SET FullName = 'Updated' WHERE Age > UpdatePeopleWithParam.age;
 END;
 /

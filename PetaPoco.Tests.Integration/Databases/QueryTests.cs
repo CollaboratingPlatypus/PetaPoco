@@ -436,7 +436,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = DB.Query<string>(sql, OrderStatus.Pending).ToList();
@@ -451,7 +451,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = DB.Query<string>(sql).ToList();
@@ -581,7 +581,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<string>();
@@ -597,7 +597,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = new List<string>();
@@ -746,7 +746,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = new List<string>();
@@ -766,7 +766,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = new List<string>();
@@ -895,7 +895,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = DB.Fetch<string>(sql, OrderStatus.Pending);
@@ -910,7 +910,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = DB.Fetch<string>(sql);
@@ -995,7 +995,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = DB.SkipTake<string>(2, 1, sql, OrderStatus.Pending);
@@ -1010,7 +1010,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = DB.SkipTake<string>(2, 1, sql);
@@ -1094,7 +1094,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = DB.Fetch<string>(2, 1, sql, OrderStatus.Pending);
@@ -1109,7 +1109,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = DB.Fetch<string>(2, 1, sql);
@@ -1232,7 +1232,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = await DB.FetchAsync<string>(sql, OrderStatus.Pending);
@@ -1247,7 +1247,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = await DB.FetchAsync<string>(sql);
@@ -1332,7 +1332,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = await DB.FetchAsync<string>(2, 1, sql, OrderStatus.Pending);
@@ -1347,7 +1347,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = await DB.FetchAsync<string>(2, 1, sql);
@@ -1431,7 +1431,7 @@ namespace PetaPoco.Tests.Integration
             AddOrders(12);
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                      $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                       $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0";
 
             var results = await DB.SkipTakeAsync<string>(2, 1, sql, OrderStatus.Pending);
@@ -1446,7 +1446,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Order), DB.DefaultMapper);
             var sql = new Sql(
                 $"SELECT {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "PoNumber").ColumnName)} " +
-                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}" +
+                $"FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} " +
                 $"WHERE {DB.Provider.EscapeSqlIdentifier(pd.Columns.Values.First(c => c.PropertyInfo.Name == "Status").ColumnName)} = @0", OrderStatus.Pending);
 
             var results = await DB.SkipTakeAsync<string>(2, 1, sql);

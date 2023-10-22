@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Oracle.ManagedDataAccess.Client;
 
 /* 
  * Converted build scripts from SqlServerBuildDatabase.sql using MSSQLTips.com for datatype conversions
@@ -18,6 +19,7 @@ namespace PetaPoco.Tests.Integration.Providers
             "PetaPoco.Tests.Integration.Scripts.OracleSetupDatabase.sql",
             "PetaPoco.Tests.Integration.Scripts.OracleBuildDatabase.sql"
         };
+        private static volatile Exception _setupException;
         private static ExecutionPhase _phase = ExecutionPhase.Setup;
 
         private string _connectionName = "Oracle";
@@ -60,13 +62,38 @@ namespace PetaPoco.Tests.Integration.Providers
             //No need to run database setup scripts for every test
             if (_phase != ExecutionPhase.Setup) return;
 
+            //No need to fail multiple times during setup failure, just fail with the same exception for every test
+            if (_setupException != null) throw _setupException;
+
             var previousName = _connectionName;
-            _connectionName = "Oracle_Builder";
 
-            _ = base.Execute();
+            try
+            {
+                _connectionName = "Oracle_Builder";
 
-            _connectionName = previousName;
-            _phase = ExecutionPhase.Build;
+                //Double check exception in case another thread updated it
+                if (_setupException != null) throw _setupException;
+
+                _ = base.Execute();
+                _phase = ExecutionPhase.Build;
+            }
+            catch (Exception ex)
+            {
+                if (ex is OracleException oex && oex.Number == 1940)
+                {
+                    //If we cannot drop a user who is currently connected, assume setup to be completed successfully.
+                    //This code was added to improve the development experience, while investigating failing tests.
+                    _phase = ExecutionPhase.Build;
+                    return;
+                }
+                
+                if (_setupException is null) _setupException = ex;
+                throw;
+            }
+            finally
+            {
+                _connectionName = previousName;
+            }
         }
 
         private string StripLineComments(string script)
