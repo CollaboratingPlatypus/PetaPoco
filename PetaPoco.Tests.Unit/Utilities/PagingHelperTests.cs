@@ -19,20 +19,18 @@ namespace PetaPoco.Tests.Unit.Utilities
 
             PagingHelper.Instance.SplitSQL(inputWithOrderBy, out SQLParts partsWithOrderBy);
             sw.Stop();
-            var elapsedMillSecondsWithOrderBy = sw.ElapsedMilliseconds;
+            var elapsedWithOrderBy = sw.Elapsed;
 
             sw.Restart();
 
             PagingHelper.Instance.SplitSQL(inputWithoutOrderBy, out SQLParts partsWithoutOrderBy);
             sw.Stop();
-            var elapsedMillSecondsWithoutOrderBy = sw.ElapsedMilliseconds;
+            var elapsedWithoutOrderBy = sw.Elapsed;
 
-            var actualTimeDiffInMilliSeconds = Math.Abs(elapsedMillSecondsWithOrderBy - elapsedMillSecondsWithoutOrderBy);
-            var maxExpectedTimeDiffInMilliSeconds = 200;
-            actualTimeDiffInMilliSeconds.ShouldBeLessThanOrEqualTo(maxExpectedTimeDiffInMilliSeconds,
-                $"{nameof(PagingHelper.SplitSQL)} degrades in performance. Expected {maxExpectedTimeDiffInMilliSeconds}ms or less, but was {actualTimeDiffInMilliSeconds}ms.");
+            var tolerance = TimeSpan.FromMilliseconds(200);
+            elapsedWithOrderBy.ShouldBe(elapsedWithoutOrderBy, tolerance, () => $"{nameof(PagingHelper.SplitSQL)} degrades in performance. " +
+                $"Expected the difference to be {tolerance.TotalMilliseconds}ms or less, but was {Math.Abs((elapsedWithOrderBy - elapsedWithoutOrderBy).TotalMilliseconds)}ms.");
         }
-
         private static string GenerateSql(int numberOfColumns, int numberOfTables, int numberOfConditions, bool includeOrderBy)
         {
             var columns = GenerateSqlPart("column{0}", numberOfColumns, true);
