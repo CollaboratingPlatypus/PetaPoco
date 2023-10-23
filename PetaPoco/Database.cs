@@ -3373,9 +3373,7 @@ namespace PetaPoco
                 sb.Append("\n");
                 for (int i = 0; i < args.Length; i++)
                 {
-                    var arg = args[i];
-                    var argTypeName = arg == null ? "Unknown Type" : args.GetType().Name;
-                    sb.AppendFormat("\t -> {0}{1} [{2}] = \"{3}\"\n", _paramPrefix, i, argTypeName, arg);
+                    sb.AppendFormat("\t -> {0}{1} [{2}] = \"{3}\"\n", _paramPrefix, i, args[i]?.GetType().Name ?? "Unknown Type", args[i]);
                 }
 
                 sb.Remove(sb.Length - 1, 1);
