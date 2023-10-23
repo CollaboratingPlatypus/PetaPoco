@@ -35,23 +35,6 @@ namespace PetaPoco.Providers
         {
             cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
             cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
-            
-            if (cmd.CommandType == CommandType.StoredProcedure)
-            {
-                //Oracle stored procedure parameter names do not use the parameter prefix
-                //They also need to match the db exactly, so it's up to the consumer to specify the correct name
-                //In Database.AddParameter, the parameter prefix is prepended and it didn't seem right to cater for this case there...
-                //...so we need to undo those changes here
-                var paramPrefix = GetParameterPrefix(null);
-                var enumerator = cmd.Parameters.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    var parameter = (IDataParameter)enumerator.Current;
-
-                    if (parameter.ParameterName.StartsWith(paramPrefix, StringComparison.OrdinalIgnoreCase))
-                        parameter.ParameterName = parameter.ParameterName.Substring(paramPrefix.Length);
-                }
-            }
         }
 
         /// <inheritdoc/>
