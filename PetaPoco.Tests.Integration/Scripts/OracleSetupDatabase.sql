@@ -1,3 +1,23 @@
+-- Drop PETAPOCO user COMPLETELY (if it exists)
+DECLARE
+    found number := 0;
+BEGIN
+    SELECT COUNT(*) INTO found
+    FROM all_users
+    WHERE username = 'PETAPOCO';
+
+    IF found <> 0 THEN
+        BEGIN
+            EXECUTE IMMEDIATE 'DROP USER petapoco CASCADE';
+        END;
+    END IF;
+END;
+/
+
+-- Create fresh user
+CREATE USER petapoco IDENTIFIED BY petapoco;
+/
+
 -- Drop DATA_TS tablespace COMPLETELY (if it exists)
 DECLARE
     found number := 0;
@@ -20,26 +40,6 @@ END;
 CREATE TABLESPACE data_ts
 DATAFILE '/opt/oracle/oradata/FREE/FREEPDB1/data01.dbf'
 SIZE 200M AUTOEXTEND ON NEXT 10M MAXSIZE UNLIMITED;
-/
-
--- Drop PETAPOCO user COMPLETELY (if it exists)
-DECLARE
-    found number := 0;
-BEGIN
-    SELECT COUNT(*) INTO found
-    FROM all_users
-    WHERE username = 'PETAPOCO';
-
-    IF found <> 0 THEN
-        BEGIN
-            EXECUTE IMMEDIATE 'DROP USER petapoco CASCADE';
-        END;
-    END IF;
-END;
-/
-
--- Create fresh user
-CREATE USER petapoco IDENTIFIED BY petapoco;
 /
 
 -- Convenience procedure to drop certain database objects without having to deal with exceptions

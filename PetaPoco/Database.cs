@@ -3161,14 +3161,22 @@ namespace PetaPoco
                 if (cmd.CommandType == CommandType.Text)
                     idbParam.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 else if (idbParam.ParameterName?.StartsWith(_paramPrefix) != true)
-                    idbParam.ParameterName = idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
+                {
+                    // only add param prefix if it's not an Oracle stored procedures
+                    if (!(cmd.CommandType == CommandType.StoredProcedure && _provider is Providers.OracleDatabaseProvider))
+                        idbParam.ParameterName = idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
+                }
 
                 cmd.Parameters.Add(idbParam);
             }
             else
             {
                 var p = cmd.CreateParameter();
-                p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
+
+                // only add param prefix if it's not an Oracle stored procedures
+                if (!(cmd.CommandType == CommandType.StoredProcedure && _provider is Providers.OracleDatabaseProvider))
+                    p.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
+                
                 SetParameterProperties(p, value, pc);
 
                 cmd.Parameters.Add(p);
@@ -3365,7 +3373,7 @@ namespace PetaPoco
                 sb.Append("\n");
                 for (int i = 0; i < args.Length; i++)
                 {
-                    sb.AppendFormat("\t -> {0}{1} [{2}] = \"{3}\"\n", _paramPrefix, i, args[i].GetType().Name, args[i]);
+                    sb.AppendFormat("\t -> {0}{1} [{2}] = \"{3}\"\n", _paramPrefix, i, args[i]?.GetType().Name ?? "Unknown Type", args[i]);
                 }
 
                 sb.Remove(sb.Length - 1, 1);
