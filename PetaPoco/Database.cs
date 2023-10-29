@@ -2764,7 +2764,7 @@ namespace PetaPoco
         /// name.</exception>
         protected virtual bool IsNew(string primaryKeyName, PocoData pocoData, object poco)
         {
-            if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject)
+            if (string.IsNullOrEmpty(primaryKeyName) || poco is ExpandoObject || poco is ExpandoPoco)
                 throw new InvalidOperationException("IsNew() and Save() are only supported on tables with identity (inc auto-increment) primary key columns");
 
             object pk;
