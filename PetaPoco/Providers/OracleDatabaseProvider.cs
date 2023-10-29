@@ -35,6 +35,12 @@ namespace PetaPoco.Providers
         {
             cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
             cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
+
+            //By default statements are cached, so if the database is modified between two reads (same statement),
+            //the last one will still access the old statement's definition.
+            //Setting this property to false prevents caching of statements completely.
+            //NOTE: Using "Statement Cache Purge=true; Statement Cache Size=0" in the ConnectionString is not a guarantee
+            cmd.GetType().GetProperty("AddToStatementCache")?.SetValue(cmd, false, null);
         }
 
         /// <inheritdoc/>
@@ -45,30 +51,31 @@ namespace PetaPoco.Providers
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
 
             //Supported by Oracle v12c and above only
-            //var sql = $"{parts.Sql}\nOFFSET @{args.Length} ROWS FETCH NEXT @{args.Length + 1} ROWS ONLY";
-            //args = args.Concat(new object[] { skip, take }).ToArray();
-            //return sql;
+            var sql = $"{parts.Sql}\nOFFSET @{args.Length} ROWS FETCH NEXT @{args.Length + 1} ROWS ONLY";
+            args = args.Concat(new object[] { skip, take }).ToArray();
+            return sql;
 
-            //Similar to SqlServerProvider with the exception of SELECT NULL FROM DUAL vs SELECT NULL
-            var helper = (PagingHelper)PagingUtility;
-            // when the query does not contain an "order by", it is very slow
-            if (helper.SimpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
-            {
-                var m = helper.SimpleRegexOrderBy.Match(parts.SqlSelectRemoved);
-                if (m.Success)
-                {
-                    var g = m.Groups[0];
-                    parts.SqlSelectRemoved = parts.SqlSelectRemoved.Substring(0, g.Index);
-                }
-            }
+            //Older versions of Oracle
+            ////Similar to SqlServerProvider with the exception of SELECT NULL FROM DUAL vs SELECT NULL
+            //var helper = (PagingHelper)PagingUtility;
+            //// when the query does not contain an "order by", it is very slow
+            //if (helper.SimpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
+            //{
+            //    var m = helper.SimpleRegexOrderBy.Match(parts.SqlSelectRemoved);
+            //    if (m.Success)
+            //    {
+            //        var g = m.Groups[0];
+            //        parts.SqlSelectRemoved = parts.SqlSelectRemoved.Substring(0, g.Index);
+            //    }
+            //}
 
-            if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
-                parts.SqlSelectRemoved = "peta_inner.* FROM (SELECT " + parts.SqlSelectRemoved + ") peta_inner";
+            //if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
+            //    parts.SqlSelectRemoved = "peta_inner.* FROM (SELECT " + parts.SqlSelectRemoved + ") peta_inner";
 
-            var sqlPage =
-                $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({parts.SqlOrderBy ?? "ORDER BY (SELECT NULL FROM DUAL)"}) peta_rn, {parts.SqlSelectRemoved}) peta_paged WHERE peta_rn > @{args.Length} AND peta_rn <= @{args.Length + 1}";
-            args = args.Concat(new object[] { skip, skip + take }).ToArray();
-            return sqlPage;
+            //var sqlPage =
+            //    $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({parts.SqlOrderBy ?? "ORDER BY (SELECT NULL FROM DUAL)"}) peta_rn, {parts.SqlSelectRemoved}) peta_paged WHERE peta_rn > @{args.Length} AND peta_rn <= @{args.Length + 1}";
+            //args = args.Concat(new object[] { skip, skip + take }).ToArray();
+            //return sqlPage;
         }
 
         /// <inheritdoc/>
@@ -83,18 +90,13 @@ namespace PetaPoco.Providers
         /// <inheritdoc/>
         public override string EscapeSqlIdentifier(string sqlIdentifier)
         {
-            return sqlIdentifier;
-
-            //TODO: Below code determines whether it is required to wrap the identifier in double quotes or not.
-            //      Included for convenience while fixing failing tests until we're sure it's not required.
-
             //If already quoted, leave as-is
             if (_delimitedIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier;
 
-            //If no quotes required, leave as-is (could also uppercase)
-            if (_ordinaryIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier; //.ToUpperInvariant();
+            //If using ordinary identifiers and no quotes required, leave as-is (could also uppercase)
+            if (UseOrdinaryIdentifiers && _ordinaryIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier; //.ToUpperInvariant();
 
-            //If not valid, wrap in quotes, but don't allow use of double quotes in identifier
+            //If using delimited identifiers or quotes required, wrap in quotes, but don't allow use of double quotes in identifier
             return "\"" + sqlIdentifier.Replace("\"", "").Replace(".", "\".\"") + "\"";
         }
 

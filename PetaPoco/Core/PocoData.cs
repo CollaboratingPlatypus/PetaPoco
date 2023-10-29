@@ -122,7 +122,7 @@ namespace PetaPoco.Core
         /// <exception cref="InvalidOperationException">Trying to use dynamic types with this method.</exception>
         public static PocoData ForType(Type type, IMapper defaultMapper)
         {
-            if (type == typeof(System.Dynamic.ExpandoObject))
+            if (type == typeof(System.Dynamic.ExpandoObject) || type == typeof(ExpandoPoco))
                 throw new InvalidOperationException("Cannot use dynamic types with this method");
 
             return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
@@ -138,7 +138,7 @@ namespace PetaPoco.Core
         public static PocoData ForObject(object obj, string primaryKeyName, IMapper defaultMapper)
         {
             var t = obj.GetType();
-            if (t == typeof(System.Dynamic.ExpandoObject))
+            if (t == typeof(System.Dynamic.ExpandoObject) || t == typeof(ExpandoPoco))
             {
                 var pd = new PocoData();
                 pd.TableInfo = new TableInfo();
@@ -148,8 +148,16 @@ namespace PetaPoco.Core
                 pd.TableInfo.AutoIncrement = true;
                 foreach (var col in (obj as IDictionary<string, object>).Keys)
                 {
-                    if (col != primaryKeyName)
-                        pd.Columns.Add(col, new ExpandoColumn() { ColumnName = col });
+                    if (col == primaryKeyName) continue;
+                    if (pd.Columns.TryGetValue(col, out PocoColumn pc))
+                    {
+                        //When col and primaryKeyName only differ by case,
+                        //we need ColumnName to match case exactly.
+                        pc.ColumnName = col;
+                        continue;
+                    }
+
+                    pd.Columns.Add(col, new ExpandoColumn() { ColumnName = col });
                 }
 
                 return pd;
@@ -168,10 +176,13 @@ namespace PetaPoco.Core
         /// <param name="columnCount">The number of columns in the record's database table.</param>
         /// <param name="reader">The data reader instance.</param>
         /// <param name="defaultMapper">The default mapper to use for the POCO.</param>
+        /// <param name="ignoreCase">Whether to make dynamic objects case insensitive.<br />
+        /// When <see langword="true"/> will return <see cref="ExpandoPoco"/>, otherwise <see cref="System.Dynamic.ExpandoObject"/>.<br />
+        /// Default is <see langword="false"/></param>
         /// <returns>A delegate that can convert an <see cref="IDataReader"/> record into a POCO.</returns>
         /// <exception cref="InvalidOperationException">The POCO type is a value type, or the POCO type has no default constructor, or the
         /// POCO type is an interface or abstract class.</exception>
-        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int columnCount, IDataReader reader, IMapper defaultMapper)
+        public Delegate GetFactory(string sql, string connectionString, int firstColumn, int columnCount, IDataReader reader, IMapper defaultMapper, bool ignoreCase = false)
         {
             // Create key for cache lookup
             var key = Tuple.Create(sql, connectionString, firstColumn, columnCount);
@@ -186,8 +197,17 @@ namespace PetaPoco.Core
 
                 if (Type == typeof(object))
                 {
-                    // var poco = new T()
-                    il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes)); // obj
+                    if (ignoreCase)
+                    {
+                        // var poco = new T(bool)
+                        il.Emit(OpCodes.Ldc_I4_1); // true
+                        il.Emit(OpCodes.Newobj, typeof(ExpandoPoco).GetConstructor(new Type[] { typeof(bool) })); // obj
+                    }
+                    else
+                    {
+                        // var poco = new T()
+                        il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes)); // obj
+                    }
 
                     MethodInfo fnAdd = typeof(IDictionary<string, object>).GetMethod("Add");
 

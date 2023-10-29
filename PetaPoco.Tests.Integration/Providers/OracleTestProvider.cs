@@ -9,20 +9,22 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace PetaPoco.Tests.Integration.Providers
 {
-    public class OracleTestProvider : TestProvider
+    public abstract class OracleTestProvider : TestProvider
     {
         private static readonly string[] _splitSemiColon = new[] { ";" };
         private static readonly string[] _splitNewLine = new[] { Environment.NewLine };
         private static readonly string[] _splitSlash = new[] { Environment.NewLine + "/" };
         private static readonly string[] _resources = new[]
         {
-            "PetaPoco.Tests.Integration.Scripts.OracleSetupDatabase.sql",
-            "PetaPoco.Tests.Integration.Scripts.OracleBuildDatabase.sql"
+            "PetaPoco.Tests.Integration.Scripts.OracleSetupDatabase",
+            "PetaPoco.Tests.Integration.Scripts.OracleBuildDatabase"
         };
         private static volatile Exception _setupException;
         private static ExecutionPhase _phase = ExecutionPhase.Setup;
 
-        private string _connectionName = "Oracle";
+        protected OracleTestProvider(string connectionName) => _connectionName = $"Oracle_{connectionName}";
+
+        private string _connectionName;
         protected override string ConnectionName => _connectionName;
 
         protected override string ScriptResourceName => _resources[(int)_phase];
@@ -102,5 +104,19 @@ namespace PetaPoco.Tests.Integration.Providers
                 .Where(s => !s.Trim().StartsWith("--"));
             return string.Join(_splitNewLine[0], parts);
         }
+    }
+
+    public class OracleDelimitedTestProvider : OracleTestProvider
+    {
+        public OracleDelimitedTestProvider() : base("Delimited") { }
+        protected override string ScriptResourceName => $"{base.ScriptResourceName}Delimited.sql";
+    }
+
+    public class OracleOrdinaryTestProvider : OracleTestProvider
+    {
+        public OracleOrdinaryTestProvider() : base("Ordinary") { }
+        protected override IDatabase LoadFromConnectionName(string name)
+            => BuildFromConnectionName(name).UsingProvider<PetaPoco.Providers.OracleOrdinaryDatabaseProvider>().Create();
+        protected override string ScriptResourceName => $"{base.ScriptResourceName}Ordinary.sql";
     }
 }

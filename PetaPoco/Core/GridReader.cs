@@ -90,7 +90,8 @@ namespace PetaPoco
             {
                 while (index == _gridIndex)
                 {
-                    var factory = pd.GetFactory(_command.CommandText, _command.Connection.ConnectionString, 0, _reader.FieldCount, _reader, _defaultMapper) as Func<IDataReader, T>;
+                    var factory = pd.GetFactory(_command.CommandText, _command.Connection.ConnectionString, 0, _reader.FieldCount,
+                        _reader, _defaultMapper, _db.Provider.UseOrdinaryIdentifiers) as Func<IDataReader, T>;
 
                     while (true)
                     {
@@ -147,7 +148,7 @@ namespace PetaPoco
                 var cmd = _command;
                 var rdr = _reader;
 
-                var factory = MultiPocoFactory.GetFactory<T>(types, cmd.Connection.ConnectionString, cmd.CommandText, rdr, _defaultMapper);
+                var factory = MultiPocoFactory.GetFactory<T>(types, cmd.Connection.ConnectionString, cmd.CommandText, rdr, _defaultMapper, _db.Provider.UseOrdinaryIdentifiers);
 
                 // if no projector function provided by caller, figure out the split points and connect them ourself
                 if (transformer == null)

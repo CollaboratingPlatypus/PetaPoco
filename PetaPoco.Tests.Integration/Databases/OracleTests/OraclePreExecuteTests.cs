@@ -6,36 +6,79 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Oracle
 {
-    [Collection("Oracle")]
-    public class OraclePreExecuteTests : PreExecuteTests
+    public abstract partial class OraclePreExecuteTests : PreExecuteTests
     {
-        protected override IPreExecuteDatabaseProvider Provider => DB.Provider as PreExecuteDatabaseProvider;
-
-        public OraclePreExecuteTests()
-            : base(new PreExecuteTestProvider())
+        protected OraclePreExecuteTests(TestProvider provider)
+            : base(provider)
         {
-            Provider.ThrowExceptions = true;
         }
 
-        protected class PreExecuteTestProvider : OracleTestProvider
+        [Collection("Oracle.Delimited")]
+        public class Delimited : OraclePreExecuteTests
         {
-            protected override IDatabase LoadFromConnectionName(string name)
-                => BuildFromConnectionName(name).UsingProvider<PreExecuteDatabaseProvider>().Create();
-        }
+            protected override IPreExecuteDatabaseProvider Provider => DB.Provider as PreExecuteDatabaseProvider;
 
-        protected class PreExecuteDatabaseProvider : PetaPoco.Providers.OracleDatabaseProvider, IPreExecuteDatabaseProvider
-        {
-            public bool ThrowExceptions { get; set; }
-            public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();
-
-            public override void PreExecute(IDbCommand cmd)
+            public Delimited()
+                : base(new PreExecuteTestProvider())
             {
-                Parameters.Clear();
+                Provider.ThrowExceptions = true;
+            }
 
-                if (ThrowExceptions)
+            protected class PreExecuteTestProvider : OracleDelimitedTestProvider
+            {
+                protected override IDatabase LoadFromConnectionName(string name)
+                    => BuildFromConnectionName(name).UsingProvider<PreExecuteDatabaseProvider>().Create();
+            }
+
+            protected class PreExecuteDatabaseProvider : PetaPoco.Providers.OracleDatabaseProvider, IPreExecuteDatabaseProvider
+            {
+                public bool ThrowExceptions { get; set; }
+                public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();
+
+                public override void PreExecute(IDbCommand cmd)
                 {
-                    Parameters = cmd.Parameters.Cast<IDataParameter>().ToList();
-                    throw new PreExecuteException();
+                    Parameters.Clear();
+
+                    if (ThrowExceptions)
+                    {
+                        Parameters = cmd.Parameters.Cast<IDataParameter>().ToList();
+                        throw new PreExecuteException();
+                    }
+                }
+            }
+        }
+
+        [Collection("Oracle.Ordinary")]
+        public class Ordinary : OraclePreExecuteTests
+        {
+            protected override IPreExecuteDatabaseProvider Provider => DB.Provider as PreExecuteDatabaseProvider;
+
+            public Ordinary()
+                : base(new PreExecuteTestProvider())
+            {
+                Provider.ThrowExceptions = true;
+            }
+
+            protected class PreExecuteTestProvider : OracleOrdinaryTestProvider
+            {
+                protected override IDatabase LoadFromConnectionName(string name)
+                    => BuildFromConnectionName(name).UsingProvider<PreExecuteDatabaseProvider>().Create();
+            }
+
+            protected class PreExecuteDatabaseProvider : PetaPoco.Providers.OracleOrdinaryDatabaseProvider, IPreExecuteDatabaseProvider
+            {
+                public bool ThrowExceptions { get; set; }
+                public List<IDataParameter> Parameters { get; set; } = new List<IDataParameter>();
+
+                public override void PreExecute(IDbCommand cmd)
+                {
+                    Parameters.Clear();
+
+                    if (ThrowExceptions)
+                    {
+                        Parameters = cmd.Parameters.Cast<IDataParameter>().ToList();
+                        throw new PreExecuteException();
+                    }
                 }
             }
         }

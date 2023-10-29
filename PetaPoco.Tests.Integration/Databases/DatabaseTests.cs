@@ -36,12 +36,14 @@ namespace PetaPoco.Tests.Integration
         public virtual void Construct_GivenConnection_ShouldBeValid()
         {
             var factory = DB.Provider.GetFactory();
+            var ignoreCase = DB.Provider.UseOrdinaryIdentifiers;
+
             using (var connection = factory.CreateConnection())
             {
                 connection.ConnectionString = DB.ConnectionString;
                 connection.Open();
 
-                using (var db = new Database(connection))
+                using (var db = new Database(connection, ignoreCase: ignoreCase))
                 {
                     AfterDbCreate(db);
                     var key = db.Insert(_note);
@@ -57,8 +59,9 @@ namespace PetaPoco.Tests.Integration
         {
             var providerName = ProviderName;
             var connectionString = DB.ConnectionString;
+            var ignoreCase = DB.Provider.UseOrdinaryIdentifiers;
 
-            using (var db = new Database(connectionString, providerName))
+            using (var db = new Database(connectionString, providerName, ignoreCase: ignoreCase))
             {
                 AfterDbCreate(db);
                 var key = db.Insert(_note);
@@ -73,8 +76,9 @@ namespace PetaPoco.Tests.Integration
         {
             var factory = DB.Provider.GetFactory();
             var connectionString = DB.ConnectionString;
+            var ignoreCase = DB.Provider.UseOrdinaryIdentifiers;
 
-            using (var db = new Database(connectionString, factory))
+            using (var db = new Database(connectionString, factory, ignoreCase: ignoreCase))
             {
                 AfterDbCreate(db);
                 var key = db.Insert(_note);
@@ -90,8 +94,9 @@ namespace PetaPoco.Tests.Integration
         {
             var connectionString = DB.ConnectionString;
             var entry = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>().FirstOrDefault(c => c.ConnectionString.Equals(connectionString));
+            var ignoreCase = DB.Provider.UseOrdinaryIdentifiers;
 
-            using (var db = new Database(entry.Name))
+            using (var db = new Database(entry.Name, ignoreCase: ignoreCase))
             {
                 AfterDbCreate(db);
                 var key = db.Insert(_note);

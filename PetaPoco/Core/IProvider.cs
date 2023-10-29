@@ -19,6 +19,11 @@ namespace PetaPoco.Core
         IPagingHelper PagingUtility { get; }
 
         /// <summary>
+        /// Gets a flag indicating whether the DB uses ordinary identifier.
+        /// </summary>
+        bool UseOrdinaryIdentifiers { get; }
+
+        /// <summary>
         /// Gets a flag indicating whether the DB has native support for GUID/UUID.
         /// </summary>
         bool HasNativeGuidSupport { get; }

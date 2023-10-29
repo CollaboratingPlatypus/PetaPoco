@@ -75,11 +75,11 @@ namespace PetaPoco.Internal
         }
 
         // Find the split point in a result set for two different POCOs and return the POCO factory for the first
-        private static Delegate FindSplitPoint(Type typeThis, Type typeNext, string connectionString, string sql, IDataReader r, ref int pos, IMapper defaultMapper)
+        private static Delegate FindSplitPoint(Type typeThis, Type typeNext, string connectionString, string sql, IDataReader r, ref int pos, IMapper defaultMapper, bool ignoreCase)
         {
             // Last?
             if (typeNext == null)
-                return PocoData.ForType(typeThis, defaultMapper).GetFactory(sql, connectionString, pos, r.FieldCount - pos, r, defaultMapper);
+                return PocoData.ForType(typeThis, defaultMapper).GetFactory(sql, connectionString, pos, r.FieldCount - pos, r, defaultMapper, ignoreCase);
 
             // Get PocoData for the two types
             var pdThis = PocoData.ForType(typeThis, defaultMapper);
@@ -94,7 +94,7 @@ namespace PetaPoco.Internal
                 var fieldName = r.GetName(pos);
                 if (usedColumns.ContainsKey(fieldName) || (!pdThis.Columns.ContainsKey(fieldName) && pdNext.Columns.ContainsKey(fieldName)))
                 {
-                    return pdThis.GetFactory(sql, connectionString, firstColumn, pos - firstColumn, r, defaultMapper);
+                    return pdThis.GetFactory(sql, connectionString, firstColumn, pos - firstColumn, r, defaultMapper, ignoreCase);
                 }
 
                 usedColumns.Add(fieldName, true);
@@ -105,7 +105,7 @@ namespace PetaPoco.Internal
         }
 
         // Create a multi-poco factory for a query
-        private static Func<IDataReader, object, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper)
+        private static Func<IDataReader, object, TRet> CreateMultiPocoFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper, bool ignoreCase)
         {
             var m = new DynamicMethod("petapoco_multipoco_factory", typeof(TRet), new[] { typeof(MultiPocoFactory), typeof(IDataReader), typeof(object) },
                 typeof(MultiPocoFactory));
@@ -120,7 +120,7 @@ namespace PetaPoco.Internal
             for (var i = 0; i < types.Length; i++)
             {
                 // Add to list of delegates to call
-                var del = FindSplitPoint(types[i], i + 1 < types.Length ? types[i + 1] : null, connectionString, sql, r, ref pos, defaultMapper);
+                var del = FindSplitPoint(types[i], i + 1 < types.Length ? types[i + 1] : null, connectionString, sql, r, ref pos, defaultMapper, ignoreCase);
                 dels.Add(del);
 
                 // Get the delegate
@@ -149,11 +149,11 @@ namespace PetaPoco.Internal
         }
 
         // Get (or create) a multi-poco factory for a query
-        public static Func<IDataReader, object, TRet> GetFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper)
+        public static Func<IDataReader, object, TRet> GetFactory<TRet>(Type[] types, string connectionString, string sql, IDataReader r, IMapper defaultMapper, bool ignoreCase)
         {
             var key = Tuple.Create(typeof(TRet), new ArrayKey<Type>(types), connectionString, sql, r.FieldCount);
 
-            return (Func<IDataReader, object, TRet>) MultiPocoFactories.GetOrAdd(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper));
+            return (Func<IDataReader, object, TRet>) MultiPocoFactories.GetOrAdd(key, () => CreateMultiPocoFactory<TRet>(types, connectionString, sql, r, defaultMapper, ignoreCase));
         }
     }
 }

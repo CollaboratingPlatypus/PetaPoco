@@ -29,6 +29,9 @@ namespace PetaPoco.Core
         public abstract DbProviderFactory GetFactory();
 
         /// <inheritdoc/>
+        public virtual bool UseOrdinaryIdentifiers => false;
+
+        /// <inheritdoc/>
         public virtual bool HasNativeGuidSupport => false;
 
         /// <inheritdoc/>
@@ -143,9 +146,10 @@ namespace PetaPoco.Core
         /// <param name="allowDefault">Specifies whether to allow the default <see cref="SqlServerDatabaseProvider"/> to be returned if no
         /// matching provider is found.</param>
         /// <param name="connectionString">The connection string.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <returns>The resolved database provider.</returns>
         /// <exception cref="ArgumentException">The <paramref name="providerType"/> name cannot be matched to a provider.</exception>
-        internal static IProvider Resolve(Type providerType, bool allowDefault, string connectionString)
+        internal static IProvider Resolve(Type providerType, bool allowDefault, string connectionString, bool ignoreCase = false)
         {
             var typeName = providerType.Name;
 
@@ -180,7 +184,9 @@ namespace PetaPoco.Core
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
 
             if (typeName.StartsWith("Oracle"))
-                return Singleton<OracleDatabaseProvider>.Instance;
+                return ignoreCase ?
+                    Singleton<OracleOrdinaryDatabaseProvider>.Instance :
+                    Singleton<OracleDatabaseProvider>.Instance;
 
             if (typeName.StartsWith("SQLite") || typeName.StartsWith("Sqlite"))
                 return Singleton<SQLiteDatabaseProvider>.Instance;
@@ -209,9 +215,10 @@ namespace PetaPoco.Core
         /// <param name="allowDefault">Specifies whether to allow the default <see cref="SqlServerDatabaseProvider"/> to be returned if no
         /// matching provider is found.</param>
         /// <param name="connectionString">The connection string.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <returns>The resolved database provider.</returns>
         /// <exception cref="ArgumentException">The <paramref name="providerName"/> name cannot be matched to a provider.</exception>
-        internal static IProvider Resolve(string providerName, bool allowDefault, string connectionString)
+        internal static IProvider Resolve(string providerName, bool allowDefault, string connectionString, bool ignoreCase = false)
         {
             // Try again with provider name
             var custom = GetCustomProvider(providerName);
@@ -243,7 +250,9 @@ namespace PetaPoco.Core
                 return Singleton<PostgreSQLDatabaseProvider>.Instance;
 
             if (providerName.IndexOf("Oracle", StringComparison.InvariantCultureIgnoreCase) >= 0)
-                return Singleton<OracleDatabaseProvider>.Instance;
+                return ignoreCase ?
+                    Singleton<OracleOrdinaryDatabaseProvider>.Instance :
+                    Singleton<OracleDatabaseProvider>.Instance;
 
             if (providerName.IndexOf("SQLite", StringComparison.InvariantCultureIgnoreCase) >= 0)
                 return Singleton<SQLiteDatabaseProvider>.Instance;

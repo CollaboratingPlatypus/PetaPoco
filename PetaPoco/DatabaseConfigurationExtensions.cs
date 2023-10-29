@@ -31,6 +31,7 @@ namespace PetaPoco
         internal const string ConnectionClosing = "ConnectionClosing";
         internal const string ExceptionThrown = "ExceptionThrown";
         internal const string Connection = "Connection";
+        internal const string IgnoreCase = "IgnoreCase";
 
         private static void SetSetting(this IDatabaseBuildConfiguration source, string key, object value)
         {
@@ -265,6 +266,20 @@ namespace PetaPoco
                 throw new ArgumentNullException(nameof(configurer));
             configurer(provider);
             source.SetSetting(Provider, provider);
+            return source;
+        }
+
+        /// <summary>
+        /// Whether to use case insensitive dynamic objects.
+        /// </summary>
+        /// <remarks>
+        /// Only supported by Oracle providers.
+        /// </remarks>
+        /// <param name="source">The configuration source.</param>
+        /// <returns>The original <paramref name="source"/> configuration, to form a fluent interface.</returns>
+        public static IDatabaseBuildConfiguration UsingCaseInsensitiveProvider(this IDatabaseBuildConfiguration source)
+        {
+            source.SetSetting(IgnoreCase, true);
             return source;
         }
 

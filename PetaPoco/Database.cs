@@ -47,15 +47,16 @@ namespace PetaPoco
         /// Constructs an instance with default values using the first connection string found in the app/web configuration file.
         /// </summary>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <exception cref="InvalidOperationException">No connection strings are registered.</exception>
-        public Database(IMapper defaultMapper = null)
+        public Database(IMapper defaultMapper = null, bool ignoreCase = false)
         {
             if (ConfigurationManager.ConnectionStrings.Count == 0)
                 throw new InvalidOperationException("One or more connection strings must be registered to use the no-parameter constructor");
 
             var entry = ConfigurationManager.ConnectionStrings[0];
             _connectionString = entry.ConnectionString;
-            InitialiseFromEntry(entry, defaultMapper);
+            InitialiseFromEntry(entry, defaultMapper, ignoreCase);
         }
 
         /// <summary>
@@ -67,9 +68,10 @@ namespace PetaPoco
         /// </remarks>
         /// <param name="connectionStringName">The name of the connection string to locate.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <exception cref="ArgumentException"><paramref name="connectionStringName"/> is null or empty.</exception>
         /// <exception cref="InvalidOperationException">A connection string cannot be found.</exception>
-        public Database(string connectionStringName, IMapper defaultMapper = null)
+        public Database(string connectionStringName, IMapper defaultMapper = null, bool ignoreCase = false)
         {
             if (string.IsNullOrEmpty(connectionStringName))
                 throw new ArgumentException("Connection string name must not be null or empty", nameof(connectionStringName));
@@ -80,13 +82,13 @@ namespace PetaPoco
                 throw new InvalidOperationException(string.Format("Can't find a connection string with the name '{0}'", connectionStringName));
 
             _connectionString = entry.ConnectionString;
-            InitialiseFromEntry(entry, defaultMapper);
+            InitialiseFromEntry(entry, defaultMapper, ignoreCase);
         }
 
-        private void InitialiseFromEntry(ConnectionStringSettings entry, IMapper defaultMapper)
+        private void InitialiseFromEntry(ConnectionStringSettings entry, IMapper defaultMapper, bool ignoreCase)
         {
             var providerName = !string.IsNullOrEmpty(entry.ProviderName) ? entry.ProviderName : "System.Data.SqlClient";
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString, ignoreCase), defaultMapper);
         }
 #endif
 
@@ -98,14 +100,15 @@ namespace PetaPoco
         /// </remarks>
         /// <param name="connection">The database connection.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <exception cref="ArgumentNullException"><paramref name="connection"/> is null or empty.</exception>
-        public Database(IDbConnection connection, IMapper defaultMapper = null)
+        public Database(IDbConnection connection, IMapper defaultMapper = null, bool ignoreCase = false)
         {
             if (connection == null)
                 throw new ArgumentNullException(nameof(connection));
 
             SetupFromConnection(connection);
-            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString, ignoreCase), defaultMapper);
         }
 
         /// <summary>
@@ -117,9 +120,10 @@ namespace PetaPoco
         /// <param name="connectionString">The connection string.</param>
         /// <param name="providerName">The database provider name.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <exception cref="ArgumentException"><paramref name="connectionString"/> or <paramref name="providerName"/> is null or
         /// empty.</exception>
-        public Database(string connectionString, string providerName, IMapper defaultMapper = null)
+        public Database(string connectionString, string providerName, IMapper defaultMapper = null, bool ignoreCase = false)
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
@@ -127,7 +131,7 @@ namespace PetaPoco
                 throw new ArgumentException("Provider name must not be null or empty", nameof(providerName));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString, ignoreCase), defaultMapper);
         }
 
         /// <summary>
@@ -139,9 +143,10 @@ namespace PetaPoco
         /// <param name="connectionString">The connection string.</param>
         /// <param name="factory">The database provider factory to use for database connections.</param>
         /// <param name="defaultMapper">The default mapper to use when no specific mapper has been registered.</param>
+        /// <param name="ignoreCase">Whether to use case insensitive dynamic objects.</param>
         /// <exception cref="ArgumentException"><paramref name="connectionString"/> is null or empty.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="factory"/> is null.</exception>
-        public Database(string connectionString, DbProviderFactory factory, IMapper defaultMapper = null)
+        public Database(string connectionString, DbProviderFactory factory, IMapper defaultMapper = null, bool ignoreCase = false)
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException("Connection string must not be null or empty", nameof(connectionString));
@@ -149,7 +154,7 @@ namespace PetaPoco
                 throw new ArgumentNullException(nameof(factory));
 
             _connectionString = connectionString;
-            Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString), defaultMapper);
+            Initialise(DatabaseProvider.Resolve(DatabaseProvider.Unwrap(factory).GetType(), false, _connectionString, ignoreCase), defaultMapper);
         }
 
         /// <summary>
@@ -190,6 +195,9 @@ namespace PetaPoco
 
             IMapper defaultMapper = null;
             settings.TryGetSetting<IMapper>(DatabaseConfigurationExtensions.DefaultMapper, v => defaultMapper = v);
+
+            var ignoreCase = false;
+            settings.TryGetSetting<bool>(DatabaseConfigurationExtensions.IgnoreCase, ic => ignoreCase = ic);
 
             IProvider provider = null;
             IDbConnection connection = null;
@@ -241,13 +249,13 @@ namespace PetaPoco
             if (provider != null)
                 Initialise(provider, defaultMapper);
             else if (providerName != null)
-                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString), defaultMapper);
+                Initialise(DatabaseProvider.Resolve(providerName, false, _connectionString, ignoreCase), defaultMapper);
 #if !NETSTANDARD
             else if (entry != null)
-                InitialiseFromEntry(entry, defaultMapper);
+                InitialiseFromEntry(entry, defaultMapper, ignoreCase);
 #endif
             else if (connection != null)
-                Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString), defaultMapper);
+                Initialise(DatabaseProvider.Resolve(_sharedConnection.GetType(), false, _connectionString, ignoreCase), defaultMapper);
             else
                 throw new InvalidOperationException("Unable to locate a provider.");
 
@@ -1011,8 +1019,8 @@ namespace PetaPoco
                         yield break;
                     }
 
-                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount, r,
-                        _defaultMapper) as Func<IDataReader, T>;
+                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, r.FieldCount,
+                        r, _defaultMapper, Provider.UseOrdinaryIdentifiers) as Func<IDataReader, T>;
                     using (r)
                     {
                         while (true)
@@ -1072,8 +1080,8 @@ namespace PetaPoco
                 return AsyncReader<T>.Empty();
             }
 
-            var factory =
-                pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader, _defaultMapper) as Func<IDataReader, T>;
+            var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount,
+                reader, _defaultMapper, Provider.UseOrdinaryIdentifiers) as Func<IDataReader, T>;
 
             return new AsyncReader<T>(this, cmd, reader, factory);
         }
@@ -1101,9 +1109,8 @@ namespace PetaPoco
                     }
 
                     var readerAsync = reader as DbDataReader;
-                    var factory =
-                        pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount, reader,
-                            _defaultMapper) as Func<IDataReader, T>;
+                    var factory = pd.GetFactory(cmd.CommandText, _sharedConnection.ConnectionString, 0, reader.FieldCount,
+                        reader, _defaultMapper, Provider.UseOrdinaryIdentifiers) as Func<IDataReader, T>;
 
                     using (reader)
                     {
@@ -1231,7 +1238,7 @@ namespace PetaPoco
                         yield break;
                     }
 
-                    var factory = MultiPocoFactory.GetFactory<TResult>(types, _sharedConnection.ConnectionString, sql, r, _defaultMapper);
+                    var factory = MultiPocoFactory.GetFactory<TResult>(types, _sharedConnection.ConnectionString, sql, r, _defaultMapper, Provider.UseOrdinaryIdentifiers);
                     if (projector == null)
                         projector = MultiPocoFactory.GetAutoMapper(types.ToArray());
                     var bNeedTerminator = false;
@@ -3162,9 +3169,13 @@ namespace PetaPoco
                     idbParam.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 else if (idbParam.ParameterName?.StartsWith(_paramPrefix) != true)
                 {
-                    // only add param prefix if it's not an Oracle stored procedures
-                    if (!(cmd.CommandType == CommandType.StoredProcedure && _provider is Providers.OracleDatabaseProvider))
-                        idbParam.ParameterName = idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
+                    var isOracleStoredProc = cmd.CommandType == CommandType.StoredProcedure &&
+                        _provider is Providers.OracleDatabaseProvider;
+
+                    // if it's an Oracle stored procedure, only escape the parameter name, don't add param prefix
+                    idbParam.ParameterName = isOracleStoredProc ?
+                        _provider.EscapeSqlIdentifier(idbParam.ParameterName) :
+                        idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
                 }
 
                 cmd.Parameters.Add(idbParam);
