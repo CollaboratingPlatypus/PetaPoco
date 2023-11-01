@@ -37,7 +37,7 @@ namespace PetaPoco.Tests.Integration
             Name = "Peta"
         };
 
-        private Note _note = new Note
+        protected Note note = new Note
         {
             CreatedOn = new DateTime(1948, 1, 11, 4, 2, 4, DateTimeKind.Utc),
             Text = "Peta's Note",
@@ -80,7 +80,6 @@ namespace PetaPoco.Tests.Integration
             orderLine.SellPrice = 5.99m;
             orderLine.Status = OrderLineStatus.Allocated;
         }
-
         #endregion
 
         [Fact]
@@ -376,7 +375,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
             var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            DB.Insert(_note);
+            DB.Insert(note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
 #if !NETCOREAPP
@@ -392,7 +391,7 @@ namespace PetaPoco.Tests.Integration
             var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
             var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            DB.Insert(_note);
+            DB.Insert(note);
             var entity = DB.Fetch<dynamic>($"SELECT * FROM {tblNote}").First();
 
             entity.Text += " was updated";
@@ -694,12 +693,12 @@ namespace PetaPoco.Tests.Integration
 
         [Fact]
         [Trait("Issue", "#667")]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldNotThrow()
         {
             var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
             var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            await DB.InsertAsync(_note);
+            await DB.InsertAsync(note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             // https://docs.shouldly.org/documentation/exceptions/throw#shouldthrowfuncoftask
@@ -711,12 +710,12 @@ namespace PetaPoco.Tests.Integration
         }
 
         [Fact]
-        public async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
+        public virtual async Task UpdateAsync_GivenTablePrimaryKeyNameAndDynamicType_ShouldUpdate()
         {
             var pd = PocoData.ForType(typeof(Note), DB.DefaultMapper);
             var tblNote = DB.Provider.EscapeTableName(pd.TableInfo.TableName);
 
-            await DB.InsertAsync(_note);
+            await DB.InsertAsync(note);
             var entity = (await DB.FetchAsync<dynamic>($"SELECT * FROM {tblNote}")).First();
 
             entity.Text += " was updated";
