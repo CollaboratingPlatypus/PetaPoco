@@ -16,7 +16,7 @@ namespace PetaPoco.Core
     {
         private static readonly object _converterLock = new object();
 
-        private static Cache<Type, PocoData> _pocoDatas = new Cache<Type, PocoData>();
+        private static Cache<Tuple<Type, Type>, PocoData> _pocoDatas = new Cache<Tuple<Type, Type>, PocoData>();
         private static List<Func<object, object>> _converters = new List<Func<object, object>>();
         private static MethodInfo fnGetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) });
         private static MethodInfo fnIsDBNull = typeof(IDataRecord).GetMethod("IsDBNull");
@@ -125,7 +125,9 @@ namespace PetaPoco.Core
             if (type == typeof(System.Dynamic.ExpandoObject))
                 throw new InvalidOperationException("Cannot use dynamic types with this method");
 
-            return _pocoDatas.GetOrAdd(type, () => new PocoData(type, defaultMapper));
+            var mapper = Mappers.GetMapper(type, defaultMapper);
+            var key = new Tuple<Type, Type>(mapper.GetType(), type);
+            return _pocoDatas.GetOrAdd(key, () => new PocoData(type, defaultMapper));
         }
 
         /// <summary>
@@ -141,14 +143,17 @@ namespace PetaPoco.Core
             if (t == typeof(System.Dynamic.ExpandoObject))
             {
                 var pd = new PocoData();
+                
                 pd.TableInfo = new TableInfo();
-                pd.Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
-                pd.Columns.Add(primaryKeyName, new ExpandoColumn() { ColumnName = primaryKeyName });
                 pd.TableInfo.PrimaryKey = primaryKeyName;
                 pd.TableInfo.AutoIncrement = true;
+                
+                pd.Columns = new Dictionary<string, PocoColumn>(StringComparer.OrdinalIgnoreCase);
+                pd.Columns.Add(primaryKeyName, new ExpandoColumn() { ColumnName = primaryKeyName });
+                
                 foreach (var col in (obj as IDictionary<string, object>).Keys)
                 {
-                    if (col != primaryKeyName)
+                    if (!col.Equals(primaryKeyName, StringComparison.OrdinalIgnoreCase))
                         pd.Columns.Add(col, new ExpandoColumn() { ColumnName = col });
                 }
 
