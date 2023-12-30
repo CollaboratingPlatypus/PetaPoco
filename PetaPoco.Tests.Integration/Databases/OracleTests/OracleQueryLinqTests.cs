@@ -3,12 +3,29 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Oracle
 {
-    [Collection("Oracle")]
-    public class OracleQueryLinqTests : QueryLinqTests
+    public abstract partial class OracleQueryLinqTests : QueryLinqTests
     {
-        public OracleQueryLinqTests()
-            : base(new OracleTestProvider())
+        protected OracleQueryLinqTests(TestProvider provider)
+            : base(provider)
         {
+        }
+
+        [Collection("Oracle.Delimited")]
+        public class Delimited : OracleQueryLinqTests
+        {
+            public Delimited()
+                : base(new OracleDelimitedTestProvider())
+            {
+            }
+        }
+
+        [Collection("Oracle.Ordinary")]
+        public class Ordinary : OracleQueryLinqTests
+        {
+            public Ordinary()
+                : base(new OracleOrdinaryTestProvider())
+            {
+            }
         }
     }
 }

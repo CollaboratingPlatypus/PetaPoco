@@ -84,5 +84,7 @@ services:
       - "5008:1521"
     environment:
       <<: *oracle-environment
+    volumes:
+      - ./Scripts/Startup:/opt/oracle/scripts/startup
 
   # TODO: teradata

@@ -1,0 +1,190 @@
+﻿-- Case Sensitive version of OracleBuildDatabaseOrdinary.sql
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."OrderLines"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."Orders"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."People"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."SpecificOrderLines"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."SpecificOrders"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."SpecificPeople"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."TransactionLogs"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."Note"');
+/
+
+CREATE TABLE "People" (
+	"Id" VARCHAR2(36) NOT NULL,
+	"FullName" VARCHAR2(255),
+	"Age" NUMBER(19) NOT NULL,
+	"Height" NUMBER(10) NOT NULL,
+	"Dob" TIMESTAMP NULL,
+    PRIMARY KEY("Id")
+);
+
+CREATE TABLE "Orders" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"PersonId" VARCHAR2(36),
+	"PoNumber" VARCHAR2(15) NOT NULL,
+	"OrderStatus" NUMBER(10) NOT NULL,
+	"CreatedOn" TIMESTAMP NOT NULL,
+	"CreatedBy" VARCHAR2(255) NOT NULL,
+    PRIMARY KEY("Id"),
+    FOREIGN KEY ("PersonId") REFERENCES "People"("Id")
+);
+
+CREATE TABLE "OrderLines" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"OrderId" NUMBER(10) NOT NULL,
+	"Qty" NUMBER(5) NOT NULL,
+	"Status" NUMBER(3) NOT NULL,
+	"SellPrice" NUMERIC(10, 4) NOT NULL,
+    PRIMARY KEY("Id"),
+    FOREIGN KEY ("OrderId") REFERENCES "Orders"("Id")
+);
+
+CREATE TABLE "SpecificPeople" (
+	"Id" VARCHAR2(36) NOT NULL,
+	"FullName" VARCHAR2(255),
+	"Age" NUMBER(19) NOT NULL,
+	"Height" NUMBER(10) NOT NULL,
+	"Dob" TIMESTAMP NULL,
+    PRIMARY KEY("Id")
+);
+
+CREATE TABLE "SpecificOrders" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"PersonId" VARCHAR2(36),
+	"PoNumber" VARCHAR2(15) NOT NULL,
+	"OrderStatus" NUMBER(10) NOT NULL,
+	"CreatedOn" TIMESTAMP NOT NULL,
+	"CreatedBy" VARCHAR2(255) NOT NULL,
+    PRIMARY KEY("Id"),
+    FOREIGN KEY("PersonId") REFERENCES "SpecificPeople"("Id")
+);
+
+CREATE TABLE "SpecificOrderLines" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"OrderId" NUMBER(10) NOT NULL,
+	"Qty" NUMBER(5) NOT NULL,
+	"Status" NUMBER(3) NOT NULL,
+	"SellPrice" NUMBER(10, 4) NOT NULL,
+    PRIMARY KEY("Id"),
+    FOREIGN KEY("OrderId") REFERENCES "SpecificOrders"("Id")
+);
+
+CREATE TABLE "TransactionLogs" (
+	"Description" LONG,
+	"CreatedOn" TIMESTAMP NOT NULL
+);
+
+CREATE TABLE "Note" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"Text" LONG NOT NULL,
+	"CreatedOn" TIMESTAMP NOT NULL
+);
+/
+
+-- Investigation Tables
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."BugInvestigation_10R9LZYK"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."BugInvestigation_3F489XV0"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."BugInvestigation_64O6LT8U"');
+/
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_delimited."BugInvestigation_5TN5C4U4"');
+/
+
+CREATE TABLE "BugInvestigation_10R9LZYK" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"TestColumn1" LONG RAW,
+    PRIMARY KEY("Id")
+);
+/
+
+CREATE TABLE "BugInvestigation_3F489XV0" (
+	"Id" NUMBER(10) GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1),
+	"TC1" NUMBER(10) NOT NULL,
+	"TC2" NUMBER(10) NOT NULL,
+	"TC3" NUMBER(10) NOT NULL,
+	"TC4" NUMBER(10) NOT NULL,
+    PRIMARY KEY("Id")
+);
+/
+
+CREATE TABLE "BugInvestigation_64O6LT8U" (
+	"ColumnA" VARCHAR2(20),
+	"Column2" VARCHAR2(20)
+);
+/
+
+CREATE TABLE "BugInvestigation_5TN5C4U4" (
+	"ColumnA" VARCHAR2(20),
+	"Column2" VARCHAR2(20)
+);
+/
+
+-- Stored procedures
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_delimited."SelectPeople"');
+/
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_delimited."SelectPeopleWithParam"');
+/
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_delimited."CountPeople"');
+/
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_delimited."CountPeopleWithParam"');
+/
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_delimited."UpdatePeople"');
+/
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_delimited."UpdatePeopleWithParam"');
+/
+
+CREATE PROCEDURE "SelectPeople"
+    ("p_out_cursor" OUT SYS_REFCURSOR) AS
+BEGIN
+	OPEN "p_out_cursor" FOR
+	SELECT * FROM "People";
+END;
+/
+
+CREATE PROCEDURE "SelectPeopleWithParam"
+    ("age" IN NUMERIC DEFAULT 0,
+    "p_out_cursor" OUT SYS_REFCURSOR) AS
+BEGIN
+	OPEN "p_out_cursor" FOR
+	SELECT * FROM "People" WHERE "Age" > "SelectPeopleWithParam"."age";
+END;
+/
+
+CREATE PROCEDURE "CountPeople"
+    ("p_out_cursor" OUT SYS_REFCURSOR)
+AS
+BEGIN
+	OPEN "p_out_cursor" FOR
+	SELECT COUNT(*) FROM "People";
+END;
+/
+
+CREATE PROCEDURE "CountPeopleWithParam"
+	("age" IN NUMERIC DEFAULT 0,
+    "p_out_cursor" OUT SYS_REFCURSOR) AS
+BEGIN
+	OPEN "p_out_cursor" FOR
+	SELECT COUNT(*) FROM "People" WHERE "Age" > "CountPeopleWithParam"."age";
+END;
+/
+
+CREATE PROCEDURE "UpdatePeople" AS
+BEGIN
+	UPDATE "People" SET "FullName" = 'Updated';
+END;
+/
+
+CREATE PROCEDURE "UpdatePeopleWithParam"
+	("age" IN NUMERIC DEFAULT 0) AS
+BEGIN
+	UPDATE "People" SET "FullName" = 'Updated' WHERE "Age" > "UpdatePeopleWithParam"."age";
+END;
+/

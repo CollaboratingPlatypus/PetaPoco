@@ -10,12 +10,29 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Oracle
 {
-    [Collection("Oracle")]
-    public class OracleQueryTests : QueryTests
+    public abstract partial class OracleQueryTests : QueryTests
     {
-        public OracleQueryTests()
-            : base(new OracleTestProvider())
+        protected OracleQueryTests(TestProvider provider)
+            : base(provider)
         {
+        }
+
+        [Collection("Oracle.Delimited")]
+        public class Delimited : OracleQueryTests
+        {
+            public Delimited()
+                : base(new OracleDelimitedTestProvider())
+            {
+            }
+        }
+
+        [Collection("Oracle.Ordinary")]
+        public class Ordinary : OracleQueryTests
+        {
+            public Ordinary()
+                : base(new OracleOrdinaryTestProvider())
+            {
+            }
         }
 
         [Fact]
@@ -128,8 +145,8 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             var pdName = pd.Columns.Values.First(c => c.PropertyInfo.Name == "Name").ColumnName;
 
             var sql = $@"SELECT *
-    FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}
-    WHERE {DB.Provider.EscapeSqlIdentifier(pdName)} LIKE @0 || '%'";
+FROM {DB.Provider.EscapeTableName(pd.TableInfo.TableName)}
+WHERE {DB.Provider.EscapeSqlIdentifier(pdName)} LIKE @0 || '%'";
 
             List<Person> result;
             using (var multi = DB.QueryMultiple(sql, "Peta"))
@@ -157,21 +174,21 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             var odPersonId = od.Columns.Values.First(c => c.PropertyInfo.Name == "PersonId").ColumnName;
 
             //Oracle 12c and above only
-    //        var sql = $@"SELECT *
-    //FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
-    //    INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
-    //WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
-    //ORDER BY 1 DESC
-    //FETCH FIRST 1 ROWS ONLY";
+//            var sql = $@"SELECT *
+//FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+//    INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
+//WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
+//ORDER BY 1 DESC
+//FETCH FIRST 1 ROWS ONLY";
 
             var sql = $@"SELECT *
-    FROM (SELECT *
-        FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
-            INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p
-                ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
-        WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
-        ORDER BY 1 DESC)
-    WHERE ROWNUM <= 1";
+FROM (SELECT *
+    FROM {DB.Provider.EscapeTableName(od.TableInfo.TableName)} o
+        INNER JOIN {DB.Provider.EscapeTableName(pd.TableInfo.TableName)} p
+            ON p.{DB.Provider.EscapeSqlIdentifier(pdId)} = o.{DB.Provider.EscapeSqlIdentifier(odPersonId)}
+    WHERE p.{DB.Provider.EscapeSqlIdentifier(pdName)} = @0
+    ORDER BY 1 DESC)
+WHERE ROWNUM <= 1";
 
             List<Order> result;
             using (var multi = DB.QueryMultiple(sql, "Peta0"))

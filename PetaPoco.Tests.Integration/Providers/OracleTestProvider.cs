@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using Oracle.ManagedDataAccess.Client;
 
 /* 
@@ -9,23 +10,27 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace PetaPoco.Tests.Integration.Providers
 {
-    public class OracleTestProvider : TestProvider
+    public abstract class OracleTestProvider : TestProvider
     {
         private static readonly string[] _splitSemiColon = new[] { ";" };
         private static readonly string[] _splitNewLine = new[] { Environment.NewLine };
         private static readonly string[] _splitSlash = new[] { Environment.NewLine + "/" };
         private static readonly string[] _resources = new[]
         {
-            "PetaPoco.Tests.Integration.Scripts.OracleSetupDatabase.sql",
-            "PetaPoco.Tests.Integration.Scripts.OracleBuildDatabase.sql"
+            "PetaPoco.Tests.Integration.Scripts.OracleSetupDatabase",
+            "PetaPoco.Tests.Integration.Scripts.OracleBuildDatabase"
         };
         private static volatile Exception _setupException;
         private static ExecutionPhase _phase = ExecutionPhase.Setup;
 
-        private string _connectionName = "Oracle";
+        protected OracleTestProvider(string connectionName) => _connectionName = $"Oracle_{connectionName}";
+
+        private string _connectionName;
         protected override string ConnectionName => _connectionName;
 
         protected override string ScriptResourceName => _resources[(int)_phase];
+
+        public IDatabase GetDatabase() => Database;
 
         public override IDatabase Execute()
         {
@@ -101,6 +106,46 @@ namespace PetaPoco.Tests.Integration.Providers
             var parts = script.Split(_splitNewLine, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => !s.Trim().StartsWith("--"));
             return string.Join(_splitNewLine[0], parts);
+        }
+    }
+
+    public class OracleDelimitedTestProvider : OracleTestProvider
+    {
+        public OracleDelimitedTestProvider() : base("Delimited") { }
+        protected override string ScriptResourceName => $"{base.ScriptResourceName}Delimited.sql";
+    }
+
+    public class OracleOrdinaryTestProvider : OracleTestProvider
+    {
+        public OracleOrdinaryTestProvider() : base("Ordinary") { }
+        protected override string ScriptResourceName => $"{base.ScriptResourceName}Ordinary.sql";
+
+        protected override IDatabaseBuildConfiguration BuildFromConnectionName(string connectionName)
+        {
+            return base.BuildFromConnectionName(connectionName)
+                .UsingProvider<CustomOracleDatabaseProvider>()
+                .UsingDefaultMapper<CustomConventionMapper>();
+        }
+
+        private class CustomOracleDatabaseProvider : PetaPoco.Providers.OracleDatabaseProvider
+        {
+            public override string EscapeSqlIdentifier(string sqlIdentifier) => sqlIdentifier.ToUpperInvariant();
+        }
+
+        private class CustomConventionMapper : ConventionMapper
+        {
+            public CustomConventionMapper() => MapColumn = Customize(MapColumn);
+
+            private Func<ColumnInfo, Type, PropertyInfo, bool> Customize(Func<ColumnInfo, Type, PropertyInfo, bool> original)
+            {
+                return (ci, t, pi) =>
+                {
+                    if (!original(ci, t, pi)) return false;
+
+                    ci.ColumnName = ci.ColumnName.ToUpperInvariant();
+                    return true;
+                };
+            }
         }
     }
 }

@@ -5,12 +5,29 @@ using Xunit;
 
 namespace PetaPoco.Tests.Integration.Databases.Oracle
 {
-    [Collection("Oracle")]
-    public class OracleInsertTests : InsertTests
+    public abstract partial class OracleInsertTests : InsertTests
     {
-        public OracleInsertTests()
-            : base(new OracleTestProvider())
+        protected OracleInsertTests(TestProvider provider)
+            : base(provider)
         {
+        }
+
+        [Collection("Oracle.Delimited")]
+        public class Delimited : OracleInsertTests
+        {
+            public Delimited()
+                : base(new OracleDelimitedTestProvider())
+            {
+            }
+        }
+
+        [Collection("Oracle.Ordinary")]
+        public class Ordinary : OracleInsertTests
+        {
+            public Ordinary()
+                : base(new OracleOrdinaryTestProvider())
+            {
+            }
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using System.Text.RegularExpressions;
+using System.Linq;
 using PetaPoco.Core;
 using PetaPoco.Utilities;
-using System.Linq;
 #if ASYNC
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,13 +19,6 @@ namespace PetaPoco.Providers
     /// </remarks>
     public class OracleDatabaseProvider : DatabaseProvider
     {
-        //An ordinary identifier must begin with a letter and contain only letters, underscore characters (_), and digits.
-        //The permitted letters and digits include all Unicode letters and digits.
-        //A delimited identifier is surrounded by double quotation marks and can contain any characters within the double quotation marks.
-        //Maximum two identifiers can be joined, separated by a dot (.)
-        private static readonly Regex _ordinaryIdentifierRegex = new Regex(@"^[\p{L}]+[\p{L}\d_]*(?:\.[\p{L}]+[\p{L}\d_]*)?$", RegexOptions.Compiled);
-        private static readonly Regex _delimitedIdentifierRegex = new Regex(@"^""[^""]*(?:""\.""[^""]*)?""$", RegexOptions.Compiled);
-
         /// <inheritdoc/>
         public override string GetParameterPrefix(string connectionString) => ":";
 
@@ -35,6 +27,13 @@ namespace PetaPoco.Providers
         {
             cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
             cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
+
+            //Required for Oracle.DataAccess.Client.OracleCommand
+            //By default statements are cached, so if the database is modified between two reads (same statement),
+            //the last one will still access the old statement's definition.
+            //Setting this property to false prevents caching of statements completely.
+            //NOTE: Using "Statement Cache Purge=true; Statement Cache Size=0" in the ConnectionString is not a guarantee
+            cmd.GetType().GetProperty("AddToStatementCache")?.SetValue(cmd, false, null);
         }
 
         /// <inheritdoc/>
@@ -49,6 +48,7 @@ namespace PetaPoco.Providers
             //args = args.Concat(new object[] { skip, take }).ToArray();
             //return sql;
 
+            //Older versions of Oracle
             //Similar to SqlServerProvider with the exception of SELECT NULL FROM DUAL vs SELECT NULL
             var helper = (PagingHelper)PagingUtility;
             // when the query does not contain an "order by", it is very slow
@@ -81,22 +81,7 @@ namespace PetaPoco.Providers
         }
 
         /// <inheritdoc/>
-        public override string EscapeSqlIdentifier(string sqlIdentifier)
-        {
-            return sqlIdentifier;
-
-            //TODO: Below code determines whether it is required to wrap the identifier in double quotes or not.
-            //      Included for convenience while fixing failing tests until we're sure it's not required.
-
-            //If already quoted, leave as-is
-            if (_delimitedIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier;
-
-            //If no quotes required, leave as-is (could also uppercase)
-            if (_ordinaryIdentifierRegex.IsMatch(sqlIdentifier)) return sqlIdentifier; //.ToUpperInvariant();
-
-            //If not valid, wrap in quotes, but don't allow use of double quotes in identifier
-            return "\"" + sqlIdentifier.Replace("\"", "").Replace(".", "\".\"") + "\"";
-        }
+        public override string EscapeSqlIdentifier(string sqlIdentifier) => $"\"{sqlIdentifier}\"";
 
         /// <inheritdoc/>
         public override string GetAutoIncrementExpression(TableInfo ti) => !string.IsNullOrEmpty(ti.SequenceName) ? $"{ti.SequenceName}.nextval" : null;

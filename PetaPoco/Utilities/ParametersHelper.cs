@@ -18,8 +18,8 @@ namespace PetaPoco.Internal
     /// </remarks>
     internal static class ParametersHelper
     {
-        private static Regex ParamPrefixRegex = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
-        private static Regex NonWordStartRegex = new Regex(@"^\W*", RegexOptions.Compiled);
+        private static readonly Regex ParamPrefixRegex = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+        private static readonly Regex NonWordStartRegex = new Regex(@"^\W*", RegexOptions.Compiled);
 
         /// <summary>
         /// Replaces all parameter prefixes in the provided SQL statement with the specified replacement string.
@@ -71,8 +71,7 @@ namespace PetaPoco.Internal
 
                 object arg_val;
 
-                int paramIndex;
-                if (int.TryParse(param, out paramIndex))
+                if (int.TryParse(param, out int paramIndex))
                 {
                     // Numbered parameter
                     if (paramIndex < 0 || paramIndex >= srcArgs.Length)
@@ -115,7 +114,7 @@ namespace PetaPoco.Internal
                 if (arg_val.IsEnumerable())
                 {
                     var sb = new StringBuilder();
-                    foreach (var i in (arg_val as System.Collections.IEnumerable))
+                    foreach (var i in (arg_val as IEnumerable))
                     {
                         sb.Append((sb.Length == 0 ? "@" : ",@") + destArgs.Count.ToString());
                         destArgs.Add(i);
@@ -160,13 +159,13 @@ namespace PetaPoco.Internal
                 }
                 else if (arg.IsEnumerable())
                 {
-                    foreach (var singleArg in (arg as System.Collections.IEnumerable))
+                    foreach (var singleArg in (arg as IEnumerable))
                     {
                         ProcessArg(singleArg);
                     }
                 }
-                else if (arg is IDbDataParameter)
-                    result.Add((IDbDataParameter)arg);
+                else if (arg is IDbDataParameter dataParam)
+                    result.Add(dataParam);
                 else
                 {
                     var type = arg.GetType();

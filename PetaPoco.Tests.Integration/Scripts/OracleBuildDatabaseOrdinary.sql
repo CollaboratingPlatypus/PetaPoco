@@ -1,18 +1,19 @@
-﻿CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.OrderLines');
+﻿-- Case Insensitive version of OracleBuildDatabaseDelimited.sql
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.OrderLines');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.Orders');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.Orders');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.People');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.People');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.SpecificOrderLines');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.SpecificOrderLines');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.SpecificOrders');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.SpecificOrders');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.SpecificPeople');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.SpecificPeople');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.TransactionLogs');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.TransactionLogs');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.Note');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.Note');
 /
 
 CREATE TABLE People (
@@ -88,13 +89,13 @@ CREATE TABLE Note (
 /
 
 -- Investigation Tables
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.BugInvestigation_10R9LZYK');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.BugInvestigation_10R9LZYK');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.BugInvestigation_3F489XV0');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.BugInvestigation_3F489XV0');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.BugInvestigation_64O6LT8U');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.BugInvestigation_64O6LT8U');
 /
-CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco.BugInvestigation_5TN5C4U4');
+CALL SYS.DROP_IF_EXISTS('TABLE', 'petapoco_ordinary.BugInvestigation_5TN5C4U4');
 /
 
 CREATE TABLE BugInvestigation_10R9LZYK (
@@ -127,17 +128,17 @@ CREATE TABLE BugInvestigation_5TN5C4U4 (
 /
 
 -- Stored procedures
-CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco.SelectPeople');
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.SelectPeople');
 /
-CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco.SelectPeopleWithParam');
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.SelectPeopleWithParam');
 /
-CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco.CountPeople');
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.CountPeople');
 /
-CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco.CountPeopleWithParam');
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.CountPeopleWithParam');
 /
-CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco.UpdatePeople');
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.UpdatePeople');
 /
-CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco.UpdatePeopleWithParam');
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.UpdatePeopleWithParam');
 /
 
 CREATE PROCEDURE SelectPeople
