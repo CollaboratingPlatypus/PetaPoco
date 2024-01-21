@@ -6,7 +6,6 @@ DROP FUNCTION IF EXISTS CountPeopleWithParam(age integer);
 DROP FUNCTION IF EXISTS UpdatePeople();
 DROP FUNCTION IF EXISTS UpdatePeopleWithParam(age integer);
 
-
 DROP TABLE IF EXISTS "OrderLines";
 DROP TABLE IF EXISTS "Orders";
 DROP TABLE IF EXISTS "People";
@@ -81,14 +80,7 @@ CREATE TABLE "Note" (
 	"CreatedOn" TIMESTAMP NOT NULL
 );
 
--- Investigation Tables
-
-DROP TABLE IF EXISTS "BugInvestigation_10R9LZYK";
-
-CREATE TABLE "BugInvestigation_10R9LZYK" (
-	"Id" SERIAL PRIMARY KEY NOT NULL,
-	"TestColumn1" BYTEA
-);
+-- MSAccess Specific Tables;
 
 DROP TABLE IF EXISTS "BugInvestigation_7K2TX4VR";
 
@@ -98,6 +90,38 @@ CREATE TABLE "BugInvestigation_7K2TX4VR" (
 	"Json2" JSONB NOT NULL
 );
 
+-- Investigation Tables
+
+DROP TABLE IF EXISTS "BugInvestigation_10R9LZYK";
+
+CREATE TABLE "BugInvestigation_10R9LZYK" (
+	"Id" SERIAL PRIMARY KEY NOT NULL,
+	"TestColumn1" BYTEA
+);
+
+DROP TABLE IF EXISTS "BugInvestigation_3F489XV0";
+
+CREATE TABLE "BugInvestigation_3F489XV0" (
+	"Id" SERIAL PRIMARY KEY NOT NULL,
+	"TC1" INT NOT NULL,
+	"TC2" INT NOT NULL,
+	"TC3" INT NOT NULL,
+	"TC4" INT NOT NULL
+);
+
+DROP TABLE IF EXISTS "BugInvestigation_64O6LT8U";
+
+CREATE TABLE "BugInvestigation_64O6LT8U" (
+	"ColumnA" VARCHAR(20),
+	"Column2" VARCHAR(20)
+);
+
+DROP TABLE IF EXISTS "BugInvestigation_5TN5C4U4";
+
+CREATE TABLE "BugInvestigation_5TN5C4U4" (
+	"ColumnA" VARCHAR(20),
+	"Column2" VARCHAR(20)
+);
 
 -- Stored Procedures
 

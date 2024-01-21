@@ -1,18 +1,17 @@
-using System;
+﻿using System;
 using PetaPoco.Core;
-using PetaPoco.Tests.Integration.Databases;
-using PetaPoco.Tests.Integration.Databases.MSSQL;
 using PetaPoco.Tests.Integration.Documentation.Pocos;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Documentation
 {
-    [Collection("MssqlTests")]
-    public class Save : BaseDatabase
+    [Collection("Documentation")]
+    public class SaveTests : BaseDbContext
     {
-        public Save()
-            : base(new MssqlDBTestProvider())
+        public SaveTests()
+            : base(new SqlServerSystemDataTestProvider())
         {
             PocoData.FlushCaches();
         }
@@ -20,9 +19,6 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void Save_Insert()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
             // Add a note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Save(note);
@@ -37,7 +33,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Fetch a new copy of note
             var noteFromDb = DB.Single<Note>(note.Id);
 
-            // They are the same
+            // The values in noteFromDb's column-mapped properties should be equal to the original poco's
             note.Id.ShouldBe(noteFromDb.Id);
             note.Text.ShouldBe(noteFromDb.Text);
             note.CreatedOn.Ticks.ShouldBe(noteFromDb.CreatedOn.Ticks);
@@ -46,9 +42,6 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void Save_Update()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
             // Add a note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Save(note);
@@ -60,7 +53,7 @@ namespace PetaPoco.Tests.Integration.Documentation
             // Fetch a new copy of note
             var noteFromDb = DB.Single<Note>(note.Id);
 
-            // The note text is the same
+            // The values in noteFromDb's column-mapped properties should be equal to the original poco's
             note.Text.ShouldBe(noteFromDb.Text);
             note.Text.ShouldContain(" and this is my update");
         }

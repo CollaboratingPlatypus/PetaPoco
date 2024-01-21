@@ -38,7 +38,7 @@ namespace PetaPoco.Tests.Unit.Core
                 return;
             }
 
-            Assert.False(true, "Expedted InvalidOperationException");
+            Assert.False(true, "Expected InvalidOperationException");
         }
 
         private enum FakeEnum

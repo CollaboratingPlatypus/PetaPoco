@@ -11,17 +11,26 @@ using System.Threading.Tasks;
 
 namespace PetaPoco.Providers
 {
+    /// <summary>
+    /// Provides an implementation of <see cref="DatabaseProvider"/> for Oracle databases using the managed Oracle Data Provider.
+    /// </summary>
+    /// <remarks>
+    /// This provider uses the "Oracle.ManagedDataAccess.Client" ADO.NET driver for data access.
+    /// </remarks>
     public class OracleDatabaseProvider : DatabaseProvider
     {
-        public override string GetParameterPrefix(string connectionString)
-            => ":";
+        /// <inheritdoc/>
+        public override string GetParameterPrefix(string connectionString) => ":";
 
+        /// <inheritdoc/>
         public override void PreExecute(IDbCommand cmd)
         {
             cmd.GetType().GetProperty("BindByName")?.SetValue(cmd, true, null);
             cmd.GetType().GetProperty("InitialLONGFetchSize")?.SetValue(cmd, -1, null);
         }
 
+        /// <inheritdoc/>
+        /// <exception cref="Exception">A paged query does not alias '*'</exception>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
             if (parts.SqlSelectRemoved.StartsWith("*"))
@@ -31,6 +40,7 @@ namespace PetaPoco.Providers
             return Singleton<SqlServerDatabaseProvider>.Instance.BuildPageQuery(skip, take, parts, ref args);
         }
 
+        /// <inheritdoc/>
         public override DbProviderFactory GetFactory()
         {
             // "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess" is for Oracle.ManagedDataAccess.dll
@@ -39,12 +49,13 @@ namespace PetaPoco.Providers
                 "Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess");
         }
 
-        public override string EscapeSqlIdentifier(string sqlIdentifier)
-            => $"\"{sqlIdentifier.ToUpperInvariant()}\"";
+        /// <inheritdoc/>
+        public override string EscapeSqlIdentifier(string sqlIdentifier) => $"\"{sqlIdentifier.ToUpperInvariant()}\"";
 
-        public override string GetAutoIncrementExpression(TableInfo ti)
-            => !string.IsNullOrEmpty(ti.SequenceName) ? $"{ti.SequenceName}.nextval" : null;
+        /// <inheritdoc/>
+        public override string GetAutoIncrementExpression(TableInfo ti) => !string.IsNullOrEmpty(ti.SequenceName) ? $"{ti.SequenceName}.nextval" : null;
 
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -58,18 +69,8 @@ namespace PetaPoco.Providers
             return -1;
         }
 
-        private IDbDataParameter PrepareInsert(IDbCommand cmd, string primaryKeyName)
-        {
-            cmd.CommandText += $" returning {EscapeSqlIdentifier(primaryKeyName)} into :newid";
-            var param = cmd.CreateParameter();
-            param.ParameterName = ":newid";
-            param.Value = DBNull.Value;
-            param.Direction = ParameterDirection.ReturnValue;
-            param.DbType = DbType.Int64;
-            cmd.Parameters.Add(param);
-            return param;
-        }
 #if ASYNC
+        /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
         {
             if (primaryKeyName != null)
@@ -83,5 +84,17 @@ namespace PetaPoco.Providers
             return -1;
         }
 #endif
+
+        private IDbDataParameter PrepareInsert(IDbCommand cmd, string primaryKeyName)
+        {
+            cmd.CommandText += $" returning {EscapeSqlIdentifier(primaryKeyName)} into :newid";
+            var param = cmd.CreateParameter();
+            param.ParameterName = ":newid";
+            param.Value = DBNull.Value;
+            param.Direction = ParameterDirection.ReturnValue;
+            param.DbType = DbType.Int64;
+            cmd.Parameters.Add(param);
+            return param;
+        }
     }
 }

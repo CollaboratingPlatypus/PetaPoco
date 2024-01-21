@@ -25,7 +25,7 @@ namespace PetaPoco.Tests.Integration.Documentation.Pocos
         [Ignore]
         public string NameAndAge => $"{Name} is of {Age}";
 
-        public void ShouldBe(Person other)
+        public void PropertiesShouldBe(Person other)
         {
             Id.ShouldBe(other.Id);
             Name.ShouldBe(other.Name);

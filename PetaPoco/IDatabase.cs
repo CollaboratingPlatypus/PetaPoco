@@ -7,7 +7,7 @@ using PetaPoco.Core;
 namespace PetaPoco
 {
     /// <summary>
-    ///     Represents the core functionality of PetaPoco.
+    /// Represents the core functionality of PetaPoco.
     /// </summary>
     public interface IDatabase : IDisposable, IQuery, IAlterPoco, IExecute, ITransactionAccessor, IStoredProc, IConnection
 #if ASYNC
@@ -15,191 +15,147 @@ namespace PetaPoco
 #endif
     {
         /// <summary>
-        ///     Gets the default mapper. (Default is <see cref="ConventionMapper" />)
+        /// Gets the default mapper.
         /// </summary>
-        /// <returns>
-        ///     The default mapper.
-        /// </returns>
         IMapper DefaultMapper { get; }
 
         /// <summary>
-        ///     Gets the SQL of the last executed statement
+        /// Gets the SQL of the last executed command.
         /// </summary>
-        /// <returns>
-        ///     The last executed SQL.
-        /// </returns>
         string LastSQL { get; }
 
         /// <summary>
-        ///     Gets the arguments to the last execute statement
+        /// Gets an array containing the arguments of the last executed command.
         /// </summary>
-        /// <returns>
-        ///     The last executed SQL arguments.
-        /// </returns>
         object[] LastArgs { get; }
 
         /// <summary>
-        ///     Gets a formatted string describing the last executed SQL statement and its argument values
+        /// Gets a formatted string describing the last executed command and its argument values.
         /// </summary>
-        /// <returns>
-        ///     The formatted string.
-        /// </returns>
         string LastCommand { get; }
 
         /// <summary>
-        ///     Gets or sets the enable auto select. (Default is True)
+        /// Gets or sets a value indicating whether automatic generation of the <c>SELECT</c> and <c>WHERE</c> parts of an SQL statement is
+        /// enabled when not explicitly provided by the caller.
         /// </summary>
-        /// <remarks>
-        ///     When set to true, PetaPoco will automatically create the "SELECT columns" section of the query for any query which
-        ///     is found to require them.
-        /// </remarks>
-        /// <returns>
-        ///     True, if auto select is enabled; else, false.
-        /// </returns>
         bool EnableAutoSelect { get; set; }
 
         /// <summary>
-        ///     Gets the flag for whether named params are enabled. (Default is True)
+        /// Gets or sets a value indicating whether named parameters are enabled.
         /// </summary>
-        /// <remarks>
-        ///     When set to true, parameters can be named ?myparam and populated from properties of the passed-in argument values.
-        /// </remarks>
-        /// <returns>
-        ///     True, if named parameters are enabled; else, false.
-        /// </returns>
         bool EnableNamedParams { get; set; }
 
         /// <summary>
-        ///     Sets the timeout value, in seconds, which PetaPoco applies to all <see cref="IDbCommand.CommandTimeout" />.
-        ///     (Default is 0)
+        /// Gets or sets the wait time (in seconds) before terminating the attempt to execute a command.
         /// </summary>
-        /// <remarks>
-        ///     If the current value is zero PetaPoco will not set the command timeout, and therefore the .NET default (30 seconds)
-        ///     will be in effect.
-        /// </remarks>
-        /// <returns>
-        ///     The current command timeout.
-        /// </returns>
         int CommandTimeout { get; set; }
 
         /// <summary>
-        ///     Sets the timeout value for the next (and only next) SQL statement.
+        /// Gets or sets a one-time timeout value to temporarily override <see cref="CommandTimeout"/> for the next command execution.
         /// </summary>
-        /// <remarks>
-        ///     This is a one-time settings, which after use, will return the <see cref="CommandTimeout" /> setting.
-        /// </remarks>
-        /// <returns>
-        ///     The one time command timeout.
-        /// </returns>
         int OneTimeCommandTimeout { get; set; }
 
         /// <summary>
-        ///     Gets the current <seealso cref="Provider" />.
+        /// Gets the underlying database Provider.
         /// </summary>
-        /// <returns>
-        ///     The current database provider.
-        /// </returns>
         IProvider Provider { get; }
 
         /// <summary>
-        ///     Gets the connection string.
+        /// Gets the connection string.
         /// </summary>
-        /// <returns>
-        ///     The connection string.
-        /// </returns>
         string ConnectionString { get; }
 
+        #region Transaction Interface
+
         /// <summary>
-        ///     Gets or sets the transaction isolation level.
+        /// Gets or sets the transaction isolation level.
         /// </summary>
-        /// <remarks>
-        ///     When value is null, the underlying provider's default isolation level is used.
-        /// </remarks>
         IsolationLevel? IsolationLevel { get; set; }
 
         /// <summary>
-        ///     Starts or continues a transaction.
+        /// Begins or continues a transaction.
         /// </summary>
-        /// <returns>An ITransaction reference that must be Completed or disposed</returns>
-        /// <remarks>
-        ///     This method makes management of calls to Begin/End/CompleteTransaction easier.
-        ///     The usage pattern for this should be:
-        ///     using (var tx = db.GetTransaction())
-        ///     {
-        ///     // Do stuff
-        ///     db.Update(...);
-        ///     // Mark the transaction as complete
-        ///     tx.Complete();
-        ///     }
-        ///     Transactions can be nested but they must all be completed otherwise the entire
-        ///     transaction is aborted.
-        /// </remarks>
         ITransaction GetTransaction();
 
         /// <summary>
-        ///     Starts a transaction scope, see GetTransaction() for recommended usage
+        /// Begins a transaction scope.
         /// </summary>
         void BeginTransaction();
 
+#if ASYNC
         /// <summary>
-        ///     Aborts the entire outermost transaction scope
+        /// Asynchronously begins a transaction scope.
         /// </summary>
-        /// <remarks>
-        ///     Called automatically by Transaction.Dispose()
-        ///     if the transaction wasn't completed.
-        /// </remarks>
-        void AbortTransaction();
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// </returns>
+        Task BeginTransactionAsync();
 
         /// <summary>
-        ///     Marks the current transaction scope as complete.
+        /// Asynchronously begins a transaction scope.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// </returns>
+        Task BeginTransactionAsync(CancellationToken cancellationToken);
+#endif
+
+        /// <summary>
+        /// Aborts the entire outermost transaction scope.
+        /// </summary>
+        void AbortTransaction();
+
+#if ASYNC
+        // TODO: Missing: `AbortTransactionAsync()`
+#endif
+
+        /// <summary>
+        /// Marks the current transaction scope as complete.
         /// </summary>
         void CompleteTransaction();
 
+#if ASYNC
+        // TODO: Missing: `CompleteTransactionAsync()`
+#endif
+
         /// <summary>
-        ///     Occurs when a new transaction has started.
+        /// Occurs when a new transaction has started.
         /// </summary>
         event EventHandler<DbTransactionEventArgs> TransactionStarted;
 
         /// <summary>
-        ///     Occurs when a transaction is about to be rolled back or committed.
+        /// Occurs when a transaction is about to be rolled back or committed.
         /// </summary>
         event EventHandler<DbTransactionEventArgs> TransactionEnding;
 
+        #endregion
+
         /// <summary>
-        ///     Occurs when a database command is about to be executed.
+        /// Occurs when a database command is about to be executed.
         /// </summary>
         event EventHandler<DbCommandEventArgs> CommandExecuting;
 
         /// <summary>
-        ///     Occurs when a database command has been executed.
+        /// Occurs when a database command has been executed.
         /// </summary>
         event EventHandler<DbCommandEventArgs> CommandExecuted;
 
-        /// <summary>
-        ///     Occurs when a database connection is about to be closed.
-        /// </summary>
-        event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+        // TODO: Missing: `event EventHandler<DbConnectionEventArgs> ConnectionOpening`
 
         /// <summary>
-        ///     Occurs when a database connection has been opened.
+        /// Occurs when a database connection has been opened.
         /// </summary>
         event EventHandler<DbConnectionEventArgs> ConnectionOpened;
 
         /// <summary>
-        ///     Occurs when a database exception has been thrown.
+        /// Occurs when a database connection is about to be closed.
+        /// </summary>
+        event EventHandler<DbConnectionEventArgs> ConnectionClosing;
+
+        /// <summary>
+        /// Occurs when a database exception has been thrown.
         /// </summary>
         event EventHandler<ExceptionEventArgs> ExceptionThrown;
-
-#if ASYNC
-        /// <summary>
-        ///     Async version of <see cref="BeginTransaction" />.
-        /// </summary>
-        Task BeginTransactionAsync();
-
-        /// <summary>
-        ///     Async version of <see cref="BeginTransaction" />.
-        /// </summary>
-        Task BeginTransactionAsync(CancellationToken cancellationToken);
-#endif
     }
 }

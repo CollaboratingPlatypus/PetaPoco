@@ -1,0 +1,198 @@
+﻿IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'OrderLines')
+	DROP TABLE dbo.[OrderLines]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'Orders')
+	DROP TABLE dbo.[Orders]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'People')
+	DROP TABLE dbo.[People]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'SpecificOrderLines')
+	DROP TABLE dbo.[SpecificOrderLines]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'SpecificOrders')
+	DROP TABLE dbo.[SpecificOrders]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'SpecificPeople')
+	DROP TABLE dbo.[SpecificPeople]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'TransactionLogs')
+	DROP TABLE dbo.[TransactionLogs]
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'Note')
+	DROP TABLE dbo.[Note]
+
+CREATE TABLE dbo.[People] (
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[FullName] NVARCHAR(255),
+	[Age] BIGINT NOT NULL,
+	[Height] INT NOT NULL,
+	[Dob] DATETIME2 NULL
+)
+
+CREATE TABLE dbo.[Orders] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[PersonId] UNIQUEIDENTIFIER FOREIGN KEY REFERENCES dbo.[People](Id),
+	[PoNumber] NVARCHAR(15) NOT NULL,
+	[OrderStatus] INT NOT NULL,
+	[CreatedOn] DATETIME2 NOT NULL,
+	[CreatedBy] NVARCHAR(255) NOT NULL
+)
+
+CREATE TABLE dbo.[OrderLines] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[OrderId] INT NOT NULL FOREIGN KEY REFERENCES dbo.[Orders](Id),
+	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
+	[SellPrice] NUMERIC(10, 4) NOT NULL
+)
+
+CREATE TABLE dbo.[SpecificPeople] (
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[FullName] NVARCHAR(255),
+	[Age] BIGINT NOT NULL,
+	[Height] INT NOT NULL,
+	[Dob] DATETIME2 NULL
+)
+
+CREATE TABLE dbo.[SpecificOrders] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[PersonId] UNIQUEIDENTIFIER FOREIGN KEY REFERENCES dbo.[SpecificPeople](Id),
+	[PoNumber] NVARCHAR(15) NOT NULL,
+	[OrderStatus] INT NOT NULL,
+	[CreatedOn] DATETIME2 NOT NULL,
+	[CreatedBy] NVARCHAR(255) NOT NULL
+)
+
+CREATE TABLE dbo.[SpecificOrderLines] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[OrderId] INT NOT NULL FOREIGN KEY REFERENCES dbo.[SpecificOrders](Id),
+	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
+	[SellPrice] NUMERIC(10, 4) NOT NULL
+)
+
+CREATE TABLE dbo.[TransactionLogs] (
+	[Description] NTEXT,
+	[CreatedOn] DATETIME2 NOT NULL
+)
+
+CREATE TABLE dbo.[Note] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[Text] NTEXT NOT NULL,
+	[CreatedOn] DATETIME2 NOT NULL
+)
+
+-- MSSQL Specific Tables
+
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'store')
+BEGIN
+	EXEC('CREATE SCHEMA store')
+END
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'store' AND t.TABLE_NAME = 'People')
+	DROP TABLE [store].[People]
+
+CREATE TABLE [store].[People] (
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[FullName] NVARCHAR(255),
+	[Age] BIGINT NOT NULL
+)
+
+-- Investigation Tables
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_10R9LZYK')
+	DROP TABLE dbo.[BugInvestigation_10R9LZYK]
+
+CREATE TABLE dbo.[BugInvestigation_10R9LZYK] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TestColumn1] VARBINARY(32)
+)
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_3F489XV0')
+	DROP TABLE dbo.[BugInvestigation_3F489XV0]
+
+CREATE TABLE dbo.[BugInvestigation_3F489XV0] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TC1] INT NOT NULL,
+	[TC2] INT NOT NULL,
+	[TC3] INT NOT NULL,
+	[TC4] INT NOT NULL
+)
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_64O6LT8U')
+	DROP TABLE dbo.[BugInvestigation_64O6LT8U]
+
+CREATE TABLE dbo.[BugInvestigation_64O6LT8U] (
+	[ColumnA] VARCHAR(20),
+	[Column2] VARCHAR(20),
+)
+
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_5TN5C4U4')
+	DROP TABLE dbo.[BugInvestigation_5TN5C4U4]
+
+CREATE TABLE dbo.[BugInvestigation_5TN5C4U4] (
+	[ColumnA] VARCHAR(20),
+	[Column2] VARCHAR(20),
+)
+GO
+
+-- Stored procedures
+
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeople')
+	DROP PROCEDURE SelectPeople
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeopleWithParam')
+	DROP PROCEDURE SelectPeopleWithParam
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'CountPeople')
+	DROP PROCEDURE CountPeople
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'CountPeopleWithParam')
+	DROP PROCEDURE CountPeopleWithParam
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePeople')
+	DROP PROCEDURE UpdatePeople
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePeopleWithParam')
+	DROP PROCEDURE UpdatePeopleWithParam
+GO
+
+CREATE PROCEDURE dbo.SelectPeople
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT * FROM [People]
+END
+GO
+
+CREATE PROCEDURE dbo.SelectPeopleWithParam
+	@@age int = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT * FROM [People] WHERE Age > @@age
+END
+GO
+
+CREATE PROCEDURE dbo.CountPeople
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT COUNT(*) FROM [People]
+END
+GO
+
+CREATE PROCEDURE dbo.CountPeopleWithParam
+	@@age int = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT COUNT(*) FROM [People] WHERE Age > @@age
+END
+GO
+
+CREATE PROCEDURE dbo.UpdatePeople
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE [People] SET [FullName] = 'Updated'
+END
+GO
+
+CREATE PROCEDURE dbo.UpdatePeopleWithParam
+	@@age int = 0
+AS
+BEGIN
+	SET NOCOUNT ON;
+	UPDATE [People] SET [FullName] = 'Updated' WHERE Age > @@age
+END
+GO

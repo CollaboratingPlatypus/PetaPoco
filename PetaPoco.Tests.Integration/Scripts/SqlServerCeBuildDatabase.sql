@@ -1,0 +1,102 @@
+﻿DROP TABLE [OrderLines];
+DROP TABLE [Orders];
+DROP TABLE [People];
+DROP TABLE [SpecificOrderLines];
+DROP TABLE [SpecificOrders];
+DROP TABLE [SpecificPeople];
+DROP TABLE [TransactionLogs];
+DROP TABLE [Note];
+
+CREATE TABLE [People] (
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[FullName] NVARCHAR(255),
+	[Age] BIGINT NOT NULL,
+	[Height] INT NOT NULL,
+	[Dob] DATETIME NULL
+);
+
+CREATE TABLE [Orders] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[PersonId] UNIQUEIDENTIFIER REFERENCES [People](Id),
+	[PoNumber] NVARCHAR(15) NOT NULL,
+	[OrderStatus] INT NOT NULL,
+	[CreatedOn] DATETIME NOT NULL,
+	[CreatedBy] NVARCHAR(255) NOT NULL
+);
+
+CREATE TABLE [OrderLines] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[OrderId] INT NOT NULL REFERENCES [Orders](Id),
+	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
+	[SellPrice] NUMERIC(10, 4) NOT NULL
+);
+
+CREATE TABLE [SpecificPeople] (
+	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	[FullName] NVARCHAR(255),
+	[Age] BIGINT NOT NULL,
+	[Height] INT NOT NULL,
+	[Dob] DATETIME NULL
+);
+
+CREATE TABLE [SpecificOrders] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[PersonId] UNIQUEIDENTIFIER REFERENCES [SpecificPeople](Id),
+	[PoNumber] NVARCHAR(15) NOT NULL,
+	[OrderStatus] INT NOT NULL,
+	[CreatedOn] DATETIME NOT NULL,
+	[CreatedBy] NVARCHAR(255) NOT NULL
+);
+
+CREATE TABLE [SpecificOrderLines] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[OrderId] INT NOT NULL REFERENCES [SpecificOrders](Id),
+	[Qty] SMALLINT NOT NULL,
+	[Status] TINYINT NOT NULL,
+	[SellPrice] NUMERIC(10, 4) NOT NULL
+);
+
+CREATE TABLE [TransactionLogs] (
+	[Description] NTEXT NOT NULL,
+	[CreatedOn] DATETIME NOT NULL
+);
+
+CREATE TABLE [Note] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[Text] NTEXT NOT NULL,
+	[CreatedOn] DATETIME NOT NULL
+);
+
+-- Investigation Tables;
+
+DROP TABLE [BugInvestigation_10R9LZYK];
+
+CREATE TABLE [BugInvestigation_10R9LZYK] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TestColumn1] BINARY(32)
+);
+
+DROP TABLE [BugInvestigation_3F489XV0];
+
+CREATE TABLE [BugInvestigation_3F489XV0] (
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[TC1] INT NOT NULL,
+	[TC2] INT NOT NULL,
+	[TC3] INT NOT NULL,
+	[TC4] INT NOT NULL
+);
+
+DROP TABLE [BugInvestigation_64O6LT8U];
+
+CREATE TABLE BugInvestigation_64O6LT8U (
+	[ColumnA] NVARCHAR(20),
+	[Column2] NVARCHAR(20)
+);
+
+DROP TABLE [BugInvestigation_5TN5C4U4];
+
+CREATE TABLE BugInvestigation_5TN5C4U4 (
+	[ColumnA] NVARCHAR(20),
+	[Column2] NVARCHAR(20)
+);

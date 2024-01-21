@@ -4,52 +4,34 @@ using System.ComponentModel;
 namespace PetaPoco
 {
     /// <summary>
-    ///     An interface used to hide the 4 System.Object instance methods from the API in Visual Studio intellisense.
+    /// Hides the compiler-generated public <see cref="object"/> instance methods from the list of intellisense code completion suggestions.
     /// </summary>
     /// <remarks>
-    ///     Reference Project: MircoLite ORM (https://github.com/TrevorPilley/MicroLite)
-    ///     Author: Trevor Pilley
-    ///     Source: https://github.com/TrevorPilley/MicroLite/blob/develop/MicroLite/IHideObjectMethods.cs
+    /// Reference Project: MicroLite ORM (<see href="https://github.com/TrevorPilley/MicroLite"/>)
+    /// <br/>Author: Trevor Pilley
+    /// <br/>Source: <see href="https://github.com/TrevorPilley/MicroLite/blob/develop/MicroLite/IHideObjectMethods.cs"/>
     /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IHideObjectMethods
     {
-        /// <summary>
-        ///     Determines whether the specified <see cref="System.Object" /> is equal to this instance.
-        /// </summary>
-        /// <param name="other">The <see cref="System.Object" /> to compare with this instance.</param>
-        /// <returns>
-        ///     <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
-        /// </returns>
+        /// <inheritdoc cref="object.Equals(object)"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        bool Equals(object other);
+        bool Equals(object obj);
 
-        /// <summary>
-        ///     Returns a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
-        /// </returns>
+        /// <inheritdoc cref="object.GetHashCode()"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
         int GetHashCode();
 
-        /// <summary>
-        ///     Gets the type.
-        /// </summary>
-        /// <returns>The type of the object.</returns>
+        /// <inheritdoc cref="object.GetType()"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification =
-            "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "GetType",
-            Justification = "The method is defined on System.Object, this interface is just to hide it from intelisense in Visual Studio")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate",
+            Justification = "The method is defined on System.Object, this interface is just to hide it from intellisense")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords",
+            Justification = "The method is defined on System.Object, this interface is just to hide it from intellisense",
+            MessageId = "GetType")]
         Type GetType();
 
-        /// <summary>
-        ///     Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        ///     A <see cref="System.String" /> that represents this instance.
-        /// </returns>
+        /// <inheritdoc cref="object.ToString()"/>
         [EditorBrowsable(EditorBrowsableState.Never)]
         string ToString();
     }

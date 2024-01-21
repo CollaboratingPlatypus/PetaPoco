@@ -1,18 +1,17 @@
-using System;
+﻿using System;
 using PetaPoco.Core;
-using PetaPoco.Tests.Integration.Databases;
-using PetaPoco.Tests.Integration.Databases.MSSQL;
 using PetaPoco.Tests.Integration.Documentation.Pocos;
+using PetaPoco.Tests.Integration.Providers;
 using Shouldly;
 using Xunit;
 
 namespace PetaPoco.Tests.Integration.Documentation
 {
-    [Collection("MssqlTests")]
-    public class Deletes : BaseDatabase
+    [Collection("Documentation")]
+    public class DeleteTests : BaseDbContext
     {
-        public Deletes()
-            : base(new MssqlDBTestProvider())
+        public DeleteTests()
+            : base(new SqlServerSystemDataTestProvider())
         {
             PocoData.FlushCaches();
         }
@@ -20,7 +19,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void DeleteByPoco()
         {
-            // Create the person
+            // Create a person
             var person = new Person { Id = Guid.NewGuid(), Name = "PetaPoco", Dob = new DateTime(2011, 1, 1), Age = (DateTime.Now.Year - 2011), Height = 242 };
 
             // Tell PetaPoco to insert it
@@ -41,10 +40,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void DeleteByPrimaryKey()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
-            // Add a note
+            // Insert a new note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Insert(note);
 
@@ -66,10 +62,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void DeleteCustomWhere()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
-            // Add a note
+            // Insert a new note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Insert(note);
 
@@ -91,10 +84,7 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void DeleteCustomSqlWhere()
         {
-            // Clear out any notes and reset the ID sequence counter
-            DB.Execute("TRUNCATE TABLE [Note]");
-
-            // Add a note
+            // Insert a new note
             var note = new Note { Text = "This is my note", CreatedOn = DateTime.UtcNow };
             DB.Insert(note);
 
@@ -118,17 +108,17 @@ namespace PetaPoco.Tests.Integration.Documentation
         [Fact]
         public void DeleteAdvanced()
         {
-            // Create the person
+            // Create a person
             var person = new Person { Id = Guid.NewGuid(), Name = "PetaPoco", Dob = new DateTime(2011, 1, 1), Age = (DateTime.Now.Year - 2011), Height = 242 };
 
-            // Tell PetaPoco to insert it, but to the table SpecificPeople and not People
+            // Tell PetaPoco to insert it in the `SpecificPeople` table (not the usual `People` table)
             DB.Insert("SpecificPeople", person);
 
-            // Obviously, we find only 1 matching person in the db
+            // Obviously, we find only 1 matching person in our db, in our `SpecificPeople` table
             var count = DB.ExecuteScalar<int>("SELECT COUNT([Id]) FROM [SpecificPeople] WHERE [Id] = @Id", new { person.Id });
             count.ShouldBe(1);
 
-            // Tell PetaPoco to delete it, but in the table SpecificPeople and not People
+            // Tell PetaPoco to delete it from the `SpecificPeople` table (specifying table as `People` this is a special case, not the default mapped table)
             DB.Delete("SpecificPeople", "Id", person);
 
             // Obviously, we should now have none in the db

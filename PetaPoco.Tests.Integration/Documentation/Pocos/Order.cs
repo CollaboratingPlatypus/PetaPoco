@@ -26,7 +26,7 @@ namespace PetaPoco.Tests.Integration.Documentation.Pocos
         [Column("OrderStatus")]
         public OrderStatus Status { get; set; }
 
-        public void ShouldBe(Order other)
+        public void PropertiesShouldBe(Order other)
         {
             Id.ShouldBe(other.Id);
             PersonId.ShouldBe(other.PersonId);

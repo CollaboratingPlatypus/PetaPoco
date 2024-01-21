@@ -1,22 +1,30 @@
 ﻿namespace PetaPoco
 {
     /// <summary>
-    ///     Wrap strings in an instance of this class to force use of DBType.AnsiString
+    /// Wraps a Unicode string that will be stored in a <c>VARCHAR</c> DB column as an <see cref="System.Data.DbType.AnsiString"/>.
     /// </summary>
+    /// <remarks>
+    /// Using this type for a column-mapped POCO property is equivalent to decorating a <see cref="string"/> property with <see
+    /// cref="ColumnAttribute.ForceToAnsiString"/>.
+    /// </remarks>
     public class AnsiString
     {
         /// <summary>
-        ///     The string value
+        /// Gets the Unicode string value wrapped by this instance.
         /// </summary>
         public string Value { get; }
 
         /// <summary>
-        ///     Constructs an AnsiString
+        /// Initializes a new instance of the <see cref="AnsiString"/> class with the specified string.
         /// </summary>
-        /// <param name="str">The C# string to be converted to ANSI before being passed to the DB</param>
-        public AnsiString(string str)
-            => Value = str;
+        /// <param name="value">The string to be stored in the database as an <see cref="System.Data.DbType.AnsiString"/>.</param>
+        public AnsiString(string value) => Value = value;
 
-        public static explicit operator AnsiString(string s) => new AnsiString(s);
+        /// <summary>
+        /// Explicitly converts a Unicode string to an <see cref="AnsiString"/> instance.
+        /// </summary>
+        /// <param name="value">The string to convert.</param>
+        /// <returns>An AnsiString instance containing the wrapped <see cref="string"/> value.</returns>
+        public static explicit operator AnsiString(string value) => new AnsiString(value);
     }
 }

@@ -36,7 +36,7 @@ namespace PetaPoco.Tests.Unit
             ((IBuildConfigurationSettings) config).SetSetting("key", null);
 
             var getCalled = false;
-            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => { getCalled = true; });
+            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => getCalled = true);
             getCalled.ShouldBeFalse();
         }
 
@@ -55,7 +55,7 @@ namespace PetaPoco.Tests.Unit
         public void TryGetSetting_GivenKeyThatDoesNotMatchValue_ShouldNotCallback()
         {
             var getCalled = false;
-            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => { getCalled = true; });
+            ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", v => getCalled = true);
             getCalled.ShouldBeFalse();
         }
 
@@ -72,7 +72,7 @@ namespace PetaPoco.Tests.Unit
         }
 
         [Fact]
-        public void TryGetSetting_GivenNullCallback_Throws()
+        public void TryGetSetting_GivenNullAction_Throws()
         {
             ((IBuildConfigurationSettings) config).SetSetting("key", "value");
             Should.Throw<NullReferenceException>(() => ((IBuildConfigurationSettings) config).TryGetSetting<string>("key", null));
@@ -287,7 +287,7 @@ namespace PetaPoco.Tests.Unit
             (db as Database).OnConnectionOpening(null);
             eventFired.ShouldBeTrue();
         }
-        
+
         [Fact]
         public void UsingConnectionOpened_AfterCreate_InstanceShouldHaveDelegate()
         {
