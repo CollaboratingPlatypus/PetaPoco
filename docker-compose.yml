@@ -1,3 +1,4 @@
+name: petapoco-integration-tests
 version: '3'
 
 x-mysql-environment: &mysql-environment
