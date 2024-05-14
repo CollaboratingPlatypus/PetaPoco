@@ -3162,9 +3162,13 @@ namespace PetaPoco
                     idbParam.ParameterName = cmd.Parameters.Count.EnsureParamPrefix(_paramPrefix);
                 else if (idbParam.ParameterName?.StartsWith(_paramPrefix) != true)
                 {
-                    // only add param prefix if it's not an Oracle stored procedures
-                    if (!(cmd.CommandType == CommandType.StoredProcedure && _provider is Providers.OracleDatabaseProvider))
-                        idbParam.ParameterName = idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
+                    var isOracleStoredProc = cmd.CommandType == CommandType.StoredProcedure &&
+                        _provider is Providers.OracleDatabaseProvider;
+
+                    // if it's an Oracle stored procedure, only escape the parameter name, don't add param prefix
+                    idbParam.ParameterName = isOracleStoredProc ?
+                        _provider.EscapeSqlIdentifier(idbParam.ParameterName) :
+                        idbParam.ParameterName.EnsureParamPrefix(_paramPrefix);
                 }
 
                 cmd.Parameters.Add(idbParam);

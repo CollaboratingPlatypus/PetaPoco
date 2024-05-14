@@ -22,8 +22,10 @@
     <None Remove="Scripts\MariaDBBuildDatabase.sql" />
     <None Remove="Scripts\MSAccessBuildDatabase.sql" />
     <None Remove="Scripts\MySqlBuildDatabase.sql" />
-    <None Remove="Scripts\OracleBuildDatabase.sql" />
-    <None Remove="Scripts\OracleSetupDatabase.sql" />
+    <None Remove="Scripts\OracleBuildDatabaseDelimited.sql" />
+    <None Remove="Scripts\OracleBuildDatabaseOrdinary.sql" />
+    <None Remove="Scripts\OracleSetupDatabaseDelimited.sql" />
+    <None Remove="Scripts\OracleSetupDatabaseOrdinary.sql" />
     <None Remove="Scripts\PostgresBuildDatabase.sql" />
     <None Remove="Scripts\SQLiteBuildDatabase.sql" />
     <None Remove="Scripts\SqlServerBuildDatabase.sql" />
@@ -35,8 +37,10 @@
     <EmbeddedResource Include="Scripts\MariaDBBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MSAccessBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\MySqlBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\OracleBuildDatabase.sql" />
-    <EmbeddedResource Include="Scripts\OracleSetupDatabase.sql" />
+    <EmbeddedResource Include="Scripts\OracleBuildDatabaseDelimited.sql" />
+    <EmbeddedResource Include="Scripts\OracleBuildDatabaseOrdinary.sql" />
+    <EmbeddedResource Include="Scripts\OracleSetupDatabaseDelimited.sql" />
+    <EmbeddedResource Include="Scripts\OracleSetupDatabaseOrdinary.sql" />
     <EmbeddedResource Include="Scripts\PostgresBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SQLiteBuildDatabase.sql" />
     <EmbeddedResource Include="Scripts\SqlServerBuildDatabase.sql" />
