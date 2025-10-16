@@ -68,6 +68,12 @@ namespace PetaPoco.Core
 
         /// <inheritdoc/>
         public virtual string GetInsertOutputClause(string primaryKeyName) => string.Empty;
+        
+        /// <inheritdoc/>
+        public virtual string GetInsertPreamble(string primaryKeyName)  => string.Empty; 
+
+        /// <inheritdoc/>
+        public virtual string GetInsertPostScript(string primaryKeyName)  => string.Empty;
 
         /// <inheritdoc/>
         public virtual object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
