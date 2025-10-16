@@ -130,6 +130,32 @@ CREATE TABLE dbo.[BugInvestigation_5TN5C4U4] (
 )
 GO
 
+IF EXISTS(SELECT * FROM INFORMATION_SCHEMA.TABLES t WHERE t.TABLE_SCHEMA = 'dbo' AND t.TABLE_NAME = 'BugInvestigation_ISSUE178')
+	DROP TABLE dbo.[BugInvestigation_ISSUE178]
+
+CREATE TABLE dbo.[BugInvestigation_ISSUE178] (
+    [Id] INT IDENTITY(1,1) PRIMARY KEY,
+    [PersonId] UNIQUEIDENTIFIER NOT NULL,
+    [PoNumber] NVARCHAR(15) NOT NULL,
+    [OrderStatus] INT NOT NULL,
+    [CreatedOn] DATETIME2 NOT NULL,
+    [CreatedBy] NVARCHAR(255) NOT NULL,
+	[UpdatedAt] DATETIME NULL
+);
+GO
+
+CREATE TRIGGER Trigger_BugInvestigation_ISSUE178_UpdatedAt
+ON dbo.[BugInvestigation_ISSUE178]
+AFTER INSERT, UPDATE
+AS
+BEGIN
+	UPDATE dbo.[BugInvestigation_ISSUE178]
+	SET dbo.[BugInvestigation_ISSUE178].[UpdatedAt] = GETDATE()
+	FROM dbo.[BugInvestigation_ISSUE178]
+	INNER JOIN inserted i ON dbo.[BugInvestigation_ISSUE178].[Id] = i.[Id];
+END;
+GO
+
 -- Stored procedures
 
 IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SelectPeople')
