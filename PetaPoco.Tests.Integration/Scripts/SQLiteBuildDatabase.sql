@@ -104,3 +104,31 @@ CREATE TABLE BugInvestigation_5TN5C4U4 (
 	[ColumnA] TEXT,
 	[Column2] TEXT
 );
+
+DROP TABLE IF EXISTS BugInvestigation_ISSUE178;
+
+CREATE TABLE BugInvestigation_ISSUE178 (
+    [Id] INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    [PersonId] TEXT NOT NULL,
+    [PoNumber] TEXT NOT NULL,
+    [OrderStatus] INTEGER NOT NULL,
+    [CreatedOn] INTEGER NOT NULL,
+    [CreatedBy] TEXT NOT NULL,
+    [UpdatedAt] DATETIME
+);
+
+CREATE TRIGGER Trigger_BugInvestigation_ISSUE178_UpdatedAt
+    AFTER INSERT ON BugInvestigation_ISSUE178
+BEGIN
+    UPDATE BugInvestigation_ISSUE178
+    SET UpdatedAt = CURRENT_TIMESTAMP
+    WHERE Id = NEW.Id;
+END;
+
+CREATE TRIGGER Trigger_BugInvestigation_ISSUE178_UpdatedAt_Update
+    AFTER UPDATE ON BugInvestigation_ISSUE178
+BEGIN
+    UPDATE BugInvestigation_ISSUE178
+    SET UpdatedAt = CURRENT_TIMESTAMP
+    WHERE Id = NEW.Id;
+END;

@@ -107,6 +107,32 @@ CREATE TABLE `BugInvestigation_5TN5C4U4` (
 	`Column2` VARCHAR(20)
 ) ENGINE=INNODB;
 
+DROP TABLE IF EXISTS BugInvestigation_ISSUE178;
+
+CREATE TABLE BugInvestigation_ISSUE178 (
+    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+    `PersonId` CHAR(36) NOT NULL,
+    `PoNumber` VARCHAR(15) NOT NULL,
+    `OrderStatus` INT NOT NULL,
+    `CreatedOn` DATETIME NOT NULL,
+    `CreatedBy` VARCHAR(255) NOT NULL,
+    `UpdatedAt` DATETIME NULL
+) ENGINE=INNODB;
+
+CREATE TRIGGER Trigger_BugInvestigation_ISSUE178_UpdatedAt
+    BEFORE UPDATE ON BugInvestigation_ISSUE178
+    FOR EACH ROW
+BEGIN
+    SET NEW.UpdatedAt = NOW();
+END;
+
+CREATE TRIGGER Trigger_BugInvestigation_ISSUE178_UpdatedAtInsert
+    BEFORE INSERT ON BugInvestigation_ISSUE178
+    FOR EACH ROW
+BEGIN
+    SET NEW.UpdatedAt = NOW();
+END;
+    
 -- Stored Procedures
 
 DROP PROCEDURE IF EXISTS `SelectPeople`;

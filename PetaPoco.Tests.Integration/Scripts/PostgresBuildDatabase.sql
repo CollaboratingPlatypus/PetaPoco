@@ -123,6 +123,31 @@ CREATE TABLE "BugInvestigation_5TN5C4U4" (
 	"Column2" VARCHAR(20)
 );
 
+DROP TABLE IF EXISTS "BugInvestigation_ISSUE178";
+
+CREATE TABLE "BugInvestigation_ISSUE178" (
+    "Id" SERIAL PRIMARY KEY,
+    "PersonId" UUID NOT NULL,
+    "PoNumber" VARCHAR(15) NOT NULL,
+    "OrderStatus" INTEGER NOT NULL,
+    "CreatedOn" TIMESTAMP NOT NULL,
+    "CreatedBy" VARCHAR(255) NOT NULL,
+    "UpdatedAt" TIMESTAMP NULL
+);
+
+CREATE OR REPLACE FUNCTION update_buginvestigation_issue178_updatedat()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW."UpdatedAt" := NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_buginvestigation_issue178_updatedat
+BEFORE INSERT OR UPDATE ON "BugInvestigation_ISSUE178"
+FOR EACH ROW
+EXECUTE FUNCTION update_buginvestigation_issue178_updatedat();
+
 -- Stored Procedures
 
 CREATE FUNCTION SelectPeople()
