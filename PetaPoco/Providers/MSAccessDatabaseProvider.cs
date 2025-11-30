@@ -32,6 +32,26 @@ namespace PetaPoco.Providers
             return ExecuteScalarHelper(db, cmd);
         }
 
+        /// <inheritdoc/>
+        public override object MapParameterValue(object value)
+        {
+            // MS Access 'Long' type is a 32-bit integer. Convert Int64 to Int32 where safe to avoid OLE DB conversion errors.
+            if (value is long l)
+            {
+                if (l <= int.MaxValue && l >= int.MinValue)
+                    return (int)l;
+            }
+
+            if (value is ulong ul)
+            {
+                if (ul <= (ulong)int.MaxValue)
+                    return (int)ul;
+            }
+
+            // Let base handle other common conversions (eg: bool -> int)
+            return base.MapParameterValue(value);
+        }
+
 #if ASYNC
         /// <inheritdoc/>
         public override async Task<object> ExecuteInsertAsync(CancellationToken cancellationToken, Database db, IDbCommand cmd, string primaryKeyName)
