@@ -131,3 +131,15 @@ CREATE TABLE BugInvestigation_5TN5C4U4 (
 	[ColumnA] TEXT(20),
 	[Column2] TEXT(20)
 );
+
+DROP TABLE [BugInvestigation_ISSUE178];
+
+CREATE TABLE BugInvestigation_ISSUE178 (
+    [Id] AUTOINCREMENT PRIMARY KEY,
+    [PersonId] TEXT(36) NOT NULL,
+    [PoNumber] TEXT(15) NOT NULL,
+    [OrderStatus] INTEGER NOT NULL,
+    [CreatedOn] DATETIME NOT NULL,
+    [CreatedBy] TEXT(255) NOT NULL,
+    [UpdatedAt] DATETIME
+);

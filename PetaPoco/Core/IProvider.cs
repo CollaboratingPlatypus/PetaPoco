@@ -100,6 +100,24 @@ namespace PetaPoco.Core
         /// <param name="primaryKeyName">The primary key column name of the row being inserted.</param>
         /// <returns>An expression describing how to return the new primary key value.</returns>
         string GetInsertOutputClause(string primaryKeyName);
+        
+        /// <summary>
+        /// Return an SQL expression that can be used with <seealso cref="GetInsertPostScript(string)"/>
+        /// and <seealso cref="GetInsertOutputClause(string)"/> to return a provider-generated value from an INSERT; typically an IDENTITY 
+        /// column in Microsoft SQL Server.
+        /// </summary>
+        /// <param name="primaryKeyName"></param>
+        /// <returns></returns>
+        string GetInsertPreamble(string primaryKeyName);
+
+        /// <summary>
+        /// Return an SQL expression that can be used with <seealso cref="GetInsertPreamble(string)"/>
+        /// and <seealso cref="GetInsertOutputClause(string)"/> to return a provider-generated value from an INSERT; typically an IDENTITY 
+        /// column in Microsoft SQL Server.
+        /// </summary>
+        /// <param name="primaryKeyName"></param>
+        /// <returns></returns>
+        string GetInsertPostScript(string primaryKeyName);
 
         /// <summary>
         /// Returns the prefix used to delimit parameters in SQL query strings.

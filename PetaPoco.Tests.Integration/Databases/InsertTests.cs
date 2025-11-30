@@ -240,6 +240,20 @@ namespace PetaPoco.Tests.Integration
             otherPerson.Height.ShouldBe(person.Height);
             otherPerson.Name.ShouldBe(person.FullName);
         }
+        
+        [Fact]
+        public virtual void Insert_GivenTableWithAutoIncrementIdAndTrigger_ShouldInsertPoco()
+        {
+            var id = DB.Insert("BugInvestigation_ISSUE178", _order);
+
+            var insertedOrder =
+                DB.Single<Order>(
+                    $"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_ISSUE178")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            
+            id.ShouldNotBeNull();
+            insertedOrder.Id.ShouldBe(id);
+            insertedOrder.ShouldBe(_order);
+        }
 
         [Fact]
         public virtual async Task InsertAsync_GivenPoco_ShouldBeValid()
@@ -432,5 +446,20 @@ namespace PetaPoco.Tests.Integration
             otherPerson.Height.ShouldBe(person.Height);
             otherPerson.Name.ShouldBe(person.FullName);
         }
+
+        [Fact]
+        public virtual async Task InsertAsync_GivenTableWithAutoIncrementIdAndTrigger_ShouldInsertPoco()
+        {
+            var id = await DB.InsertAsync("BugInvestigation_ISSUE178", _order);
+
+            var insertedOrder =
+                await DB.SingleAsync<Order>(
+                    $"SELECT * FROM {DB.Provider.EscapeTableName("BugInvestigation_ISSUE178")} WHERE {DB.Provider.EscapeSqlIdentifier("Id")} = @0", _order.Id);
+            
+            id.ShouldNotBeNull();
+            insertedOrder.Id.ShouldBe(id);
+            insertedOrder.ShouldBe(_order);
+        }
     }
+     
 }

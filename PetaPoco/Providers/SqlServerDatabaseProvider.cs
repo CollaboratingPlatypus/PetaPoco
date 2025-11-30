@@ -63,6 +63,14 @@ namespace PetaPoco.Providers
 
         /// <inheritdoc/>
         public override string GetInsertOutputClause(string primaryKeyName)
-            => $" OUTPUT INSERTED.[{primaryKeyName}]";
+            => $" OUTPUT INSERTED.[{primaryKeyName}] into @result({primaryKeyName})";
+
+        /// <inheritdoc/>
+        public override string GetInsertPreamble(string primaryKeyName)
+            => $"DECLARE @result TABLE({primaryKeyName} sql_variant); ";
+
+        /// <inheritdoc/>
+        public override string GetInsertPostScript(string primaryKeyName)
+            => $"; SELECT {primaryKeyName} FROM @result; ";
     }
 }

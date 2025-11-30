@@ -107,6 +107,18 @@ CREATE TABLE `BugInvestigation_5TN5C4U4` (
 	`Column2` VARCHAR(20)
 ) ENGINE=INNODB;
 
+DROP TABLE IF EXISTS `BugInvestigation_ISSUE178`;
+
+CREATE TABLE `BugInvestigation_ISSUE178` (
+    `Id` INT AUTO_INCREMENT PRIMARY KEY,
+    `PersonId` CHAR(36) NOT NULL,
+    `PoNumber` VARCHAR(15) NOT NULL,
+    `OrderStatus` INT NOT NULL,
+    `CreatedOn` DATETIME(6) NOT NULL,
+    `CreatedBy` VARCHAR(255) NOT NULL,
+    `UpdatedAt` DATETIME(6) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+) ENGINE=INNODB;
+
 -- Stored Procedures
 
 DROP PROCEDURE IF EXISTS `SelectPeople`;

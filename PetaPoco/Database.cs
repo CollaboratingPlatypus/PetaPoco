@@ -2094,11 +2094,17 @@ namespace PetaPoco
             }
 
             var outputClause = string.Empty;
+            var insertPreamble = string.Empty;
+            var insertPostScript = string.Empty;
             if (autoIncrement)
+            {
+                insertPreamble = _provider.GetInsertPreamble(primaryKeyName);
                 outputClause = _provider.GetInsertOutputClause(primaryKeyName);
+                insertPostScript = _provider.GetInsertPostScript(primaryKeyName);
+            }
 
             cmd.CommandText =
-                $"INSERT INTO {_provider.EscapeTableName(tableName)} ({string.Join(",", names.ToArray())}){outputClause} VALUES ({string.Join(",", values.ToArray())})";
+                $"{insertPreamble}INSERT INTO {_provider.EscapeTableName(tableName)} ({string.Join(",", names.ToArray())}){outputClause} VALUES ({string.Join(",", values.ToArray())}){insertPostScript}";
         }
 
         /// <inheritdoc cref="IAlterPoco.Insert(string, string, bool, object)"/>
