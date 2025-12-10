@@ -48,6 +48,15 @@ namespace PetaPoco.Providers
                     return (int)ul;
             }
 
+            // MS Access OLE DB provider cannot handle DateTime parameters with sub-second precision (milliseconds).
+            // Truncate to whole seconds to avoid "Data type mismatch in criteria expression" errors.
+            // See: https://github.com/CollaboratingPlatypus/PetaPoco/issues/736
+            if (value is DateTime dt)
+            {
+                // Remove milliseconds by creating new DateTime with only year/month/day/hour/minute/second
+                return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, dt.Kind);
+            }
+
             // Let base handle other common conversions (eg: bool -> int)
             return base.MapParameterValue(value);
         }
