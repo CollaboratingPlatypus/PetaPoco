@@ -29,6 +29,36 @@ namespace PetaPoco.Tests.Unit.Core
             pd.QueryColumns.ShouldBe(new[] { "RegularProperty", "ResultProperty" });
         }
 
+        [Fact]
+        public void ForType_GivenDifferentMappers_ShouldCreateDistinctColumnMetadata()
+        {
+            PocoData.FlushCaches();
+
+            var type = typeof(PocoWithMappedName);
+            var mapper1 = new ConventionMapper();
+            mapper1.MapColumn = (ci, t, pi) =>
+            {
+                if (pi.Name == nameof(PocoWithMappedName.Value))
+                    ci.ColumnName = "FirstName";
+                return true;
+            };
+
+            var mapper2 = new ConventionMapper();
+            mapper2.MapColumn = (ci, t, pi) =>
+            {
+                if (pi.Name == nameof(PocoWithMappedName.Value))
+                    ci.ColumnName = "SecondName";
+                return true;
+            };
+
+            var pd1 = PocoData.ForType(type, mapper1);
+            var pd2 = PocoData.ForType(type, mapper2);
+
+            pd1.GetColumnName(nameof(PocoWithMappedName.Value)).ShouldBe("FirstName");
+            pd2.GetColumnName(nameof(PocoWithMappedName.Value)).ShouldBe("SecondName");
+            pd1.ShouldNotBeSameAs(pd2);
+        }
+
         public class TestEntity
         {
             public static TestEntity Instance => new TestEntity("");
@@ -52,6 +82,11 @@ namespace PetaPoco.Tests.Unit.Core
 
             [ResultColumn(IncludeInAutoSelect.Yes)]
             public string ResultProperty { get; set; }
+        }
+
+        public class PocoWithMappedName
+        {
+            public string Value { get; set; }
         }
 
         [Theory]

@@ -252,5 +252,37 @@ namespace PetaPoco.Tests.Integration
             await DB.ExecuteNonQueryProcAsync("UpdatePeopleWithParam", GetDataParameter());
             DB.Query<Person>($"WHERE {DB.Provider.EscapeSqlIdentifier("FullName")}='Updated'").Count().ShouldBe(3);
         }
+
+        [Fact]
+        [Trait("Issue", "#657")]
+        public virtual async Task SchemaVariantProc_WithParam_ShouldReturnCorrectDynamicTypeCollection()
+        {
+            var expectedFirst = new Dictionary<string, object>
+            {
+                { "One", 1 },
+                { "Two", 2 },
+                { "Three", 3 }
+            };
+            var expectedSecond = new Dictionary<string, object>
+            {
+                { "Ten", 10 },
+                { "Twenty", 20 },
+                { "Thirty", 30 }
+            };
+
+            IDictionary<string, object> actualFirst = (await DB.FetchProcAsync<dynamic>("SchemaVariantProc", new { schemaIndex = 0 })).First();
+            foreach (var item in actualFirst)
+            {
+                expectedFirst.ShouldContainKey(item.Key);
+                expectedFirst[item.Key].ShouldBe(item.Value);
+            }
+
+            IDictionary<string, object> actualSecond = (await DB.FetchProcAsync<dynamic>("SchemaVariantProc", new { schemaIndex = 1 })).First();
+            foreach (var item in actualSecond)
+            {
+                expectedSecond.ShouldContainKey(item.Key);
+                expectedSecond[item.Key].ShouldBe(item.Value);
+            }
+        }
     }
 }

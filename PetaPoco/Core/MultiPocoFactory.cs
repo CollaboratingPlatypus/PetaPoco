@@ -87,17 +87,15 @@ namespace PetaPoco.Internal
 
             // Find split point
             var firstColumn = pos;
-            var usedColumns = new Dictionary<string, bool>();
+            var usedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             for (; pos < r.FieldCount; pos++)
             {
                 // Split if field name has already been used, or if the field doesn't exist in current poco but does in the next
                 var fieldName = r.GetName(pos);
-                if (usedColumns.ContainsKey(fieldName) || (!pdThis.Columns.ContainsKey(fieldName) && pdNext.Columns.ContainsKey(fieldName)))
+                if (!usedColumns.Add(fieldName) || (!pdThis.Columns.ContainsKey(fieldName) && pdNext.Columns.ContainsKey(fieldName)))
                 {
                     return pdThis.GetFactory(sql, connectionString, firstColumn, pos - firstColumn, r, defaultMapper);
                 }
-
-                usedColumns.Add(fieldName, true);
             }
 
             // TODO: InvalidOperationException using `typeThis, typeNext` in exception string; should probably be `typeThis.Name, typeNext.Name`

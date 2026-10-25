@@ -10,7 +10,7 @@ DROP TABLE [Note];
 CREATE TABLE [People] (
 	[Id] MEMO NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
-	[Age] Long NOT NULL,
+	[Age] BIGINT NOT NULL,
 	[Height] INTEGER NOT NULL,
 	[Dob] Datetime NULL
 );
@@ -35,7 +35,7 @@ CREATE TABLE [OrderLines] (
 CREATE TABLE [SpecificPeople] (
 	[Id] MEMO NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
-	[Age] Long NOT NULL,
+	[Age] BIGINT NOT NULL,
 	[Height] INTEGER NOT NULL,
 	[Dob] Datetime NULL
 );
@@ -77,7 +77,7 @@ DROP TABLE [JoinablePeople];
 CREATE TABLE [JoinablePeople] (
 	[Id] INTEGER NOT NULL PRIMARY KEY,
 	[FullName] MEMO,
-	[Age] Long NOT NULL,
+	[Age] BIGINT NOT NULL,
 	[Height] INTEGER NOT NULL,
 	[Dob] Datetime NULL
 );

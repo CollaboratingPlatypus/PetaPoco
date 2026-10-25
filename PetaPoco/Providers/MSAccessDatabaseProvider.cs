@@ -25,6 +25,18 @@ namespace PetaPoco.Providers
             => GetFactory("System.Data.OleDb.OleDbFactory, System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 
         /// <inheritdoc/>
+        public override object MapParameterValue(object value)
+        {
+            if (value is long l)
+                return (decimal)l;
+
+            if (value is ulong ul)
+                return (decimal)ul;
+
+            return base.MapParameterValue(value);
+        }
+
+        /// <inheritdoc/>
         public override object ExecuteInsert(Database db, IDbCommand cmd, string primaryKeyName)
         {
             ExecuteNonQueryHelper(db, cmd);
