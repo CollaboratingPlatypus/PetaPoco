@@ -30,33 +30,31 @@ namespace PetaPoco.Tests.Unit.Core
         }
 
         [Fact]
-        public void ForType_GivenDifferentMappers_ShouldCreateDistinctColumnMetadata()
+        public void ForType_GivenDifferentMapperTypes_ShouldCreateDistinctColumnMetadata()
         {
             PocoData.FlushCaches();
 
             var type = typeof(PocoWithMappedName);
-            var mapper1 = new ConventionMapper();
-            mapper1.MapColumn = (ci, t, pi) =>
-            {
-                if (pi.Name == nameof(PocoWithMappedName.Value))
-                    ci.ColumnName = "FirstName";
-                return true;
-            };
 
-            var mapper2 = new ConventionMapper();
-            mapper2.MapColumn = (ci, t, pi) =>
-            {
-                if (pi.Name == nameof(PocoWithMappedName.Value))
-                    ci.ColumnName = "SecondName";
-                return true;
-            };
-
-            var pd1 = PocoData.ForType(type, mapper1);
-            var pd2 = PocoData.ForType(type, mapper2);
+            var pd1 = PocoData.ForType(type, new FirstNameMapper());
+            var pd2 = PocoData.ForType(type, new SecondNameMapper());
 
             pd1.GetColumnName(nameof(PocoWithMappedName.Value)).ShouldBe("FirstName");
             pd2.GetColumnName(nameof(PocoWithMappedName.Value)).ShouldBe("SecondName");
             pd1.ShouldNotBeSameAs(pd2);
+        }
+
+        [Fact]
+        public void ForType_GivenSameMapperType_ShouldReuseCachedColumnMetadata()
+        {
+            PocoData.FlushCaches();
+
+            var type = typeof(PocoWithMappedName);
+
+            var pd1 = PocoData.ForType(type, new FirstNameMapper());
+            var pd2 = PocoData.ForType(type, new FirstNameMapper());
+
+            pd1.ShouldBeSameAs(pd2);
         }
 
         public class TestEntity
@@ -87,6 +85,44 @@ namespace PetaPoco.Tests.Unit.Core
         public class PocoWithMappedName
         {
             public string Value { get; set; }
+        }
+
+        /// <summary>
+        /// A convention mapper that maps the <see cref="PocoWithMappedName.Value"/> property onto a named column, leaving the
+        /// rest of the convention mapping in place.
+        /// </summary>
+        public abstract class NamedColumnMapper : ConventionMapper
+        {
+            protected NamedColumnMapper(string columnName)
+            {
+                var original = MapColumn;
+                MapColumn = (ci, t, pi) =>
+                {
+                    if (!original(ci, t, pi))
+                        return false;
+
+                    if (pi.Name == nameof(PocoWithMappedName.Value))
+                        ci.ColumnName = columnName;
+
+                    return true;
+                };
+            }
+        }
+
+        /// <summary>
+        /// A convention mapper that maps the <see cref="PocoWithMappedName.Value"/> property onto the "FirstName" column.
+        /// </summary>
+        public class FirstNameMapper : NamedColumnMapper
+        {
+            public FirstNameMapper() : base("FirstName") { }
+        }
+
+        /// <summary>
+        /// A convention mapper that maps the <see cref="PocoWithMappedName.Value"/> property onto the "SecondName" column.
+        /// </summary>
+        public class SecondNameMapper : NamedColumnMapper
+        {
+            public SecondNameMapper() : base("SecondName") { }
         }
 
         [Theory]
