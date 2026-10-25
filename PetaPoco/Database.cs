@@ -3054,7 +3054,7 @@ namespace PetaPoco
             {
                 param.Value = DBNull.Value;
 
-                if (pocoColumn?.PropertyInfo.PropertyType.Name == "Byte[]")
+                if (pocoColumn?.PropertyInfo?.PropertyType.Name == "Byte[]")
                     param.DbType = DbType.Binary;
             }
             else

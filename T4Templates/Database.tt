@@ -27,7 +27,7 @@
 */
 
 	// Generate output
-	if (tables.Count>0)
+	if (tables.Count > 0)
 	{
 #>
 <#@ include file="PetaPoco.Generator.ttinclude" #>
