@@ -140,6 +140,8 @@ CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.UpdatePeople');
 /
 CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.UpdatePeopleWithParam');
 /
+CALL SYS.DROP_IF_EXISTS('PROCEDURE', 'petapoco_ordinary.SchemaVariantProc');
+/
 
 CREATE PROCEDURE SelectPeople
     (p_out_cursor OUT SYS_REFCURSOR) AS
@@ -186,5 +188,19 @@ CREATE PROCEDURE UpdatePeopleWithParam
 	(age IN NUMERIC DEFAULT 0) AS
 BEGIN
 	UPDATE People SET FullName = 'Updated' WHERE Age > UpdatePeopleWithParam.age;
+END;
+/
+
+CREATE PROCEDURE SchemaVariantProc
+	(schemaIndex IN NUMERIC DEFAULT NULL,
+    p_out_cursor OUT SYS_REFCURSOR) AS
+BEGIN
+	IF (schemaIndex = 0) THEN
+		OPEN p_out_cursor FOR
+		SELECT 1 AS One, 2 AS Two, 3 AS Three FROM DUAL;
+	ELSE
+		OPEN p_out_cursor FOR
+		SELECT 10 AS Ten, 20 AS Twenty, 30 AS Thirty FROM DUAL;
+	END IF;
 END;
 /

@@ -144,6 +144,8 @@ IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePe
 	DROP PROCEDURE UpdatePeople
 IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'UpdatePeopleWithParam')
 	DROP PROCEDURE UpdatePeopleWithParam
+IF EXISTS (SELECT * FROM sys.objects o WHERE o.type = 'P' AND o.NAME = 'SchemaVariantProc')
+	DROP PROCEDURE SchemaVariantProc
 GO
 
 CREATE PROCEDURE dbo.SelectPeople
@@ -194,5 +196,17 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	UPDATE [People] SET [FullName] = 'Updated' WHERE Age > @@age
+END
+GO
+
+CREATE PROCEDURE dbo.SchemaVariantProc @@schemaIndex INT = NULL
+AS
+BEGIN
+	IF(@@schemaIndex = 0) BEGIN
+        SELECT 1 AS One, 2 AS Two, 3 AS Three;
+    END;
+    ELSE BEGIN
+        SELECT 10 AS Ten, 20 AS Twenty, 30 AS Thirty;
+    END;
 END
 GO

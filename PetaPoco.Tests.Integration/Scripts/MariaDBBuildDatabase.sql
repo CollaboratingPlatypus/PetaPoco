@@ -115,6 +115,7 @@ DROP PROCEDURE IF EXISTS `CountPeople`;
 DROP PROCEDURE IF EXISTS `CountPeopleWithParam`;
 DROP PROCEDURE IF EXISTS `UpdatePeople`;
 DROP PROCEDURE IF EXISTS `UpdatePeopleWithParam`;
+DROP PROCEDURE IF EXISTS `SchemaVariantProc`;
 
 CREATE PROCEDURE `SelectPeople` ()
 	SELECT * FROM `People`;
@@ -133,3 +134,12 @@ CREATE PROCEDURE `UpdatePeople` ()
 
 CREATE PROCEDURE `UpdatePeopleWithParam` (age INT)
 	UPDATE `People` SET `FullName` = 'Updated' WHERE `People`.`Age` > age;
+
+CREATE PROCEDURE `SchemaVariantProc` (schemaIndex INT)
+BEGIN
+	IF (schemaIndex = 0) THEN
+		SELECT 1 AS One, 2 AS Two, 3 AS Three; 
+	ELSE
+		SELECT 10 AS Ten, 20 AS Twenty, 30 AS Thirty;
+	END IF;
+END;

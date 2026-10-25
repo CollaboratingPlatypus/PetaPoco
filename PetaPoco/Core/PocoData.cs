@@ -23,7 +23,7 @@ namespace PetaPoco.Core
         private static FieldInfo fldConverters = typeof(PocoData).GetField("_converters", BindingFlags.Static | BindingFlags.GetField | BindingFlags.NonPublic);
         private static MethodInfo fnListGetItem = typeof(List<Func<object, object>>).GetProperty("Item").GetGetMethod();
         private static MethodInfo fnInvoke = typeof(Func<object, object>).GetMethod("Invoke");
-        private Cache<Tuple<string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, int, int>, Delegate>();
+        private Cache<Tuple<string, string, string, int, int>, Delegate> PocoFactories = new Cache<Tuple<string, string, string, int, int>, Delegate>();
 
         /// <summary>
         /// Gets or sets the type of the POCO class represented by the PocoData instance.
@@ -178,8 +178,10 @@ namespace PetaPoco.Core
         /// POCO type is an interface or abstract class.</exception>
         public Delegate GetFactory(string sql, string connectionString, int firstColumn, int columnCount, IDataReader reader, IMapper defaultMapper)
         {
+            //Schema key only applies when the reader dictates the shape
+            var schemaKey = IsDynamic ? GetSchemaKey(reader, firstColumn, columnCount) : null;
             // Create key for cache lookup
-            var key = Tuple.Create(sql, connectionString, firstColumn, columnCount);
+            var key = Tuple.Create(sql, connectionString, schemaKey, firstColumn, columnCount);
 
             // Check cache
             return PocoFactories.GetOrAdd(key, () =>
@@ -189,7 +191,7 @@ namespace PetaPoco.Core
                 var il = m.GetILGenerator();
                 var mapper = Mappers.GetMapper(Type, defaultMapper);
 
-                if (Type == typeof(object))
+                if (IsDynamic)
                 {
                     // var poco = new T()
                     il.Emit(OpCodes.Newobj, typeof(System.Dynamic.ExpandoObject).GetConstructor(Type.EmptyTypes)); // obj
@@ -375,6 +377,12 @@ namespace PetaPoco.Core
             });
         }
 
+        private string GetSchemaKey(IDataReader reader, int start, int count) =>
+            string.Join("|", Enumerable.Range(start, count)
+                .Select(i => $"{reader.GetName(i)}:{reader.GetFieldType(i).FullName}"));
+
+        private bool IsDynamic => Type == typeof(object);
+
         private static void AddConverterToStack(ILGenerator il, Func<object, object> converter)
         {
             if (converter != null)
@@ -492,6 +500,6 @@ namespace PetaPoco.Core
         /// <returns>The column name that maps to the given property name.</returns>
         /// <exception cref="ArgumentNullException">No mapped column exists for <paramref name="propertyName"/>.</exception>
         public string GetColumnName(string propertyName)
-            => Columns.Values.First(c => c.PropertyInfo.Name.Equals(propertyName)).ColumnName;
+            => Columns.Values.Single(c => c.PropertyInfo.Name.Equals(propertyName)).ColumnName;
     }
 }

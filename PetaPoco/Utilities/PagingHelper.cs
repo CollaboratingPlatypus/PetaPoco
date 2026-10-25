@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace PetaPoco.Utilities
 {
@@ -17,6 +18,7 @@ namespace PetaPoco.Utilities
         /// <c><u>SELECT column1, column2</u> FROM tbl;</c><br/>
         /// <c><u>SELECT SUM(column1) AS sum_col1, column2</u> FROM tbl;</c>
         /// </remarks>
+        [Obsolete("No longer required internally. Will be removed in future version")]
         public Regex RegexColumns { get; } = new Regex(
             @"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b",
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -30,6 +32,7 @@ namespace PetaPoco.Utilities
         /// <c>SELECT <u>DISTINCT</u> * FROM tbl;</c><br/>
         /// <c>SELECT <u>DISTINCT</u> column1 FROM tbl;</c>
         /// </remarks>
+        [Obsolete("No longer required internally. Will be removed in future version")]
         public Regex RegexDistinct { get; } = new Regex(@"\ADISTINCT\s",
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -43,6 +46,7 @@ namespace PetaPoco.Utilities
         /// <c>SELECT * FROM tbl <u>ORDER BY column1, column2 DESC;</u></c><br/>
         /// <c>SELECT column1, column2 AS col2 <u>ORDER BY SUM(column1) ASC, col2;</u></c><br/>
         /// </remarks>
+        [Obsolete("No longer required internally. Will be removed in future version")]
         public Regex RegexOrderBy { get; } = new Regex(
             @"\bORDER\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*",
             RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -56,6 +60,7 @@ namespace PetaPoco.Utilities
         /// <c>SELECT * FROM tbl <u>ORDER BY</u> column1, column2 DESC;</c><br/>
         /// <c>SELECT column1, column2 AS col2 <u>ORDER BY</u> SUM(column1) ASC, col2;</c>
         /// </remarks>
+        [Obsolete("No longer required internally. Will be removed in future version")]
         public Regex SimpleRegexOrderBy { get; } = new Regex(@"\bORDER\s+BY\s+",
             RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -69,6 +74,7 @@ namespace PetaPoco.Utilities
         /// <c>SELECT column1, column2 <u>GROUP BY SUM(column1), column2</u>;</c><br/>
         /// <c>SELECT column1 AS col1 FROM tbl <u>GROUP BY col1</u> ORDER BY col1;</c>
         /// </remarks>
+        [Obsolete("No longer required internally. Will be removed in future version")]
         public Regex RegexGroupBy { get; } = new Regex(
             @"\bGROUP\s+BY\s+(?!.*?(?:\)|\s+)AS\s)(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\[\]`""\w\(\)\.])+?)*",
             RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
@@ -82,6 +88,7 @@ namespace PetaPoco.Utilities
         /// <c>SELECT * FROM tbl <u>GROUP BY</u> column1, column2;</c><br/>
         /// <c>SELECT column1, COUNT(column2) AS count_col2 FROM tbl <u>GROUP BY</u> column1 ORDER BY column1;</c>
         /// </remarks>
+        [Obsolete("No longer required internally. Will be removed in future version")]
         public Regex SimpleRegexGroupBy { get; } = new Regex(@"\bGROUP\s+BY\s+",
             RegexOptions.RightToLeft | RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -101,38 +108,50 @@ namespace PetaPoco.Utilities
             parts.SqlSelectRemoved = null;
             parts.SqlCount = sql;
             parts.SqlOrderBy = null;
+            parts.SqlCte = null;
+            parts.IsDistinct = false;
 
-            // Extract the columns from "SELECT <whatever> FROM"
-            var columnsMatch = RegexColumns.Match(sql);
-            if (!columnsMatch.Success)
+            var analysis = SqlClauseScanner.Analyze(sql);
+            if (!analysis.Success)
                 return false;
 
-            // Look for the last "ORDER BY <whatever>" clause not part of a ROW_NUMBER expression
-            // when the query does not contain an "order by", it is very slow
-            if (SimpleRegexOrderBy.IsMatch(sql))
+            parts.SqlCte = analysis.Cte;
+            parts.IsDistinct = analysis.IsDistinct;
+
+            // The generated statements are rebuilt from the outermost select list onwards, so that the text in front of it
+            // (whitespace, comments, the terminator of an empty statement) and the statement terminator itself are not carried
+            // into them. The common table expression list that the statement declares, if any, is carried into them, because
+            // the outermost statement may refer to the expressions that it declares.
+            var cte = parts.SqlCte ?? string.Empty;
+
+            // The ORDER BY clause, the row limiting clauses that may follow it and the statement terminator are not part of
+            // the statements used to select the page of records or to count the total number of records.
+            var hasOrderBy = analysis.OrderByEnd > analysis.OrderByIndex && analysis.OrderByIndex > analysis.SelectListStart;
+            var bodyEnd = hasOrderBy ? analysis.OrderByIndex : analysis.StatementEnd;
+
+            parts.SqlSelectRemoved = sql.Substring(analysis.SelectListStart, bodyEnd - analysis.SelectListStart).TrimEnd();
+
+            if (hasOrderBy)
             {
-                var orderByMatch = RegexOrderBy.Match(sql);
-                if (orderByMatch.Success)
-                {
-                    parts.SqlOrderBy = orderByMatch.Value;
-                    parts.SqlCount = sql.Replace(orderByMatch.Value, string.Empty);
-                }
+                // The clause is the ordering expression list only, so that it can safely be re-used in a
+                // "ROW_NUMBER() OVER (...)" expression.
+                parts.SqlOrderBy = sql.Substring(analysis.OrderByIndex, analysis.OrderByEnd - analysis.OrderByIndex).Trim();
             }
 
-            // Save column list and replace with COUNT(*)
-            var columnsGroup = columnsMatch.Groups[1];
-            parts.SqlSelectRemoved = sql.Substring(columnsGroup.Index);
-
-            if (RegexDistinct.IsMatch(parts.SqlSelectRemoved) || SimpleRegexGroupBy.IsMatch(parts.SqlSelectRemoved))
+            // Replace the column list with COUNT(*). The statement is wrapped when the rows it selects are not one to one
+            // with the rows of the tables it selects from.
+            if (analysis.IsDistinct || analysis.GroupByIndex >= 0)
             {
-                parts.SqlCount = sql.Substring(0, columnsGroup.Index) + "COUNT(*) FROM (" + parts.SqlCount + ") countAlias";
+                parts.SqlCount = $"{cte}SELECT COUNT(*) FROM (SELECT {parts.SqlSelectRemoved}) countAlias";
             }
             else
             {
-                parts.SqlCount = sql.Substring(0, columnsGroup.Index) + "COUNT(*) " + parts.SqlCount.Substring(columnsGroup.Index + columnsGroup.Length);
+                var fromOnwards = sql.Substring(analysis.SelectListEnd, bodyEnd - analysis.SelectListEnd).TrimEnd();
+                parts.SqlCount = $"{cte}SELECT COUNT(*) {fromOnwards}";
             }
 
             return true;
         }
+
     }
 }

@@ -247,5 +247,38 @@ namespace PetaPoco.Tests.Integration.Databases.Oracle
             var count = await DB.ExecuteScalarProcAsync<int>(DB.Provider.EscapeTableName("CountPeopleWithParam"), GetDataParameter(), GetOutputParameter());
             count.ShouldBe(3);
         }
+
+        [Fact]
+        public override async Task SchemaVariantProc_WithParam_ShouldReturnCorrectDynamicTypeCollection()
+        {
+            var expectedFirst = new Dictionary<string, object>
+            {
+                { DB.Provider.EscapeSqlIdentifier("One"), 1 },
+                { DB.Provider.EscapeSqlIdentifier("Two"), 2 },
+                { DB.Provider.EscapeSqlIdentifier("Three"), 3 }
+            };
+            var expectedSecond = new Dictionary<string, object>
+            {
+                { DB.Provider.EscapeSqlIdentifier("Ten"), 10 },
+                { DB.Provider.EscapeSqlIdentifier("Twenty"), 20 },
+                { DB.Provider.EscapeSqlIdentifier("Thirty"), 30 }
+            };
+
+            IDictionary<string, object> actualFirst = (await DB.FetchProcAsync<dynamic>(DB.Provider.EscapeTableName("SchemaVariantProc"), new { schemaIndex = 0 }, GetOutputParameter())).First();
+            foreach (var item in actualFirst)
+            {
+                var key = DB.Provider.EscapeSqlIdentifier(item.Key);
+                expectedFirst.ShouldContainKey(key);
+                expectedFirst[key].ShouldBe(item.Value);
+            }
+
+            IDictionary<string, object> actualSecond = (await DB.FetchProcAsync<dynamic>(DB.Provider.EscapeTableName("SchemaVariantProc"), new { schemaIndex = 1 }, GetOutputParameter())).First();
+            foreach (var item in actualSecond)
+            {
+                var key = DB.Provider.EscapeSqlIdentifier(item.Key);
+                expectedSecond.ShouldContainKey(key);
+                expectedSecond[key].ShouldBe(item.Value);
+            }
+        }
     }
 }

@@ -150,7 +150,22 @@ RETURNS VOID
 AS $$ BEGIN UPDATE "People" SET "FullName" = 'Updated';  END $$
 LANGUAGE plpgsql;
 
-CREATE  FUNCTION UpdatePeopleWithParam(age integer)
+CREATE FUNCTION UpdatePeopleWithParam(age integer)
 RETURNS VOID
 AS $$ BEGIN UPDATE "People" SET "FullName" = 'Updated' WHERE "Age" > age;  END $$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE PROCEDURE SchemaVariantProc(
+    schemaIndex INT DEFAULT NULL,
+    INOUT p_cursor REFCURSOR DEFAULT 'p_out_cursor'
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF (schemaIndex = 0) THEN
+        OPEN p_cursor FOR SELECT 1 AS "One", 2 AS "Two", 3 AS "Three";
+    ELSE
+        OPEN p_cursor FOR SELECT 10 AS "Ten", 20 AS "Twenty", 30 AS "Thirty";
+    END IF;
+END;
+$$;

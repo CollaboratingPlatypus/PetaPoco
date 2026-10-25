@@ -26,23 +26,17 @@ namespace PetaPoco.Providers
         /// <inheritdoc/>
         public override string BuildPageQuery(long skip, long take, SQLParts parts, ref object[] args)
         {
-            var helper = (PagingHelper)PagingUtility;
-            // when the query does not contain an "order by", it is very slow
-            if (helper.SimpleRegexOrderBy.IsMatch(parts.SqlSelectRemoved))
-            {
-                var m = helper.SimpleRegexOrderBy.Match(parts.SqlSelectRemoved);
-                if (m.Success)
-                {
-                    var g = m.Groups[0];
-                    parts.SqlSelectRemoved = parts.SqlSelectRemoved.Substring(0, g.Index);
-                }
-            }
-
-            if (helper.RegexDistinct.IsMatch(parts.SqlSelectRemoved))
+            // The row number cannot be added to a select list that selects distinct rows, because the DISTINCT modifier applies to
+            // every column of the list.
+            if (parts.IsDistinct)
                 parts.SqlSelectRemoved = "peta_inner.* FROM (SELECT " + parts.SqlSelectRemoved + ") peta_inner";
 
+            // The common table expression list that the statement declares has to stay in front of the page query, because the
+            // columns that are selected may refer to the expressions that it declares.
+            var cte = parts.SqlCte ?? string.Empty;
+
             var sqlPage =
-                $"SELECT * FROM (SELECT ROW_NUMBER() OVER ({parts.SqlOrderBy ?? "ORDER BY (SELECT NULL)"}) peta_rn, {parts.SqlSelectRemoved}) peta_paged WHERE peta_rn > @{args.Length} AND peta_rn <= @{args.Length + 1}";
+                $"{cte}SELECT * FROM (SELECT ROW_NUMBER() OVER ({parts.SqlOrderBy ?? "ORDER BY (SELECT NULL)"}) peta_rn, {parts.SqlSelectRemoved}) peta_paged WHERE peta_rn > @{args.Length} AND peta_rn <= @{args.Length + 1}";
             args = args.Concat(new object[] { skip, skip + take }).ToArray();
             return sqlPage;
         }
